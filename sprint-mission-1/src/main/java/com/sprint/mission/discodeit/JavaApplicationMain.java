@@ -1,4 +1,4 @@
-package com.sprint.mission;
+package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.StatusType;
 import com.sprint.mission.discodeit.entity.Server;
