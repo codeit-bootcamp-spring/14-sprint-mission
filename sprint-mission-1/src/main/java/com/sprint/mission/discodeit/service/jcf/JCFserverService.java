@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.service.serverRepository;
-import com.sprint.mission.discodeit.service.serverService;
+import com.sprint.mission.discodeit.repository.jcf.JCFserverRepository;
+import com.sprint.mission.discodeit.repository.serverRepository;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class JCFserverService extends JCFserverRepository implements serverRepository {

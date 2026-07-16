@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.Category;
 
 public interface categoryService {
     // 서버 목록 출력
-    void allPrintServer();
-    void printServer();
+    void allPrintCategory();
+    void printCategory();
     // 서버 선택
-    Server selectedServer();
+    Category selectedCategory();
 }

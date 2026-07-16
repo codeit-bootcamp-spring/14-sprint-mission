@@ -1,14 +1,14 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.service.serverRepository;
+import com.sprint.mission.discodeit.repository.serverRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public abstract class JCFserverRepository implements serverRepository {
-    List<Server> servers = new ArrayList<>();
+    protected final List<Server> servers = new ArrayList<>();
 
     @Override
     public void serverCreate(String serverName) {
