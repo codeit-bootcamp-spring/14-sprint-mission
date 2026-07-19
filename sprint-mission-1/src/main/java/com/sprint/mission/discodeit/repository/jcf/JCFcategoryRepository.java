@@ -41,7 +41,7 @@ public abstract class JCFcategoryRepository implements categoryRepository {
         Category category = findByCategory(categoryName);
         if (category != null){
             System.out.println(categoryName+" 카테고리의 이름을 "+updateCategoryName+"로 수정했습니다.");
-            category.setCategoryName(updateCategoryName);
+            category.updateName(updateCategoryName);
         }
     }
 

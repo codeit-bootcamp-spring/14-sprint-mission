@@ -41,7 +41,7 @@ public abstract class JCFchannelRepository implements channelRepository {
         Channel channel = findByChannel(channelName);
         if (channel != null){
             System.out.println(channelName+" 카테고리의 이름을 "+updateChannelName+"로 수정했습니다.");
-            channel.setChannelName(updateChannelName);
+            channel.updateName(updateChannelName);
         }
     }
 

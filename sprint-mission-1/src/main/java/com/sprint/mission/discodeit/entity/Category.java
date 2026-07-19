@@ -14,7 +14,9 @@ public class Category {
     private final UUID categoryId = UUID.randomUUID();
     private final LocalDateTime createAt = LocalDateTime.now();
     private final LocalDateTime updateAt = LocalDateTime.now();
-    @Setter
     private String categoryName;
 
+    public void updateName(String updateName){
+        this.categoryName = updateName;
+    }
 }

@@ -12,9 +12,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Server {
     private final UUID serverId = UUID.randomUUID();
-    @Setter
     private String serverName;
     private final LocalDateTime createAt = LocalDateTime.now();
     private final LocalDateTime updateAt = LocalDateTime.now();
 
+    public void updateName(String updateName){
+        this.serverName = updateName;
+    }
 }

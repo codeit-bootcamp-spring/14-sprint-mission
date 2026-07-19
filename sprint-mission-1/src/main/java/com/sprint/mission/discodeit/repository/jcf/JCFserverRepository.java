@@ -41,7 +41,7 @@ public abstract class JCFserverRepository implements serverRepository {
         Server server = findByServer(serverName);
         if (server != null){
             System.out.println(serverName+" 서버의 이름을 "+updateServerName+"로 수정했습니다.");
-            server.setServerName(updateServerName);
+            server.updateName(updateServerName);
         }
     }
 

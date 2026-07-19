@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.enumType;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,10 +8,11 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public enum StatusType {
-    SEVER("서버"),
-    CATEGORY("카테고리"),
-    CHANNEL("채널");
+public enum userRole {
+    ADMINISTRATOR("관리자"),
+    MANAGER("매니저"),
+    TEAMLEADER("팀장"),
+    JUNIOR("신입");
 
-    String statusName;
+    String roleName;
 }

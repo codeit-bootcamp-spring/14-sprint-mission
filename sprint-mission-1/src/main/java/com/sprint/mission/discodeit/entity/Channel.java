@@ -14,7 +14,9 @@ public class Channel {
     private final UUID channelId = UUID.randomUUID();
     private final LocalDateTime createAt = LocalDateTime.now();
     private final LocalDateTime updateAt = LocalDateTime.now();
-    @Setter
     private String channelName;
 
+    public void updateName(String updateName){
+        this.channelName = updateName;
+    }
 }
