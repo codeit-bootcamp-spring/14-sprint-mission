@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.dto.MessageDto;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -24,8 +25,8 @@ public class Message {
         this.user = user;
     }
 
-    public void update(Message message) {
-        this.content = message.getContent();
+    public void update(MessageDto dto) {
+        this.content = dto.getContent();
         this.updatedAt = now();
     }
 

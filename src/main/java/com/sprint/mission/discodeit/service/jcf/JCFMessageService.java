@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.dto.MessageDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +33,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void update(UUID id, Message to) {
-        findById(id).ifPresent(retrieved -> retrieved.update(to));
+        findById(id).ifPresent(retrieved -> retrieved.update(new MessageDto(to.getContent())));
     }
 
     @Override
