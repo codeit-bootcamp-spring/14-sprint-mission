@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.dto.UserDto;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -18,7 +19,7 @@ public class JavaApplication {
         System.out.println(u1);
 
         // User.update()
-        u1.update(me);
+        u1.update(UserDto.of("Parksoomin"));
         System.out.println(me);
         System.out.println(u1);
         System.out.println("me.equals(u1) = " + me.equals(u1));
@@ -27,14 +28,10 @@ public class JavaApplication {
         System.out.println(" ===== UserService =====");
         UserService userService = new JCFUserService();
 
-        // findAll
-        System.out.println(" ===== UserService.findAll() =====");
-        System.out.println("userService.findAll() = " + userService.findAll());
-
         // create
         System.out.println(" ===== UserService.create() =====");
         System.out.println("userService.create(me) = " + userService.create(me));
-        me.update(new User("SoominPark"));
+        me.update(UserDto.of("SoominPark"));
         System.out.println("userService.create(me) = " + userService.create(me));
         
         // findById
@@ -47,6 +44,10 @@ public class JavaApplication {
         userService.update(me.getId(), new User("ParkSoomin"));
         System.out.println(userService.findById(me.getId()));
         userService.update(UUID.randomUUID(), new User("ParkSoomin"));
+
+        // findAll
+        System.out.println(" ===== UserService.findAll() =====");
+        System.out.println("userService.findAll() = " + userService.findAll());
 
         // deleteById()
         System.out.println(" ===== UserService.delete() =====");

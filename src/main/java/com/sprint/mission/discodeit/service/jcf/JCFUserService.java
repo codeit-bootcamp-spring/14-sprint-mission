@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.dto.UserDto;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +33,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void update(UUID id, User to) {
-        findById(id).ifPresent(retrieved -> retrieved.update(to));
+        findById(id).ifPresent(retrieved -> retrieved.update(new UserDto(to.getName())));
     }
 
     @Override

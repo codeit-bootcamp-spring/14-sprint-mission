@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.dto.UserDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -24,9 +25,9 @@ public class User {
         this.name = name;
     }
 
-    public void update(User user) {
+    public void update(UserDto dto) {
         this.updatedAt = now();
-        this.name = user.getName();
+        this.name = dto.getName();
     }
 
     private Long now() {
