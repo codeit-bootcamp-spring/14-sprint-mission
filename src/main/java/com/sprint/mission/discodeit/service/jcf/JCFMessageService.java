@@ -32,8 +32,8 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void update(UUID id, Message to) {
-        findById(id).ifPresent(retrieved -> retrieved.update(new MessageDto(to.getContent())));
+    public void update(UUID id, MessageDto dto) {
+        findById(id).ifPresent(retrieved -> retrieved.update(dto));
     }
 
     @Override

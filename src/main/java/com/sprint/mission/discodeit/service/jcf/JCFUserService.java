@@ -32,8 +32,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void update(UUID id, User to) {
-        findById(id).ifPresent(retrieved -> retrieved.update(new UserDto(to.getName())));
+    public void update(UUID id, UserDto dto) {
+        findById(id).ifPresent(retrieved -> retrieved.update(dto));
     }
 
     @Override

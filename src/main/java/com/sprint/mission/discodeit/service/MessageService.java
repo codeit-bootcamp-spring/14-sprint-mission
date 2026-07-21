@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.dto.MessageDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ public interface MessageService {
 
     List<Message> findAll();
 
-    void update(UUID id, Message to);
+    void update(UUID id, MessageDto dto);
 
     void deleteById(UUID id);
 }
