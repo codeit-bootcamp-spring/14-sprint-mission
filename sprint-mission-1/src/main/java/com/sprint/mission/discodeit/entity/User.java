@@ -11,10 +11,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class User {
     private final UUID userId = UUID.randomUUID();
+    private final Long createAt = System.currentTimeMillis();
+    private final Long updateAt = System.currentTimeMillis();
     private String userName;
-    private final String role;
-    private final LocalDateTime createAt = LocalDateTime.now();
-    private final LocalDateTime updateAt = LocalDateTime.now();
 
     public void updateName(String updateName){
         this.userName = updateName;
