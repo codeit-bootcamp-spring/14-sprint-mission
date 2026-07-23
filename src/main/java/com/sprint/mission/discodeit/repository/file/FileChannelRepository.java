@@ -17,8 +17,8 @@ public class FileChannelRepository extends MapFileIO<Channel>
         super(new File(fileName));
         this.buffer = Optional.of(file)
                 .filter(file -> file.exists() && file.length() != 0)
-                .map(file -> super.readFile(file))
-                .orElseGet(() -> super.writeFile(file, EMPTY_BUFFER));
+                .map(file -> super.readFile())
+                .orElseGet(() -> super.writeFile(EMPTY_BUFFER));
     }
 
     @Override
@@ -33,13 +33,13 @@ public class FileChannelRepository extends MapFileIO<Channel>
 
     @Override
     public Optional<Channel> findById(UUID id) {
-        buffer = super.readFile(file);
+        buffer = readFile();
         return Optional.ofNullable(buffer.get(id));
     }
 
     @Override
     public List<Channel> findAll() {
-        buffer = super.readFile(file);
+        buffer = readFile();
         return new ArrayList<>(buffer.values());
     }
 
@@ -61,11 +61,12 @@ public class FileChannelRepository extends MapFileIO<Channel>
 
     @Override
     public void deleteUsersByUserId(UUID userId) {
-        buffer.values().forEach(channel -> channel.getUsersId().remove(userId));
+        buffer.values()
+                .forEach(channel -> channel.getUsersId().remove(userId));
         writeFile();
     }
 
     private void writeFile() {
-        super.writeFile(file, buffer);
+        super.writeFile(buffer);
     }
 }

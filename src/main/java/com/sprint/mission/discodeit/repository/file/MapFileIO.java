@@ -12,7 +12,7 @@ public abstract class MapFileIO<T> {
         this.file = file;
     }
 
-    protected final Map<UUID, T> readFile(File file) {
+    protected final Map<UUID, T> readFile() {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
             Map<UUID, T> retrieved = (Map<UUID, T>) inputStream.readObject();
             return new HashMap<>(retrieved);
@@ -21,7 +21,7 @@ public abstract class MapFileIO<T> {
         }
     }
 
-    protected final Map<UUID, T> writeFile(File file, Map<UUID, T> toBeSaved) {
+    protected final Map<UUID, T> writeFile(Map<UUID, T> toBeSaved) {
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             outputStream.writeObject(toBeSaved);
             return toBeSaved;
