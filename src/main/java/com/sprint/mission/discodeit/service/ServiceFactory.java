@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -17,9 +20,9 @@ public class ServiceFactory {
 
     //이제 ServiceFactory생성하면 자등으로 모든 서비스의 객체 생성되며 사용가능
     public ServiceFactory() {
-        this.userService = new JCFUserService();
-        this.channelService = new JCFChannelService(userService);
-        this.messageService = new JCFMessageService(channelService, userService);
+        this.userService = new FileUserService();
+        this.channelService = new FileChannelService(userService);
+        this.messageService = new FileMessageService(channelService, userService);
     }
 
     public static ServiceFactory useSingleton() {
