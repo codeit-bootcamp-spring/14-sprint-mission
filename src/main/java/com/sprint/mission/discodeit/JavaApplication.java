@@ -6,34 +6,19 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.channel.ChannelCreationDto;
 import com.sprint.mission.discodeit.entity.dto.message.MessageCreationDto;
 import com.sprint.mission.discodeit.entity.dto.user.UserDto;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+
 
 import java.util.List;
 
 public class JavaApplication {
 
     public static void main(String[] args) {
-        UserRepository userRepository = new FileUserRepository("src/main/java/com/sprint/mission/discodeit/repository/file/user.ser");
-        MessageRepository messageRepository = new FileMessageRepository("src/main/java/com/sprint/mission/discodeit/repository/file/message.ser");
-        ChannelRepository channelRepository = new FileChannelRepository("src/main/java/com/sprint/mission/discodeit/repository/file/channel.ser");
-
-        UserService userService = new JCFUserService(userRepository, messageRepository, channelRepository);
-        MessageService messageService = new JCFMessageService(messageRepository, channelRepository);
-        ChannelService channelService = new JCFChannelService(channelRepository, messageRepository);
+        UserService userService = AppConfig.userService();
+        MessageService messageService = AppConfig.messageService();
+        ChannelService channelService = AppConfig.channelService();
 
         User u1 = userService.createAccount(new UserDto("soomin"));
         User u2 = userService.createAccount(new UserDto("sumin"));
