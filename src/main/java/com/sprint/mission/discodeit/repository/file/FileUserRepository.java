@@ -10,7 +10,7 @@ import java.util.*;
 public class FileUserRepository extends MapFileIO<User>
         implements UserRepository {
 
-    protected final Map<UUID, User> EMPTY_BUFFER = new HashMap<>();
+    private final Map<UUID, User> EMPTY_BUFFER = new HashMap<>();
     private Map<UUID, User> buffer;
 
     public FileUserRepository(String fileName) {

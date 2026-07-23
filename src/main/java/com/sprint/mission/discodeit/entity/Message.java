@@ -4,11 +4,12 @@ import com.sprint.mission.discodeit.entity.dto.message.MessageUpdateDto;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @ToString
 @Getter
-public class Message {
+public class Message implements Serializable {
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
