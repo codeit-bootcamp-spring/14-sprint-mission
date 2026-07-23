@@ -42,9 +42,8 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void deleteAllByUserId(UUID id) {
         data.values().stream()
-                .map(Message::getUserId)
-                .filter(userId -> userId.equals(id))
-                .toList()
-                .forEach(this::deleteById);
+                .filter(message -> message.getUserId().equals(id))
+                .map(message -> message.getId())
+                .forEach(toBeDeleted -> deleteById(toBeDeleted));
     }
 }
