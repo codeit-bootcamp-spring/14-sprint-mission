@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.UserDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserDto;
 
 import java.util.List;
 import java.util.Optional;

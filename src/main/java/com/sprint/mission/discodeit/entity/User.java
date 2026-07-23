@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.UserDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

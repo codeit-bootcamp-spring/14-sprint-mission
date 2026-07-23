@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.MessageDto;
+import com.sprint.mission.discodeit.entity.dto.message.MessageUpdateDto;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -14,18 +14,18 @@ public class Message {
     private Long updatedAt;
 
     private String content;
-    private final User user;
+    private final UUID userId;
 
-    public Message(String content, User user) {
+    public Message(String content, UUID userId) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
 
         this.content = content;
-        this.user = user;
+        this.userId = userId;
     }
 
-    public void update(MessageDto dto) {
+    public void update(MessageUpdateDto dto) {
         this.content = dto.getContent();
         this.updatedAt = now();
     }

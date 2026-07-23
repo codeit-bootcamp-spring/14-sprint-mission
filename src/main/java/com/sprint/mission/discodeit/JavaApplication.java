@@ -1,60 +1,50 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.UserDto;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.entity.dto.channel.ChannelCreationDto;
+import com.sprint.mission.discodeit.entity.dto.message.MessageCreationDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserDto;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.util.UUID;
+import java.util.List;
 
 public class JavaApplication {
+
     public static void main(String[] args) {
-        // User
-        System.out.println(" ===== User =====");
-        User me = new User("Parksoomin");
-        User u1 = new User("u1");
+        UserRepository userRepository = new JCFUserRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
 
-        // User()
-        System.out.println(me);
-        System.out.println(u1);
+        UserService userService = new JCFUserService(userRepository, messageRepository, channelRepository);
+        MessageService messageService = new JCFMessageService(messageRepository, channelRepository);
+        ChannelService channelService = new JCFChannelService(channelRepository, messageRepository);
 
-        // User.update()
-        u1.update(UserDto.of("Parksoomin"));
-        System.out.println(me);
-        System.out.println(u1);
-        System.out.println("me.equals(u1) = " + me.equals(u1));
+        User u1 = userService.createAccount(new UserDto("soomin"));
+        User u2 = userService.createAccount(new UserDto("sumin"));
+        User u3 = userService.createAccount(new UserDto("ssoomin"));
+        User u4 = userService.createAccount(new UserDto("ssumin"));
+        System.out.println(userService.getAllUsers());
 
-        // UserService
-        System.out.println(" ===== UserService =====");
-        UserService userService = new JCFUserService();
+        Channel c1 = channelService.createChannel(new ChannelCreationDto("channel1", List.of(u1.getId(), u2.getId())));
+        Channel c2 = channelService.createChannel(new ChannelCreationDto("channel2", List.of(u3.getId(), u4.getId())));
+        System.out.println(channelService.getAllChannels());
 
-        // create
-        System.out.println(" ===== UserService.create() =====");
-        System.out.println("userService.create(me) = " + userService.create(me));
-        me.update(UserDto.of("SoominPark"));
-        System.out.println("userService.create(me) = " + userService.create(me));
-        
-        // findById
-        System.out.println(" ===== UserService.findById() =====");
-        System.out.println("userService.findById(me.getId()) = " + userService.findById(me.getId()));
-        System.out.println("userService.findById(UUID.randomUUID()) = " + userService.findById(UUID.randomUUID()));
+        Message m1 = messageService.createMessage(new MessageCreationDto("ssoomin1", u1.getId(), c1.getId()));
+//        messageService.createMessage(new MessageCreationDto("ssoomin1", u2.getId(), c2.getId())); // 채널에 없는 유저가 메시지 보낼 시 오류
+        System.out.println(messageService.getAllMessages());
 
-        // update
-        System.out.println(" ===== UserService.update() =====");
-        userService.update(me.getId(), new User("ParkSoomin"));
-        System.out.println(userService.findById(me.getId()));
-        userService.update(UUID.randomUUID(), new User("ParkSoomin"));
-
-        // findAll
-        System.out.println(" ===== UserService.findAll() =====");
-        System.out.println("userService.findAll() = " + userService.findAll());
-
-        // deleteById()
-        System.out.println(" ===== UserService.delete() =====");
-        userService.deleteById(me.getId());
-        System.out.println(userService.findById(me.getId()));
-
-        userService.deleteById(me.getId());
-        System.out.println(userService.findById(me.getId()));
     }
 }

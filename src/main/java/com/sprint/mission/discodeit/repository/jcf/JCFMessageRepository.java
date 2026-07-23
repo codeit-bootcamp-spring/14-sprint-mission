@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.dto.MessageDto;
+import com.sprint.mission.discodeit.entity.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
@@ -30,12 +30,21 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void update(UUID id, MessageDto dto) {
+    public void update(UUID id, MessageUpdateDto dto) {
         findById(id).ifPresent(retrieved -> retrieved.update(dto));
     }
 
     @Override
     public void deleteById(UUID id) {
         findById(id).ifPresent(retrieved -> data.remove(id));
+    }
+
+    @Override
+    public void deleteAllByUserId(UUID id) {
+        data.values().stream()
+                .map(Message::getUserId)
+                .filter(userId -> userId.equals(id))
+                .toList()
+                .forEach(this::deleteById);
     }
 }
