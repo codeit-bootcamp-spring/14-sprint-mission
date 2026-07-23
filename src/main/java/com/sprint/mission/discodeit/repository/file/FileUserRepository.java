@@ -7,37 +7,40 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.io.*;
 import java.util.*;
 
-public class FileUserRepository implements UserRepository {
-    private static final Map<UUID, User> EMPTY_BUFFER = new HashMap<>();
-    private static final File USER_FILE = new File("src/main/java/com/sprint/mission/discodeit/repository/file/user.ser");
-    private static Map<UUID, User> buffer = EMPTY_BUFFER;
+public class FileUserRepository extends MapFileIO<User>
+        implements UserRepository {
 
-    static {
-        if (!USER_FILE.exists() || USER_FILE.length() == 0) {
-            writeFile();
-        }
-        readFromFile();
+    protected final Map<UUID, User> EMPTY_BUFFER = new HashMap<>();
+    private Map<UUID, User> buffer;
+
+    public FileUserRepository(String fileName) {
+        super(new File(fileName));
+        this.buffer = Optional.of(file)
+                .filter(file -> file.exists() && file.length() != 0)
+                .map(file -> super.readFile(file))
+                .orElseGet(() -> super.writeFile(file, EMPTY_BUFFER));
     }
+
 
     @Override
     public User create(User user) {
         UUID userId = user.getId();
         return findById(userId).orElseGet(() -> {
             buffer.put(userId, user);
-            writeFile();
+            super.writeFile(file, buffer);
             return user;
         });
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        readFromFile();
+        buffer = super.readFile(file);
         return Optional.ofNullable(buffer.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        readFromFile();
+        buffer = readFile(file);
         return new ArrayList<>(buffer.values());
     }
 
@@ -45,7 +48,7 @@ public class FileUserRepository implements UserRepository {
     public void update(UUID id, UserDto dto) {
         findById(id).ifPresent(retrieved -> {
             retrieved.update(dto);
-            writeFile();
+            writeFile(file, buffer);
         });
     }
 
@@ -53,24 +56,8 @@ public class FileUserRepository implements UserRepository {
     public void deleteById(UUID id) {
         findById(id).ifPresent(retrieved -> {
             buffer.remove(id);
-            writeFile();
+            writeFile(file, buffer);
         });
     }
 
-    private static void readFromFile() {
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(USER_FILE))) {
-            Map<UUID, User> retrieved = (Map<UUID, User>) inputStream.readObject();
-            buffer = new HashMap<>(retrieved);
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void writeFile() {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(USER_FILE))) {
-            outputStream.writeObject(buffer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

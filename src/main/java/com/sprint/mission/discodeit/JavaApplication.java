@@ -25,7 +25,7 @@ import java.util.List;
 public class JavaApplication {
 
     public static void main(String[] args) {
-        UserRepository userRepository = new FileUserRepository();
+        UserRepository userRepository = new FileUserRepository("src/main/java/com/sprint/mission/discodeit/repository/file/user.ser");
         MessageRepository messageRepository = new JCFMessageRepository();
         ChannelRepository channelRepository = new JCFChannelRepository();
 
@@ -37,6 +37,7 @@ public class JavaApplication {
         User u2 = userService.createAccount(new UserDto("sumin"));
         User u3 = userService.createAccount(new UserDto("ssoomin"));
         User u4 = userService.createAccount(new UserDto("ssumin"));
+        userService.updateUser(u1.getId(), new UserDto("UpdatedSoomin"));
         System.out.println(userService.getAllUsers());
 
         Channel c1 = channelService.createChannel(new ChannelCreationDto("channel1", List.of(u1.getId(), u2.getId())));
