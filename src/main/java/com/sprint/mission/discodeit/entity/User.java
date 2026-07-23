@@ -5,16 +5,19 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-@ToString
-@EqualsAndHashCode
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(of = {"id"})
 @Getter
-public class User {
+public class User implements Serializable {
+    @ToString.Include
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
 
+    @ToString.Include
     private String name;
 
     public User(String name) {

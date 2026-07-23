@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.dto.user.UserDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -24,7 +25,7 @@ import java.util.List;
 public class JavaApplication {
 
     public static void main(String[] args) {
-        UserRepository userRepository = new JCFUserRepository();
+        UserRepository userRepository = new FileUserRepository();
         MessageRepository messageRepository = new JCFMessageRepository();
         ChannelRepository channelRepository = new JCFChannelRepository();
 
