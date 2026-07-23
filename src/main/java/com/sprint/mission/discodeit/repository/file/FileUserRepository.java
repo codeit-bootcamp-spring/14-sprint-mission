@@ -17,8 +17,8 @@ public class FileUserRepository extends MapFileIO<User>
         super(new File(fileName));
         this.buffer = Optional.of(file)
                 .filter(file -> file.exists() && file.length() != 0)
-                .map(file -> super.readFile(file))
-                .orElseGet(() -> super.writeFile(file, EMPTY_BUFFER));
+                .map(file -> super.readFile())
+                .orElseGet(() -> super.writeFile(EMPTY_BUFFER));
     }
 
 
@@ -27,20 +27,20 @@ public class FileUserRepository extends MapFileIO<User>
         UUID userId = user.getId();
         return findById(userId).orElseGet(() -> {
             buffer.put(userId, user);
-            super.writeFile(file, buffer);
+            super.writeFile(buffer);
             return user;
         });
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        buffer = super.readFile(file);
+        buffer = super.readFile();
         return Optional.ofNullable(buffer.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        buffer = readFile(file);
+        buffer = readFile();
         return new ArrayList<>(buffer.values());
     }
 
@@ -48,7 +48,7 @@ public class FileUserRepository extends MapFileIO<User>
     public void update(UUID id, UserDto dto) {
         findById(id).ifPresent(retrieved -> {
             retrieved.update(dto);
-            writeFile(file, buffer);
+            writeFile();
         });
     }
 
@@ -56,8 +56,12 @@ public class FileUserRepository extends MapFileIO<User>
     public void deleteById(UUID id) {
         findById(id).ifPresent(retrieved -> {
             buffer.remove(id);
-            writeFile(file, buffer);
+            writeFile();
         });
+    }
+
+    private void writeFile() {
+        super.writeFile(buffer);
     }
 
 }
