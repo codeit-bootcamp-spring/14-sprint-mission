@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.user.UserDto;
+import com.sprint.mission.discodeit.entity.User;;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,7 @@ public interface UserRepository {
 
     List<User> findAll();
 
-    void update(UUID id, UserDto dto);
+    void update(UUID id, String name);
 
     void deleteById(UUID id);
 }

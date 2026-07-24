@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.user.UserDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
@@ -30,8 +29,8 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(UUID id, UserDto dto) {
-        findById(id).ifPresent(retrieved -> retrieved.update(dto));
+    public void update(UUID id, String name) {
+        findById(id).ifPresent(retrieved -> retrieved.update(name));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.user.UserDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -28,9 +27,9 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public void update(UserDto dto) {
+    public void update(String name) {
         this.updatedAt = now();
-        this.name = dto.getName();
+        this.name = name;
     }
 
     private Long now() {

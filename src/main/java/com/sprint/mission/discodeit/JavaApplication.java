@@ -5,7 +5,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.channel.ChannelCreationDto;
 import com.sprint.mission.discodeit.entity.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.entity.dto.user.UserDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserCreationDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -20,11 +21,11 @@ public class JavaApplication {
         MessageService messageService = AppConfig.messageService();
         ChannelService channelService = AppConfig.channelService();
 
-        User u1 = userService.createAccount(new UserDto("soomin"));
-        User u2 = userService.createAccount(new UserDto("sumin"));
-        User u3 = userService.createAccount(new UserDto("ssoomin"));
-        User u4 = userService.createAccount(new UserDto("ssumin"));
-        userService.updateUser(u1.getId(), new UserDto("UpdatedSoomin"));
+        User u1 = userService.createAccount(new UserCreationDto("soomin"));
+        User u2 = userService.createAccount(new UserCreationDto("sumin"));
+        User u3 = userService.createAccount(new UserCreationDto("ssoomin"));
+        User u4 = userService.createAccount(new UserCreationDto("ssumin"));
+        userService.updateUser(u1.getId(), new UserUpdateDto("UpdatedSoomin"));
         System.out.println(userService.getAllUsers());
 
         Channel c1 = channelService.createChannel(new ChannelCreationDto("channel1", List.of(u1.getId(), u2.getId())));

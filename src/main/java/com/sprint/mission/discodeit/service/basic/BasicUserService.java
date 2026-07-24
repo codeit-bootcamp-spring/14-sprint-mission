@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.user.UserDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserCreationDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -19,7 +20,7 @@ public class BasicUserService implements UserService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public User createAccount(UserDto dto) {
+    public User createAccount(UserCreationDto dto) {
         User user = new User(dto.getName());
         return userRepository.create(user);
     }
@@ -35,8 +36,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UUID id, UserDto dto) {
-        userRepository.update(id, dto);
+    public void updateUser(UUID id, UserUpdateDto dto) {
+        userRepository.update(id, dto.getName());
     }
 
     @Override

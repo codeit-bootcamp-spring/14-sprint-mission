@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.dto.user.UserDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
@@ -45,9 +44,9 @@ public class FileUserRepository extends MapFileIO<User>
     }
 
     @Override
-    public void update(UUID id, UserDto dto) {
+    public void update(UUID id, String name) {
         findById(id).ifPresent(retrieved -> {
-            retrieved.update(dto);
+            retrieved.update(name);
             writeFile();
         });
     }
