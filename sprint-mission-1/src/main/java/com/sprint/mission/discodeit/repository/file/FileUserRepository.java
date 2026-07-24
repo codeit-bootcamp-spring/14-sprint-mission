@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.file.repository.file;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.file.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class FileuserRepository implements UserRepository {
+public class FileUserRepository implements UserRepository {
     private final static List<User> users = new ArrayList<>();
 
-    @Override
+    public FileUserRepository() {
+        userLoad();
+    }
+
     public void userLoad() {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("data/User.ser"))){
             users.addAll((List<User>) objectInputStream.readObject());
@@ -21,7 +24,6 @@ public class FileuserRepository implements UserRepository {
         }
     }
 
-    @Override
     public void userFlush() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("data/User.ser"))) {
             objectOutputStream.writeObject(this.users);
@@ -30,7 +32,6 @@ public class FileuserRepository implements UserRepository {
         }
     }
 
-    @Override
     public List<String> readUserName() {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("data/User.txt"))) {
             String name;
@@ -45,8 +46,9 @@ public class FileuserRepository implements UserRepository {
     }
 
     @Override
-    public void userAdd(List<User> users) {
-        this.users.addAll(users);
+    public User userAdd(User user) {
+        this.users.add(user);
+        return user;
     }
 
     @Override

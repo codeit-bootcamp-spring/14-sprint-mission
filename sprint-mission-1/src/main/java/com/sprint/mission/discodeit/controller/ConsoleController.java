@@ -6,9 +6,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ChatService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFchannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFchatService;
-import com.sprint.mission.discodeit.service.jcf.JCFuserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFChatService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
 import java.util.Scanner;
@@ -16,9 +16,9 @@ import java.util.UUID;
 
 public class ConsoleController {
     public static final Scanner SC = new Scanner(System.in);
-    ChannelService channelService = new JCFchannelService();
-    UserService userService = new JCFuserService();
-    ChatService chatService = new JCFchatService();
+    ChannelService channelService = new JCFChannelService();
+    UserService userService = new JCFUserService();
+    ChatService chatService = new JCFChatService();
 
     public void consoleContorller(){
         System.out.println("--- 아래 메뉴에서 기능을 선택하세요 ---");

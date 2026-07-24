@@ -2,17 +2,17 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.jcf.JCFchatRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFuserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChatRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChatService;
 
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class JCFchatService implements ChatService {
-    private final JCFchatRepository jcFchatRepository = new JCFchatRepository();
-    private final JCFuserRepository jcFuserRepository = new JCFuserRepository();
+public class JCFChatService implements ChatService {
+    private final JCFChatRepository jcFchatRepository = new JCFChatRepository();
+    private final JCFUserRepository jcFuserRepository = new JCFUserRepository();
     private final Scanner sc = new Scanner(System.in);
 
     @Override

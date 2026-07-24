@@ -1,33 +1,22 @@
-package com.sprint.mission.discodeit.file.service.file;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.NameExistsException;
-import com.sprint.mission.discodeit.file.repository.file.FilechannelRepository;
-import com.sprint.mission.discodeit.file.service.ChannelService;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class FilechannelService implements ChannelService {
-    private final FilechannelRepository filechannelRepository = new FilechannelRepository();
+public class FileChannelService implements ChannelService {
+    private final FileChannelRepository filechannelRepository = new FileChannelRepository();
 
-    @Override
-    public void channelInit() {
-        filechannelRepository.channelLoad();
-    }
-
-    @Override
-    public void channelCreate() {
-        List<String> channelName = filechannelRepository.readChannelName();
-        List<Channel> newChannels = new ArrayList<>();
-
-        for (String name : channelName) {
-            if (filechannelRepository.findByChannel(name).isEmpty()) {
-                System.out.println("채널 생성이 완료되었습니다: " + name);
-                newChannels.add(new Channel(name));
-            }
+    public Channel channelCreate(String channelName) {
+        if (filechannelRepository.findByChannel(channelName).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 채널입니다: " + channelName);
         }
-        filechannelRepository.channelAdd(newChannels);
+
+        Channel channel = new Channel(channelName);
+        return filechannelRepository.channelAdd(channel);
     }
 
     @Override
@@ -62,10 +51,12 @@ public class FilechannelService implements ChannelService {
     }
 
     @Override
-    public void printChannel(String channelName) {
+    public Channel printChannel(String channelName) {
         Channel channel = filechannelRepository.findByChannel(channelName)
                 .orElseThrow(() -> new IllegalArgumentException("보고자 하는 채널이 없습니다: " + channelName));
 
         System.out.printf("채널 이름: %s, 채널 아이디: %s \n", channel.getChannelName(),channel.getChannelId());
+
+        return channel;
     }
 }

@@ -5,33 +5,29 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NameExistsException;
-import com.sprint.mission.discodeit.file.service.ChannelService;
-import com.sprint.mission.discodeit.file.service.ChatService;
-import com.sprint.mission.discodeit.file.service.UserService;
-import com.sprint.mission.discodeit.file.service.file.FilechannelService;
-import com.sprint.mission.discodeit.file.service.file.FilechatService;
-import com.sprint.mission.discodeit.file.service.file.FileuserService;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ChatService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileChatService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 
 import java.util.List;
 import java.util.UUID;
 
 public class FileController{
-    private final ChannelService channelService= new FilechannelService();
-    private final UserService userService = new FileuserService();
-    private final ChatService chatService = new FilechatService();
+    private final ChannelService channelService= new FileChannelService();
+    private final UserService userService = new FileUserService();
+    private final ChatService chatService = new FileChatService();
 
     public void fileController(){
 
         //채널
-        // 파일에 저장된 객체 읽기
-        channelService.channelInit();
         // 채널 리스트 전체 출력
         List<Channel> channels = channelService.allPrintChannel();
         for (Channel channel:channels){
             System.out.println(channel.getChannelName());
         }
-        // 채널 이름 읽고 신규 채널 있을 경우 추가
-        channelService.channelCreate();
         // 채널 수정
         try {
             channelService.channelUpdate("11번 채널", "업데이트 11번 채널");
@@ -39,6 +35,7 @@ public class FileController{
             System.out.println("채널을 업데이트 할 수 없습니다.");
             System.out.println(e.getMessage());
         }
+        channelService.channelCreate("1번 채널");
         // 채널 삭제
         channelService.channelDelete("1번 채널");
         // 채널 전체 출력
@@ -48,15 +45,12 @@ public class FileController{
 
 
         //유저
-        // 파일에 저장된 객체 읽기
-        userService.userInit();
-
         List<User> users = userService.allPrintUser();
         for (User user:users){
             System.out.println(user.getUserName());
         }
 
-        userService.userCreate("2번 채널");
+        userService.userCreate("2번 채널", "고신재");
 
         try {
             userService.userUpdate("김예준", "개명한 김예준");
@@ -65,16 +59,13 @@ public class FileController{
             System.out.println(e.getMessage());
         }
 
-        userService.userDelete("홍길동");
+        userService.userDelete("고신재");
 
         for (User user:userService.allPrintUser()){
             System.out.printf("유저 ID: %s, 유저 이름: %s, 채널: %s\n", user.getUserId(), user.getUserName(), user.getChannel().getChannelName());
         }
 
         //메시지
-        // 파일에 저장된 객체 읽기
-        chatService.chatInit();
-
         List<Message> messages = chatService.allPrintMessage();
         for (Message message:messages){
             System.out.println(message.getAuthor().getUserName()+": "+message.getMessage());

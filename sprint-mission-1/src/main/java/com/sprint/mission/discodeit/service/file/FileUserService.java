@@ -1,38 +1,42 @@
-package com.sprint.mission.discodeit.file.service.file;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NameExistsException;
-import com.sprint.mission.discodeit.file.repository.file.FilechannelRepository;
-import com.sprint.mission.discodeit.file.repository.file.FileuserRepository;
-import com.sprint.mission.discodeit.file.service.UserService;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class FileuserService implements UserService {
-    private final FileuserRepository fileuserRepository = new FileuserRepository();
-    private final FilechannelRepository filechannelRepository = new FilechannelRepository();
+public class FileUserService implements UserService {
+    private final FileUserRepository fileuserRepository = new FileUserRepository();
+    private final FileChannelRepository filechannelRepository = new FileChannelRepository();
     private final Scanner sc = new Scanner(System.in);
 
-    @Override
-    public void userInit() {
-        fileuserRepository.userLoad();
-    }
+
+//    public void userNameAdd(String channelName) {
+//        List<String> userName = fileuserRepository.readUserName();
+//
+//        for (String name : userName) {
+//            if (filechannelRepository.findByChannel(channelName).isPresent()&&fileuserRepository.findByUser(name).isEmpty()) {
+//                System.out.println("유저 생성이 완료되었습니다: " + name);
+//                fileuserRepository.userAdd(new User(name, filechannelRepository.findByChannel(channelName).get()));
+//            }
+//        }
+//    }
 
     @Override
-    public void userCreate(String channelName) {
-        List<String> userName = fileuserRepository.readUserName();
-        List<User> newUsers = new ArrayList<>();
-
-        for (String name : userName) {
-            if (filechannelRepository.findByChannel(channelName).isPresent()&&fileuserRepository.findByUser(name).isEmpty()) {
-                System.out.println("유저 생성이 완료되었습니다: " + name);
-                newUsers.add(new User(name, filechannelRepository.findByChannel(channelName).get()));
-            }
+    public User userCreate(String channelName, String userName) {
+        if (fileuserRepository.findByUser(userName).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 유저입니다: " + userName);
         }
-        fileuserRepository.userAdd(newUsers);
+        Channel channel = filechannelRepository.findByChannel(channelName)
+                .orElseThrow(() -> new IllegalArgumentException("채널이 없습니다: " + channelName));
+
+        User user = new User(userName, channel);
+        return fileuserRepository.userAdd(user);
     }
 
     @Override

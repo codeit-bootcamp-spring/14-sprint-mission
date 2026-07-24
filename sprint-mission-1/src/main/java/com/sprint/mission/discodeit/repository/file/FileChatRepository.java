@@ -1,8 +1,7 @@
-package com.sprint.mission.discodeit.file.repository.file;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.file.repository.ChatRepository;
+import com.sprint.mission.discodeit.repository.ChatRepository;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,10 +9,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FilechatRepository implements ChatRepository {
+public class FileChatRepository implements ChatRepository {
     protected final static List<Message> messages = new ArrayList<>();
 
-    @Override
+    public FileChatRepository() {
+        chatLoad();
+    }
+
     public void chatLoad() {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("data/Message.ser"))){
             messages.addAll((List<Message>) objectInputStream.readObject());
@@ -22,7 +24,6 @@ public class FilechatRepository implements ChatRepository {
         }
     }
 
-    @Override
     public void chatFlush() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("data/Message.ser"))) {
             objectOutputStream.writeObject((List<Message>)this.messages);
@@ -33,8 +34,9 @@ public class FilechatRepository implements ChatRepository {
     }
 
     @Override
-    public void messageAdd(Message message) {
+    public Message messageAdd(Message message) {
         this.messages.add(message);
+        return message;
     }
 
     @Override

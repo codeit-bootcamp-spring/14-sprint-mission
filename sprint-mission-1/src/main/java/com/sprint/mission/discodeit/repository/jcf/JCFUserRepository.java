@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class JCFuserRepository implements UserRepository {
+public class JCFUserRepository implements UserRepository {
     private final static List<User> users = new ArrayList<>();
 
     @Override

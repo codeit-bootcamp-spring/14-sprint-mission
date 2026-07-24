@@ -1,33 +1,30 @@
-package com.sprint.mission.discodeit.file.service.file;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.file.repository.file.FilechatRepository;
-import com.sprint.mission.discodeit.file.repository.file.FileuserRepository;
-import com.sprint.mission.discodeit.file.service.ChatService;
+import com.sprint.mission.discodeit.repository.file.FileChatRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.ChatService;
 
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class FilechatService implements ChatService {
-    private final FilechatRepository filechatRepository = new FilechatRepository();
-    private final FileuserRepository fileuserRepository = new FileuserRepository();
+public class FileChatService implements ChatService {
+    private final FileChatRepository filechatRepository = new FileChatRepository();
+    private final FileUserRepository fileuserRepository = new FileUserRepository();
     private final Scanner sc = new Scanner(System.in);
 
     @Override
-    public void chatInit() {
-        filechatRepository.chatLoad();
-    }
-
-    @Override
-    public void messageCreate(String author, String message) {
+    public Message messageCreate(String author, String message) {
         User user = fileuserRepository.findByUser(author)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다: " + author));
 
         Message newMessage = new Message(user, message);
         filechatRepository.messageAdd(newMessage);
         filechatRepository.chatFlush();
+
+        return newMessage;
     }
 
     @Override

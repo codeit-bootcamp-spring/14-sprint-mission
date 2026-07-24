@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.file.repository.file;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.file.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class FilechannelRepository implements ChannelRepository {
+public class FileChannelRepository implements ChannelRepository {
     private final static List<Channel> channels = new ArrayList<>();
 
-    @Override
+    public FileChannelRepository(){
+        channelLoad();
+    }
+
     public void channelLoad() {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("data/Channel.ser"))) {
             channels.addAll((List<Channel>) objectInputStream.readObject());
@@ -21,7 +24,6 @@ public class FilechannelRepository implements ChannelRepository {
         }
     }
 
-    @Override
     public void channelFlush() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("data/Channel.ser"))) {
             objectOutputStream.writeObject(this.channels);
@@ -30,7 +32,6 @@ public class FilechannelRepository implements ChannelRepository {
         }
     }
 
-    @Override
     public List<String> readChannelName() {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("data/Channel.txt"))) {
             String name;
@@ -45,14 +46,14 @@ public class FilechannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> channelAdd(List<Channel> channels) {
-        this.channels.addAll(channels);
+    public Channel channelAdd(Channel channel) {
+        this.channels.add(channel);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("data/Channel.ser"))) {
             objectOutputStream.writeObject(this.channels);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return this.channels;
+        return channel;
     }
 
     @Override

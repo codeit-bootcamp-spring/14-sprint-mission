@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChatRepository;
 
 import java.util.ArrayList;
@@ -9,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFchatRepository implements ChatRepository {
+public class JCFChatRepository implements ChatRepository {
     protected final static List<Message> messages = new ArrayList<>();
 
     @Override

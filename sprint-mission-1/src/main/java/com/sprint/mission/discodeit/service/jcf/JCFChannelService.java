@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.jcf.JCFchannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.List;
 import java.util.Scanner;
 
-public class JCFchannelService implements ChannelService {
-    private final JCFchannelRepository jcFchannelRepository = new JCFchannelRepository();
+public class JCFChannelService implements ChannelService {
+    private final JCFChannelRepository jcFchannelRepository = new JCFChannelRepository();
     private final Scanner sc = new Scanner(System.in);
 
     @Override
