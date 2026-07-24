@@ -26,27 +26,27 @@ public class AppConfig {
     private static MessageService messageService;
 
     public static UserRepository userRepository() {
-        return get(userRepository, () -> new FileUserRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/user.ser"));
+        return get(userRepository, () -> userRepository = new FileUserRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/user.ser"));
     }
 
     public static ChannelRepository channelRepository() {
-        return get(channelRepository, () -> new FileChannelRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/channel.ser"));
+        return get(channelRepository, () -> channelRepository = new FileChannelRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/channel.ser"));
     }
 
     public static MessageRepository messageRepository() {
-        return get(messageRepository, () -> new FileMessageRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/message.ser"));
+        return get(messageRepository, () -> messageRepository = new FileMessageRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/message.ser"));
     }
 
     public static UserService userService() {
-        return get(userService, () -> new BasicUserService(userRepository(), messageRepository(), channelRepository()));
+        return get(userService, () -> userService = new BasicUserService(userRepository(), messageRepository(), channelRepository()));
     }
 
     public static ChannelService channelService() {
-        return get(channelService, () -> new BasicChannelService(channelRepository() ,messageRepository()));
+        return get(channelService, () -> channelService = new BasicChannelService(channelRepository() ,messageRepository()));
     }
 
     public static MessageService messageService() {
-        return get(messageService, () -> new BasicMessageService(messageRepository(), channelRepository()));
+        return get(messageService, () -> messageService = new BasicMessageService(messageRepository(), channelRepository()));
     }
 
     private static <T> T get(T t, Supplier<T> supplier) {
