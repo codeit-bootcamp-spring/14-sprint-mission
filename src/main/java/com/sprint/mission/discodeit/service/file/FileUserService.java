@@ -32,13 +32,7 @@ public class FileUserService implements UserService {
         userList.add(user);
         //파일안에다가 저장
         //어짜피피 리스트를 통째로 저장하기때문에
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("userlist.ser"))){
-            objectOutputStream.writeObject(userList);
-            System.out.println("직렬화 완료: userlist.ser");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        saveUserFile();
         return user;
 
 }
@@ -66,14 +60,9 @@ public class FileUserService implements UserService {
         User user = readUser(id);
         user.setName(name);
         user.setUpdatedAt();
-//        return user;
+//      return user;
         //얘도 그냥 객체 하나하나 업데이트가 아닌 그냥 메모리에있는 수정된 리스트를 통째로 업데이트하면됌
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("userlist.ser"))) {
-            objectOutputStream.writeObject(userList);
-            //업데이트 완료
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        saveUserFile();
     }
 
     @Override
@@ -82,9 +71,15 @@ public class FileUserService implements UserService {
         User user = readUser(id);
         userList.remove(user);
         //이 친구 또한 그냥 객체 하나하나 업데이트가 아닌 그냥 메모리에있는 수정된 리스트를 통째로 업데이트하면됌
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("userlist.ser"))) {
+        saveUserFile();
+    }
+
+    // CRUD내부에 들어간 영속화 로직을 그냥 메서드로 하나 만듬
+    private void saveUserFile() {
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("userlist.ser"))){
             objectOutputStream.writeObject(userList);
-            //업데이트 완료
+            System.out.println("직렬화 완료: userlist.ser");
+
         } catch (IOException e) {
             e.printStackTrace();
         }

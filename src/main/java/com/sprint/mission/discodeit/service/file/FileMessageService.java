@@ -41,13 +41,7 @@ public class FileMessageService implements MessageService {
                 Message message = new Message(values, channel, sender);
                 messageList.add(message);
 
-                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("messagelist.ser"))) {
-                    objectOutputStream.writeObject(messageList);
-                    System.out.println("직렬화 완료: messagelist.ser");
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                saveMessageFile(); //영속화
 
                 return message;
             }
@@ -84,11 +78,7 @@ public class FileMessageService implements MessageService {
         message.setValues(values);
         message.setUpdatedAt();
 
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("messagelist.ser"))) {
-            objectOutputStream.writeObject(messageList);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        saveMessageFile();
     }
 
     @Override
@@ -97,6 +87,10 @@ public class FileMessageService implements MessageService {
         Message message = readMessage(id);
         messageList.remove(message);
 
+        saveMessageFile();
+    }
+
+    public void saveMessageFile() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("messagelist.ser"))) {
             objectOutputStream.writeObject(messageList);
         } catch (IOException e) {

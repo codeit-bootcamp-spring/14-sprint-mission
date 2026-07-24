@@ -36,13 +36,7 @@ public class FileChannelService implements ChannelService {
                 List.of(members)
         ));
         channels.add(channel);
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("channels.ser"))){
-            objectOutputStream.writeObject(channels);
-            System.out.println("직렬화 완료: channel.ser");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        saveChannelFile();
         return channel;
     }
 
@@ -82,13 +76,7 @@ public class FileChannelService implements ChannelService {
             channel.setMembers(new ArrayList<>(List.of(members)));
         }
         channel.setUpdatedAt();
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("channels.ser"))){
-            objectOutputStream.writeObject(channels);
-            System.out.println("직렬화 완료: channel.ser");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        saveChannelFile();
     }
 
     @Override
@@ -96,6 +84,10 @@ public class FileChannelService implements ChannelService {
         Channel channel = readChannel(id);
         channels.remove(channel);
         //항상 정상로직 이후에 FileIO 또는 역/직렬화가 이루어져야함 업데이트된 메모리를 기준으로 쓰기때문에
+        saveChannelFile();
+    }
+
+    private void saveChannelFile() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("channels.ser"))){
             objectOutputStream.writeObject(channels);
             System.out.println("직렬화 완료: channel.ser");
@@ -103,5 +95,6 @@ public class FileChannelService implements ChannelService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 }
