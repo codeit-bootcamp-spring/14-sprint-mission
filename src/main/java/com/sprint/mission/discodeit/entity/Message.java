@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.message.MessageUpdateDto;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -26,8 +25,8 @@ public class Message implements Serializable {
         this.userId = userId;
     }
 
-    public void update(MessageUpdateDto dto) {
-        this.content = dto.getContent();
+    public void updateContent(String content) {
+        this.content = content;
         this.updatedAt = now();
     }
 

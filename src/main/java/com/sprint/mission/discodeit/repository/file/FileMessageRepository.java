@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.File;
@@ -44,9 +43,9 @@ public class FileMessageRepository extends MapFileIO<Message>
     }
 
     @Override
-    public void update(UUID id, MessageUpdateDto dto) {
+    public void updateContent(UUID id, String content) {
         findById(id).ifPresent(retrieved -> {
-            retrieved.update(dto);
+            retrieved.updateContent(content);
             writeFile();
         });
     }

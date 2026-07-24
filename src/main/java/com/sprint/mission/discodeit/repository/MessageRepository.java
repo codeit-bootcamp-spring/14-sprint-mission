@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.dto.message.MessageUpdateDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,7 @@ public interface MessageRepository {
 
     List<Message> findAll();
 
-    void update(UUID id, MessageUpdateDto dto);
+    void updateContent(UUID id, String content);
 
     void deleteById(UUID id);
 
