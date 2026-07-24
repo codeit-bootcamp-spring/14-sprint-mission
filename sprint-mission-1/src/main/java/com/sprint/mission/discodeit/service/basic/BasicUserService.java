@@ -13,7 +13,6 @@ import java.util.Scanner;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository ;
     private final ChannelRepository channelRepository;
-    private final Scanner sc = new Scanner(System.in);
 
     public BasicUserService(UserRepository userRepository, ChannelRepository channelRepository) {
         this.userRepository = userRepository;
@@ -43,8 +42,6 @@ public class BasicUserService implements UserService {
 
         user.updateName(updateUserName);
         System.out.println(userName+" 유저의 이름을 "+updateUserName+"으로 수정했습니다.");
-
-        userRepository.userAdd(user);
     }
 
     @Override

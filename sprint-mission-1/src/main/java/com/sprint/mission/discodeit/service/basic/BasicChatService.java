@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChatRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChatService;
 
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.UUID;
 public class BasicChatService implements ChatService {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
-    private final Scanner sc = new Scanner(System.in);
 
     public BasicChatService(ChatRepository chatRepository, UserRepository userRepository) {
         this.chatRepository = chatRepository;

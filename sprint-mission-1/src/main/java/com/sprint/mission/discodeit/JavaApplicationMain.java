@@ -50,8 +50,8 @@ public class JavaApplicationMain {
             System.out.printf("유저: %s(%s)\n메시지: %s\n", message.getAuthor().getUserName(), message.getAuthor().getChannel().getChannelName(), message.getMessage());
         }
 
+        // 콘솔 테스트
 //        ConsoleController consoleController = new ConsoleController();
-//
 //        System.out.println("--- 디스코드잇에 오신 걸 환영합니다 ---");
 //        consoleController.consoleContorller();
 
