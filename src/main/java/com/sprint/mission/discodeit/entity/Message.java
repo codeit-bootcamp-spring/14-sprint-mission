@@ -9,11 +9,14 @@ import java.util.UUID;
 @ToString
 @Getter
 public class Message implements Serializable {
+    @ToString.Include
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
 
+    @ToString.Include
     private String content;
+    @ToString.Include
     private final UUID userId;
 
     public Message(String content, UUID userId) {
