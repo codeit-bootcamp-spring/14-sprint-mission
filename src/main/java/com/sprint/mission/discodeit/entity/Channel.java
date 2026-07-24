@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.dto.channel.ChannelUpdateNameDto;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -34,10 +33,10 @@ public class Channel implements Serializable {
         messagesId = new ArrayList<>();
     }
 
-    public void updateName(ChannelUpdateNameDto dto) {
+    public void updateName(String name) {
         this.updatedAt = now();
 
-        this.name = dto.getName();
+        this.name = name;
     }
 
     public void addMessage(UUID userId ,UUID messageId) {

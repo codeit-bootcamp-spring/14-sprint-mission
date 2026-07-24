@@ -35,7 +35,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void updateChannelName(UUID id, ChannelUpdateNameDto dto) {
-        channelRepository.updateName(id, dto);
+        channelRepository.updateName(id, dto.getName());
     }
 
     @Override

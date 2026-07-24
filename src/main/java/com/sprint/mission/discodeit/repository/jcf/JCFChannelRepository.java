@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.dto.channel.ChannelCreationDto;
-import com.sprint.mission.discodeit.entity.dto.channel.ChannelUpdateNameDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
@@ -31,8 +29,8 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void updateName(UUID id, ChannelUpdateNameDto dto) {
-        findById(id).ifPresent(retrieved -> retrieved.updateName(dto));
+    public void updateName(UUID id, String name) {
+        findById(id).ifPresent(retrieved -> retrieved.updateName(name));
     }
 
     @Override

@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.dto.channel.ChannelCreationDto;
-import com.sprint.mission.discodeit.entity.dto.channel.ChannelUpdateNameDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +13,7 @@ public interface ChannelRepository {
 
     List<Channel> findAll();
 
-    void updateName(UUID id, ChannelUpdateNameDto dto);
+    void updateName(UUID id, String name);
 
     void deleteById(UUID id);
 

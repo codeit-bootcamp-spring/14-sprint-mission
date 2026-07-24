@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.dto.channel.ChannelUpdateNameDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.File;
@@ -44,9 +43,9 @@ public class FileChannelRepository extends MapFileIO<Channel>
     }
 
     @Override
-    public void updateName(UUID id, ChannelUpdateNameDto dto) {
+    public void updateName(UUID id, String name) {
         findById(id).ifPresent(retrieved -> {
-            retrieved.updateName(dto);
+            retrieved.updateName(name);
             writeFile();
         });
     }
