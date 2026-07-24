@@ -48,10 +48,12 @@ public class JCFchannelService implements ChannelService {
     }
 
     @Override
-    public void printChannel(String channelName) {
+    public Channel printChannel(String channelName) {
         Channel channel = jcFchannelRepository.findByChannel(channelName)
                 .orElseThrow(() -> new IllegalArgumentException("보고자 하는 채널이 없습니다: " + channelName));
 
         System.out.printf("채널 이름: %s, 채널 아이디: %s \n", channel.getChannelName(),channel.getChannelId());
+
+        return channel;
     }
 }

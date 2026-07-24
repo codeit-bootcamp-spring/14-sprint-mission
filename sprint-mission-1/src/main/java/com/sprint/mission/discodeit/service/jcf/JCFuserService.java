@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.jcf.JCFchannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFuserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -9,16 +11,20 @@ import java.util.Scanner;
 
 public class JCFuserService implements UserService {
     private final JCFuserRepository jcFuserRepository = new JCFuserRepository();
+    private final JCFchannelRepository jcFchannelRepository = new JCFchannelRepository();
     private final Scanner sc = new Scanner(System.in);
 
     @Override
-    public User userCreate(String userName) {
+    public User userCreate(String channelName, String userName) {
         if (jcFuserRepository.findByUser(userName).isPresent()){
             throw new IllegalArgumentException("이미 생성된 유저의 이름입니다: "+userName);
         }
 
+        Channel channel = jcFchannelRepository.findByChannel(channelName)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다: " + channelName));
+
         System.out.println("유저 생성이 완료되었습니다: "+userName);
-        User user = new User(userName);
+        User user = new User(userName, channel);
 
         return jcFuserRepository.userAdd(user);
     }
