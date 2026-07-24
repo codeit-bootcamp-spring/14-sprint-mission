@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exception.NameExistsException;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -25,6 +26,10 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void channelUpdate(String channelName, String updateChannelName) {
+        if (jcFchannelRepository.findByChannel(updateChannelName).isPresent()){
+            throw NameExistsException.ofChannel(updateChannelName);
+        }
+
         Channel channel = jcFchannelRepository.findByChannel(channelName)
                 .orElseThrow(() -> new IllegalArgumentException("수정할 채널이 없습니다: " + channelName));
 

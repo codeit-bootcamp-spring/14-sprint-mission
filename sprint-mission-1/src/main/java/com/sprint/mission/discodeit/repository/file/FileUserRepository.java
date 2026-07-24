@@ -10,7 +10,7 @@ import java.util.Optional;
 
 
 public class FileUserRepository implements UserRepository {
-    private final static List<User> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
 
     public FileUserRepository() {
         userLoad();
@@ -48,6 +48,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User userAdd(User user) {
         this.users.add(user);
+        userFlush();
         return user;
     }
 
@@ -61,6 +62,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void delete(User user) {
         users.remove(user);
+        userFlush();
     }
 
     @Override

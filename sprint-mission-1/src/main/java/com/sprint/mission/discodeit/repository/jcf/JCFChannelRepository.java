@@ -9,7 +9,7 @@ import java.util.Optional;
 
 
 public class JCFChannelRepository implements ChannelRepository {
-    private final static List<Channel> channels = new ArrayList<>();
+    private final List<Channel> channels = new ArrayList<>();
 
     @Override
     public Channel channelAdd(Channel channel) {

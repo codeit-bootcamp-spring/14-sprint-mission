@@ -10,7 +10,7 @@ import java.util.Optional;
 
 
 public class FileChannelRepository implements ChannelRepository {
-    private final static List<Channel> channels = new ArrayList<>();
+    private final List<Channel> channels = new ArrayList<>();
 
     public FileChannelRepository(){
         channelLoad();
@@ -66,6 +66,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void delete(Channel channel) {
         channels.remove(channel);
+        channelFlush();
     }
 
     @Override

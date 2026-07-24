@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileChatRepository implements ChatRepository {
-    protected final static List<Message> messages = new ArrayList<>();
+    protected final List<Message> messages = new ArrayList<>();
 
     public FileChatRepository() {
         chatLoad();
@@ -36,6 +36,7 @@ public class FileChatRepository implements ChatRepository {
     @Override
     public Message messageAdd(Message message) {
         this.messages.add(message);
+        chatFlush();
         return message;
     }
 
@@ -49,6 +50,7 @@ public class FileChatRepository implements ChatRepository {
     @Override
     public void delete(Message message) {
         messages.remove(message);
+        chatFlush();
     }
 
     @Override

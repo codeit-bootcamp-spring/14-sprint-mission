@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChatRepository implements ChatRepository {
-    protected final static List<Message> messages = new ArrayList<>();
+    protected final List<Message> messages = new ArrayList<>();
 
     @Override
     public Message messageAdd(Message message) {

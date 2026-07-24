@@ -9,7 +9,7 @@ import java.util.Optional;
 
 
 public class JCFUserRepository implements UserRepository {
-    private final static List<User> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
 
     @Override
     public User userAdd(User user) {
