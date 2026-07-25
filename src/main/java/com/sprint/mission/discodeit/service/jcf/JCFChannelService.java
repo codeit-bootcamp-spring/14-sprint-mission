@@ -57,7 +57,7 @@ public class JCFChannelService implements ChannelService {
         if (Objects.isNull(channel)) {
             throw new RuntimeException("해당 채널이 존재하지 않습니다.");
         }
-        //채널 널 or 공백인지 확인
+        //파라미터로 받는 채널명이 널 or 공백인지 확인
         if (channelName != null && !channelName.isBlank()) {
             channel.setChannelName(channelName);
         }
