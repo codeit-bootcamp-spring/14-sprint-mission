@@ -41,5 +41,5 @@ public class Channel implements Serializable {
 //        System.out.println();
 //    }
 }
-//TODO : 패키지 나눔 이제 안에 기능 뭐넣을지 생각해보기 어떻게 객체지향적이고
+//DONE : 패키지 나눔 이제 안에 기능 뭐넣을지 생각해보기 어떻게 객체지향적이고 (완료)
 
