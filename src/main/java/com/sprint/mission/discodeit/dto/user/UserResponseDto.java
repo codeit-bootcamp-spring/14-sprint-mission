@@ -25,8 +25,7 @@ public class UserResponseDto {
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getUpdatedAt()
+                user.getUpdatedAt() // User에서 추가된 정보
         );
     }
-
 }

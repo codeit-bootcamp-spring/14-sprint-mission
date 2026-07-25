@@ -12,6 +12,10 @@ public class MessageUpdateRequestDto {
     private String content;
 
     public static MessageUpdateRequestDto of(UUID id, String content) {
+        if (content == null || content.isEmpty()) {
+            throw new RuntimeException("Message의 content가 비어있습니다.");
+        }
+
         return new MessageUpdateRequestDto(id, content);
     }
 }
