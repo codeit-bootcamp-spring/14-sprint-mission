@@ -32,6 +32,11 @@ public class FileUserRepository extends MapFileIO<User>
     }
 
     @Override
+    public boolean existsById(UUID id) {
+        return findById(id).isPresent();
+    }
+
+    @Override
     public Optional<User> findById(UUID id) {
         buffer = super.readFile();
         return Optional.ofNullable(buffer.get(id));

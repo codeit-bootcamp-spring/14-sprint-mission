@@ -19,6 +19,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean existsById(UUID id) {
+        return findById(id).isPresent();
+    }
+
+    @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
     }

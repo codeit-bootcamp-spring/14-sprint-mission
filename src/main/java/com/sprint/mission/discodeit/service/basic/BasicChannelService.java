@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.dto.channel.ChannelUpdateNameDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.validator.Validator;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -17,8 +18,12 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
 
+    private final Validator userValidator;
+
     @Override
     public Channel createChannel(ChannelCreationDto dto) {
+        userValidator.validateAll(dto.getUsersId());
+
         Channel channel = new Channel(dto.getTitle(), dto.getUsersId());
         return channelRepository.create(channel);
     }
@@ -42,7 +47,7 @@ public class BasicChannelService implements ChannelService {
     public void deleteChannel(UUID id) {
         // 채널 내부 message 삭제
         channelRepository.findById(id)
-                        .ifPresent(channel -> channel.getMessagesId().forEach(messageRepository::deleteById));
+                .ifPresent(channel -> channel.getMessagesId().forEach(messageRepository::deleteById));
 
         channelRepository.deleteById(id);
     }

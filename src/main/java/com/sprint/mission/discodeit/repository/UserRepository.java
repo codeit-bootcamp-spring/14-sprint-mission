@@ -9,6 +9,8 @@ import java.util.UUID;
 public interface UserRepository {
     User create(User user);
 
+    boolean existsById(UUID id);
+
     Optional<User> findById(UUID id);
 
     List<User> findAll();
