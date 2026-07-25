@@ -2,13 +2,22 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.NoArgsConstructor;
 
 import java.io.*;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
+    private static final FileUserRepository INSTANCE = new FileUserRepository();
+
     private final String USER_FILENAME = "users.ser";
-    private Map<UUID, User> userMap;
+    private Map<UUID, User> userMap = new HashMap<>();
+
+    private FileUserRepository() {}
+
+    public static FileUserRepository getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public User save(User user) {

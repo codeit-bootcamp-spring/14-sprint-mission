@@ -8,8 +8,16 @@ import java.io.*;
 import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
+    private final static FileMessageRepository INSTANCE = new FileMessageRepository();
+
     private final String MESSAGE_FILENAME = "messages.ser";
     private Map<UUID, Message> messageMap;
+
+    private FileMessageRepository() {}
+
+    public static FileMessageRepository getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public Message save(Message message) {

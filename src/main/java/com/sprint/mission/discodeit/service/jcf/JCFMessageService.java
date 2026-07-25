@@ -4,20 +4,37 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private final JCFMessageRepository messageRepository;
+    private final JCFUserRepository userRepository;
+    private final JCFChannelRepository channelRepository;
 
-    public JCFMessageService() {
-        this.messageRepository = new JCFMessageRepository();
+    public JCFMessageService(
+            JCFMessageRepository messageRepository,
+            JCFUserRepository userRepository,
+            JCFChannelRepository channelRepository
+    ) {
+        this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
+        this.channelRepository = channelRepository;
     }
 
     @Override
     public MessageResponseDto create(MessageCreateRequestDto requestDto) {
+        // 존재하는 유저, 채널 아이디인지 검증
+        userRepository.find(requestDto.getSenderId());
+        channelRepository.find(requestDto.getChannelId());
+
         Message newMessage = Message.from(requestDto);
         messageRepository.save(newMessage);
         return MessageResponseDto.from(newMessage);

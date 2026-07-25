@@ -4,7 +4,10 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
@@ -12,10 +15,9 @@ import java.util.*;
 public class JCFChannelService implements ChannelService {
     private final JCFChannelRepository channelRepository;
 
-    public JCFChannelService() {
-        this.channelRepository = new JCFChannelRepository();
+    public JCFChannelService(JCFChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
-
 
     @Override
     public ChannelResponseDto create(ChannelCreateRequestDto requestDto) {

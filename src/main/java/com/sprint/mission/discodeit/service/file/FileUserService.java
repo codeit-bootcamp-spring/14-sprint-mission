@@ -11,10 +11,10 @@ import java.io.*;
 import java.util.*;
 
 public class FileUserService implements UserService {
-    FileUserRepository userRepository;
+    private final FileUserRepository userRepository;
 
-    public FileUserService() {
-        this.userRepository = new FileUserRepository();
+    public FileUserService(FileUserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override

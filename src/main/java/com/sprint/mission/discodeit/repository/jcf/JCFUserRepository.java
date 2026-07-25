@@ -6,31 +6,35 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private Map<UUID, User> userMap;
+    private static final JCFUserRepository INSTANCE = new JCFUserRepository();  // 싱글톤 패턴 적용
 
-    public JCFUserRepository() {
-        this.userMap = new HashMap<>();
+    private static final Map<UUID, User> userMap = new HashMap<>();
+
+    private JCFUserRepository() {}
+
+    public static JCFUserRepository getInstance() {
+        return INSTANCE;
     }
 
     @Override
     public User save(User user) {
-        this.userMap.put(user.getId(), user);
+        userMap.put(user.getId(), user);
         return user;
     }
 
     @Override
     public User find(UUID id) {
-        return Optional.ofNullable(this.userMap.get(id)).orElseThrow();
+        return Optional.ofNullable(userMap.get(id)).orElseThrow();
     }
 
     @Override
     public List<User> findAll() {
-        return this.userMap.values().stream().toList();
+        return userMap.values().stream().toList();
     }
 
     @Override
     public void delete(UUID id) {
-        if (this.userMap.remove(id) == null) {
+        if (userMap.remove(id) == null) {
             throw new NoSuchElementException();
         }
     }

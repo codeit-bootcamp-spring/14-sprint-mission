@@ -11,7 +11,7 @@ public class Channel extends Entity implements Serializable {
     private String name;
     private ChannelType channelType;
 
-    // ChannelCreateDto를 통해 Channel 객체 생성
+    // ChannelCreateDto를 통해 Channel 객체 생성, 따라서 private으로
     private Channel(String name, ChannelType channelType) {
         super();
         this.name = name;

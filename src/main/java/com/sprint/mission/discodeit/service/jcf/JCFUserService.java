@@ -10,10 +10,10 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    JCFUserRepository userRepository;
+    private final JCFUserRepository userRepository;
 
-    public JCFUserService() {
-        this.userRepository = new JCFUserRepository();
+    public JCFUserService(JCFUserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override

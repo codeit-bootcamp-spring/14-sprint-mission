@@ -1,15 +1,22 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
 import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
+    private static final FileChannelRepository INSTANCE = new FileChannelRepository();
+
     private final String CHANNEL_FILENAME = "channels.ser";
     private Map<UUID, Channel> channelMap;
+
+    private FileChannelRepository() {}
+
+    public static FileChannelRepository getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public Channel save(Channel channel) {

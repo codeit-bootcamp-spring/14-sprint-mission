@@ -33,37 +33,32 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 public class Application {
     public static void main(String[] args) {
-        // JCF Service 생성
-//        UserService userService = new JCFUserService();
-//        ChannelService channelService = new JCFChannelService();
-//        MessageService messageService = new JCFMessageService();
-
-//        // File Service 생성
-//        UserService userService = new FileUserService();
-//        ChannelService channelService = new FileChannelService();
-//        MessageService messageService = new FileMessageService();
-
-//        // JCF 저장 방식
-//        UserRepository userRepository = new JCFUserRepository();
-//        ChannelRepository channelRepository = new JCFChannelRepository();
-//        MessageRepository messageRepository = new JCFMessageRepository();
+        // JCF 저장 방식
+        JCFUserRepository userRepository = JCFUserRepository.getInstance();
+        JCFChannelRepository channelRepository = JCFChannelRepository.getInstance();
+        JCFMessageRepository messageRepository = JCFMessageRepository.getInstance();
 
 
-        // File I/O 저장 방식
-        UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelRepository();
-        MessageRepository messageRepository = new FileMessageRepository();
+//        // File I/O 저장 방식
+//        FileUserRepository userRepository = FileUserRepository.getInstance();
+//        FileChannelRepository channelRepository = FileChannelRepository.getInstance();
+//        FileMessageRepository messageRepository = FileMessageRepository.getInstance();
 
 
         UserService userService = new BasicUserService(userRepository);
         ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMessageService(messageRepository);
+        MessageService messageService =
+                new BasicMessageService(
+                        messageRepository,
+                        userRepository,
+                        channelRepository
+                );
 
         // 1. 등록
         System.out.println("\n=== 1. 등록 ===");
         UserResponseDto user1 = userService.create(
                 UserCreateRequestDto.of(
-                        "user1",
+                        "userk",
                         "user1@email.com",
                         "pw123"
                 )

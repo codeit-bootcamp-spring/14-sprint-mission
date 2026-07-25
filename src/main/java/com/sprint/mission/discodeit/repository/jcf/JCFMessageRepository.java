@@ -6,10 +6,14 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
-    private Map<UUID, Message> messageMap;
+    private static final JCFMessageRepository INSTANCE = new JCFMessageRepository();
 
-    public JCFMessageRepository() {
-        this.messageMap = new HashMap<>();
+    private final Map<UUID, Message> messageMap = new HashMap<>();
+
+    private JCFMessageRepository() {}
+
+    public static JCFMessageRepository getInstance() {
+        return INSTANCE;
     }
 
     @Override

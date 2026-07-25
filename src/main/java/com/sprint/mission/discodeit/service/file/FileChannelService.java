@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -15,8 +16,8 @@ import java.util.*;
 public class FileChannelService implements ChannelService {
     private final FileChannelRepository channelRepository;
 
-    public FileChannelService() {
-        this.channelRepository = new FileChannelRepository();
+    public FileChannelService(FileChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override

@@ -19,7 +19,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto create(UserCreateRequestDto requestDto) {
-        User newUser = User.from(requestDto);
+        User newUser = User.from(requestDto);   // requestDto 객체에 있는 정보로 새로운 User 생성
         userRepository.save(newUser);
         return UserResponseDto.from(newUser);
     }

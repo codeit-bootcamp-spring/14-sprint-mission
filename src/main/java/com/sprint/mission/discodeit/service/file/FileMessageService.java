@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.io.*;
@@ -12,13 +14,23 @@ import java.util.*;
 
 public class FileMessageService implements MessageService {
     private final FileMessageRepository messageRepository;
+    private final FileUserRepository userRepository;
+    private final FileChannelRepository channelRepository;
 
-    public FileMessageService() {
-        this.messageRepository = new FileMessageRepository();
+    public FileMessageService(FileMessageRepository messageRepository,
+                              FileUserRepository userRepository,
+                              FileChannelRepository channelRepository) {
+        this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
+        this.channelRepository = channelRepository;
     }
 
     @Override
     public MessageResponseDto create(MessageCreateRequestDto requestDto) {
+        // 존재하는지 검증
+        userRepository.find(requestDto.getSenderId());
+        channelRepository.find(requestDto.getChannelId());
+
         Message newMessage = Message.from(requestDto);
         messageRepository.save(newMessage);
 
