@@ -6,16 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository {
-    User create(User user);
-
+public interface UserRepository extends CrudRepository<User> {
     boolean existsById(UUID id);
 
-    Optional<User> findById(UUID id);
-
-    List<User> findAll();
-
-    void update(UUID id, String name);
-
-    void deleteById(UUID id);
+    void updateName(UUID id, String name);
 }

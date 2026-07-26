@@ -6,16 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ChannelRepository {
-    Channel create(Channel channel);
-
-    Optional<Channel> findById(UUID id);
-
-    List<Channel> findAll();
-
+public interface ChannelRepository extends CrudRepository<Channel>{
     void updateName(UUID id, String name);
-
-    void deleteById(UUID id);
 
     void deleteUsersByUserId(UUID userId);
 }
