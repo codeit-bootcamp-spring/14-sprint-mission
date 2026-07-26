@@ -23,13 +23,14 @@ public class BasicMessageService implements MessageService {
         String content = dto.getContent();
         UUID userId = dto.getUserId();
 
-        Message message = new Message(content, userId);
-        UUID messageId = message.getId();
-
         Channel channel = channelRepository.findById(dto.getChannelId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
 
-        channel.addMessage(userId, messageId);
+        if (!channel.containsUser(userId)) {
+            throw new IllegalArgumentException(String.format("Channel에 소속된 User만 Message 생성 가능. Channel: %s, User: %s", channel, userId));
+        }
+
+        Message message = new Message(content, userId, channel.getId());
         return messageRepository.create(message);
     }
 

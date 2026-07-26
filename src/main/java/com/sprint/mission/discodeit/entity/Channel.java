@@ -18,14 +18,11 @@ public final class Channel extends Entity {
     private String name;
     @ToString.Include
     private final List<UUID> usersId;
-    @ToString.Include
-    private final List<UUID> messagesId;
 
     public Channel(String name, List<UUID> usersId) {
         super();
         this.name = name;
         this.usersId = new ArrayList<>(usersId);
-        messagesId = new ArrayList<>();
     }
 
     public void updateName(String name) {
@@ -33,11 +30,7 @@ public final class Channel extends Entity {
         this.name = name;
     }
 
-    public void addMessage(UUID userId ,UUID messageId) {
-        if (!usersId.contains(userId)) {
-            throw new IllegalArgumentException("채널에 없는 유저는 메시지 보낼 수 없음");
-        }
-
-        messagesId.add(messageId);
+    public boolean containsUser(UUID userId) {
+        return usersId.contains(userId);
     }
 }

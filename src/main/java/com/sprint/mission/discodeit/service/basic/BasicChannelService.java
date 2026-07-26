@@ -46,9 +46,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID id) {
         // 채널 내부 message 삭제
-        channelRepository.findById(id)
-                .ifPresent(channel -> channel.getMessagesId().forEach(messageRepository::deleteById));
-
+        messageRepository.deleteAllByChannelId(id);
         channelRepository.deleteById(id);
     }
 }

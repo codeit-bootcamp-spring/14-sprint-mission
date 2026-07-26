@@ -67,6 +67,15 @@ public class FileMessageRepository extends MapFileIO<Message>
         writeFile();
     }
 
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        buffer.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(message -> message.getId())
+                .forEach(toBeDeleted -> deleteById(toBeDeleted));
+        writeFile();
+    }
+
     private void writeFile() {
         super.writeFile(buffer);
     }

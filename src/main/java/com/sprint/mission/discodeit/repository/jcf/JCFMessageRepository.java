@@ -45,4 +45,12 @@ public class JCFMessageRepository implements MessageRepository {
                 .map(message -> message.getId())
                 .forEach(toBeDeleted -> deleteById(toBeDeleted));
     }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(message -> message.getId())
+                .forEach(toBeDeleted -> deleteById(toBeDeleted));
+    }
 }

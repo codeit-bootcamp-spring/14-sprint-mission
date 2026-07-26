@@ -16,11 +16,14 @@ public final class Message extends Entity {
     private String content;
     @ToString.Include
     private final UUID userId;
+    @ToString.Include
+    private final UUID channelId;
 
-    public Message(String content, UUID userId) {
+    public Message(String content, UUID userId, UUID channelId) {
         super();
         this.content = content;
         this.userId = userId;
+        this.channelId = channelId;
     }
 
     public void updateContent(String content) {
