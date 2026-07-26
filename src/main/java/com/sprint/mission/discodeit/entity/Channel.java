@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.ChannelType;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
 import lombok.Getter;
 
 import java.io.Serializable;
 
 @Getter
-public class Channel extends Entity implements Serializable {
+public class Channel extends Entity {
     private String name;
     private ChannelType channelType;
 

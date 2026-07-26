@@ -8,15 +8,18 @@ import java.io.*;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private static final FileUserRepository INSTANCE = new FileUserRepository();
 
     private final String USER_FILENAME = "users.ser";
     private Map<UUID, User> userMap = new HashMap<>();
 
     private FileUserRepository() {}
 
+    private static class LazyHolder {
+        private static final FileUserRepository INSTANCE = new FileUserRepository();
+    }
+
     public static FileUserRepository getInstance() {
-        return INSTANCE;
+        return LazyHolder.INSTANCE;
     }
 
     @Override

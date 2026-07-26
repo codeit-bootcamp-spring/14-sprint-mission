@@ -6,14 +6,17 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private static final JCFUserRepository INSTANCE = new JCFUserRepository();  // 싱글톤 패턴 적용
-
     private static final Map<UUID, User> userMap = new HashMap<>();
 
     private JCFUserRepository() {}
 
+    private static class LazyHolder {
+        private static final JCFUserRepository INSTANCE = new JCFUserRepository();  // 싱글톤 패턴 적용
+    }
+
+
     public static JCFUserRepository getInstance() {
-        return INSTANCE;
+        return LazyHolder.INSTANCE;
     }
 
     @Override

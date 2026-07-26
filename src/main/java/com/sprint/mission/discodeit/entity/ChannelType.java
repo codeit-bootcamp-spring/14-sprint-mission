@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.entity;
 
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -9,12 +9,8 @@ import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -24,35 +20,18 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.serviceFactory.RepositoryType;
+import com.sprint.mission.discodeit.serviceFactory.ServiceFactory;
 
 public class Application {
     public static void main(String[] args) {
-        // JCF 저장 방식
-        JCFUserRepository userRepository = JCFUserRepository.getInstance();
-        JCFChannelRepository channelRepository = JCFChannelRepository.getInstance();
-        JCFMessageRepository messageRepository = JCFMessageRepository.getInstance();
 
+        ServiceFactory serviceFactory = ServiceFactory.createFactory(RepositoryType.JCF);
+//        ServiceFactory serviceFactory = ServiceFactory.createFactory(RepositoryType.FILE);
+        UserService userService = serviceFactory.getUserService();
+        ChannelService channelService = serviceFactory.getChannelService();
+        MessageService messageService = serviceFactory.getMessageService();
 
-//        // File I/O 저장 방식
-//        FileUserRepository userRepository = FileUserRepository.getInstance();
-//        FileChannelRepository channelRepository = FileChannelRepository.getInstance();
-//        FileMessageRepository messageRepository = FileMessageRepository.getInstance();
-
-
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService =
-                new BasicMessageService(
-                        messageRepository,
-                        userRepository,
-                        channelRepository
-                );
 
         // 1. 등록
         System.out.println("\n=== 1. 등록 ===");
@@ -63,6 +42,7 @@ public class Application {
                         "pw123"
                 )
         );
+
         UserResponseDto user2 = userService.create(
                 UserCreateRequestDto.of(
                         "user2",

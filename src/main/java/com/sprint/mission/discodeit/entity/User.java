@@ -5,7 +5,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
-public class User extends Entity implements Serializable {
+public class User extends Entity {
     @Getter
     private String username;
     @Getter
@@ -13,7 +13,7 @@ public class User extends Entity implements Serializable {
     private String password;    // Getter 막기
 
     // UserRequestDto 통해서 User 객체를 생성할것이기 때문에 private으로
-    private User(String username, String email, String password) {
+    public User(String username, String email, String password) {
         super();
         this.username = username;
         this.email = email;

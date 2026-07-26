@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+// 저장로직
 public interface UserRepository {
     User save(User user);
     User find(UUID id);

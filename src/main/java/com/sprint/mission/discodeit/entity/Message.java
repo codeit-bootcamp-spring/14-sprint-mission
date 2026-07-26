@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Getter
-public class Message extends Entity implements Serializable {
+public class Message extends Entity {
     private String content;
     private UUID senderId;
     private UUID channelId;

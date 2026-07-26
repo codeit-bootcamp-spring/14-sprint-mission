@@ -8,15 +8,18 @@ import java.io.*;
 import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
-    private final static FileMessageRepository INSTANCE = new FileMessageRepository();
 
     private final String MESSAGE_FILENAME = "messages.ser";
     private Map<UUID, Message> messageMap;
 
     private FileMessageRepository() {}
 
+    private static class LazyHolder {
+        private final static FileMessageRepository INSTANCE = new FileMessageRepository();
+    }
+
     public static FileMessageRepository getInstance() {
-        return INSTANCE;
+        return LazyHolder.INSTANCE;
     }
 
     @Override

@@ -6,15 +6,19 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
-    private static final JCFMessageRepository INSTANCE = new JCFMessageRepository();
 
     private final Map<UUID, Message> messageMap = new HashMap<>();
 
     private JCFMessageRepository() {}
 
-    public static JCFMessageRepository getInstance() {
-        return INSTANCE;
+    private static class LazyHolder {
+        private static final JCFMessageRepository INSTANCE = new JCFMessageRepository();
     }
+
+    public static JCFMessageRepository getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+
 
     @Override
     public Message save(Message message) {

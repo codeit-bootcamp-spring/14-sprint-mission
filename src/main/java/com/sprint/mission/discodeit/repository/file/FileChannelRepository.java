@@ -7,15 +7,18 @@ import java.io.*;
 import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
-    private static final FileChannelRepository INSTANCE = new FileChannelRepository();
 
     private final String CHANNEL_FILENAME = "channels.ser";
     private Map<UUID, Channel> channelMap;
 
     private FileChannelRepository() {}
 
+    private static class LazyHolder {
+        private static final FileChannelRepository INSTANCE = new FileChannelRepository();
+    }
+
     public static FileChannelRepository getInstance() {
-        return INSTANCE;
+        return LazyHolder.INSTANCE;
     }
 
     @Override
