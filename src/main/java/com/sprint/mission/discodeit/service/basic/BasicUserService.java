@@ -37,7 +37,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void updateUser(UUID id, UserUpdateDto dto) {
-        userRepository.update(id, dto.getName());
+        userRepository.updateName(id, dto.getName());
     }
 
     @Override

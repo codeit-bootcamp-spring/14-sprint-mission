@@ -49,9 +49,9 @@ public class FileUserRepository extends MapFileIO<User>
     }
 
     @Override
-    public void update(UUID id, String name) {
+    public void updateName(UUID id, String name) {
         findById(id).ifPresent(retrieved -> {
-            retrieved.update(name);
+            retrieved.updateName(name);
             writeFile();
         });
     }

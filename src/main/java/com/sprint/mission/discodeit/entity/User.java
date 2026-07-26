@@ -27,7 +27,7 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public void update(String name) {
+    public void updateName(String name) {
         this.updatedAt = now();
         this.name = name;
     }

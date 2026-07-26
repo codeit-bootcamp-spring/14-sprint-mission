@@ -34,8 +34,8 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(UUID id, String name) {
-        findById(id).ifPresent(retrieved -> retrieved.update(name));
+    public void updateName(UUID id, String name) {
+        findById(id).ifPresent(retrieved -> retrieved.updateName(name));
     }
 
     @Override
