@@ -3,14 +3,17 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serializable;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @ToString(onlyExplicitlyIncluded = true)
 @Getter
-public class Channel implements Serializable {
+public class Channel implements Entity {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @ToString.Include
     private final UUID id;
     private final Long createdAt;
