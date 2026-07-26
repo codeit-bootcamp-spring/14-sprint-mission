@@ -91,7 +91,7 @@ public class FileMessageService implements MessageService {
     }
 
     public void saveMessageFile() {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("messagelist.ser"))) {
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("newmessagelist.ser"))) {
             objectOutputStream.writeObject(messageList);
         } catch (IOException e) {
             e.printStackTrace();
