@@ -8,14 +8,9 @@ import java.util.UUID;
 
 @ToString
 @Getter
-public class Message implements Entity {
+public final class Message extends Entity {
     @Serial
     private static final long serialVersionUID = 1L;
-
-    @ToString.Include
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
 
     @ToString.Include
     private String content;
@@ -23,22 +18,13 @@ public class Message implements Entity {
     private final UUID userId;
 
     public Message(String content, UUID userId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
-
+        super();
         this.content = content;
         this.userId = userId;
     }
 
     public void updateContent(String content) {
         this.content = content;
-        this.updatedAt = now();
+        super.updatedAt = now();
     }
-
-    private Long now() {
-        return System.currentTimeMillis();
-    }
-
-
 }

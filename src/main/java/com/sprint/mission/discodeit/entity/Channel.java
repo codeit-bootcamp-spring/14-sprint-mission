@@ -10,14 +10,9 @@ import java.util.UUID;
 
 @ToString(onlyExplicitlyIncluded = true)
 @Getter
-public class Channel implements Entity {
+public final class Channel extends Entity {
     @Serial
     private static final long serialVersionUID = 1L;
-
-    @ToString.Include
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
 
     @ToString.Include
     private String name;
@@ -27,18 +22,14 @@ public class Channel implements Entity {
     private final List<UUID> messagesId;
 
     public Channel(String name, List<UUID> usersId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = now();
-        this.updatedAt = createdAt;
-
+        super();
         this.name = name;
         this.usersId = new ArrayList<>(usersId);
         messagesId = new ArrayList<>();
     }
 
     public void updateName(String name) {
-        this.updatedAt = now();
-
+        super.updatedAt = now();
         this.name = name;
     }
 
@@ -49,9 +40,4 @@ public class Channel implements Entity {
 
         messagesId.add(messageId);
     }
-
-    private Long now() {
-        return System.currentTimeMillis();
-    }
-
 }

@@ -1,8 +1,23 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import lombok.Getter;
+
 import java.util.UUID;
 
-public interface Entity extends Serializable {
-    UUID getId();
+@Getter
+public abstract class Entity implements Identifiable {
+    protected final UUID id;
+    protected final Long createdAt;
+    protected Long updatedAt;
+
+    protected Entity() {
+        this.id = UUID.randomUUID();
+        this.createdAt = now();
+        this.updatedAt = this.createdAt;
+    }
+
+    protected Long now() {
+        return System.currentTimeMillis();
+    }
+
 }
