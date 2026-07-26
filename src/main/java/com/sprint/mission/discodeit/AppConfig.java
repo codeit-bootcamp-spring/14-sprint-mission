@@ -12,8 +12,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.validator.UserValidator;
-import com.sprint.mission.discodeit.service.validator.Validator;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -26,8 +24,6 @@ public class AppConfig {
     private static UserService userService;
     private static ChannelService channelService;
     private static MessageService messageService;
-
-    private static Validator userValidator;
 
     public static UserRepository userRepository() {
         return get(userRepository, () -> userRepository = new FileUserRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/user.ser"));
@@ -46,15 +42,11 @@ public class AppConfig {
     }
 
     public static ChannelService channelService() {
-        return get(channelService, () -> channelService = new BasicChannelService(channelRepository() ,messageRepository(),userValidator()));
+        return get(channelService, () -> channelService = new BasicChannelService(channelRepository() ,messageRepository(),userRepository()));
     }
 
     public static MessageService messageService() {
         return get(messageService, () -> messageService = new BasicMessageService(messageRepository(), channelRepository()));
-    }
-
-    public static Validator userValidator() {
-        return get(userValidator, () -> userValidator = new UserValidator(userRepository()));
     }
 
     private static <T> T get(T t, Supplier<T> supplier) {
