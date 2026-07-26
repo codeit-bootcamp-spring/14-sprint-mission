@@ -16,7 +16,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 
 public class JavaApplication {
-
     static UserService userService = AppConfig.userService();
     static MessageService messageService = AppConfig.messageService();
     static ChannelService channelService = AppConfig.channelService();
@@ -39,9 +38,6 @@ public class JavaApplication {
         serviceIntegrationTest(userService, channelService, messageService);
     }
 
-    static void beforeEach() {
-
-    }
 
 
     static void userServiceTest(UserService userService) {
@@ -76,8 +72,6 @@ public class JavaApplication {
         System.out.println("6. 삭제된 Channel 단일 조회");
         channelService.deleteChannel(c2.getId());
         System.out.println("channelService.getChannel(c2.getId()) = " + channelService.getChannel(c2.getId()));
-
-        // TODO 채널 소속 유저 추가/삭제 기능 추가 후 테스트
     }
 
     static void messageServiceTest(MessageService messageService) {
@@ -88,8 +82,8 @@ public class JavaApplication {
 
         System.out.println("3. Message 내용 갱신");
         System.out.println("4. 갱신된 Message 단일 조회");
-        messageService.updateMessage(m2.getId(), new MessageUpdateDto("UPDATED"));
-        System.out.println("messageService.getMessage(m2.) = " + messageService.getMessage(m2.getId()));
+        messageService.updateMessage(m1.getId(), new MessageUpdateDto("UPDATED"));
+        System.out.println("messageService.getMessage(m1.getId()) = " + messageService.getMessage(m1.getId()));
 
         System.out.println("5. Message 삭제");
         System.out.println("6. 삭제된 Message 단일 조회");
@@ -101,22 +95,50 @@ public class JavaApplication {
                                        ChannelService channelService,
                                        MessageService messageService) {
         System.out.println("\n\n\n============= ServiceIntegrationTest =============");
-        // TODO 1. User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증
-        // TODO 2. Channel에 속하지 않은 User가 Message 보낼 수 없음을 검증
-        User notInChannel = new User("notInChannel");
-        Channel notUserChannel = channelService.createChannel(new ChannelCreationDto("test channel", List.of()));
-        messageService.createMessage(new MessageCreationDto("", notInChannel.getId(), notUserChannel.getId()));
+        
+        // User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증 완료
+        System.out.println("1. User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증");
+        User userToBeDeleted = userService.createAccount(new UserCreationDto("userToBeDeleted"));
+        Channel channelToBeDeleted = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted", List.of(userToBeDeleted.getId())));
+        Message msgToBeDeleted = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", userToBeDeleted.getId(), channelToBeDeleted.getId()));
 
-        // TODO 3. Message 생성 시, {User가 repository에 등록됨, User가 Channel에 소속됨}을 검증
+        userService.deleteAccount(userToBeDeleted.getId());
+        System.out.println("channelService.getChannel(channelToBeDeleted.getId()) = " + channelService.getChannel(channelToBeDeleted.getId()));
+        System.out.println("messageService.getMessage(msgToBeDeleted.getId()) = " + messageService.getMessage(msgToBeDeleted.getId()));
 
+        // Channel 삭제 시, 내부 Message가 삭제됨을 검증
+        System.out.println("2. Channel 삭제 시, 내부 Message가 삭제됨을 검증");
+        User u = userService.createAccount(new UserCreationDto("u"));
+        Channel channelToBeDeleted2 = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted2", List.of(u.getId())));
+        Message msgToBeDeleted2 = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", u.getId(), channelToBeDeleted2.getId()));
 
-        // TODO 4. Channel 생성 시, User가 repository에 등록된 유저임을 검증 (O)
+        channelService.deleteChannel(channelToBeDeleted2.getId());
+        System.out.println("messageService.getMessage(msgToBeDeleted2.getId()) = " + messageService.getMessage(msgToBeDeleted2.getId()));
+
+        // Message 생성 시, User가 channel에 소속됨을 검증
+        try {
+            User notInChannel = new User("notInChannel");
+            Channel channel = channelService.createChannel(new ChannelCreationDto("test channel", List.of()));
+            messageService.createMessage(new MessageCreationDto("", notInChannel.getId(), channel.getId()));
+        } catch (IllegalArgumentException e) {
+            System.out.println("3. Message 생성 시, User가 channel에 소속됨을 검증 성공");
+        }
+
+        // Message 생성 시, Channel이 Repository에 소속됨을 검증
+        try {
+            User user = userService.createAccount(new UserCreationDto("user"));
+            Channel notRegistered = new Channel("notRegistered", List.of(user.getId()));
+            messageService.createMessage(new MessageCreationDto("", user.getId(), notRegistered.getId()));
+        } catch (IllegalArgumentException e) {
+            System.out.println("4. Message 생성 시, Channel이 Repository에 소속됨을 검증");
+        }
+
+        // Channel 생성 시, User가 Repository에 등록된 유저임을 검증
         try {
             User notRegistered = new User("notRegistered");
             channelService.createChannel(new ChannelCreationDto("not valid channel", List.of(notRegistered.getId())));
         } catch (IllegalArgumentException e) {
-            System.out.println("Channel 생성 시, User가 reposiotry에 등록된 유저임을 검증");
+            System.out.println("5. Channel 생성 시, User가 repository 등록된 유저임을 검증 성공");
         }
-
     }
 }
