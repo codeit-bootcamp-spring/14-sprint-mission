@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,15 +15,14 @@ public class UserCreateRequestDto {
 
     // 팩토리 패턴
     public static UserCreateRequestDto of(String username, String email, String password) {
-
         if (username == null || username.isEmpty()) {
-            throw new RuntimeException("User의 username이 비어있습니다.");
+            throw new CustomException(ExceptionType.USER_USERNAME_IS_NULL);
         }
         if (email == null || email.isEmpty()) {
-            throw new RuntimeException("User의 email이 비어있습니다.");
+            throw new CustomException(ExceptionType.USER_EMAIL_IS_NULL);
         }
         if (password == null || password.isEmpty()) {
-            throw new RuntimeException("User의 password가 비어있습니다.");
+            throw new CustomException(ExceptionType.USER_PASSWORD_IS_NULL);
         }
         return new UserCreateRequestDto(username, email, password);
     }

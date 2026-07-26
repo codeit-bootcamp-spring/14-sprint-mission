@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
@@ -33,7 +35,8 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public Channel find(UUID id) {
         channelMap = loadFile(CHANNEL_FILENAME);
-        return Optional.ofNullable(channelMap.get(id)).orElseThrow();
+        return Optional.ofNullable(channelMap.get(id))
+                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
     }
 
     @Override
@@ -46,7 +49,7 @@ public class FileChannelRepository implements ChannelRepository {
     public void delete(UUID id) {
         channelMap = loadFile(CHANNEL_FILENAME);
         if (channelMap.remove(id) == null) {
-            throw new NoSuchElementException();
+            throw new CustomException(ExceptionType.USER_NOT_FOUND);
         }
         saveToFile(channelMap, CHANNEL_FILENAME);
     }

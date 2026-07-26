@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.*;
@@ -33,9 +35,8 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public Message find(UUID id) {
         messageMap = loadFile(MESSAGE_FILENAME);
-        return Optional.ofNullable(
-                messageMap.get(id)
-        ).orElseThrow();
+        return Optional.ofNullable(messageMap.get(id))
+                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
     }
 
     @Override
@@ -48,7 +49,7 @@ public class FileMessageRepository implements MessageRepository {
     public void delete(UUID id) {
         messageMap = loadFile(MESSAGE_FILENAME);
         if (messageMap.remove(id) == null) {
-            throw new NoSuchElementException();
+            throw new CustomException(ExceptionType.USER_NOT_FOUND);
         }
         saveToFile(messageMap, MESSAGE_FILENAME);
     }

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto.message;
 
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,13 +17,13 @@ public class MessageCreateRequestDto {
 
     public static MessageCreateRequestDto of(String content, UUID senderId, UUID channelId) {
         if (content == null || content.isEmpty()) {
-            throw new RuntimeException("Message의 content가 비어있습니다.");
+            throw new CustomException(ExceptionType.MESSAGE_CONTENT_IS_NULL);
         }
         if (senderId == null) {
-            throw new RuntimeException("Message의 senderId가 비어있습니다.");
+            throw new CustomException(ExceptionType.MESSAGE_SENDER_ID_IS_NULL);
         }
         if (channelId == null) {
-            throw new RuntimeException("Message의 channelId가 비어있습니다.");
+            throw new CustomException(ExceptionType.MESSAGE_CHANNEL_ID_IS_NULL);
         }
 
 

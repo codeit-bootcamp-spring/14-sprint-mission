@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,10 +15,10 @@ public class ChannelCreateRequestDto {
 
     public static ChannelCreateRequestDto of(String name, ChannelType channelType) {
         if (name == null || name.isEmpty()) {
-            throw new RuntimeException("Channel의 name이 비어있습니다.");
+            throw new CustomException(ExceptionType.CHANNEL_NAME_IS_NULL);
         }
         if (channelType == null) {
-            throw new RuntimeException("Channel의 channelType이 비어있습니다.");
+            throw new CustomException(ExceptionType.CHANNEL_TYPE_IS_NULL);
         }
 
         return new ChannelCreateRequestDto(name, channelType);

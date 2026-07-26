@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.NoArgsConstructor;
 
@@ -34,7 +36,8 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User find(UUID id) {
         userMap = loadFile(USER_FILENAME);
-        return Optional.ofNullable(userMap.get(id)).orElseThrow();
+        return Optional.ofNullable(userMap.get(id))
+                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
     }
 
     @Override
@@ -47,7 +50,7 @@ public class FileUserRepository implements UserRepository {
     public void delete(UUID id) {
         userMap = loadFile(USER_FILENAME);
         if (userMap.remove(id) == null) {
-            throw new NoSuchElementException();
+            throw new CustomException(ExceptionType.USER_NOT_FOUND);
         }
         saveToFile(userMap, USER_FILENAME);
     }
