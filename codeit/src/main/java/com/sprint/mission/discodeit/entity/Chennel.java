@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.UUID;
 
+@Getter
 public class Chennel {
     private final UUID id;
     private final Long createAt;
@@ -22,11 +25,4 @@ public class Chennel {
         this.channelNumber = channelNumber;
         this.updateAt = System.currentTimeMillis();
     }
-    public UUID getId(){
-        return id;
-    }
-    public String getName() {
-        return channelName;
-    }
-    public int getChannelNumber(){ return channelNumber; }
 }

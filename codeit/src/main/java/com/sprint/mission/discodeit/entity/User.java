@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.UUID;
 
+@Getter
 public class User {
     private final UUID id;
     private final Long createAt;
@@ -25,15 +28,4 @@ public class User {
         this.password  = password;
         this.updateAt = System.currentTimeMillis();
     }
-    public UUID getId(){
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public String getEmail(){
-        return email;
-    }
-    public String getpassword(){return password;}
 }

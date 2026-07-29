@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.UUID;
 
+@Getter
 public class Message {
     private final UUID id;
     private final Long createAt;
@@ -20,12 +23,5 @@ public class Message {
         this.sendMessage = sendMessage;
         this.receiveMessage = receiveMessage;
         this.updateAt = System.currentTimeMillis();
-    }
-    public UUID getId(){return id;}
-    public String getSendMessage() {
-        return sendMessage;
-    }
-    public String getReceiveMessage(){
-        return receiveMessage;
     }
 }
