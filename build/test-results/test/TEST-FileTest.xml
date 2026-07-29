@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="FileTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-07-26T14:11:04.363Z" hostname="LAPTOP-TO33RE26" time="0.131">
+  <properties/>
+  <testcase name="findAll_테스트()" classname="FileTest" time="0.092"/>
+  <system-out><![CDATA[[User{userName='김양횬', email='new@test.com', password='9999'}]
+[Channel{channelType=PRIVATE, memo='바뀐공지', memoText='바뀐공지123'}]
+[Message{message='바뀐공지', channelId=1a3aec7d-ff34-4803-8755-b7d069d601c9, UserId=5e8d729b-23c0-4407-8b01-759132f24676}]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
