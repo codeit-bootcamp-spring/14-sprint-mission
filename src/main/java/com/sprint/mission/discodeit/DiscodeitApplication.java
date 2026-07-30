@@ -1,13 +1,152 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.dto.channel.ChannelCreationDto;
+import com.sprint.mission.discodeit.entity.dto.channel.ChannelUpdateNameDto;
+import com.sprint.mission.discodeit.entity.dto.message.MessageCreationDto;
+import com.sprint.mission.discodeit.entity.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserCreationDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.List;
+
+import static com.sprint.mission.discodeit.JavaApplication.*;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-
 	public static void main(String[] args) {
-		SpringApplication.run(DiscodeitApplication.class, args);
+//		SpringApplication.run(DiscodeitApplication.class, args);
+		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+		UserService userService = context.getBean(UserService.class);
+		ChannelService channelService = context.getBean(ChannelService.class);
+		MessageService messageService = context.getBean(MessageService.class);
+
+		User u1 = userService.createAccount(new UserCreationDto("user1"));
+		User u2 = userService.createAccount(new UserCreationDto("user2"));
+		User u3 = userService.createAccount(new UserCreationDto("user3"));
+		User u4 = userService.createAccount(new UserCreationDto("ToBeDeleted"));
+
+		Channel c1 = channelService.createChannel(new ChannelCreationDto("channel1", List.of(u1.getId(), u2.getId())));
+		Channel c2 = channelService.createChannel(new ChannelCreationDto("ToBeDeleted", List.of(u3.getId(), u4.getId())));
+
+		Message m1 = messageService.createMessage(new MessageCreationDto("user1 to channel1", u1.getId(), c1.getId()));
+		Message m2 = messageService.createMessage(new MessageCreationDto("ToBeUpdatedAndDeleted", u3.getId(), c2.getId()));
+
+		userServiceTest(userService);
+		messageServiceTest(messageService);
+		channelServiceTest(channelService);
+		serviceIntegrationTest(userService, channelService, messageService);
+	}
+
+
+	static void userServiceTest(UserService userService) {
+		System.out.println("\n\n\n============= UserService =============");
+		System.out.println("1. User 생성");
+		System.out.println("2. User 전체 조회");
+		System.out.println(userService.getAllUsers());
+
+		System.out.println("3. User 이름 갱신");
+		System.out.println("4. 갱신된 User 단일 조회");
+		userService.updateUser(u1.getId(), new UserUpdateDto("user1_updated"));
+		System.out.println("userService.getUser(u1.getId()) = " + userService.getUser(u1.getId()));
+
+		System.out.println("5. User 삭제");
+		System.out.println("6. 삭제된 User 단일 조회");
+		userService.deleteAccount(u4.getId());
+		System.out.println("userService.getUser(u4) = " + userService.getUser(u4.getId()));
+	}
+
+	static void channelServiceTest(ChannelService channelService) {
+		System.out.println("\n\n\n============= ChannelService =============");
+		System.out.println("1. Channel 생성");
+		System.out.println("2. Channel 전체 조회");
+		System.out.println(channelService.getAllChannels());
+
+		System.out.println("3. Channel 이름 갱신");
+		System.out.println("4. 갱신된 Channel 단일 조회");
+		channelService.updateChannelName(c1.getId(), new ChannelUpdateNameDto("c1_updated"));
+		System.out.println("channelService.getChannel(c1.getId()) = " + channelService.getChannel(c1.getId()));
+
+		System.out.println("5. Channel 삭제");
+		System.out.println("6. 삭제된 Channel 단일 조회");
+		channelService.deleteChannel(c2.getId());
+		System.out.println("channelService.getChannel(c2.getId()) = " + channelService.getChannel(c2.getId()));
+	}
+
+	static void messageServiceTest(MessageService messageService) {
+		System.out.println("\n\n\n============= MessageService =============");
+		System.out.println("1. Message 생성");
+		System.out.println("2. Message 전체 조회");
+		System.out.println(messageService.getAllMessages());
+
+		System.out.println("3. Message 내용 갱신");
+		System.out.println("4. 갱신된 Message 단일 조회");
+		messageService.updateMessage(m1.getId(), new MessageUpdateDto("UPDATED"));
+		System.out.println("messageService.getMessage(m1.getId()) = " + messageService.getMessage(m1.getId()));
+
+		System.out.println("5. Message 삭제");
+		System.out.println("6. 삭제된 Message 단일 조회");
+		messageService.deleteMessage(m2.getId());
+		System.out.println("messageService.getMessage(m2.getId()) = " + messageService.getMessage(m2.getId()));
+	}
+
+	static void serviceIntegrationTest(UserService userService,
+									   ChannelService channelService,
+									   MessageService messageService) {
+		System.out.println("\n\n\n============= ServiceIntegrationTest =============");
+
+		// User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증 완료
+		System.out.println("1. User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증");
+		User userToBeDeleted = userService.createAccount(new UserCreationDto("userToBeDeleted"));
+		Channel channelToBeDeleted = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted", List.of(userToBeDeleted.getId())));
+		Message msgToBeDeleted = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", userToBeDeleted.getId(), channelToBeDeleted.getId()));
+
+		userService.deleteAccount(userToBeDeleted.getId());
+		System.out.println("channelService.getChannel(channelToBeDeleted.getId()) = " + channelService.getChannel(channelToBeDeleted.getId()));
+		System.out.println("messageService.getMessage(msgToBeDeleted.getId()) = " + messageService.getMessage(msgToBeDeleted.getId()));
+
+		// Channel 삭제 시, 내부 Message가 삭제됨을 검증
+		System.out.println("2. Channel 삭제 시, 내부 Message가 삭제됨을 검증");
+		User u = userService.createAccount(new UserCreationDto("u"));
+		Channel channelToBeDeleted2 = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted2", List.of(u.getId())));
+		Message msgToBeDeleted2 = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", u.getId(), channelToBeDeleted2.getId()));
+
+		channelService.deleteChannel(channelToBeDeleted2.getId());
+		System.out.println("messageService.getMessage(msgToBeDeleted2.getId()) = " + messageService.getMessage(msgToBeDeleted2.getId()));
+
+		// Message 생성 시, User가 channel에 소속됨을 검증
+		try {
+			User notInChannel = new User("notInChannel");
+			Channel channel = channelService.createChannel(new ChannelCreationDto("test channel", List.of()));
+			messageService.createMessage(new MessageCreationDto("", notInChannel.getId(), channel.getId()));
+		} catch (IllegalArgumentException e) {
+			System.out.println("3. Message 생성 시, User가 channel에 소속됨을 검증 성공");
+		}
+
+		// Message 생성 시, Channel이 Repository에 소속됨을 검증
+		try {
+			User user = userService.createAccount(new UserCreationDto("user"));
+			Channel notRegistered = new Channel("notRegistered", List.of(user.getId()));
+			messageService.createMessage(new MessageCreationDto("", user.getId(), notRegistered.getId()));
+		} catch (IllegalArgumentException e) {
+			System.out.println("4. Message 생성 시, Channel이 Repository에 소속됨을 검증");
+		}
+
+		// Channel 생성 시, User가 Repository에 등록된 유저임을 검증
+		try {
+			User notRegistered = new User("notRegistered");
+			channelService.createChannel(new ChannelCreationDto("not valid channel", List.of(notRegistered.getId())));
+		} catch (IllegalArgumentException e) {
+			System.out.println("5. Channel 생성 시, User가 repository 등록된 유저임을 검증 성공");
+		}
 	}
 
 }
