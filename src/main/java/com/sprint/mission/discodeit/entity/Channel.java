@@ -26,8 +26,9 @@ public final class Channel extends Entity {
     }
 
     public void updateName(String name) {
-        super.updatedAt = now();
         this.name = name;
+
+        super.markAsUpdate();
     }
 
     public boolean containsUser(UUID userId) {

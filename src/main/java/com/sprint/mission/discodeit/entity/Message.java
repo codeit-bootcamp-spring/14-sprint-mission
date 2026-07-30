@@ -28,6 +28,7 @@ public final class Message extends Entity {
 
     public void updateContent(String content) {
         this.content = content;
-        super.updatedAt = now();
+
+        super.markAsUpdate();
     }
 }

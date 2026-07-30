@@ -20,7 +20,8 @@ public final class User extends Entity {
     }
 
     public void updateName(String name) {
-        super.updatedAt = now();
         this.name = name;
+
+        super.markAsUpdate();
     }
 }
