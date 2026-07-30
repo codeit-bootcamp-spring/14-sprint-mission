@@ -26,15 +26,15 @@ public class AppConfig {
     private static MessageService messageService;
 
     public static UserRepository userRepository() {
-        return get(userRepository, () -> userRepository = new FileUserRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/user.ser"));
+        return get(userRepository, () -> userRepository = new FileUserRepository());
     }
 
     public static ChannelRepository channelRepository() {
-        return get(channelRepository, () -> channelRepository = new FileChannelRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/channel.ser"));
+        return get(channelRepository, () -> channelRepository = new FileChannelRepository());
     }
 
     public static MessageRepository messageRepository() {
-        return get(messageRepository, () -> messageRepository = new FileMessageRepository("src/main/java/com/sprint/mission/discodeit/repository/file/data/message.ser"));
+        return get(messageRepository, () -> messageRepository = new FileMessageRepository());
     }
 
     public static UserService userService() {

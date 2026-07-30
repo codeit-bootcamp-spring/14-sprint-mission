@@ -2,18 +2,20 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.Files;
+import org.springframework.stereotype.Repository;
 
-import java.io.File;
 import java.util.*;
 
+@Repository
 public class FileChannelRepository extends MapFileIO<Channel>
         implements ChannelRepository {
 
     protected final Map<UUID, Channel> EMPTY_BUFFER = new HashMap<>();
     private Map<UUID, Channel> buffer;
 
-    public FileChannelRepository(String fileName) {
-        super(new File(fileName));
+    public FileChannelRepository() {
+        super(Files.CHANNEL);
         this.buffer = Optional.of(file)
                 .filter(file -> file.exists() && file.length() != 0)
                 .map(file -> super.readFile())

@@ -1,19 +1,21 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.Files;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileUserRepository extends MapFileIO<User>
         implements UserRepository {
 
     private final Map<UUID, User> EMPTY_BUFFER = new HashMap<>();
     private Map<UUID, User> buffer;
 
-    public FileUserRepository(String fileName) {
-        super(new File(fileName));
+    public FileUserRepository() {
+        super(Files.USER);
         this.buffer = Optional.of(file)
                 .filter(file -> file.exists() && file.length() != 0)
                 .map(file -> super.readFile())

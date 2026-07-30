@@ -1,19 +1,21 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.Files;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
-import java.io.File;
 import java.util.*;
 
+@Repository
 public class FileMessageRepository extends MapFileIO<Message>
         implements MessageRepository {
 
     private final Map<UUID, Message> EMPTY_BUFFER = new HashMap<>();
     private Map<UUID, Message> buffer;
 
-    public FileMessageRepository(String filename) {
-        super(new File(filename));
+    public FileMessageRepository() {
+        super(Files.MESSAGE);
         this.buffer = Optional.of(file)
                 .filter(file -> file.exists() && file.length() > 0)
                 .map(file -> super.readFile())
@@ -59,9 +61,9 @@ public class FileMessageRepository extends MapFileIO<Message>
     }
 
     @Override
-    public void deleteAllByUserId(UUID id) {
+    public void deleteAllByUserId(UUID userId) {
         buffer.values().stream()
-                .filter(message -> message.getUserId().equals(id))
+                .filter(message -> message.getUserId().equals(userId))
                 .map(message -> message.getId())
                 .forEach(toBeDeleted -> deleteById(toBeDeleted));
         writeFile();

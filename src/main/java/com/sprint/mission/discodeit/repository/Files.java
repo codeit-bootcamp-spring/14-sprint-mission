@@ -1,0 +1,10 @@
+package com.sprint.mission.discodeit.repository;
+
+import java.io.File;
+
+public final class Files {
+    public static final File USER = new File("src/main/java/com/sprint/mission/discodeit/repository/file/data/user.ser");
+    public static final File CHANNEL = new File("src/main/java/com/sprint/mission/discodeit/repository/file/data/channel.ser");
+    public static final File MESSAGE = new File("src/main/java/com/sprint/mission/discodeit/repository/file/data/message.ser");
+
+}
