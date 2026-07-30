@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.common.ModifiableEntity;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -8,7 +9,7 @@ import java.util.UUID;
 
 @ToString
 @Getter
-public final class Message extends Entity {
+public final class Message extends ModifiableEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -29,6 +30,6 @@ public final class Message extends Entity {
     public void updateContent(String content) {
         this.content = content;
 
-        super.markAsUpdate();
+        super.markedAsUpdate();
     }
 }
