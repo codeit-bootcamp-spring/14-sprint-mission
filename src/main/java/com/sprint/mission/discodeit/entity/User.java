@@ -15,13 +15,22 @@ public final class User extends ModifiableEntity {
 
     @ToString.Include
     private final UUID profileId;
+
     @ToString.Include
     private String name;
+    private String email;
+    private String password;
 
-    public User(String name) {
+    public User(String name, String email, String password) {
         super();
         this.profileId = UUID.randomUUID();
         this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(String name) {
+        this(name, null, null);
     }
 
     public void updateName(String name) {
