@@ -1,16 +1,20 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import org.springframework.stereotype.Service;
+
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Service
 public class BasicChannelService implements ChannelService {
     // 의존성 주입 패턴
     private final ChannelRepository channelRepository;
