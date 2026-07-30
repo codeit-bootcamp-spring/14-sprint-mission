@@ -12,7 +12,7 @@ import java.util.*;
 public class FileUserRepository implements UserRepository {
 
     private final String USER_FILENAME = "users.ser";
-    private Map<UUID, User> userMap = new HashMap<>();
+    private Map<UUID, User> userMap = loadFile(USER_FILENAME);
 
     private FileUserRepository() {}
 
@@ -26,29 +26,24 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        userMap = loadFile(USER_FILENAME);
         userMap.put(user.getId(), user);
         saveToFile(userMap, USER_FILENAME);
-
         return user;
     }
 
     @Override
     public User find(UUID id) {
-        userMap = loadFile(USER_FILENAME);
         return Optional.ofNullable(userMap.get(id))
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
     }
 
     @Override
     public List<User> findAll() {
-        userMap = loadFile(USER_FILENAME);
         return userMap.values().stream().toList();
     }
 
     @Override
     public void delete(UUID id) {
-        userMap = loadFile(USER_FILENAME);
         if (userMap.remove(id) == null) {
             throw new CustomException(ExceptionType.USER_NOT_FOUND);
         }

@@ -11,7 +11,9 @@ import java.util.*;
 public class FileChannelRepository implements ChannelRepository {
 
     private final String CHANNEL_FILENAME = "channels.ser";
-    private Map<UUID, Channel> channelMap;
+
+    // FileChannelRepository 생성 시 한번만 로드
+    private Map<UUID, Channel> channelMap = loadFile(CHANNEL_FILENAME);
 
     private FileChannelRepository() {}
 
@@ -25,31 +27,26 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel save(Channel channel) {
-        channelMap = loadFile(CHANNEL_FILENAME);
         channelMap.put(channel.getId(), channel);
         saveToFile(channelMap, CHANNEL_FILENAME);
-
         return channel;
     }
 
     @Override
     public Channel find(UUID id) {
-        channelMap = loadFile(CHANNEL_FILENAME);
         return Optional.ofNullable(channelMap.get(id))
-                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND));
     }
 
     @Override
     public List<Channel> findAll() {
-        channelMap = loadFile(CHANNEL_FILENAME);
         return channelMap.values().stream().toList();
     }
 
     @Override
     public void delete(UUID id) {
-        channelMap = loadFile(CHANNEL_FILENAME);
         if (channelMap.remove(id) == null) {
-            throw new CustomException(ExceptionType.USER_NOT_FOUND);
+            throw new CustomException(ExceptionType.CHANNEL_NOT_FOUND);
         }
         saveToFile(channelMap, CHANNEL_FILENAME);
     }

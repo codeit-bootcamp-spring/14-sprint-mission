@@ -11,8 +11,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.UUID;
 
 @Getter
-@ToString
-@AllArgsConstructor(access =AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ChannelResponseDto {
     UUID id;

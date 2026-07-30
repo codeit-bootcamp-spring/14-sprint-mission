@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
@@ -27,7 +29,8 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel find(UUID id) {
-        return Optional.ofNullable(this.channelMap.get(id)).orElseThrow();
+        return Optional.ofNullable(this.channelMap.get(id))
+                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND));
     }
 
     @Override
@@ -38,7 +41,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public void delete(UUID id) {
         if (this.channelMap.remove(id) == null) {
-            throw new NoSuchElementException();
+            throw new CustomException(ExceptionType.CHANNEL_NOT_FOUND);
         }
     }
 }

@@ -6,12 +6,14 @@ import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ChannelCreateRequestDto {
-    private String name;
-    private ChannelType channelType;
+    String name;
+    ChannelType channelType;
 
     public static ChannelCreateRequestDto of(String name, ChannelType channelType) {
         if (name == null || name.isEmpty()) {

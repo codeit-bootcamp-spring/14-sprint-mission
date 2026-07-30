@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
@@ -28,9 +30,8 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message find(UUID id) {
-        return Optional.ofNullable(
-                messageMap.get(id)
-        ).orElseThrow();
+        return Optional.ofNullable(messageMap.get(id))
+                .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND));
     }
 
     @Override
@@ -41,7 +42,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void delete(UUID id) {
         if (messageMap.remove(id) == null) {
-            throw new NoSuchElementException();
+            throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND);
         }
     }
 }

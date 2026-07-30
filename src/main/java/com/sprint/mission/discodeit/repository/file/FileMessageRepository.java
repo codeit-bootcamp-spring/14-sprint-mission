@@ -12,7 +12,7 @@ import java.util.*;
 public class FileMessageRepository implements MessageRepository {
 
     private final String MESSAGE_FILENAME = "messages.ser";
-    private Map<UUID, Message> messageMap;
+    private Map<UUID, Message> messageMap = loadFile(MESSAGE_FILENAME);
 
     private FileMessageRepository() {}
 
@@ -26,7 +26,6 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        messageMap = loadFile(MESSAGE_FILENAME);
         messageMap.put(message.getId(), message);
         saveToFile(messageMap, MESSAGE_FILENAME);
         return message;
@@ -34,22 +33,19 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message find(UUID id) {
-        messageMap = loadFile(MESSAGE_FILENAME);
         return Optional.ofNullable(messageMap.get(id))
-                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND));
     }
 
     @Override
     public List<Message> findAll() {
-        messageMap = loadFile(MESSAGE_FILENAME);
         return messageMap.values().stream().toList();
     }
 
     @Override
     public void delete(UUID id) {
-        messageMap = loadFile(MESSAGE_FILENAME);
         if (messageMap.remove(id) == null) {
-            throw new CustomException(ExceptionType.USER_NOT_FOUND);
+            throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND);
         }
         saveToFile(messageMap, MESSAGE_FILENAME);
     }

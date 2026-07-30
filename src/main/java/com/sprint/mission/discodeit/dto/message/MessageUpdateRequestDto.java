@@ -2,16 +2,19 @@ package com.sprint.mission.discodeit.dto.message;
 
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class MessageUpdateRequestDto {
-    private UUID id;
-    private String content;
+    UUID id;
+    String content;
 
     public static MessageUpdateRequestDto of(UUID id, String content) {
         if (id == null) {

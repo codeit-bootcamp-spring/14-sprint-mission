@@ -5,15 +5,17 @@ import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class MessageCreateRequestDto {
-    private String content;
-    private UUID senderId;
-    private UUID channelId;
+    String content;
+    UUID senderId;
+    UUID channelId;
 
     public static MessageCreateRequestDto of(String content, UUID senderId, UUID channelId) {
         if (content == null || content.isEmpty()) {

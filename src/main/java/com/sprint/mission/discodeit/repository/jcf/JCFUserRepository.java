@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
@@ -27,7 +29,8 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User find(UUID id) {
-        return Optional.ofNullable(userMap.get(id)).orElseThrow();
+        return Optional.ofNullable(userMap.get(id))
+                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
     }
 
     @Override
@@ -38,7 +41,7 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void delete(UUID id) {
         if (userMap.remove(id) == null) {
-            throw new NoSuchElementException();
+            throw new CustomException(ExceptionType.USER_NOT_FOUND);
         }
     }
 }
