@@ -9,12 +9,10 @@ import java.util.UUID;
 public abstract class BasicEntity implements Identifiable {
     protected final UUID id;
     protected final Instant createdAt;
-    protected Instant updatedAt;
 
     protected BasicEntity() {
         this.id = UUID.randomUUID();
         this.createdAt = now();
-        this.updatedAt = this.createdAt;
     }
 
 
