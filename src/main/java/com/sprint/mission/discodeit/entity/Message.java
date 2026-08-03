@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.common.ModifiableEntity;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @ToString
@@ -20,11 +24,21 @@ public final class Message extends ModifiableEntity {
     @ToString.Include
     private final UUID channelId;
 
-    public Message(String content, UUID userId, UUID channelId) {
+    private final List<UUID> attachmentIds = new ArrayList<>();
+
+    public Message(String content, UUID userId, UUID channelId, @Nullable List<UUID> attachmentIds) {
         super();
         this.content = content;
         this.userId = userId;
         this.channelId = channelId;
+
+        if (Objects.nonNull(attachmentIds)) {
+            this.attachmentIds.addAll(attachmentIds);
+        }
+    }
+
+    public Message(String content, UUID userId, UUID channelId) {
+        this(content, userId, channelId, null);
     }
 
     public void updateContent(String content) {

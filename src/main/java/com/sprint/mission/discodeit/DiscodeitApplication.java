@@ -37,8 +37,8 @@ public class DiscodeitApplication {
 		Channel c1 = channelService.createChannel(new ChannelCreationDto("channel1", List.of(u1.getId(), u2.getId())));
 		Channel c2 = channelService.createChannel(new ChannelCreationDto("ToBeDeleted", List.of(u3.getId(), u4.getId())));
 
-		Message m1 = messageService.createMessage(new MessageCreationDto("user1 to channel1", u1.getId(), c1.getId()));
-		Message m2 = messageService.createMessage(new MessageCreationDto("ToBeUpdatedAndDeleted", u3.getId(), c2.getId()));
+		Message m1 = messageService.createMessage(new MessageCreationDto("user1 to channel1", u1.getId(), c1.getId(), null));
+		Message m2 = messageService.createMessage(new MessageCreationDto("ToBeUpdatedAndDeleted", u3.getId(), c2.getId(), null));
 
 		userServiceTest(userService);
 		messageServiceTest(messageService);
@@ -107,7 +107,7 @@ public class DiscodeitApplication {
 		System.out.println("1. User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증");
 		User userToBeDeleted = userService.createAccount(new UserCreationDto("userToBeDeleted", "email", "password", null));
 		Channel channelToBeDeleted = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted", List.of(userToBeDeleted.getId())));
-		Message msgToBeDeleted = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", userToBeDeleted.getId(), channelToBeDeleted.getId()));
+		Message msgToBeDeleted = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", userToBeDeleted.getId(), channelToBeDeleted.getId(), null));
 
 		userService.deleteAccount(userToBeDeleted.getId());
 		System.out.println("channelService.getChannel(channelToBeDeleted.getId()) = " + channelService.getChannel(channelToBeDeleted.getId()));
@@ -117,7 +117,7 @@ public class DiscodeitApplication {
 		System.out.println("2. Channel 삭제 시, 내부 Message가 삭제됨을 검증");
 		User u = userService.createAccount(new UserCreationDto("u", "email", "password", null));
 		Channel channelToBeDeleted2 = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted2", List.of(u.getId())));
-		Message msgToBeDeleted2 = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", u.getId(), channelToBeDeleted2.getId()));
+		Message msgToBeDeleted2 = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", u.getId(), channelToBeDeleted2.getId(), null));
 
 		channelService.deleteChannel(channelToBeDeleted2.getId());
 		System.out.println("messageService.getMessage(msgToBeDeleted2.getId()) = " + messageService.getMessage(msgToBeDeleted2.getId()));
@@ -126,7 +126,7 @@ public class DiscodeitApplication {
 		try {
 			User notInChannel = new User("notInChannel", "email", "password", null);
 			Channel channel = channelService.createChannel(new ChannelCreationDto("test channel", List.of()));
-			messageService.createMessage(new MessageCreationDto("", notInChannel.getId(), channel.getId()));
+			messageService.createMessage(new MessageCreationDto("", notInChannel.getId(), channel.getId(), null));
 		} catch (IllegalArgumentException e) {
 			System.out.println("3. Message 생성 시, User가 channel에 소속됨을 검증 성공");
 		}
@@ -135,7 +135,7 @@ public class DiscodeitApplication {
 		try {
 			User user = userService.createAccount(new UserCreationDto("user", "email", "password", null));
 			Channel notRegistered = new Channel("notRegistered", List.of(user.getId()));
-			messageService.createMessage(new MessageCreationDto("", user.getId(), notRegistered.getId()));
+			messageService.createMessage(new MessageCreationDto("", user.getId(), notRegistered.getId(), null));
 		} catch (IllegalArgumentException e) {
 			System.out.println("4. Message 생성 시, Channel이 Repository에 소속됨을 검증");
 		}
