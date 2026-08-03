@@ -39,6 +39,17 @@ public class FileUserRepository extends MapFileIO<User>
     }
 
     @Override
+    public boolean existsByNameOrEmail(String name, String email) {
+        buffer = super.readFile();
+        return buffer.values().stream()
+                .anyMatch(user -> containsNameOrEmail(name, email, user));
+    }
+
+    private static boolean containsNameOrEmail(String name, String email, User user) {
+        return user.getName().equals(name) || user.getEmail().equals(email);
+    }
+
+    @Override
     public Optional<User> findById(UUID id) {
         buffer = super.readFile();
         return Optional.ofNullable(buffer.get(id));

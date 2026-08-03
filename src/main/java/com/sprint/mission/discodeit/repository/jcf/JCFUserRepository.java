@@ -24,6 +24,12 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean existsByNameOrEmail(String name, String email) {
+        // TODO 구현해야 함
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
     }
