@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.user.UserCreationDto;
 import com.sprint.mission.discodeit.entity.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStausRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
+    private final UserStausRepository userStausRepository;
 
     @Override
     public User createAccount(UserCreationDto dto) {
@@ -38,13 +41,15 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("유저 생성 시 password가 꼭 필요합니다.");
         }
 
-        // TODO 2. username과 email은 다른 유저와 달라야 한다.
+        // 2. username과 email은 다른 유저와 달라야 한다.
         if(userRepository.existsByNameOrEmail(name, email)) {
             throw new IllegalArgumentException("유저 생성 시 이미 사용 중인 name, email은 사용할 수 없습니다.");
         }
 
-        // TODO UserStatus를 같이 생성해야 한다.
+        // 3. UserStatus를 같이 생성해야 한다.
         User user = dto.toUser();
+        userStausRepository.create(new UserStatus(user.getId()));
+
         return userRepository.create(user);
     }
 

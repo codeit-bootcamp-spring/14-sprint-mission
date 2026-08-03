@@ -18,8 +18,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.List;
 
-import static com.sprint.mission.discodeit.JavaApplication.*;
-
 @SpringBootApplication
 public class DiscodeitApplication {
 	public static void main(String[] args) {
@@ -29,25 +27,33 @@ public class DiscodeitApplication {
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
 
-		User u1 = userService.createAccount(new UserCreationDto("user1", "email", "password", null));
-		User u2 = userService.createAccount(new UserCreationDto("user2", "email", "password", null));
-		User u3 = userService.createAccount(new UserCreationDto("user3", "email", "password", null));
-		User u4 = userService.createAccount(new UserCreationDto("ToBeDeleted", "email", "password", null));
+		User u1 = userService.createAccount(new UserCreationDto("user1", "user1", "password", null));
+		User u2 = userService.createAccount(new UserCreationDto("user2", "user2", "password", null));
+		User u3 = userService.createAccount(new UserCreationDto("user3", "user3", "password", null));
+		User u4 = userService.createAccount(new UserCreationDto("ToBeDeleted", "ToBeDeleted", "password", null));
+		List<User> users = List.of(u1, u2, u3, u4);
 
 		Channel c1 = channelService.createChannel(new ChannelCreationDto("channel1", List.of(u1.getId(), u2.getId())));
 		Channel c2 = channelService.createChannel(new ChannelCreationDto("ToBeDeleted", List.of(u3.getId(), u4.getId())));
+		List<Channel> channels = List.of(c1, c2);
 
 		Message m1 = messageService.createMessage(new MessageCreationDto("user1 to channel1", u1.getId(), c1.getId(), null));
 		Message m2 = messageService.createMessage(new MessageCreationDto("ToBeUpdatedAndDeleted", u3.getId(), c2.getId(), null));
+		List<Message> messages = List.of(m1, m2);
 
-		userServiceTest(userService);
-		messageServiceTest(messageService);
-		channelServiceTest(channelService);
+		userServiceTest(userService, users);
+		messageServiceTest(messageService, messages);
+		channelServiceTest(channelService, channels);
 		serviceIntegrationTest(userService, channelService, messageService);
 	}
 
 
-	static void userServiceTest(UserService userService) {
+	static void userServiceTest(UserService userService, List<User> users) {
+		User u1 = users.get(0);
+		User u2 = users.get(1);
+		User u3 = users.get(2);
+		User u4 = users.get(3);
+
 		System.out.println("\n\n\n============= UserService =============");
 		System.out.println("1. User 생성");
 		System.out.println("2. User 전체 조회");
@@ -64,7 +70,10 @@ public class DiscodeitApplication {
 		System.out.println("userService.getUser(u4) = " + userService.getUser(u4.getId()));
 	}
 
-	static void channelServiceTest(ChannelService channelService) {
+	static void channelServiceTest(ChannelService channelService, List<Channel> channels) {
+		Channel c1 = channels.get(0);
+		Channel c2 = channels.get(1);
+
 		System.out.println("\n\n\n============= ChannelService =============");
 		System.out.println("1. Channel 생성");
 		System.out.println("2. Channel 전체 조회");
@@ -81,7 +90,10 @@ public class DiscodeitApplication {
 		System.out.println("channelService.getChannel(c2.getId()) = " + channelService.getChannel(c2.getId()));
 	}
 
-	static void messageServiceTest(MessageService messageService) {
+	static void messageServiceTest(MessageService messageService, List<Message> messages) {
+		Message m1 = messages.get(0);
+		Message m2 = messages.get(1);
+
 		System.out.println("\n\n\n============= MessageService =============");
 		System.out.println("1. Message 생성");
 		System.out.println("2. Message 전체 조회");
@@ -105,7 +117,7 @@ public class DiscodeitApplication {
 
 		// User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증 완료
 		System.out.println("1. User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증");
-		User userToBeDeleted = userService.createAccount(new UserCreationDto("userToBeDeleted", "email", "password", null));
+		User userToBeDeleted = userService.createAccount(new UserCreationDto("userToBeDeleted", "userToBeDeleted", "password", null));
 		Channel channelToBeDeleted = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted", List.of(userToBeDeleted.getId())));
 		Message msgToBeDeleted = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", userToBeDeleted.getId(), channelToBeDeleted.getId(), null));
 
@@ -115,7 +127,7 @@ public class DiscodeitApplication {
 
 		// Channel 삭제 시, 내부 Message가 삭제됨을 검증
 		System.out.println("2. Channel 삭제 시, 내부 Message가 삭제됨을 검증");
-		User u = userService.createAccount(new UserCreationDto("u", "email", "password", null));
+		User u = userService.createAccount(new UserCreationDto("u", "u", "password", null));
 		Channel channelToBeDeleted2 = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted2", List.of(u.getId())));
 		Message msgToBeDeleted2 = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", u.getId(), channelToBeDeleted2.getId(), null));
 
@@ -133,7 +145,7 @@ public class DiscodeitApplication {
 
 		// Message 생성 시, Channel이 Repository에 소속됨을 검증
 		try {
-			User user = userService.createAccount(new UserCreationDto("user", "email", "password", null));
+			User user = userService.createAccount(new UserCreationDto("user", "user", "password", null));
 			Channel notRegistered = new Channel("notRegistered", List.of(user.getId()));
 			messageService.createMessage(new MessageCreationDto("", user.getId(), notRegistered.getId(), null));
 		} catch (IllegalArgumentException e) {
