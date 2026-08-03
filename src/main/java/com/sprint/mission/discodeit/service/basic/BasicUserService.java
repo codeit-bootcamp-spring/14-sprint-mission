@@ -21,20 +21,28 @@ public class BasicUserService implements UserService {
 
     @Override
     public User createAccount(UserCreationDto dto) {
-        // TODO 선택적으로 프로필 이미지를 등록할 수 있어야 한다.
+        // 1. 선택적으로 프로필 이미지를 등록할 수 있어야 한다.
         // 다른 필드들은 필수로 받아야한다는 뜻?
         // Controller 안거쳐서 @Valid는 의미 없으니 service에서 노가다
-        if (Objects.isNull(dto.getName())) {
+        String name = dto.getName();
+        String email = dto.getEmail();
+        String password = dto.getPassword();
+
+        if (Objects.isNull(name)) {
             throw new IllegalArgumentException("유저 생성 시 name이 꼭 필요합니다.");
         }
-        if (Objects.isNull(dto.getEmail())) {
+        if (Objects.isNull(email)) {
             throw new IllegalArgumentException("유저 생성 시 email이 꼭 필요합니다.");
         }
-        if (Objects.isNull(dto.getPassword())) {
+        if (Objects.isNull(password)) {
             throw new IllegalArgumentException("유저 생성 시 password가 꼭 필요합니다.");
         }
 
-        // TODO username과 email은 다른 유저와 달라야 한다.
+        // TODO 2. username과 email은 다른 유저와 달라야 한다.
+        if(userRepository.existsByNameOrEmail(name, email)) {
+            throw new IllegalArgumentException("유저 생성 시 이미 사용 중인 name, email은 사용할 수 없습니다.");
+        }
+
         // TODO UserStatus를 같이 생성해야 한다.
         User user = dto.toUser();
         return userRepository.create(user);
