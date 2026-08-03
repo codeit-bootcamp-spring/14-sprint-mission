@@ -27,7 +27,7 @@ public class BasicUserService implements UserService {
         // TODO 2. DTO를 활용해 파라미터 그룹화해야 한다.
         // TODO 3. username과 email은 다른 유저와 달라야 한다.
         // TODO 4. UserStatus를 같이 생성해야 한다.
-        User user = new User(dto.getName());
+        User user = new User(dto.getName(), dto.getEmail(), dto.getPassword(), dto.getProfileId());
         return userRepository.create(user);
     }
 

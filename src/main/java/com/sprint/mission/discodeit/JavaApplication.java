@@ -20,10 +20,10 @@ public class JavaApplication {
     static MessageService messageService = AppConfig.messageService();
     static ChannelService channelService = AppConfig.channelService();
 
-    static User u1 = userService.createAccount(new UserCreationDto("user1"));
-    static User u2 = userService.createAccount(new UserCreationDto("user2"));
-    static User u3 = userService.createAccount(new UserCreationDto("user3"));
-    static User u4 = userService.createAccount(new UserCreationDto("ToBeDeleted"));
+    static User u1 = userService.createAccount(new UserCreationDto("user1", "email", "password", null));
+    static User u2 = userService.createAccount(new UserCreationDto("user2", "email", "password", null));
+    static User u3 = userService.createAccount(new UserCreationDto("user3", "email", "password", null));
+    static User u4 = userService.createAccount(new UserCreationDto("ToBeDeleted", "email", "password", null));
 
     static Channel c1 = channelService.createChannel(new ChannelCreationDto("channel1", List.of(u1.getId(), u2.getId())));
     static Channel c2 = channelService.createChannel(new ChannelCreationDto("ToBeDeleted", List.of(u3.getId(), u4.getId())));
@@ -98,7 +98,7 @@ public class JavaApplication {
         
         // User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증 완료
         System.out.println("1. User 삭제 시, 해당 User의 Message, 그리고 Channel의 user list 에서도 삭제됨을 검증");
-        User userToBeDeleted = userService.createAccount(new UserCreationDto("userToBeDeleted"));
+        User userToBeDeleted = userService.createAccount(new UserCreationDto("userToBeDeleted", "email", "password", null));
         Channel channelToBeDeleted = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted", List.of(userToBeDeleted.getId())));
         Message msgToBeDeleted = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", userToBeDeleted.getId(), channelToBeDeleted.getId()));
 
@@ -108,7 +108,7 @@ public class JavaApplication {
 
         // Channel 삭제 시, 내부 Message가 삭제됨을 검증
         System.out.println("2. Channel 삭제 시, 내부 Message가 삭제됨을 검증");
-        User u = userService.createAccount(new UserCreationDto("u"));
+        User u = userService.createAccount(new UserCreationDto("u", "email", "password", null));
         Channel channelToBeDeleted2 = channelService.createChannel(new ChannelCreationDto("channelToBeDeleted2", List.of(u.getId())));
         Message msgToBeDeleted2 = messageService.createMessage(new MessageCreationDto("msgToBeDeleted", u.getId(), channelToBeDeleted2.getId()));
 
@@ -117,7 +117,7 @@ public class JavaApplication {
 
         // Message 생성 시, User가 channel에 소속됨을 검증
         try {
-            User notInChannel = new User("notInChannel");
+            User notInChannel = new User("notInChannel", "email", "password", null);
             Channel channel = channelService.createChannel(new ChannelCreationDto("test channel", List.of()));
             messageService.createMessage(new MessageCreationDto("", notInChannel.getId(), channel.getId()));
         } catch (IllegalArgumentException e) {
@@ -126,7 +126,7 @@ public class JavaApplication {
 
         // Message 생성 시, Channel이 Repository에 소속됨을 검증
         try {
-            User user = userService.createAccount(new UserCreationDto("user"));
+            User user = userService.createAccount(new UserCreationDto("user", "email", "password", null));
             Channel notRegistered = new Channel("notRegistered", List.of(user.getId()));
             messageService.createMessage(new MessageCreationDto("", user.getId(), notRegistered.getId()));
         } catch (IllegalArgumentException e) {
@@ -135,7 +135,7 @@ public class JavaApplication {
 
         // Channel 생성 시, User가 Repository에 등록된 유저임을 검증
         try {
-            User notRegistered = new User("notRegistered");
+            User notRegistered = new User("notRegistered", "email", "password", null);
             channelService.createChannel(new ChannelCreationDto("not valid channel", List.of(notRegistered.getId())));
         } catch (IllegalArgumentException e) {
             System.out.println("5. Channel 생성 시, User가 repository 등록된 유저임을 검증 성공");
