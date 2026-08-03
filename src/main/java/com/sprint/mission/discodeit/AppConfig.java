@@ -16,41 +16,41 @@ import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class AppConfig {
-    private static UserRepository userRepository;
-    private static ChannelRepository channelRepository;
-    private static MessageRepository messageRepository;
-
-    private static UserService userService;
-    private static ChannelService channelService;
-    private static MessageService messageService;
-
-    public static UserRepository userRepository() {
-        return get(userRepository, () -> userRepository = new FileUserRepository());
-    }
-
-    public static ChannelRepository channelRepository() {
-        return get(channelRepository, () -> channelRepository = new FileChannelRepository());
-    }
-
-    public static MessageRepository messageRepository() {
-        return get(messageRepository, () -> messageRepository = new FileMessageRepository());
-    }
-
-    public static UserService userService() {
-        return get(userService, () -> userService = new BasicUserService(userRepository(), messageRepository(), channelRepository()));
-    }
-
-    public static ChannelService channelService() {
-        return get(channelService, () -> channelService = new BasicChannelService(channelRepository() ,messageRepository(),userRepository()));
-    }
-
-    public static MessageService messageService() {
-        return get(messageService, () -> messageService = new BasicMessageService(messageRepository(), channelRepository()));
-    }
-
-    private static <T> T get(T t, Supplier<T> supplier) {
-        return Optional.ofNullable(t)
-                .orElseGet(supplier);
-    }
-}
+//public class AppConfig {
+//    private static UserRepository userRepository;
+//    private static ChannelRepository channelRepository;
+//    private static MessageRepository messageRepository;
+//
+//    private static UserService userService;
+//    private static ChannelService channelService;
+//    private static MessageService messageService;
+//
+//    public static UserRepository userRepository() {
+//        return get(userRepository, () -> userRepository = new FileUserRepository());
+//    }
+//
+//    public static ChannelRepository channelRepository() {
+//        return get(channelRepository, () -> channelRepository = new FileChannelRepository());
+//    }
+//
+//    public static MessageRepository messageRepository() {
+//        return get(messageRepository, () -> messageRepository = new FileMessageRepository());
+//    }
+//
+//    public static UserService userService() {
+//        return get(userService, () -> userService = new BasicUserService(userRepository(), messageRepository(), channelRepository()));
+//    }
+//
+//    public static ChannelService channelService() {
+//        return get(channelService, () -> channelService = new BasicChannelService(channelRepository() ,messageRepository(),userRepository()));
+//    }
+//
+//    public static MessageService messageService() {
+//        return get(messageService, () -> messageService = new BasicMessageService(messageRepository(), channelRepository()));
+//    }
+//
+//    private static <T> T get(T t, Supplier<T> supplier) {
+//        return Optional.ofNullable(t)
+//                .orElseGet(supplier);
+//    }
+//}
