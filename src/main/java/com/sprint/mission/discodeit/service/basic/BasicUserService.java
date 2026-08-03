@@ -10,9 +10,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,11 +21,22 @@ public class BasicUserService implements UserService {
 
     @Override
     public User createAccount(UserCreationDto dto) {
-        // TODO 1. 선택적으로 프로필 이미지를 등록할 수 있어야 한다.
-        // TODO 2. DTO를 활용해 파라미터 그룹화해야 한다.
-        // TODO 3. username과 email은 다른 유저와 달라야 한다.
-        // TODO 4. UserStatus를 같이 생성해야 한다.
-        User user = new User(dto.getName(), dto.getEmail(), dto.getPassword(), dto.getProfileId());
+        // TODO 선택적으로 프로필 이미지를 등록할 수 있어야 한다.
+        // 다른 필드들은 필수로 받아야한다는 뜻?
+        // Controller 안거쳐서 @Valid는 의미 없으니 service에서 노가다
+        if (Objects.isNull(dto.getName())) {
+            throw new IllegalArgumentException("유저 생성 시 name이 꼭 필요합니다.");
+        }
+        if (Objects.isNull(dto.getEmail())) {
+            throw new IllegalArgumentException("유저 생성 시 email이 꼭 필요합니다.");
+        }
+        if (Objects.isNull(dto.getPassword())) {
+            throw new IllegalArgumentException("유저 생성 시 password가 꼭 필요합니다.");
+        }
+
+        // TODO username과 email은 다른 유저와 달라야 한다.
+        // TODO UserStatus를 같이 생성해야 한다.
+        User user = dto.toUser();
         return userRepository.create(user);
     }
 
