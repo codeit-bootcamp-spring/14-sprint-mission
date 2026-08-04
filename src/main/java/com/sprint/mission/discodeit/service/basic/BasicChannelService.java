@@ -31,8 +31,7 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalArgumentException("repository에 존재하지 않는 User는 사용할 수 없습니다");
         }
 
-        // TODO 팩토리 메서드
-        Channel channel = new Channel(dto.getTitle(), dto.getUsersId());
+        Channel channel = dto.toChannel();
         return channelRepository.create(channel);
     }
 
