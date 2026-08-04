@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.dto.channel.ChannelCreationDto;
-import com.sprint.mission.discodeit.entity.dto.channel.ChannelUpdateNameDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;

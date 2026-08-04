@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto.message;
+package com.sprint.mission.discodeit.dto.message;
 
 import lombok.Value;
 

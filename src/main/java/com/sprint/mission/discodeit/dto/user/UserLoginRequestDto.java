@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.dto.user;
+package com.sprint.mission.discodeit.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Value;
