@@ -29,6 +29,11 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        throw new UnsupportedOperationException("나중에.. ㅋ");
+    }
+
+    @Override
     public void updateContent(UUID id, String content) {
         findById(id).ifPresent(retrieved -> retrieved.updateContent(content));
     }

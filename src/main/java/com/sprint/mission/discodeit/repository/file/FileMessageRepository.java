@@ -15,6 +15,13 @@ public class FileMessageRepository extends AbstractFileRepository<Message>
     }
 
     @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return super.buffer.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
     public void updateContent(UUID id, String content) {
         findById(id).ifPresent(retrieved -> {
             retrieved.updateContent(content);
