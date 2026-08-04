@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class FileChannelRepository extends MapFileRepository<Channel>
+public class FileChannelRepository extends AbstractFileRepository<Channel>
         implements ChannelRepository {
 
     public FileChannelRepository() {
@@ -28,5 +28,4 @@ public class FileChannelRepository extends MapFileRepository<Channel>
                 .forEach(channel -> channel.getUsersId().remove(userId));
         super.writeFromBufferToFile();
     }
-
 }

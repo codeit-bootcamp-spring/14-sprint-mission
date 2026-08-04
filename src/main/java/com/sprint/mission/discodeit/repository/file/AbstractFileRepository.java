@@ -6,49 +6,42 @@ import com.sprint.mission.discodeit.repository.CrudRepository;
 import java.io.*;
 import java.util.*;
 
-public abstract class MapFileRepository<T extends BasicEntity> implements CrudRepository<T> {
+public abstract class AbstractFileRepository<T extends BasicEntity> implements CrudRepository<T> {
+
     protected final File file;
+    protected final Map<UUID, T> EMPTY_BUFFER = new HashMap<>();
     protected Map<UUID, T> buffer;
 
-    protected final Map<UUID, T> EMPTY_BUFFER = new HashMap<>();
-
-    protected MapFileRepository(File file) {
+    protected AbstractFileRepository(File file) {
         this.file = file;
-        initBuffer();
-    }
-
-    private void initBuffer() {
         this.buffer = Optional.of(file)
-                .filter(file -> file.exists() && file.length() != 0)
-                .map(file -> this.readFile())
-                .orElseGet(() -> this.writeFile(EMPTY_BUFFER));
+                .filter(f -> file.exists() && file.length() != 0)
+                .map(f -> readFile())
+                .orElseGet(() -> writeFile(EMPTY_BUFFER));
     }
 
     @Override
-    public final T create(T t) {
+    public T create(T t) {
         UUID id = t.getId();
         return findById(id).orElseGet(() -> {
-            buffer.put(id, t);
-            this.writeFile(buffer);
-            return t;
+                buffer.put(id, t);
+                writeFromBufferToFile();
+                return t;
         });
     }
 
     @Override
-    public final Optional<T> findById(UUID id) {
-        readFromFileToBuffer();
+    public Optional<T> findById(UUID id) {
         return Optional.ofNullable(buffer.get(id));
     }
 
     @Override
-    public final List<T> findAll() {
-        readFromFileToBuffer();
+    public List<T> findAll() {
         return new ArrayList<>(buffer.values());
     }
 
     @Override
-    public final void deleteById(UUID id) {
-        readFromFileToBuffer();
+    public void deleteById(UUID id) {
         findById(id).ifPresent(retrieved -> {
             buffer.remove(id);
             writeFromBufferToFile();
@@ -64,8 +57,12 @@ public abstract class MapFileRepository<T extends BasicEntity> implements CrudRe
         }
     }
 
-    protected final void readFromFileToBuffer() {
-        this.buffer = readFile();
+    /**
+     * buffer의 내용을 file에 덮어쓴다.
+     * repository의 신규 데이터가 생성되거나, 기존 데이터가 삭제/수정되면 이 메서드가 호출되어야 한다.
+     */
+    protected final void writeFromBufferToFile() {
+        this.writeFile(buffer);
     }
 
     private Map<UUID, T> writeFile(Map<UUID, T> toBeSaved) {
@@ -75,9 +72,5 @@ public abstract class MapFileRepository<T extends BasicEntity> implements CrudRe
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    protected final void writeFromBufferToFile() {
-        this.writeFile(buffer);
     }
 }

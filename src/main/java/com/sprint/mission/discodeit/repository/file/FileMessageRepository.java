@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class FileMessageRepository extends MapFileRepository<Message>
+public class FileMessageRepository extends AbstractFileRepository<Message>
         implements MessageRepository {
 
     public FileMessageRepository() {

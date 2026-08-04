@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class FileUserRepository extends MapFileRepository<User>
+public class FileUserRepository extends AbstractFileRepository<User>
         implements UserRepository {
 
     public FileUserRepository() {
@@ -21,7 +21,6 @@ public class FileUserRepository extends MapFileRepository<User>
 
     @Override
     public boolean existsByNameOrEmail(String name, String email) {
-        readFromFileToBuffer();
         return buffer.values().stream()
                 .anyMatch(user -> containsNameOrEmail(name, email, user));
     }
