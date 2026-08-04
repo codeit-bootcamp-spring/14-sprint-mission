@@ -14,7 +14,6 @@ public class JCFUserRepository implements UserRepository {
         this.userList = new ArrayList<>();
     }
 
-
     @Override
     public void save(User user) {
         userList.add(user);
@@ -38,6 +37,8 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void delete(UUID id) {
         User target = findById(id);
-        userList.remove(target);
+        if (target != null) {
+            userList.remove(target);
+        }
     }
 }

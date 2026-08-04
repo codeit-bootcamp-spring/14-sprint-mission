@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Setter
@@ -17,31 +18,19 @@ public class User implements Serializable {
     private final String email;
 
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
-    //유저는 이름과 이메일을 가진다
     public User(String email, String name) {
         this.name = name;
         this.email = email;
 
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
     }
 
-    public void setUpdatedAt () {
-        this.updatedAt = System.currentTimeMillis();
+    public void setUpdatedAt() {
+        this.updatedAt = Instant.now();
     }
-
-//    public void setUser(String name,String email) {
-//        this.name = name;
-//        this.email = email;
-//        this.updatedAt = System.currentTimeMillis();
-//        System.out.println("수정완료 이름 -> " + this.name + " 이메일 -> " + this.email);
-//    }
-//    @Override
-//    public String toString() {
-//
-//    }
 }

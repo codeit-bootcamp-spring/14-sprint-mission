@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,31 +16,22 @@ public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String channelName;
-    private List<User> members;
+    private List<UUID> memberIds;
 
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
-    public Channel(String channelName, List<User> members) {
+    public Channel(String channelName, List<UUID> memberIds) {
         this.channelName = channelName;
-        this.members = members;
+        this.memberIds = memberIds;
 
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
     }
 
     public void setUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
-
-
-//    public void setChannel(String channelName, List<User> members) {
-//        this.channelName = channelName;
-//        this.updatedAt = System.currentTimeMillis();
-//        System.out.println();
-//    }
 }
-//DONE : 패키지 나눔 이제 안에 기능 뭐넣을지 생각해보기 어떻게 객체지향적이고 (완료)
-

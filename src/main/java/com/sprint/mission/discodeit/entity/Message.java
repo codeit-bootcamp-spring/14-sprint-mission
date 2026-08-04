@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Setter
@@ -14,24 +15,24 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String values;
-    private final Channel channel;
-    private final User sender;
+    private final UUID channelId;
+    private final UUID senderId;
 
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
-    public Message(String values, Channel channel, User sender) {
+    public Message(String values, UUID channelId, UUID senderId) {
         this.values = values;
-        this.channel = channel;
-        this.sender = sender;
+        this.channelId = channelId;
+        this.senderId = senderId;
 
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
     }
 
     public void setUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 }
