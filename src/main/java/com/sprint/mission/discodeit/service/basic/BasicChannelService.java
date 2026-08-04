@@ -1,18 +1,20 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,14 +22,36 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     @Override
     public Channel createChannel(ChannelCreationDto dto) {
+        // 1. PUBLIC 채널 생성은 기존 로직 유지
         if (containsInvalidUser(dto.getUsersId())) {
             throw new IllegalArgumentException("repository에 존재하지 않는 User는 사용할 수 없습니다");
         }
 
+        // TODO 팩토리 메서드
         Channel channel = new Channel(dto.getTitle(), dto.getUsersId());
+        return channelRepository.create(channel);
+    }
+
+    @Override
+    public Channel createPrivateChannel(@Valid PrivateChannelCreateDto dto) {
+        // 2. PRIVATE/PUBLIC 채널 메서드를 분리
+        // 3. PRIVATE Channel 생성 시, 참여 User의 정보를 받아 User 별 ReadStatus 정보 생성
+        if (containsInvalidUser(dto.getUserIds())) {
+            throw new IllegalArgumentException("repository에 존재하지 않는 User는 사용할 수 없습니다");
+        }
+
+        List<ReadStatus> readStatuses = new ArrayList<>();
+        Channel channel = dto.toChannel();
+        UUID channelId = channel.getId();
+
+        dto.getUserIds().stream()
+                .map(userId -> new ReadStatus(userId, channelId))
+                .forEach(readStatus -> readStatusRepository.create(readStatus));
+
         return channelRepository.create(channel);
     }
 

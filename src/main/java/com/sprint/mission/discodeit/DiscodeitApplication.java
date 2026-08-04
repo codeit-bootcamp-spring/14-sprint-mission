@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -36,7 +37,8 @@ public class DiscodeitApplication {
 
 		Channel c1 = channelService.createChannel(new ChannelCreationDto("channel1", List.of(u1.getId(), u2.getId())));
 		Channel c2 = channelService.createChannel(new ChannelCreationDto("ToBeDeleted", List.of(u3.getId(), u4.getId())));
-		List<Channel> channels = List.of(c1, c2);
+		Channel c3 = channelService.createPrivateChannel(new PrivateChannelCreateDto("private, ", List.of(u1.getId(), u2.getId())));
+		List<Channel> channels = List.of(c1, c2, c3);
 
 		Message m1 = messageService.createMessage(new MessageCreationDto("user1 to channel1", u1.getId(), c1.getId(), null));
 		Message m2 = messageService.createMessage(new MessageCreationDto("ToBeUpdatedAndDeleted", u3.getId(), c2.getId(), null));

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
@@ -10,6 +11,8 @@ import java.util.UUID;
 
 public interface ChannelService {
     Channel createChannel(ChannelCreationDto dto);
+
+    Channel createPrivateChannel(PrivateChannelCreateDto dto);
 
     Optional<Channel> getChannel(UUID uuid);
 
