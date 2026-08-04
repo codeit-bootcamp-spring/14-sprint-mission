@@ -20,11 +20,20 @@ public final class Channel extends ModifiableEntity {
     @ToString.Include
     private final List<UUID> usersId;
 
-    public Channel(String name, List<UUID> usersId) {
+    @ToString.Include
+    private final ChannelType channelType;
+
+    public Channel(ChannelType channelType, String name, List<UUID> usersId) {
         super();
+        this.channelType = channelType;
         this.name = name;
         this.usersId = new ArrayList<>(usersId);
     }
+
+    public Channel(String name, List<UUID> usersId) {
+        this(ChannelType.PUBLIC, name, usersId);
+    }
+
 
     public void updateName(String name) {
         this.name = name;
