@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -30,10 +31,9 @@ public class FileUserRepository extends AbstractFileRepository<User>
     }
 
     @Override
-    public void updateName(UUID id, String name) {
-        findById(id).ifPresent(retrieved -> {
-            retrieved.updateName(name);
-            super.writeFromBufferToFile();
-        });
+    public void update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
+        findById(id).ifPresent(user -> user.update(name, email, password, profileId));
     }
+
+
 }

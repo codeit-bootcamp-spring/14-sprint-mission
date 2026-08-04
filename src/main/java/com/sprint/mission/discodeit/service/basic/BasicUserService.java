@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStausRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -82,10 +83,20 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UUID id, UserUpdateDto dto) {
-        // TODO 1. 선택적으로 프로필 이미지를 대체할 수 있어야 한다.
-        // TODO 2. DTO를 활용해 파라미터를 그룹화한다.
-        userRepository.updateName(id, dto.getName());
+    public void updateUser(UUID id, @Valid UserUpdateDto dto) {
+        // 1. 선택적으로 프로필 이미지를 대체할 수 있어야 한다.
+        // 2. DTO를 활용해 파라미터를 그룹화한다.
+        String name = dto.getName();
+        String email = dto.getEmail();
+        String password = dto.getPassword();
+        UUID profileId = dto.getProfileId();
+
+        if (userRepository.existsById(id)) {
+            userRepository.update(id, name, email, password, profileId);
+        } else {
+            throw new NoSuchElementException(String.format("userId %s가 존재하지 않으므로 조회 불가", id));
+        }
+
     }
 
     @Override

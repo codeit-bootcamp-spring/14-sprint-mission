@@ -62,7 +62,7 @@ public class DiscodeitApplication {
 
 		System.out.println("3. User 이름 갱신");
 		System.out.println("4. 갱신된 User 단일 조회");
-		userService.updateUser(u1.getId(), new UserUpdateDto("user1_updated"));
+		userService.updateUser(u1.getId(), new UserUpdateDto("user1_updated", "email_updated", "password_updated", null));
 		System.out.println("userService.getUser(u1.getId()) = " + userService.getUser(u1.getId()));
 
 		System.out.println("5. User 삭제");

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
+import jakarta.annotation.Nullable;
 
 import java.util.UUID;
 
@@ -9,5 +10,5 @@ public interface UserRepository extends CrudRepository<User> {
 
     boolean existsByNameOrEmail(String name, String email);
 
-    void updateName(UUID id, String name);
+    void update(UUID id, String name, String email, String password, @Nullable UUID profileId);
 }

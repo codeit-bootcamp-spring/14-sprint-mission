@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -30,6 +31,12 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public void update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
+        // TODO 구현해야 함
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
     }
@@ -37,11 +44,6 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public List<User> findAll() {
         return new ArrayList<>(data.values());
-    }
-
-    @Override
-    public void updateName(UUID id, String name) {
-        findById(id).ifPresent(retrieved -> retrieved.updateName(name));
     }
 
     @Override
