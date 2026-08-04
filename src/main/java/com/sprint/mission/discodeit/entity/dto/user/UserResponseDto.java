@@ -12,13 +12,15 @@ public class UserResponseDto {
     String name;
     String email;
     Boolean isOnline;
+    UUID profileId;
 
     public static UserResponseDto of(User user, UserStatus userStatus) {
         return new UserResponseDto(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                userStatus.isOnline()
+                userStatus.isOnline(),
+                user.getProfileId()
         );
     }
 }
