@@ -69,10 +69,16 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        // TODO 1. 사용자 온라인 정보를 포함시켜야 한다.
-        // TODO 2. 패스워드 정보는 제외해야 한다.
-        return userRepository.findAll();
+    public List<UserResponseDto> getAllUsers() {
+        // 1. 사용자 온라인 정보를 포함시켜야 한다.
+        // 2. 패스워드 정보는 제외해야 한다.
+        List<User> users = userRepository.findAll();
+        List<UserResponseDto> dtos = new ArrayList<>();
+        for (User user : users) {
+            dtos.add(getUser(user.getId()));
+        }
+
+        return dtos;
     }
 
     @Override
