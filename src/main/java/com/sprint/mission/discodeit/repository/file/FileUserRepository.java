@@ -26,8 +26,15 @@ public class FileUserRepository extends AbstractFileRepository<User>
                 .anyMatch(user -> containsNameOrEmail(name, email, user));
     }
 
-    private static boolean containsNameOrEmail(String name, String email, User user) {
+    private boolean containsNameOrEmail(String name, String email, User user) {
         return user.getName().equals(name) || user.getEmail().equals(email);
+    }
+
+    @Override
+    public Optional<User> findByNameAndPassword(String name, String password) {
+        return super.buffer.values().stream()
+                .filter(user -> user.getName().equals(name) && user.getPassword().equals(password))
+                .findFirst();
     }
 
     @Override

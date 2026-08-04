@@ -31,6 +31,12 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByNameAndPassword(String name, String password) {
+        // TODO 구현해야 함
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
         // TODO 구현해야 함
         throw new UnsupportedOperationException();
