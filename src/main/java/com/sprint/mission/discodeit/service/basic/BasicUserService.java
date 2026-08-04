@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.user.UserCreationDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -54,10 +55,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<User> getUser(UUID id) {
-        // TODO 1. 사용자 온라인 정보를 포함시켜야 한다.
-        // TODO 2. 패스워드 정보는 제외해야 한다.
-        return userRepository.findById(id);
+    public UserResponseDto getUser(UUID id) {
+        // 1. 사용자 온라인 정보를 포함시켜야 한다.
+        // 2. 패스워드 정보는 제외해야 한다.
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(String.format("userId %s가 존재하지 않으므로 조회 불가", id)));
+
+        UserStatus userStatus = userStausRepository.findByUserId(id)
+                .orElseThrow(() -> new NoSuchElementException(String.format("userStatusId %s가 존재하지 않으므로 조회 불가", id)));
+
+        return UserResponseDto.of(user, userStatus);
     }
 
     @Override

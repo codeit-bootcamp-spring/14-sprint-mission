@@ -5,11 +5,12 @@ import com.sprint.mission.discodeit.repository.CrudRepository;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractFileRepository<T extends BasicEntity> implements CrudRepository<T> {
 
     protected final File file;
-    protected final Map<UUID, T> EMPTY_BUFFER = new HashMap<>();
+    protected final Map<UUID, T> EMPTY_BUFFER = new ConcurrentHashMap<>();
     protected Map<UUID, T> buffer;
 
     protected AbstractFileRepository(File file) {

@@ -19,6 +19,7 @@ public class UserStatus extends ModifiableEntity {
     public UserStatus(UUID userId) {
         super();
         this.userId = userId;
+        updateLastSeenAt();
     }
 
     public void updateLastSeenAt() {

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.dto.user.UserCreationDto;
+import com.sprint.mission.discodeit.entity.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.dto.user.UserUpdateDto;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface UserService {
 
     User createAccount(UserCreationDto dto);
 
-    Optional<User> getUser(UUID id);
+    UserResponseDto getUser(UUID id);
 
     List<User> getAllUsers();
 

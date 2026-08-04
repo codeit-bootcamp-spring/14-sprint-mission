@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -66,8 +67,13 @@ public class DiscodeitApplication {
 
 		System.out.println("5. User 삭제");
 		System.out.println("6. 삭제된 User 단일 조회");
-		userService.deleteAccount(u4.getId());
-		System.out.println("userService.getUser(u4) = " + userService.getUser(u4.getId()));
+		try {
+			userService.deleteAccount(u4.getId());
+			System.out.println("userService.getUser(u4) = " + userService.getUser(u4.getId()));
+		} catch (NoSuchElementException e) {
+			System.out.println("6. 삭제된 User 조회되지 않음을 검증");
+		}
+
 	}
 
 	static void channelServiceTest(ChannelService channelService, List<Channel> channels) {
