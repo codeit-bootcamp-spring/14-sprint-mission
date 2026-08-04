@@ -19,7 +19,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
-    private final UserStausRepository userStausRepository;
+    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
@@ -48,7 +48,7 @@ public class BasicUserService implements UserService {
 
         // 3. UserStatus를 같이 생성해야 한다.
         User user = dto.toUser();
-        userStausRepository.create(new UserStatus(user.getId()));
+        userStatusRepository.create(new UserStatus(user.getId()));
 
         return userRepository.create(user);
     }
@@ -61,7 +61,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(String.format("userId %s가 존재하지 않으므로 조회 불가", id)));
 
-        UserStatus userStatus = userStausRepository.findByUserId(id)
+        UserStatus userStatus = userStatusRepository.findByUserId(id)
                 .orElseThrow(() -> new NoSuchElementException(String.format("userStatusId %s가 존재하지 않으므로 조회 불가", id)));
 
         return UserResponseDto.of(user, userStatus);
@@ -108,7 +108,7 @@ public class BasicUserService implements UserService {
 
         channelRepository.deleteUsersByUserId(id);
         messageRepository.deleteAllByUserId(id);
-        userStausRepository.deleteByUserId(id);
+        userStatusRepository.deleteByUserId(id);
         userRepository.deleteById(id);
     }
 }

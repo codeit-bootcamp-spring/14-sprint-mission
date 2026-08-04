@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserStausRepository extends CrudRepository<UserStatus> {
+public interface UserStatusRepository extends CrudRepository<UserStatus> {
     Optional<UserStatus> findByUserId(UUID userId);
 
     void deleteByUserId(UUID userId);
