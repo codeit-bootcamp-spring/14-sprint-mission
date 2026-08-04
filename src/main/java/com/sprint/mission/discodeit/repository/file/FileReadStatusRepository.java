@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
@@ -22,5 +23,12 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
         }
 
         return created;
+    }
+
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return super.buffer.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
     }
 }
