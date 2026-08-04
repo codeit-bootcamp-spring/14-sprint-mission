@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.dto.user.UserCreationDto;
 import com.sprint.mission.discodeit.entity.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStausRepository;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +20,7 @@ public class BasicUserService implements UserService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserStausRepository userStausRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public User createAccount(UserCreationDto dto) {
@@ -102,8 +100,15 @@ public class BasicUserService implements UserService {
     @Override
     public void deleteAccount(UUID id) {
         // TODO 1. 관련된 도메인도 같이 삭제한다. (BinaryContent, UserStatus, ReadStatus ... )
+        User toBeDeleted = userRepository.findById(id)
+                        .orElseThrow(() -> new NoSuchElementException(String.format("userId %s가 존재하지 않으므로 조회 불가", id)));
+        // 여기서 이렇게 if 해서 처리하는게 맘에 안듦
+        Optional.ofNullable(toBeDeleted.getProfileId())
+                        .ifPresent(profileId -> binaryContentRepository.deleteById(profileId));
+
         channelRepository.deleteUsersByUserId(id);
         messageRepository.deleteAllByUserId(id);
+        userStausRepository.deleteByUserId(id);
         userRepository.deleteById(id);
     }
 }
