@@ -17,7 +17,7 @@ public final class Channel extends ModifiableEntity {
 
     @ToString.Include
     private String name;
-    @ToString.Include
+
     private final List<UUID> usersId;
 
     @ToString.Include

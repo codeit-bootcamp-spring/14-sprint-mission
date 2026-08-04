@@ -35,7 +35,7 @@ public class DiscodeitApplication {
 		User u4 = userService.createAccount(new UserCreationDto("ToBeDeleted", "ToBeDeleted", "password", null));
 		List<User> users = List.of(u1, u2, u3, u4);
 
-		Channel c1 = channelService.createChannel(new ChannelCreationDto(ChannelType.PUBLIC, "channel1", List.of(u1.getId(), u2.getId())));
+		Channel c1 = channelService.createChannel(new ChannelCreationDto(ChannelType.PRIVATE, "channel1", List.of(u1.getId(), u2.getId())));
 		Channel c2 = channelService.createChannel(new ChannelCreationDto(ChannelType.PRIVATE, "ToBeDeleted", List.of(u3.getId(), u4.getId())));
 		List<Channel> channels = List.of(c1, c2);
 
@@ -93,8 +93,13 @@ public class DiscodeitApplication {
 
 		System.out.println("5. Channel 삭제");
 		System.out.println("6. 삭제된 Channel 단일 조회");
-		channelService.deleteChannel(c2.getId());
-		System.out.println("channelService.getChannel(c2.getId()) = " + channelService.getChannel(c2.getId()));
+		try {
+			channelService.deleteChannel(c2.getId());
+			System.out.println("channelService.getChannel(c2.getId()) = " + channelService.getChannel(c2.getId()));
+		} catch (NoSuchElementException e) {
+			System.out.println("6. 삭제된 Channel 조회되지 않음 검증 완료");
+		}
+
 	}
 
 	static void messageServiceTest(MessageService messageService, List<Message> messages) {

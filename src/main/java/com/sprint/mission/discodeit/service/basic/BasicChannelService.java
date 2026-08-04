@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -12,6 +14,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -44,9 +47,25 @@ public class BasicChannelService implements ChannelService {
                 .allMatch(userRepository::existsById);
     }
 
+    // TODO 1. DTO를 활용해 가장 최근 메시지의 시간 정보 포함
+    // TODO 2. PRIVATE 채널인 경우 참여한 User의 id정보 반환
     @Override
-    public Optional<Channel> getChannel(UUID uuid) {
-        return channelRepository.findById(uuid);
+    public ChannelResponseDto getChannel(UUID id) {
+        Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("니가 찾는 채널이 없다."));
+        Instant messageLastSentAt = messageRepository.findAllByChannelId(id).stream()
+                .map(message -> message.getCreatedAt())
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+
+        List<UUID> userIds = readStatusRepository.findAllByChannelId(channel.getId()).stream()
+                .map(readStatus -> readStatus.getUserId())
+                .toList();
+
+        return ChannelResponseDto.of(
+                channel,
+                messageLastSentAt,
+                channel.getChannelType().equals(ChannelType.PRIVATE) ? userIds : null
+        );
     }
 
     @Override

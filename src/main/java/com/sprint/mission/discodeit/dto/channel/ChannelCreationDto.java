@@ -18,6 +18,6 @@ public class ChannelCreationDto {
     List<UUID> userIds;
 
     public Channel toChannel() {
-        return new Channel(name, userIds);
+        return new Channel(channelType, name, userIds);
     }
 }
