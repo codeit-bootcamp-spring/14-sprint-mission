@@ -7,4 +7,6 @@ import java.util.UUID;
 
 public interface UserStausRepository extends CrudRepository<UserStatus> {
     Optional<UserStatus> findByUserId(UUID userId);
+
+    void deleteByUserId(UUID userId);
 }
