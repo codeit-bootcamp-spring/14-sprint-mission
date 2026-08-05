@@ -47,8 +47,6 @@ public class BasicChannelService implements ChannelService {
                 .allMatch(userRepository::existsById);
     }
 
-    // TODO 1. DTO를 활용해 가장 최근 메시지의 시간 정보 포함
-    // TODO 2. PRIVATE 채널인 경우 참여한 User의 id정보 반환
     @Override
     public ChannelResponseDto getChannel(UUID id) {
         Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("니가 찾는 채널이 없다."));
@@ -68,10 +66,26 @@ public class BasicChannelService implements ChannelService {
         );
     }
 
+    // 1. DTO를 활용해 가장 최근 메시지의 시간 정보 포함
+    // 2. PRIVATE 채널인 경우 참여한 User의 id정보 반환
+    // 1, 2 요구사항은 service의 getChannel 재사용
+
+    // 3. 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
+    // 4. PUBLIC인 전체조회, PRIVATE은 User가 참여한 채널만 조회하도록
     @Override
     public List<Channel> getAllChannels() {
         return channelRepository.findAll();
     }
+
+    public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
+        List<Channel> channels = channelRepository.findAllByUserId(userId);
+
+        return channels.stream()
+                .map(channel -> this.getChannel(channel.getId()))
+                .toList();
+    }
+
+
 
     @Override
     public void updateChannelName(UUID id, ChannelUpdateNameDto dto) {
