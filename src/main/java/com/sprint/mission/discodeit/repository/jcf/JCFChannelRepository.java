@@ -37,15 +37,4 @@ public class JCFChannelRepository implements ChannelRepository {
     public void deleteById(UUID id) {
         findById(id).ifPresent(retrieved -> data.remove(id));
     }
-
-    @Override
-    public void deleteUsersByUserId(UUID userId) {
-        data.values().forEach(channel -> channel.getUsersId().remove(userId));
-    }
-
-    @Override
-    public List<Channel> findAllByUserId(UUID userId) {
-        throw new UnsupportedOperationException();
-    }
-
 }

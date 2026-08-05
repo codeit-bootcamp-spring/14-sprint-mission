@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.dto.message.MessageCreationDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,18 +20,27 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
+    private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public Message createMessage(MessageCreationDto dto) {
-        Channel channel = channelRepository.findById(dto.getChannelId())
+    public Message createMessage(@Valid MessageCreationDto dto) {
+        UUID userId = dto.getUserId();
+        UUID channelId = dto.getChannelId();
+
+        if (!userRepository.existsById(userId)) {
+            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
+        }
+
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
 
-        UUID userId = dto.getUserId();
-        if (!channel.containsUser(dto.getUserId())) {
-            throw new IllegalArgumentException(String.format("Channel에 소속된 User만 Message 생성 가능. Channel: %s, User: %s", channel, userId));
+        // PRIVATE 채널의 경우 소속된 User만 Message 생성 가능
+        if (channel.getChannelType().equals(ChannelType.PRIVATE) && !readStatusRepository.existsByUserAndChannel(userId, channelId)) {
+            throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
         Message message = dto.toMessage();

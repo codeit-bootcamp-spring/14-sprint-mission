@@ -20,7 +20,6 @@ import java.util.*;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
-    private final ChannelRepository channelRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
@@ -99,7 +98,6 @@ public class BasicUserService implements UserService {
             binaryContentRepository.deleteById(toBeDeleted.getProfileId());
         }
         readStatusRepository.deleteByUserId(id);
-        channelRepository.deleteUsersByUserId(id);
         messageRepository.deleteAllByUserId(id);
         userStatusRepository.deleteByUserId(id);
         userRepository.deleteById(id);

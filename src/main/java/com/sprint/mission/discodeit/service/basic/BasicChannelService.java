@@ -31,14 +31,16 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel createChannel(@Valid ChannelCreationDto dto) {
         // 1. PUBLIC 채널 생성은 기존 로직 유지
-        if(!userRepository.existsAllByIds(dto.getUserIds())) {
+        Channel channel = dto.toChannel();
+        UUID channelId = channel.getId();
+        List<UUID> userIds = dto.getUserIds();
+
+        if (!userRepository.existsAllByIds(userIds)) {
             throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
         }
 
-        Channel channel = dto.toChannel();
-        UUID channelId = channel.getId();
         // 참여 User의 정보를 받아 User 별 ReadStatus 정보 생성
-        List<ReadStatus> readStatuses = dto.getUserIds().stream()
+        List<ReadStatus> readStatuses = userIds.stream()
                 .map(userId -> new ReadStatus(userId, channelId))
                 .toList();
 
@@ -78,9 +80,11 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
-        List<Channel> channels = channelRepository.findAllByUserId(userId);
-
-        return channels.stream()
+        // userId로 readStatus에서 channel 찾아서 반환
+        // public은 전부 포함해야 함. private은 소속된 채널만
+        return getAllChannels().stream()
+                .filter(channel -> channel.getChannelType().equals(ChannelType.PUBLIC)
+                        || readStatusRepository.existsByUserAndChannel(userId, channel.getId()))
                 .map(channel -> this.getChannel(channel.getId()))
                 .toList();
     }

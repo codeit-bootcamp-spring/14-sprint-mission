@@ -14,10 +14,11 @@ public class ChannelCreationDto {
     ChannelType channelType;
     @NotNull
     String name;
+
     @NotNull
     List<UUID> userIds;
 
     public Channel toChannel() {
-        return new Channel(channelType, name, userIds);
+        return new Channel(channelType, name);
     }
 }

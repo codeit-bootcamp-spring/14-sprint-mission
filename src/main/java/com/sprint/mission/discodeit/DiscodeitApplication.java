@@ -151,14 +151,14 @@ public class DiscodeitApplication {
 			User notInChannel = new User("notInChannel", "email", "password", null);
 			Channel channel = channelService.createChannel(new ChannelCreationDto(ChannelType.PRIVATE, "test channel", List.of()));
 			messageService.createMessage(new MessageCreationDto("", notInChannel.getId(), channel.getId(), null));
-		} catch (IllegalArgumentException e) {
+		} catch (CustomException e) {
 			System.out.println("3. Message 생성 시, User가 channel에 소속됨을 검증 성공");
 		}
 
 		// Message 생성 시, Channel이 Repository에 소속됨을 검증
 		try {
 			User user = userService.createAccount(new UserCreationDto("user", "user", "password", null));
-			Channel notRegistered = new Channel("notRegistered", List.of(user.getId()));
+			Channel notRegistered = new Channel(ChannelType.PRIVATE, "notRegistered");
 			messageService.createMessage(new MessageCreationDto("", user.getId(), notRegistered.getId(), null));
 		} catch (IllegalArgumentException e) {
 			System.out.println("4. Message 생성 시, Channel이 Repository에 소속됨을 검증");
