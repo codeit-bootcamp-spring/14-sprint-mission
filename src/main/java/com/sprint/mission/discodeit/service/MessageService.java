@@ -10,7 +10,7 @@ public interface MessageService {
     Message create(Message message);
 
     // 생성(Overload)
-    Message create(String content, UUID channelId, UUID authorId);
+//    Message create(String content, UUID channelId, UUID authorId);
 
     // 단건 조회
     Message findById(UUID id);
@@ -22,7 +22,7 @@ public interface MessageService {
     Message update(UUID id, Message message);
 
     // 수정(Overload)
-    Message update(UUID id, String content);
+//    Message update(UUID id, String content);
 
     // 삭제
     void delete(UUID id);

@@ -10,7 +10,7 @@ public interface UserService {
     User create(User user);
 
     // 생성(Overload)
-    User create(String username, String email, String password);
+//    User create(String username, String email, String password);
 
     // 단건 조회
     User findById(UUID id);
@@ -22,7 +22,7 @@ public interface UserService {
     User update(UUID id, User user);
 
     // 수정(Overload)
-    User update(UUID id, String username, String email, String password);
+//    User update(UUID id, String username, String email, String password);
 
     // 삭제
     void delete(UUID id);
