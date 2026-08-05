@@ -49,6 +49,7 @@ public class BasicMessageService implements MessageService {
         return messageRepository.findAllByChannelId(channelId);
     }
 
+    // TODO 구현은 나중에, 앤티티 수정해야 해서 너무 오래 걸릴 듯,,
     @Override
     public void updateMessage(UUID id, MessageUpdateDto dto) {
         messageRepository.updateContent(id, dto.getContent());
