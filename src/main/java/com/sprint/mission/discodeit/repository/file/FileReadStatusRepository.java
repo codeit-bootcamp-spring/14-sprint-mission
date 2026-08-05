@@ -58,4 +58,11 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     public void update(UUID id) {
         findById(id).ifPresent(readStatus -> readStatus.update());
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        findAll().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .forEach(readStatus -> deleteById(readStatus.getId()));
+    }
 }
