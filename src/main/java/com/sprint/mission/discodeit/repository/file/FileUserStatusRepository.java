@@ -34,6 +34,7 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
                 .filter(userStatus -> userStatus.getUserId().equals(userId))
                 .map(userStatus -> userStatus.getId())
                 .forEach(id -> deleteById(id));
+        super.writeFromBufferToFile();
     }
 
     @Override
@@ -45,10 +46,12 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     @Override
     public void update(UUID id) {
         findById(id).ifPresent(userStatus -> userStatus.update());
+        super.writeFromBufferToFile();
     }
 
     @Override
     public void updateByUserId(UUID userId) {
         findByUserId(userId).ifPresent(userStatus -> userStatus.update());
+        super.writeFromBufferToFile();
     }
 }

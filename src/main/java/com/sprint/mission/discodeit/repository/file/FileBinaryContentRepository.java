@@ -26,6 +26,7 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
         for (UUID id : ids) {
             super.deleteById(id);
         }
+        super.writeFromBufferToFile();
     }
 
     @Override
@@ -34,5 +35,4 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
                 .filter(binaryContent -> ids.contains(binaryContent.getId()))
                 .toList();
     }
-
 }
