@@ -25,6 +25,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean existsAllByIds(List<UUID> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean existsByNameOrEmail(String name, String email) {
         // TODO 구현해야 함
         throw new UnsupportedOperationException();

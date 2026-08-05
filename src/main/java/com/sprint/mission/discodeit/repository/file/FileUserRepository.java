@@ -21,6 +21,12 @@ public class FileUserRepository extends AbstractFileRepository<User>
     }
 
     @Override
+    public boolean existsAllByIds(List<UUID> ids) {
+        return ids.stream()
+                .allMatch(id -> existsById(id));
+    }
+
+    @Override
     public boolean existsByNameOrEmail(String name, String email) {
         return buffer.values().stream()
                 .anyMatch(user -> containsNameOrEmail(name, email, user));
