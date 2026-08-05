@@ -6,13 +6,15 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
-    public BasicUserService(UserRepository userRepository){
-        this.userRepository = userRepository;
-    }
+
 
     @Override
     public void create(User entity) {

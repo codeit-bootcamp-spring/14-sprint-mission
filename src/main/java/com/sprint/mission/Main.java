@@ -18,12 +18,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 //TIP 코드를 <b>실행</b>하려면 <shortcut actionId="Run"/>을(를) 누르거나
 // 에디터 여백에 있는 <icon src="AllIcons.Actions.Execute"/> 아이콘을 클릭하세요.
@@ -50,7 +44,7 @@ public class Main {
             MessageRepository messageRepository) {
                 UserService userService = new BasicUserService(userRepository);
                 ChannelService channelService = new BasicChannelService(channelRepository);
-                MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
+                MessageService messageService = new BasicMessageService(messageRepository, userRepository, channelRepository);
 
                 User user = setupUser(userService);
                 Channel channel = setupChannel(channelService);
