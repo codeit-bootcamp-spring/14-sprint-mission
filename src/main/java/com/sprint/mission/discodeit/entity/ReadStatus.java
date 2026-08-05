@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.common.ModifiableEntity;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -16,9 +17,17 @@ public class ReadStatus extends ModifiableEntity {
     private final UUID userId;
     private final UUID channelId;
 
+    private Instant lastReadAt;
+
     public ReadStatus(UUID userId, UUID channelId) {
         super();
         this.userId = userId;
         this.channelId = channelId;
+        lastReadAt = now();
+    }
+
+    public void update() {
+        lastReadAt = now();
+        markedAsUpdate();
     }
 }

@@ -43,6 +43,13 @@ public class BasicReadStatusService {
         return readStatusRepository.findAllByUserId(userId);
     }
 
+    public void updateReadStatus(UUID id) {
+        // 요구사항 : DTO를 활용해 파라미터를 그룹화합니다 (수정 대상 객체의 id 파라미터, 수정할 값 파라미터)
+        // 아니 근데 readStatus애서 수정할 필드라곤 마지막 메시지 읽은 시간밖에 없어서 파라미터도 필요 없는데
+        // 왜 DTO를 만들라고 했을까?
+        readStatusRepository.update(id);
+    }
+
 
 
 

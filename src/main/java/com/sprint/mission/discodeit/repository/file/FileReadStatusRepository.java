@@ -53,4 +53,9 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
                 .forEach(readStatus -> super.deleteById(readStatus.getId()));
         super.writeFromBufferToFile();
     }
+
+    @Override
+    public void update(UUID id) {
+        findById(id).ifPresent(readStatus -> readStatus.update());
+    }
 }
