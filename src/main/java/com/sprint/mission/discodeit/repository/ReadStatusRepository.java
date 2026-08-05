@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusRepository extends CrudRepository<ReadStatus> {
+    boolean existsByUserAndChannel(UUID userId, UUID channelId);
 
     List<ReadStatus> createAll(List<ReadStatus> readStatuses);
 
