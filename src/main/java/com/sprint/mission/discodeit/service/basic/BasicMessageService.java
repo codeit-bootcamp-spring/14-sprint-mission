@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.dto.message.MessageCreationDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public Message createMessage(MessageCreationDto dto) {
@@ -57,6 +59,11 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void deleteMessage(UUID id) {
+        // binaryContent 필드에 다른 필드의 id가 없어서, 다른 엔티티에서 조회해야하는 번거로움
+        Message toBeDeleted = messageRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("찾는메시지 없다"));
+        binaryContentRepository.delete(toBeDeleted.getAttachmentIds());
+
         messageRepository.deleteById(id);
     }
 }
