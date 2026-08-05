@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreationDto;
@@ -40,7 +37,9 @@ public class DiscodeitApplication {
 		List<Channel> channels = List.of(c1, c2);
 
 		Message m1 = messageService.createMessage(new MessageCreationDto("user1 to channel1", u1.getId(), c1.getId(), null));
-		Message m2 = messageService.createMessage(new MessageCreationDto("ToBeUpdatedAndDeleted", u3.getId(), c2.getId(), null));
+
+		BinaryContent bc = new BinaryContent();
+		Message m2 = messageService.createMessage(new MessageCreationDto("ToBeUpdatedAndDeleted", u3.getId(), c2.getId(), List.of(bc.getId())));
 		List<Message> messages = List.of(m1, m2);
 
 		userServiceTest(userService, users);
