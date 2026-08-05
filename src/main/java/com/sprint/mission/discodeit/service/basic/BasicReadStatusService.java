@@ -50,6 +50,10 @@ public class BasicReadStatusService {
         readStatusRepository.update(id);
     }
 
+    public void deleteReadStatus(UUID id) {
+        readStatusRepository.deleteById(id);
+    }
+
 
 
 
