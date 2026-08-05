@@ -77,6 +77,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findAll();
     }
 
+    @Override
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
         List<Channel> channels = channelRepository.findAllByUserId(userId);
 
@@ -97,5 +98,6 @@ public class BasicChannelService implements ChannelService {
         // 채널 내부 message 삭제
         messageRepository.deleteAllByChannelId(id);
         channelRepository.deleteById(id);
+
     }
 }
