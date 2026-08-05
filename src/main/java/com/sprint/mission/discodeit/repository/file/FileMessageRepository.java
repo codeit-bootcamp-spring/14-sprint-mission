@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -45,5 +46,13 @@ public class FileMessageRepository extends AbstractFileRepository<Message>
                 .map(message -> message.getId())
                 .forEach(toBeDeleted -> deleteById(toBeDeleted));
         super.writeFromBufferToFile();
+    }
+
+    // Channel에 message 없으면 null 반환할 가능성 있음
+    @Override
+    public Optional<Instant> findLatestMessageByChannelId(UUID channelId) {
+        return findAllByChannelId(channelId).stream()
+                .map(message -> message.getCreatedAt())
+                .max(Comparator.naturalOrder());
     }
 }

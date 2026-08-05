@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository extends CrudRepository<Message>{
@@ -13,4 +15,6 @@ public interface MessageRepository extends CrudRepository<Message>{
     void deleteAllByUserId(UUID userId);
 
     void deleteAllByChannelId(UUID channelId);
+
+    Optional<Instant> findLatestMessageByChannelId(UUID channelId);
 }
