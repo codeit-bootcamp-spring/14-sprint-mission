@@ -3,21 +3,19 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.jspecify.annotations.Nullable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-public class JCFUserRepository implements UserRepository {
-    private static final Map<UUID, User> data = new HashMap<>();
-
-    @Override
-    public User create(User user) {
-        UUID id = user.getId();
-
-        return findById(id).orElseGet(() -> {
-            data.put(id, user);
-            return user;
-        });
-    }
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "jcf"
+)
+public class JCFUserRepository extends AbstractJCFRepository<User>
+        implements UserRepository {
 
     @Override
     public boolean existsById(UUID id) {
@@ -26,39 +24,28 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public boolean existsAllByIds(List<UUID> ids) {
-        throw new UnsupportedOperationException();
+        return ids.stream()
+                .allMatch(id -> existsById(id));
     }
 
     @Override
     public boolean existsByNameOrEmail(String name, String email) {
-        // TODO 구현해야 함
-        throw new UnsupportedOperationException();
+        return findAll().stream()
+                .anyMatch(user -> user.getName().equals(name)
+                        || user.getEmail().equals(email));
     }
 
     @Override
     public Optional<User> findByNameAndPassword(String name, String password) {
-        // TODO 구현해야 함
-        throw new UnsupportedOperationException();
+        return  findAll().stream()
+                .filter(user -> user.getName().equals(name)
+                        && user.getPassword().equals(password))
+                .findFirst();
     }
 
     @Override
     public void update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
-        // TODO 구현해야 함
-        throw new UnsupportedOperationException();
+        findById(id).ifPresent(user -> user.update(name, email, password, profileId));
     }
 
-    @Override
-    public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
-
-    @Override
-    public List<User> findAll() {
-        return new ArrayList<>(data.values());
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        findById(id).ifPresent(retrieved -> data.remove(id));
-    }
 }

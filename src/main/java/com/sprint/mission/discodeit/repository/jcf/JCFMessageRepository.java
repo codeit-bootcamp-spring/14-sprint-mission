@@ -2,36 +2,26 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.*;
 
-public class JCFMessageRepository implements MessageRepository {
-    private static final Map<UUID, Message> data = new HashMap<>();
-
-    @Override
-    public Message create(Message message) {
-        UUID id = message.getId();
-
-        return findById(id).orElseGet(() -> {
-            data.put(id, message);
-            return message;
-        });
-    }
-
-    @Override
-    public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
-
-    @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(data.values());
-    }
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "jcf"
+)
+public class JCFMessageRepository extends AbstractJCFRepository<Message>
+        implements MessageRepository {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        throw new UnsupportedOperationException("나중에.. ㅋ");
+        return findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
@@ -40,13 +30,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
-        findById(id).ifPresent(retrieved -> data.remove(id));
-    }
-
-    @Override
     public void deleteAllByUserId(UUID userId) {
-        data.values().stream()
+        findAll().stream()
                 .filter(message -> message.getUserId().equals(userId))
                 .map(message -> message.getId())
                 .forEach(toBeDeleted -> deleteById(toBeDeleted));
@@ -54,14 +39,16 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-        data.values().stream()
+        findAll().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .map(message -> message.getId())
                 .forEach(toBeDeleted -> deleteById(toBeDeleted));
     }
 
     @Override
-    public Optional<Instant> findLatestMessageByChannelId(UUID id) {
-        throw new UnsupportedOperationException();
+    public Optional<Instant> findLatestMessageByChannelId(UUID channelId) {
+        return findAllByChannelId(channelId).stream()
+                .map(message -> message.getCreatedAt())
+                .max(Comparator.naturalOrder());
     }
 }
