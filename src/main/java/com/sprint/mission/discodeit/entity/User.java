@@ -1,9 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.time.Instant;
+import java.util.UUID;
+import lombok.Getter;
+
+@Getter
 public class User extends BasicEntity {
 
     private String name;
     private String email;
+    private UUID profileId;
 
     public User(String name, String email) {
         super();
@@ -12,26 +18,18 @@ public class User extends BasicEntity {
     }
 
 
-    public String getName() {
-        return this.name;
-    }
 
-    public String getEmail() {
-        return this.email;
-    }
 
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+
 
     public void setName(String name) {
         this.name = name;
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
     public void setEmail(String email) {
         this.email = email;
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
     @Override

@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import java.time.Instant;
+import lombok.Getter;
+
+@Getter
 public class Channel extends BasicEntity {
 
 
@@ -12,16 +16,14 @@ public class Channel extends BasicEntity {
     }
 
 
-    public String getName() {
-        return this.name;
-    }
+
 
     public void setName(String name) {
         this.name = name;
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
-    public void setUpdatedAt(Long updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
