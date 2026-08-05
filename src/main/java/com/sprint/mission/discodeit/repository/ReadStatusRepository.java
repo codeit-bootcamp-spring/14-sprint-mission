@@ -19,4 +19,6 @@ public interface ReadStatusRepository extends CrudRepository<ReadStatus> {
     void update(UUID id);
 
     void deleteByUserId(UUID userId);
+
+    List<UUID> findAllUserIdsByChannelId(UUID channelId);
 }
