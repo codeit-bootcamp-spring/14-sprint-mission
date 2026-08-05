@@ -10,4 +10,10 @@ public class BinaryContent extends BasicEntity {
     /*
     User, Message 도메인 모델과의 의존 관계 방향성을 잘 고려하여 id 참조 필드를 추가하세요.
      */
+    private final byte[] content;
+
+    public BinaryContent(byte[] content) {
+        super();
+        this.content = content;
+    }
 }

@@ -22,4 +22,11 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
         }
     }
 
+    @Override
+    public List<BinaryContent> findAllById(List<UUID> ids) {
+        return findAll().stream()
+                .filter(binaryContent -> ids.contains(binaryContent.getId()))
+                .toList();
+    }
+
 }

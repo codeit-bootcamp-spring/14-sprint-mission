@@ -38,7 +38,7 @@ public class DiscodeitApplication {
 
 		Message m1 = messageService.createMessage(new MessageCreationDto("user1 to channel1", u1.getId(), c1.getId(), null));
 
-		BinaryContent bc = new BinaryContent();
+		BinaryContent bc = new BinaryContent(null);
 		Message m2 = messageService.createMessage(new MessageCreationDto("ToBeUpdatedAndDeleted", u3.getId(), c2.getId(), List.of(bc.getId())));
 		List<Message> messages = List.of(m1, m2);
 
