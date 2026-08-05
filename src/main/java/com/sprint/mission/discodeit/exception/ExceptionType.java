@@ -21,6 +21,7 @@ public enum ExceptionType {
 
     // 이거 두개는 뭔가 비슷한듯 다른듯 접미사를 통일할지 말지 잘 모르겠음
     // ALREADY_EXISTS
+    USERSTATUS_ALREADY_EXISTS("UserStatus 중복", "해당 UserStatus 이미 존재", "이미 등록된 UserStatus입니다."),
     READSTATUS_ALREADY_EXISTS("ReadStatus 중복", "해당 ReadStatus 이미 존재", "이미 등록된 ReadStatus입니다."),
     // UNIQUE_FIELD_CONFLICT
     USER_UNIQUE_FIELD_CONFLICT("User 필드 중복", "Name, Email 필드 중복 불가", "이미 사용 중인 name, email입니다.");

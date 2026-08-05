@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -21,10 +23,10 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatus create(UserStatusCreateDto dto) {
         UUID userId = dto.getUserId();
         if(!userRepository.existsById(userId)) {
-            throw new RuntimeException("유저 없음");
+            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
         }
         if(userStatusRepository.existsByUserId(userId)) {
-            throw new RuntimeException("UserStatus 이미 존재");
+            throw new CustomException(ExceptionType.USERSTATUS_ALREADY_EXISTS);
         }
 
         return userStatusRepository.create(dto.toUserStatus());
@@ -32,7 +34,8 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus getUserStatus(UUID id) {
-        return userStatusRepository.findById(id).orElseThrow();
+        return userStatusRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionType.USERSTATUS_NOT_FOUND_IN_DATABASE));
     }
 
     @Override
