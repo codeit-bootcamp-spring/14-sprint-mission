@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.message.MessageCreationDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreationDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -70,7 +71,7 @@ public class DiscodeitApplication {
 		try {
 			userService.deleteAccount(u4.getId());
 			System.out.println("userService.getUser(u4) = " + userService.getUser(u4.getId()));
-		} catch (NoSuchElementException e) {
+		} catch (CustomException e) {
 			System.out.println("6. 삭제된 User 조회되지 않음을 검증");
 		}
 

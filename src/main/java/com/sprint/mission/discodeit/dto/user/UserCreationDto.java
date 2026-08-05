@@ -1,14 +1,18 @@
 package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Value;
 
 import java.util.UUID;
 
 @Value
 public class UserCreationDto {
+    @NotBlank
     String name;
+    @NotBlank
     String email;
+    @NotBlank
     String password;
     UUID profileId;
 
