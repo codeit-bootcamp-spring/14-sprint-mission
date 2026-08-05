@@ -7,15 +7,17 @@ public record UserResponseDto(
     UUID id,
     String name,
     String email,
-    UUID profileId
+    UUID profileId,
+     boolean onlined
 ) {
 
-    public static UserResponseDto from(User user){
+    public static UserResponseDto from(User user, boolean onlined){
         return new UserResponseDto(
             user.getId(),
             user.getName(),
             user.getEmail(),
-            user.getProfileId()
+            user.getProfileId(),
+            onlined
         );
     }
 }

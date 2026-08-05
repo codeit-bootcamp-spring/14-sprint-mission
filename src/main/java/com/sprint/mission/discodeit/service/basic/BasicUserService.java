@@ -49,16 +49,20 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
         userStatusRepository.save(userStatus);
 
-        return UserResponseDto.from(user);
+        boolean online = userStatus.isOnline();
+        return UserResponseDto.from(user, online);
     }
 
     @Override
-    public User read(UUID id) {
+    public UserResponseDto read(UUID id) {
         User user = userRepository.findById(id);
         if(Objects.isNull(user)){
             throw new RuntimeException("존재하지 않는 유저입니다.");
         }
-        return user;
+        UserStatus userStatus = userStatusRepository.findByUserId(id)
+            .orElseThrow(() -> new RuntimeException("유저 상태 정보가 없습니다."));
+        boolean online = userStatus.isOnline();
+        return UserResponseDto.from(user, online);
     }
 
     @Override

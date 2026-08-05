@@ -11,6 +11,7 @@ public class User extends BasicEntity {
     private String email;
     private UUID profileId;
 
+
     public User(String name, String email, UUID profileId) {
         super();
         this.name = name;
