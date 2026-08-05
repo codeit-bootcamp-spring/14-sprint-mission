@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -9,6 +10,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file"
+)
 public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
         implements ReadStatusRepository {
     protected FileReadStatusRepository() {
@@ -57,6 +63,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     @Override
     public void update(UUID id) {
         findById(id).ifPresent(readStatus -> readStatus.update());
+        super.writeFromBufferToFile();
     }
 
     @Override
@@ -64,6 +71,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
         findAll().stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userId))
                 .forEach(readStatus -> deleteById(readStatus.getId()));
+        super.writeFromBufferToFile();
     }
 
     @Override
