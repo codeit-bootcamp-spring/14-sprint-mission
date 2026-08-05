@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,13 @@ public class FileChannelRepository extends AbstractFileRepository<Channel>
         buffer.values()
                 .forEach(channel -> channel.getUsersId().remove(userId));
         super.writeFromBufferToFile();
+    }
+
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        // 모든 유저는 PUBLIC 채널 접근 가능하물호, 조회 시 PUBLIC 채널은 반환
+        return super.buffer.values().stream()
+                .filter(channel -> channel.getUsersId().contains(userId) || channel.getChannelType().equals(ChannelType.PUBLIC))
+                .toList();
     }
 }

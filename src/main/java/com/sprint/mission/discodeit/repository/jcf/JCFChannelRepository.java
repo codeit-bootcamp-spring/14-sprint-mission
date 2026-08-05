@@ -43,4 +43,9 @@ public class JCFChannelRepository implements ChannelRepository {
         data.values().forEach(channel -> channel.getUsersId().remove(userId));
     }
 
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        throw new UnsupportedOperationException();
+    }
+
 }

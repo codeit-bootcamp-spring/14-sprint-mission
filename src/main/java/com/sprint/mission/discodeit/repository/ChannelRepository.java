@@ -10,4 +10,6 @@ public interface ChannelRepository extends CrudRepository<Channel>{
     void updateName(UUID id, String name);
 
     void deleteUsersByUserId(UUID userId);
+
+    List<Channel> findAllByUserId(UUID userId);
 }
