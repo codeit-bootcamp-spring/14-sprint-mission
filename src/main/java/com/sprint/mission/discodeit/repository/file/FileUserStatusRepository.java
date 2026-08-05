@@ -35,4 +35,14 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
         return findAll().stream()
                 .anyMatch(userStatus -> userStatus.getUserId().equals(userId));
     }
+
+    @Override
+    public void update(UUID id) {
+        findById(id).ifPresent(userStatus -> userStatus.update());
+    }
+
+    @Override
+    public void updateByUserId(UUID userId) {
+        findByUserId(userId).ifPresent(userStatus -> userStatus.update());
+    }
 }

@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.entity.common;
 
+import lombok.Getter;
+
 import java.time.Instant;
 
 public abstract class ModifiableEntity extends BasicEntity
         implements Modifiable{
+    @Getter
     private Instant updatedAt;
 
     public ModifiableEntity() {

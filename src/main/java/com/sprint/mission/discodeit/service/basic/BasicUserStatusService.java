@@ -22,7 +22,7 @@ public class BasicUserStatusService {
             throw new RuntimeException("유저 없음");
         }
         if(userStatusRepository.existsByUserId(userId)) {
-            throw new RuntimeException("UsetStatus 이미 존재");
+            throw new RuntimeException("UserStatus 이미 존재");
         }
 
         return userStatusRepository.create(dto.toUserStatus());
@@ -36,7 +36,13 @@ public class BasicUserStatusService {
         return userStatusRepository.findAll();
     }
 
+    public void update(UUID id) {
+        userStatusRepository.update(id);
+    }
 
+    public void updateByUserId(UUID userId) {
+        userStatusRepository.updateByUserId(userId);
+    }
 
 
 }

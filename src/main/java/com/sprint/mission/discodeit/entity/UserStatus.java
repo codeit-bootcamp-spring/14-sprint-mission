@@ -35,5 +35,10 @@ public class UserStatus extends ModifiableEntity {
         Instant threshold = lastSeenAt.plusSeconds(300);
         return super.now().isBefore(threshold);
     }
+
+    public void update() {
+        markedAsUpdate();
+        this.lastSeenAt = super.getUpdatedAt();
+    }
 }
 
