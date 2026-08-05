@@ -9,4 +9,6 @@ public interface UserStatusRepository extends CrudRepository<UserStatus> {
     Optional<UserStatus> findByUserId(UUID userId);
 
     void deleteByUserId(UUID userId);
+
+    boolean existsByUserId(UUID userId);
 }

@@ -29,4 +29,10 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
                 .map(userStatus -> userStatus.getId())
                 .forEach(id -> deleteById(id));
     }
+
+    @Override
+    public boolean existsByUserId(UUID userId) {
+        return findAll().stream()
+                .anyMatch(userStatus -> userStatus.getUserId().equals(userId));
+    }
 }
