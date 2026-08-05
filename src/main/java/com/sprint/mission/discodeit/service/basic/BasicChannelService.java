@@ -98,6 +98,6 @@ public class BasicChannelService implements ChannelService {
         // 채널 내부 message 삭제
         messageRepository.deleteAllByChannelId(id);
         channelRepository.deleteById(id);
-
+        readStatusRepository.deleteByChannelId(id);
     }
 }
