@@ -72,7 +72,7 @@ public class BasicMessageService implements MessageService {
     public void deleteMessage(UUID id) {
         // binaryContent 필드에 다른 필드의 id가 없어서, 다른 엔티티에서 조회해야하는 번거로움
         Message toBeDeleted = messageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("찾는메시지 없다"));
+                .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE));
         binaryContentRepository.delete(toBeDeleted.getAttachmentIds());
 
         messageRepository.deleteById(id);
