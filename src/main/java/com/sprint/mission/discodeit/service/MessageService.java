@@ -15,6 +15,8 @@ public interface MessageService {
 
     List<Message> getAllMessages();
 
+    List<Message> getAllByChannelId(UUID channelId);
+
     void updateMessage(UUID id, MessageUpdateDto dto);
 
     void deleteMessage(UUID id);
