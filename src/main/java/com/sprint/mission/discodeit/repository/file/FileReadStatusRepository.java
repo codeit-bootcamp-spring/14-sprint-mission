@@ -16,6 +16,13 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     }
 
     @Override
+    public boolean existsByUserAndChannel(UUID userId, UUID channelId) {
+        return super.findAll().stream()
+                .anyMatch(readStatus -> readStatus.getUserId().equals(userId)
+                        && readStatus.getChannelId().equals(channelId));
+    }
+
+    @Override
     public List<ReadStatus> createAll(List<ReadStatus> readStatuses) {
         List<ReadStatus> created = new ArrayList<>();
         for (ReadStatus readStatus : readStatuses) {
