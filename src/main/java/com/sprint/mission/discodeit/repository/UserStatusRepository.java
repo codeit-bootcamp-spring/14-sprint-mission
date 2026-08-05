@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public interface UserStatusRepository {
     //메모리 업데이트 반환값이 필요없다고 생각함
     void save(UserStatus userStatus);

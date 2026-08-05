@@ -41,4 +41,23 @@ public class JCFUserRepository implements UserRepository {
             userList.remove(target);
         }
     }
+
+    @Override
+    public User findByEmail(String email) {
+        User target = userList.stream()
+                .filter(each -> each.getEmail().equals(email))
+                .findFirst()
+                .orElse(null);
+        return target;
+    }
+
+    @Override
+    public User findByName(String name){
+        User target = userList.stream()
+                .filter(each -> each.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+        return target;
+    };
+
 }

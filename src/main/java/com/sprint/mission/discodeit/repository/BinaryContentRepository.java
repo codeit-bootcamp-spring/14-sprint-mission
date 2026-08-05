@@ -11,6 +11,8 @@ public interface BinaryContentRepository {
 
     //메모리에서 id로 컨텐츠 가져오기
     BinaryContent findById(UUID id);
+    // userId로 컨텐츠 가져오기
+    BinaryContent findByUserId(UUID userId);
     //userid랑 channelid로 해당 유저가 해당채널에서 마지막 읽기상태를 가져옴
     BinaryContent findByUserIdAndChannelId(UUID userId, UUID channelId);
 

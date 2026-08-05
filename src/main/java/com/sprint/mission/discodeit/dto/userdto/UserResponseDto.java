@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.userdto;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,14 +19,16 @@ public class UserResponseDto {
     String name;
     Instant createdAt;
     Instant updatedAt;
+    boolean isOnline;
 
-    public static UserResponseDto from(User user) {
+    public static UserResponseDto from(User user, UserStatus userStatus) {
         return new UserResponseDto(
                 user.getId(),
                 user.getEmail(),
                 user.getName(),
                 user.getCreatedAt(),
-                user.getUpdatedAt()
+                user.getUpdatedAt(),
+                userStatus.isOnline()
         );
     }
 }

@@ -34,4 +34,9 @@ public class UserStatus {
         this.lastActiveAt = Instant.now();
         setUpdatedAt();
     }
+
+    public boolean isOnline() {
+        // 300초 이내면 true반환
+        return this.lastActiveAt.plusSeconds(300).isAfter(Instant.now());
+    }
 }

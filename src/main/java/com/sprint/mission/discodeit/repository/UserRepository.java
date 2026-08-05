@@ -12,6 +12,11 @@ public interface UserRepository {
     //메모리에서 id로 읽어오기
     public abstract User findById(UUID id);
 
+    //이메일과 이름은 중복되면 안되서 이걸로 검증하려고 넣음
+    User findByEmail(String email);
+
+    User findByName(String name);
+
     //유저 리스트 가져오기
     public abstract List<User> findAll();
 
