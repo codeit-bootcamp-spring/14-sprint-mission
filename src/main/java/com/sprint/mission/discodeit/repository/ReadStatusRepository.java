@@ -10,6 +10,8 @@ public interface ReadStatusRepository extends CrudRepository<ReadStatus> {
 
     List<ReadStatus> createAll(List<ReadStatus> readStatuses);
 
+    List<ReadStatus> findAllByUserId(UUID userId);
+
     List<ReadStatus> findAllByChannelId(UUID channelId);
 
     void deleteByChannelId(UUID channelId);

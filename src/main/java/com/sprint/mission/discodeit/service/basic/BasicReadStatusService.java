@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,6 +37,10 @@ public class BasicReadStatusService {
     public ReadStatus getReadStatus(UUID id) {
         return readStatusRepository.findById(id)
                 .orElseThrow();
+    }
+
+    public List<ReadStatus> getAllReadStatusByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(userId);
     }
 
 
