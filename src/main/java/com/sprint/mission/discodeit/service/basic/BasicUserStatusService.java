@@ -44,5 +44,9 @@ public class BasicUserStatusService {
         userStatusRepository.updateByUserId(userId);
     }
 
+    public void delete(UUID id) {
+        userStatusRepository.deleteById(id);
+    }
+
 
 }
