@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,4 +27,16 @@ public class BasicUserStatusService {
 
         return userStatusRepository.create(dto.toUserStatus());
     }
+
+    public UserStatus getUserStatus(UUID id) {
+        return userStatusRepository.findById(id).orElseThrow();
+    }
+
+    public List<UserStatus> getAllUserStatus() {
+        return userStatusRepository.findAll();
+    }
+
+
+
+
 }
