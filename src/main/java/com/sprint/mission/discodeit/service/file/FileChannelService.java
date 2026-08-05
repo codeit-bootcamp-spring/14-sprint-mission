@@ -41,8 +41,7 @@ public class FileChannelService implements ChannelService {
         Channel updatedChannel = Optional.ofNullable(channelRepository.findById(id))
                 .orElseThrow(() -> new IllegalArgumentException("수정할 채널이 없습니다."));
 
-        updatedChannel.setChannelName(channel.getChannelName());
-        updatedChannel.setDescription(channel.getDescription());
+        updatedChannel.update(channel.getChannelName(), channel.getDescription());
 
         channelRepository.save(updatedChannel);
         System.out.println("채널 정보 수정이 완료되었습니다.");

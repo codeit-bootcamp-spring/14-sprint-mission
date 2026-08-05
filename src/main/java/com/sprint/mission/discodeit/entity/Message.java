@@ -12,29 +12,29 @@ public class Message implements Serializable {
     private static final long serialVersionID = 1L;
 
     private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
 
     // 메시지 내용, 사용자 ID, 채널 ID
-    @Setter
     private String content;
     private UUID userId;
     private UUID channelId;
 
+    private Long createdAt;
+    private Long updatedAt;
+
     // 생성자
     public Message(String content, UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
         this.content = content;
         this.userId = userId;
         this.channelId = channelId;
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = createdAt;
     }
 
     // update()
-    public void update(String content) {
-        this.updatedAt = System.currentTimeMillis();
+    public void updateContent(String content) {
         this.content = content;
+        this.updatedAt = System.currentTimeMillis();
     }
 
     @Override

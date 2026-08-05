@@ -36,22 +36,20 @@ public class JCFUserService implements UserService {
 
     @Override
     public User update(UUID id, User user) {
-        User updatedUser = Optional.ofNullable(userRepository.findById(id))
+        User targetUser = Optional.ofNullable(userRepository.findById(id))
                 .orElseThrow(() -> new IllegalArgumentException("수정할 사용자가 없습니다."));
 
-        updatedUser.setName(user.getName());
-        updatedUser.setAge(user.getAge());
-        updatedUser.setEmail(user.getEmail());
+        targetUser.update(user.getName(), user.getAge(), user.getEmail());
 
-        userRepository.save(updatedUser);
+        userRepository.save(targetUser);
         System.out.println("사용자 정보 수정이 완료되었습니다.");
 
-        return updatedUser;
+        return targetUser;
     }
 
     @Override
     public void delete(UUID id) {
-        User deletedUser = Optional.ofNullable(userRepository.findById(id))
+        User targetUser = Optional.ofNullable(userRepository.findById(id))
                 .orElseThrow(() -> new IllegalArgumentException("삭제할 사용자가 없습니다."));
 
         userRepository.delete(id);

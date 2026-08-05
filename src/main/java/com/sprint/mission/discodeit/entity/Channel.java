@@ -12,29 +12,40 @@ public class Channel implements Serializable {
     private static final long serialVersionID = 1L;
 
     private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
 
     // 채널명, 채널설명
-    @Setter
     private String channelName;
-    @Setter
     private String description;
+
+    private Long createdAt;
+    private Long updatedAt;
 
     // 생성자
     public Channel(String channelName, String description) {
         this.id = UUID.randomUUID();
+        this.channelName = channelName;
+        this.description = description;
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
-        this.channelName = channelName;
-        this.description = description;
     }
 
-    // update()
-    public void update(String channelName, String description) {
+    // update(channelName)
+    public void updateChannelName(String channelName) {
+        this.channelName = channelName;
         this.updatedAt = System.currentTimeMillis();
+    }
+
+    // update(description)
+    public void updateDescription(String description) {
+        this.description = description;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    // update(channelName, description)
+    public void update(String channelName, String description) {
         this.channelName = channelName;
         this.description = description;
+        this.updatedAt = System.currentTimeMillis();
     }
 
     @Override

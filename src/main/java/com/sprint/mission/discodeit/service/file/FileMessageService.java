@@ -41,7 +41,7 @@ public class FileMessageService implements MessageService {
         Message updatedMessage = Optional.ofNullable(messageRepository.findById(id))
                 .orElseThrow(() -> new IllegalArgumentException("수정할 메시지가 없습니다."));
 
-        updatedMessage.setContent(message.getContent());
+        updatedMessage.updateContent(message.getContent());
 
         messageRepository.save(updatedMessage);
         System.out.println("메시지 정보 수정이 완료되었습니다.");

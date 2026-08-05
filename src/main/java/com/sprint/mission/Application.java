@@ -93,7 +93,7 @@ public class Application {
 
         // 수정
         System.out.println("\n----- update() -----");
-        noticeroom.setDescription("공지방입니다. 공지를 확인해 주세요.");
+        noticeroom.updateDescription("공지방입니다. 공지를 확인해 주세요.");
         channelService.update(noticeroom.getId(), noticeroom);
 
         // 수정된 데이터 조회
@@ -130,7 +130,7 @@ public class Application {
 
         // 수정
         System.out.println("\n----- update() -----");
-        byeMessage.setContent("안녕히 계세요. 바이바이. 바이짜이찌엔");
+        byeMessage.updateContent("안녕히 계세요. 바이바이. 바이짜이찌엔");
         messageService.update(byeMessage.getId(), byeMessage);
 
         // 수정된 데이터 조회
@@ -204,7 +204,7 @@ public class Application {
 
         // 수정
         System.out.println("\n----- update() -----");
-        fileNoticeroom.setDescription("공지방입니다. 공지를 확인해 주세요.");
+        fileNoticeroom.updateDescription("공지방입니다. 공지를 확인해 주세요.");
         fileChannelService.update(fileNoticeroom.getId(), fileNoticeroom);
 
         // 수정된 데이터 조회
@@ -241,7 +241,7 @@ public class Application {
 
         // 수정
         System.out.println("\n----- update() -----");
-        fileByeMessage.setContent("안녕히 계세요. 바이바이. 바이짜이찌엔");
+        fileByeMessage.updateContent("안녕히 계세요. 바이바이. 바이짜이찌엔");
         fileMessageService.update(fileByeMessage.getId(), fileByeMessage);
 
         // 수정된 데이터 조회

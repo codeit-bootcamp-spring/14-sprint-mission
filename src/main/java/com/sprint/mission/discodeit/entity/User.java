@@ -12,8 +12,6 @@ public class User implements Serializable {
     private static final long serialVersionID = 1L;
 
     private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
 
     // 사용자명, 나이, 이메일
     @Setter
@@ -23,22 +21,25 @@ public class User implements Serializable {
     @Setter
     private String email;
 
+    private Long createdAt;
+    private Long updatedAt;
+
     // 생성자
     public User(String name, int age, String email) {
         this.id = UUID.randomUUID();
+        this.name = name;
+        this.age = age;
+        this.email = email;
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
-        this.name = name;
-        this.age = age;
-        this.email = email;
     }
 
-    // update()
+    // update(name, age, email)
     public void update(String name, int age, String email) {
-        this.updatedAt = System.currentTimeMillis();
         this.name = name;
         this.age = age;
         this.email = email;
+        this.updatedAt = System.currentTimeMillis();
     }
 
     @Override

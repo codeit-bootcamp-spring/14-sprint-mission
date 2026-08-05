@@ -36,20 +36,20 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message update(UUID id, Message message) {
-        Message updatedMessage = Optional.ofNullable(messageRepository.findById(id))
+        Message targetMessage = Optional.ofNullable(messageRepository.findById(id))
                 .orElseThrow(() -> new IllegalArgumentException("수정할 메시지가 없습니다."));
 
-        updatedMessage.setContent(message.getContent());
+        targetMessage.updateContent(message.getContent());
 
-        messageRepository.save(updatedMessage);
+        messageRepository.save(targetMessage);
         System.out.println("메시지 정보 수정이 완료되었습니다.");
 
-        return updatedMessage;
+        return targetMessage;
     }
 
     @Override
     public void delete(UUID id) {
-        Message deletedMessage = Optional.ofNullable(messageRepository.findById(id))
+        Message targetMessage = Optional.ofNullable(messageRepository.findById(id))
                 .orElseThrow(() -> new IllegalArgumentException("삭제할 메시지가 없습니다."));
 
         messageRepository.delete(id);
