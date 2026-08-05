@@ -11,10 +11,11 @@ public class User extends BasicEntity {
     private String email;
     private UUID profileId;
 
-    public User(String name, String email) {
+    public User(String name, String email, UUID profileId) {
         super();
         this.name = name;
         this.email = email;
+        this.profileId = profileId;
     }
 
 
