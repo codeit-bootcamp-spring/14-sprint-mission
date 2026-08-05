@@ -21,7 +21,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
         for (ReadStatus readStatus : readStatuses) {
             created.add(super.create(readStatus));
         }
-
+        super.writeFromBufferToFile();
         return created;
     }
 
@@ -30,5 +30,13 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
         return super.buffer.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .toList();
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        super.buffer.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .forEach(readStatus -> super.deleteById(readStatus.getId()));
+        super.writeFromBufferToFile();
     }
 }
