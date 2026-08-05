@@ -12,6 +12,8 @@ public enum ExceptionType {
     // NOT_FOUND_IN_DATABASE
     USER_NOT_FOUND_IN_DATABASE("User 미존재", "Database에서 해당 User를 찾을 수 없음.", "등록되지 않은 User입니다."),
     USERSTATUS_NOT_FOUND_IN_DATABASE("UserStatus 미존재", "Database에서 해당 UserStatus 찾을 수 없음", "등록되지 않은 UserStatus입니다."),
+    CHANNEL_NOT_FOUND_IN_DATABASE("Channel 미존재", "Database에서 해당 Channel 찾을 수 없음", "등록되지 않은 Channel입니다."),
+    MESSAGE_NOT_FOUND_IN_DATABASE("Message 미존재", "Database에서 해당 Message 찾을 수 없음", "등록되지 않은 Message입니다."),
 
     // UNIQUE_FIELD_CONFLICT
     USER_UNIQUE_FIELD_CONFLICT("User 필드 중복", "Name, Email 필드 중복 불가", "이미 사용 중인 name, email입니다.");

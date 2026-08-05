@@ -6,11 +6,14 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +29,12 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public Channel createChannel(ChannelCreationDto dto) {
+    public Channel createChannel(@Valid ChannelCreationDto dto) {
         // 1. PUBLIC 채널 생성은 기존 로직 유지
-        if (containsInvalidUser(dto.getUserIds())) {
-            throw new IllegalArgumentException("repository에 존재하지 않는 User는 사용할 수 없습니다");
+        if(!userRepository.existsAllByIds(dto.getUserIds())) {
+            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
         }
+
         Channel channel = dto.toChannel();
         UUID channelId = channel.getId();
         // 참여 User의 정보를 받아 User 별 ReadStatus 정보 생성
@@ -42,22 +46,17 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.create(channel);
     }
 
-    private boolean containsInvalidUser(List<UUID> userIds) {
-        return !userIds.stream()
-                .allMatch(userRepository::existsById);
-    }
-
     @Override
     public ChannelResponseDto getChannel(UUID id) {
-        Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("니가 찾는 채널이 없다."));
-        Instant messageLastSentAt = messageRepository.findAllByChannelId(id).stream()
-                .map(message -> message.getCreatedAt())
-                .max(Comparator.naturalOrder())
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
+
+        // 메시지는 당연히 없을 수도 있는데 예외를 던지면 안되지 않을까?
+        Instant messageLastSentAt = messageRepository.findLatestMessageByChannelId(id)
                 .orElse(null);
 
-        List<UUID> userIds = readStatusRepository.findAllByChannelId(channel.getId()).stream()
-                .map(readStatus -> readStatus.getUserId())
-                .toList();
+        List<UUID> userIds = readStatusRepository.findAllUserIdsByChannelId(channel.getId());
+
 
         return ChannelResponseDto.of(
                 channel,

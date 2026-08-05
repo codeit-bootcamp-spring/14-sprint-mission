@@ -96,7 +96,7 @@ public class DiscodeitApplication {
 		try {
 			channelService.deleteChannel(c2.getId());
 			System.out.println("channelService.getChannel(c2.getId()) = " + channelService.getChannel(c2.getId()));
-		} catch (NoSuchElementException e) {
+		} catch (CustomException e) {
 			System.out.println("6. 삭제된 Channel 조회되지 않음 검증 완료");
 		}
 
@@ -168,7 +168,7 @@ public class DiscodeitApplication {
 		try {
 			User notRegistered = new User("notRegistered", "email", "password", null);
 			channelService.createChannel(new ChannelCreationDto(ChannelType.PRIVATE, "not valid channel", List.of(notRegistered.getId())));
-		} catch (IllegalArgumentException e) {
+		} catch (CustomException e) {
 			System.out.println("5. Channel 생성 시, User가 repository 등록된 유저임을 검증 성공");
 		}
 	}
