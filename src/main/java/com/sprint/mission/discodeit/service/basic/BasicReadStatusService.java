@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -25,12 +27,12 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus create(@Valid ReadStatusCreateDto dto) {
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow();
+                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
         Channel channel = channelRepository.findById(dto.getChannelId())
-                .orElseThrow();
+                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
 
         if (readStatusRepository.existsByUserAndChannel(user.getId(), channel.getId())) {
-            throw new IllegalArgumentException("ReadStatus 이미 있어서 못만듦 ㅋ");
+            throw new CustomException(ExceptionType.READSTATUS_ALREADY_EXISTS);
         }
 
         return dto.toReadStatus();
@@ -39,7 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus getReadStatus(UUID id) {
         return readStatusRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new CustomException(ExceptionType.READSTATUS_NOT_FOUND_IN_DATABASE));
     }
 
     @Override
