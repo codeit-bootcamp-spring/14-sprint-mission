@@ -85,8 +85,8 @@ public class BasicChannelService implements ChannelService {
                 .toList();
     }
 
-
-
+    // TODO 1. DTO 활용해 파라미터 그룹화
+    // TODO 2. PRIVATE 채널은 수정할 수 없음
     @Override
     public void updateChannelName(UUID id, ChannelUpdateNameDto dto) {
         channelRepository.updateName(id, dto.getName());
