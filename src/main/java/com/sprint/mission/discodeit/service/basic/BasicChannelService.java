@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(Channel channel) {
+    public Channel create(ChannelType type, String channelName, String description) {
+        Channel channel = new Channel(type, channelName, description);
         Channel savedChannel = channelRepository.save(channel);
         log.info("채널 생성 완료 : id={}", savedChannel.getId());
 
@@ -41,10 +43,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID id, Channel channel) {
+    public Channel update(UUID id, ChannelType type, String channelName, String description) {
         Channel targetChannel = channelRepository.findById(id);
 
-        targetChannel.update(channel.getType(), channel.getChannelName(), channel.getDescription());
+        targetChannel.update(type, channelName, description);
 
         Channel updatedChannel = channelRepository.save(targetChannel);
         log.info("채널 수정 완료 : id={}", updatedChannel.getId());

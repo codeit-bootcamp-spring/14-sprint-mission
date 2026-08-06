@@ -7,10 +7,10 @@ import java.util.UUID;
 
 public interface UserService {
     // 생성
-    User create(User user);
+//    User create(User user);
 
     // 생성(Overload)
-//    User create(String username, String email, String password);
+    User create(String username, String email, String password);
 
     // 단건 조회
     User findById(UUID id);
@@ -19,10 +19,10 @@ public interface UserService {
     List<User> findAll();
 
     // 수정
-    User update(UUID id, User user);
+//    User update(UUID id, User user);
 
     // 수정(Overload)
-//    User update(UUID id, String username, String email, String password);
+    User update(UUID id, String username, String email, String password);
 
     // 삭제
     void delete(UUID id);

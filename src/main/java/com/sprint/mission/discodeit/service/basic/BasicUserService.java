@@ -17,7 +17,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User create(User user) {
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
         User savedUser = userRepository.save(user);
         log.info("사용자 생성 완료 : id={}", savedUser.getId());
 
@@ -41,10 +42,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID id, User user) {
+    public User update(UUID id, String username, String email, String password) {
         User targetUser = userRepository.findById(id);
 
-        targetUser.update(user.getUsername(), user.getEmail(), user.getPassword());
+        targetUser.update(username, email, password);
 
         User updatedUser = userRepository.save(targetUser);
         log.info("사용자 수정 완료 : id={}", updatedUser.getId());

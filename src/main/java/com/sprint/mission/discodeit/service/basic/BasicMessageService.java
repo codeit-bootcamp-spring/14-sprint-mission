@@ -17,7 +17,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message create(Message message) {
+    public Message create(String content, UUID channelId, UUID authorId) {
+        Message message = new Message(content, channelId, authorId);
         Message savedMessage = messageRepository.save(message);
         log.info("메시지 생성 완료 : id={}", savedMessage.getId());
 
@@ -41,10 +42,10 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID id, Message message) {
+    public Message update(UUID id, String content) {
         Message targetMessage = messageRepository.findById(id);
 
-        targetMessage.updateContent(message.getContent());
+        targetMessage.updateContent(content);
 
         Message updatedMessage = messageRepository.save(targetMessage);
         log.info("메시지 수정 완료 : id={}", updatedMessage.getId());
