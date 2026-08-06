@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 .kotlin
+.discodeit
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

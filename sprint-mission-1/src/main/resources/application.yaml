@@ -1,0 +1,15 @@
+discodeit:
+  repository:
+    type: jcf   # jcf | file
+    file-directory: .discodeit
+
+spring:
+  application:
+    name: Discodeit
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+server:
+  port: 8080
