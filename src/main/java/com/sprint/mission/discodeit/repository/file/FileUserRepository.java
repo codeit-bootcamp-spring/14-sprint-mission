@@ -1,40 +1,69 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
 
-public class FileUserRepository implements UserRepository {
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+public class FileUserRepository
+        extends AbstractFileRepository<User>
+        implements UserRepository {
 
-    private final String USER_FILENAME = "users.ser";
-    private Map<UUID, User> userMap = loadFile(USER_FILENAME);
+    private static final String USER_FILENAME = "users.ser";
 
-    private FileUserRepository() {}
+    private final Map<UUID, User> userMap;
 
-    private static class LazyHolder {
-        private static final FileUserRepository INSTANCE = new FileUserRepository();
-    }
-
-    public static FileUserRepository getInstance() {
-        return LazyHolder.INSTANCE;
+    public FileUserRepository(
+            @Value("${discodeit.repository.file-directory:.discodeit/objects}")
+            String fileDirectory
+    ) {
+        super("User", fileDirectory, USER_FILENAME);
+        this.userMap = loadFile();
     }
 
     @Override
     public User save(User user) {
-        userMap.put(user.getId(), user);
-        saveToFile(userMap, USER_FILENAME);
+        User previousUser = userMap.put(user.getId(), user);
+        try {
+            saveFile(userMap);
+        } catch (RuntimeException exception) {
+            if (Objects.isNull(previousUser)) {
+                userMap.remove(user.getId());
+            } else {
+                userMap.put(previousUser.getId(), previousUser);
+            }
+            throw exception;
+        }
         return user;
     }
 
     @Override
-    public User find(UUID id) {
-        return Optional.ofNullable(userMap.get(id))
-                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(userMap.get(userId));
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return userMap.values().stream()
+                .filter(user -> Objects.equals(user.getUsername(), username))
+                .findFirst();
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userMap.values().stream()
+                .anyMatch(user -> Objects.equals(user.getUsername(), username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userMap.values().stream()
+                .anyMatch(user -> Objects.equals(user.getEmail(), email));
     }
 
     @Override
@@ -43,33 +72,16 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        if (userMap.remove(id) == null) {
-            throw new CustomException(ExceptionType.USER_NOT_FOUND);
-        }
-        saveToFile(userMap, USER_FILENAME);
-    }
-
-
-    /**
-     * Helper
-     */
-
-    private Map<UUID, User> loadFile(String filename) {
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filename))) {
-            return (Map<UUID, User>) objectInputStream.readObject();
-        } catch (FileNotFoundException e) {
-            return new HashMap<>();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public void delete(UUID userId) {
+        User deletedUser = userMap.remove(userId);
+        try {
+            saveFile(userMap);
+        } catch (RuntimeException exception) {
+            if (Objects.nonNull(deletedUser)) {
+                userMap.put(deletedUser.getId(), deletedUser);
+            }
+            throw exception;
         }
     }
 
-    private void saveToFile(Map<UUID, User> userMap, String filename) {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
-            objectOutputStream.writeObject(userMap);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

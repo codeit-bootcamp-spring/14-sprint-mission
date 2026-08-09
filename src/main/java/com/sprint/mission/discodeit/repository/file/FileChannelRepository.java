@@ -1,41 +1,53 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-public class FileChannelRepository implements ChannelRepository {
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+public class FileChannelRepository
+        extends AbstractFileRepository<Channel>
+        implements ChannelRepository {
 
-    private final String CHANNEL_FILENAME = "channels.ser";
+    private static final String CHANNEL_FILENAME = "channels.ser";
 
-    // FileChannelRepository 생성 시 한번만 로드
-    private Map<UUID, Channel> channelMap = loadFile(CHANNEL_FILENAME);
+    private final Map<UUID, Channel> channelMap;
 
-    private FileChannelRepository() {}
-
-    private static class LazyHolder {
-        private static final FileChannelRepository INSTANCE = new FileChannelRepository();
-    }
-
-    public static FileChannelRepository getInstance() {
-        return LazyHolder.INSTANCE;
+    public FileChannelRepository(
+            @Value("${discodeit.repository.file-directory:.discodeit/objects}")
+            String fileDirectory
+    ) {
+        super("Channel", fileDirectory, CHANNEL_FILENAME);
+        this.channelMap = loadFile();
     }
 
     @Override
     public Channel save(Channel channel) {
-        channelMap.put(channel.getId(), channel);
-        saveToFile(channelMap, CHANNEL_FILENAME);
+        Channel previousChannel = channelMap.put(channel.getId(), channel);
+        try {
+            saveFile(channelMap);
+        } catch (RuntimeException exception) {
+            if (previousChannel == null) {
+                channelMap.remove(channel.getId());
+            } else {
+                channelMap.put(previousChannel.getId(), previousChannel);
+            }
+            throw exception;
+        }
         return channel;
     }
 
     @Override
-    public Channel find(UUID id) {
-        return Optional.ofNullable(channelMap.get(id))
-                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND));
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(channelMap.get(channelId));
     }
 
     @Override
@@ -44,34 +56,16 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        if (channelMap.remove(id) == null) {
-            throw new CustomException(ExceptionType.CHANNEL_NOT_FOUND);
-        }
-        saveToFile(channelMap, CHANNEL_FILENAME);
-    }
-
-
-
-    /**
-     * Helper
-     */
-
-    private Map<UUID, Channel> loadFile(String filename) {
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filename))) {
-            return (Map<UUID, Channel>) objectInputStream.readObject();
-        } catch (FileNotFoundException e) {
-            return new HashMap<>();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public void delete(UUID channelId) {
+        Channel deletedChannel = channelMap.remove(channelId);
+        try {
+            saveFile(channelMap);
+        } catch (RuntimeException exception) {
+            if (deletedChannel != null) {
+                channelMap.put(deletedChannel.getId(), deletedChannel);
+            }
+            throw exception;
         }
     }
 
-    private void saveToFile(Map<UUID, Channel> channelMap, String filename) {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
-            objectOutputStream.writeObject(channelMap);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

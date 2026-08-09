@@ -1,25 +1,18 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
     private static final Map<UUID, User> userMap = new HashMap<>();
-
-    private JCFUserRepository() {}
-
-    private static class LazyHolder {
-        private static final JCFUserRepository INSTANCE = new JCFUserRepository();  // 싱글톤 패턴 적용
-    }
-
-
-    public static JCFUserRepository getInstance() {
-        return LazyHolder.INSTANCE;
-    }
 
     @Override
     public User save(User user) {
@@ -28,9 +21,29 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User find(UUID id) {
-        return Optional.ofNullable(userMap.get(id))
-                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(userMap.get(userId));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userMap.values().stream()
+                .anyMatch(user ->
+                        Objects.equals(user.getUsername(), username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userMap.values().stream()
+                .anyMatch(user ->
+                        Objects.equals(user.getEmail(), email));
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userMap.values().stream()
+                .filter(user ->
+                        Objects.equals(user.getUsername(), username))
+                .findFirst();
     }
 
     @Override
@@ -39,9 +52,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        if (userMap.remove(id) == null) {
-            throw new CustomException(ExceptionType.USER_NOT_FOUND);
-        }
+    public void delete(UUID userId) {
+        userMap.remove(userId);
     }
 }

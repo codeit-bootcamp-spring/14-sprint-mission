@@ -1,40 +1,68 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
 
-public class FileMessageRepository implements MessageRepository {
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+public class FileMessageRepository
+        extends AbstractFileRepository<Message>
+        implements MessageRepository {
 
-    private final String MESSAGE_FILENAME = "messages.ser";
-    private Map<UUID, Message> messageMap = loadFile(MESSAGE_FILENAME);
+    private static final String MESSAGE_FILENAME = "messages.ser";
 
-    private FileMessageRepository() {}
+    private final Map<UUID, Message> messageMap;
 
-    private static class LazyHolder {
-        private final static FileMessageRepository INSTANCE = new FileMessageRepository();
-    }
-
-    public static FileMessageRepository getInstance() {
-        return LazyHolder.INSTANCE;
+    public FileMessageRepository(
+            @Value("${discodeit.repository.file-directory:.discodeit/objects}")
+            String fileDirectory
+    ) {
+        super("Message", fileDirectory, MESSAGE_FILENAME);
+        this.messageMap = loadFile();
     }
 
     @Override
     public Message save(Message message) {
-        messageMap.put(message.getId(), message);
-        saveToFile(messageMap, MESSAGE_FILENAME);
+        Message previousMessage = messageMap.put(message.getId(), message);
+        try {
+            saveFile(messageMap);
+        } catch (RuntimeException exception) {
+            if (Objects.isNull(previousMessage)) {
+                messageMap.remove(message.getId());
+            } else {
+                messageMap.put(previousMessage.getId(), previousMessage);
+            }
+            throw exception;
+        }
         return message;
     }
 
     @Override
-    public Message find(UUID id) {
-        return Optional.ofNullable(messageMap.get(id))
-                .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND));
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.ofNullable(messageMap.get(messageId));
+    }
+
+    @Override
+    public Optional<Message> findMostRecentByChannelId(UUID channelId) {
+        Message mostRecentMessage = null;
+
+        for (Message currentMessage : messageMap.values()) {
+            if (currentMessage.getChannelId().equals(channelId)) continue;
+
+            // 가장 최근 보낸 메세지 선정 로직
+            if (Objects.isNull(mostRecentMessage)
+                    || currentMessage.getCreatedAt()
+                        .isAfter(mostRecentMessage.getCreatedAt())) {
+                mostRecentMessage = currentMessage;
+            }
+        }
+
+        return Optional.ofNullable(mostRecentMessage);
     }
 
     @Override
@@ -43,34 +71,43 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        if (messageMap.remove(id) == null) {
-            throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND);
-        }
-        saveToFile(messageMap, MESSAGE_FILENAME);
-    }
-
-
-
-    /**
-     * Helper
-     */
-
-    private Map<UUID, Message> loadFile(String filename) {
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filename))) {
-            return (Map<UUID, Message>) objectInputStream.readObject();
-        } catch (FileNotFoundException e) {
-            return new HashMap<>();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public void delete(UUID messageId) {
+        Message deletedMessage = messageMap.remove(messageId);
+        try {
+            saveFile(messageMap);
+        } catch (RuntimeException exception) {
+            if (Objects.nonNull(deletedMessage)) {
+                messageMap.put(deletedMessage.getId(), deletedMessage);
+            }
+            throw exception;
         }
     }
 
-    private void saveToFile(Map<UUID, Message> messageMap, String filename) {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
-            objectOutputStream.writeObject(messageMap);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        List<Message> messagesToDelete = new ArrayList<>();
+
+        // channelId로 보내진 모든 메세지들을 모은다
+        for (Message message : messageMap.values()) {
+            if (Objects.equals(message.getChannelId(), channelId)) {
+                messagesToDelete.add(message);
+            }
+        }
+
+        // 그 메세지들을 하나하나 다 지운다
+        for (Message message : messagesToDelete) {
+            messageMap.remove(message.getId());
+        }
+
+        // 파일 저장
+        try {
+            saveFile(messageMap);
+        } catch (RuntimeException exception) {
+            for (Message message : messagesToDelete) {
+                messageMap.put(message.getId(), message);
+            }
+            throw exception;
         }
     }
+
 }
