@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -26,6 +27,7 @@ public class BasicServiceFactory {
     private final MessageService messageService;
     private final ReadStatusService readStatusService;
     private final UserStatusService userStatusService;
+    private final BinaryContentService binaryContentService;
 
     public BasicServiceFactory() {
         UserRepository userRepository = new FileUserRepository();
@@ -41,5 +43,6 @@ public class BasicServiceFactory {
         this.messageService = new BasicMessageService(messageRepository, channelRepository, userRepository, binaryContentRepository);
         this.readStatusService = new BasicReadStatusService(readStatusRepository, userRepository, channelRepository);
         this.userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
+        this.binaryContentService = new BasicBinaryContentService(binaryContentRepository);
     }
 }
