@@ -1,0 +1,110 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.authLogin.AuthLoginRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.AuthenticationFailedException;
+import com.sprint.mission.discodeit.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
+import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@RequiredArgsConstructor
+class BasicUserServiceTest {
+
+
+    private UserService userService;
+
+    private AuthService authService;
+
+    @BeforeEach
+    void setUp(){
+        UserRepository userRepository = new JCFUserRepository();
+        userService = new BasicUserService(
+                userRepository,
+                new JCFUserStatusRepository(),
+                new JCFBinaryContentRepository()
+        );
+        authService = new BasicAuthService(
+                userRepository
+        );
+    }
+
+    @Test
+    void 유저를_생성하면_조회할_수_있다(){
+        byte[] image = {1,2,3,4};
+        UserResponseDto created = userService.create(new UserRequestDto("김양현", "yyy2724@naver.com", "2724", image));
+        UserResponseDto found = userService.find(created.id());
+
+        assertEquals(created.id(), found.id());
+        assertEquals("김양현", found.userName());
+        assertEquals("yyy2724@naver.com", found.email());
+
+    }
+
+    @Test
+    void 유저를_생성하면_전체조회시_포함되어_있다(){
+        byte[] image = {1,2,3,4,5,6,7};
+        UserResponseDto created = userService.create(new UserRequestDto("김양횬", "y@naver.com", "2724", image));
+
+        boolean 포함되어_있는가 = userService.findAll().stream()
+                .anyMatch(user -> user.id().equals(created.id()));
+
+        assertTrue(포함되어_있는가);
+    }
+
+    @Test
+    void 유저를_생성하고_업데이트하면_조회할_수_있으며_로그인할_수_있다_그리고_비밀번호_다를_시_에러를_낸다(){
+        byte[] image = {1,2,3,4,5,6,8};
+        UserResponseDto created = userService.create(new UserRequestDto("김양햔", "hyan@naver.com", "1234", image));
+        UserUpdateRequestDto request = new UserUpdateRequestDto(created.id(), created.profileId(),"새김양현",
+                "new@naver.com", "newPassword", null);
+
+        userService.update(request);
+
+        UserResponseDto found = userService.find(created.id());
+        assertEquals("새김양현", found.userName());
+        assertEquals("new@naver.com", found.email());
+
+        AuthLoginRequestDto login = new AuthLoginRequestDto("새김양현", "newPassword");
+        assertDoesNotThrow(() -> authService.login(login));
+        assertThrows(AuthenticationFailedException.class, () -> authService.login(new AuthLoginRequestDto("새김양현", "1234")));
+    }
+
+    @Test
+    void 유저를_생성하면_유저명과_이메일로_조회할_수_있다(){
+        byte[] image = {1,2,3,4};
+        UserResponseDto created = userService.create(new UserRequestDto("김양현", "yyy2724@naver.com", "2724", image));
+
+        User findUserName = userService.findByUsername(created.userName()).orElseThrow();
+        User findEmail = userService.findByEmail(created.email()).orElseThrow();
+
+        assertEquals("김양현", findUserName.getUserName());
+        assertEquals("yyy2724@naver.com", findEmail.getEmail());
+
+    }
+
+    @Test
+    void 유저를_생성하고_삭제하면_관련된_모든_것을_삭제_할_수_있다(){
+        byte[] image = {1,2,3,4};
+        UserResponseDto created = userService.create(new UserRequestDto("김양현", "yyy2724@naver.com", "2724", image));
+
+        userService.delete(created.id());
+
+        assertThrows(NoSuchElementException.class, () ->userService.find(created.id()));
+    }
+
+
+}

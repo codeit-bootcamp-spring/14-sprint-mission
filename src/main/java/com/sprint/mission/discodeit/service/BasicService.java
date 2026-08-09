@@ -5,8 +5,7 @@ import java.util.UUID;
 
 public interface BasicService<T> {
 
-    T read(UUID id);
-    void update(T t);
+
     void delete(UUID id);
-    List<T> readAll();
+
 }

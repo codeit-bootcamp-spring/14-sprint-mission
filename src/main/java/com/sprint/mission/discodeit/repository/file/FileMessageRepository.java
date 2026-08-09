@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -10,48 +13,53 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void save(Message message) {
         try {
             Files.createDirectories(Paths.get("./message"));
-        }catch (IOException e){
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream("./message/" + message.getId() + ".ser"))) {
+        try (FileOutputStream fos = new FileOutputStream("./message/" + message.getId() + ".ser");
+             ObjectOutputStream output = new ObjectOutputStream(fos)) {
 
             output.writeObject(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     //생 객체를 넣어버려서
     @Override
-    public Message findById(UUID id) {
-        try(ObjectInputStream input = new ObjectInputStream(new FileInputStream("./message/" + id +".ser"))){
-            return (Message) input.readObject();
-        } catch (IOException | ClassNotFoundException e){
-            e.printStackTrace();
+    public Optional<Message> findById(UUID id) {
+        try (FileInputStream fis = new FileInputStream("./message/" + id + ".ser");
+             ObjectInputStream input = new ObjectInputStream(fis)) {
+            return Optional.ofNullable((Message) input.readObject());
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        throw new NullPointerException("값이 없습니다.");
     }
 
     @Override
     public List<Message> findAll() {
         List<Message> lists = new ArrayList<>();
         // 해당 위치 파일 다 긁어 오기
-        File[] files = new File("./message").listFiles();
+        File[] files = new File("./message").listFiles((dir, name) -> name.endsWith(".ser"));
 
         for (File file : files) {
-            try(ObjectInputStream input = new ObjectInputStream(new FileInputStream(file))){
-                lists.add((Message)input.readObject());
-            } catch (IOException | ClassNotFoundException e){
-                e.printStackTrace();
+            try (FileInputStream fis = new FileInputStream(file);
+                 ObjectInputStream input = new ObjectInputStream(fis)) {
+                lists.add((Message) input.readObject());
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -61,11 +69,33 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteById(UUID id) {
-        try{
+        try {
             Files.deleteIfExists(Path.of("./message/" + id + ".ser"));
-        } catch (IOException e){
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        // 삭제할 메세지
+        List<UUID> ids = findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(BaseEntity::getId)
+                .toList();
+
+        // 진짜 삭제
+        for (UUID id : ids) {
+            deleteById(id);
+        }
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId){
+
+        return findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
 }

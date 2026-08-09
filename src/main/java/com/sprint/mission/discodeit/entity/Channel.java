@@ -1,41 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serial;
+import java.time.Instant;
+
+@Getter
 public class Channel extends BaseEntity{
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private ChannelType channelType;
+    private String title;
     private String memo;
-    private String memoText;
 
     public Channel(ChannelType channelType, String memo, String memoText) {
         super();
         this.channelType = channelType;
-        this.memo = memo;
-        this.memoText = memoText;
+        this.title = memo;
+        this.memo = memoText;
     }
 
     public void update(ChannelType channelType, String memo, String memoText){
         this.channelType = channelType;
-        this.memo = memo;
-        this.memoText = memoText;
-        this.updateUpdatedAt(System.currentTimeMillis());
-    }
-
-    public ChannelType getChannelType(){
-        return channelType;
-    }
-    public String getMemo(){
-        return memo;
-    }
-    public String getMemoText(){
-        return memoText;
+        this.title = memo;
+        this.memo = memoText;
+        this.updateUpdatedAt(Instant.now());
     }
 
     @Override
     public String toString() {
         return "Channel{" +
                 "channelType=" + channelType +
-                ", memo='" + memo + '\'' +
-                ", memoText='" + memoText + '\'' +
+                ", title='" + title + '\'' +
+                ", title='" + memo + '\'' +
                 '}';
     }
 }

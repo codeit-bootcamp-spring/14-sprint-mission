@@ -1,33 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serial;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message extends BaseEntity{
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String message;
     private UUID channelId;
-    private UUID UserId;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
 
-    public Message(String message, UUID channelId, UUID UserId) {
+    public Message(List<UUID> attachmentIds, String message, UUID channelId, UUID userId) {
         super();
+        if(attachmentIds == null){
+            attachmentIds = new ArrayList<>();
+        }
+        this.attachmentIds = attachmentIds;
         this.message = message;
         this.channelId = channelId;
-        this.UserId = UserId;
-    }
-
-    public String getMessage(){
-        return message;
-    }
-    public UUID getMemo(){
-        return channelId;
-    }
-    public UUID getMemoText(){
-        return UserId;
+        this.authorId = userId;
     }
 
     public void update(String message){
         this.message = message;
-        this.updateUpdatedAt(System.currentTimeMillis());
+        this.updateUpdatedAt(Instant.now());
     }
 
     @Override
@@ -35,7 +40,7 @@ public class Message extends BaseEntity{
         return "Message{" +
                 "message='" + message + '\'' +
                 ", channelId=" + channelId +
-                ", UserId=" + UserId +
+                ", UserId=" + authorId +
                 '}';
     }
 }

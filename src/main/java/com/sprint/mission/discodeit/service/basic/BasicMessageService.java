@@ -1,58 +1,81 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-    MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    public BasicMessageService(MessageRepository messageRepository){
-        this.messageRepository = messageRepository;
-    }
-
-
-    @Override
-    public Message create(String message, UUID ChannelId, UUID userId) {
-        Message messsage = new Message(message, ChannelId, userId);
-        messageRepository.save(messsage);
-        return messsage;
-    }
 
     @Override
-    public Message read(UUID id) {
-
-        return check(id);
+    public MessageResponseDto create(MessageCreateRequestDto request) {
+        Message message = request.toEntity();
+        messageRepository.save(message);
+        return MessageResponseDto.from(message.getId(), message.getAttachmentIds(), message.getMessage(),
+                message.getChannelId(), message.getAuthorId());
     }
 
     @Override
-    public void update(Message t) {
-        Message message1 = check(t.getId());
-        message1.update(t.getMessage());
-        messageRepository.save(message1);
+    public MessageResponseDto find(UUID id) {
+        Message message = check(id);
+        return MessageResponseDto.from(message.getId(), message.getAttachmentIds(), message.getMessage(),
+                message.getChannelId(), message.getAuthorId());
+    }
+
+    @Override
+    public void update(MessageUpdateRequestDto request) {
+        Message message = check(request.id());
+        message.update(request.message());
+        messageRepository.save(message);
     }
 
     @Override
     public void delete(UUID id) {
-        check(id);
+        Message message = check(id);
+
+        List<UUID> attachmentIds = message.getAttachmentIds();
+
+        for (UUID attachmentId : attachmentIds) {
+            binaryContentRepository.deleteById(attachmentId);
+        }
+
+
         messageRepository.deleteById(id);
+
+
     }
 
     @Override
-    public List<Message> readAll() {
-        return  messageRepository.findAll();
+    public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId).stream()
+                .map(message -> MessageResponseDto.from(message.getId(), message.getAttachmentIds(), message.getMessage(),
+                        message.getChannelId(), message.getAuthorId()))
+                .toList();
     }
 
 
     private Message check(UUID id) {
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new IllegalArgumentException("해당 값이 존재하지 않습니다.");
-        }
-        return message;
+
+        return messageRepository.findById(id).orElseThrow(NoSuchElementException::new);
     }
 }
