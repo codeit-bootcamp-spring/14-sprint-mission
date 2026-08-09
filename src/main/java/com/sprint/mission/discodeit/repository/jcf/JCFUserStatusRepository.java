@@ -34,7 +34,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus findByUserId(UUID userId) {
         for (UserStatus each : userStatusList) {
-            if (each.getUserId().equals(userId)) {
+            if (each.getUserId() != null && each.getUserId().equals(userId)) {
                 return each;
             }
         }
@@ -43,7 +43,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public List<UserStatus> findAll() {
-        return this.userStatusList;
+        return userStatusList;
     }
 
     @Override

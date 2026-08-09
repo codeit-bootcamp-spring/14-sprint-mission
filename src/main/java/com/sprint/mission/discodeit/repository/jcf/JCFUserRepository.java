@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public class JCFUserRepository implements UserRepository {
     final List<User> userList;
 
@@ -59,5 +61,4 @@ public class JCFUserRepository implements UserRepository {
                 .orElse(null);
         return target;
     };
-
 }
