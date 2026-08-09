@@ -26,7 +26,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public BinaryContent findById(UUID id) {
         return binaryContentList.stream()
-                .filter(b -> b.getId().equals(id))
+                .filter(each -> each.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
@@ -42,7 +42,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public BinaryContent findByUserIdAndChannelId(UUID userId, UUID channelId) {
         return binaryContentList.stream()
-                .filter(b -> b.getUserId() != null && b.getUserId().equals(userId))
+                .filter(each -> each.getUserId() != null && each.getUserId().equals(userId))
                 .findFirst()
                 .orElse(null);
     }
