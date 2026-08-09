@@ -15,6 +15,8 @@ public interface ReadStatusRepository {
     //읽기상태 목록 가져오기
     List<ReadStatus> findAll();
 
+    List<ReadStatus> findAllByChannelId(UUID channelId);
+
     //메모리에서 읽기상태 지우기
     void delete(UUID id);
-}    
+}

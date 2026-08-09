@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -43,11 +42,21 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageList.stream()
+                .filter(m -> m.getChannelId() != null && m.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
     public void delete(UUID id) {
         Message target = findById(id);
-        messageList.remove(target);
-        saveMessage();
+        if (target != null) {
+            messageList.remove(target);
+            saveMessage();
+        }
     }
+
     private void saveMessage() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("newmessagelist"))) {
             objectOutputStream.writeObject(messageList);

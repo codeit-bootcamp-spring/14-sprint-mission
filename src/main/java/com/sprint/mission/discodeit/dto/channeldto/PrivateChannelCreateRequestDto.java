@@ -12,11 +12,10 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChannelCreateRequestDto {
-    private String channelName;
+public class PrivateChannelCreateRequestDto {
     private List<UUID> memberIds;
 
     public Channel toEntity() {
-        return new Channel(this.channelName, this.memberIds, ChannelType.PUBLIC);
+        return new Channel(null, this.memberIds, ChannelType.PRIVATE);
     }
 }
