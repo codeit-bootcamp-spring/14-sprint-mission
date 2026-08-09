@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: discodeit
+
+server:
+  port: 8002
+
+# properties 대신 yaml을 쓴다. 중첩 키를 다루기 편하다.

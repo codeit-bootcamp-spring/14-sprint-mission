@@ -1,0 +1,235 @@
+@startuml discodeit-class-diagram
+
+' ── 표시 규칙 ────────────────────────────────────────────────
+left to right direction
+hide methods
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 60
+
+title Discodeit — 스프린트 미션 3 (기본 + UserService 고도화까지)
+
+' ── 도메인 모델 ──────────────────────────────────────────────
+package "discodeit.entity" {
+
+  class Common {
+    - id : UUID
+    - createdAt : Instant
+    - updatedAt : Instant
+  }
+
+  class User {
+    - username : String
+    - email : String
+    - password : String
+    - profileId : UUID
+  }
+
+  class Channel {
+    - type : ChannelType
+    - channelName : String
+    - description : String
+  }
+
+  class Message {
+    - content : String
+    - channelId : UUID
+    - authorId : UUID
+  }
+
+  class UserStatus {
+    - userId : UUID
+    - lastActiveAt : Instant
+  }
+
+  class ReadStatus {
+    - userId : UUID
+    - channelId : UUID
+    - lastReadAt : Instant
+  }
+
+  ' Common을 상속하지 않는다. 수정 불가라 updatedAt이 없어야 하기 때문이다.
+  class BinaryContent {
+    - id : UUID
+    - createdAt : Instant
+    - fileName : String
+    - contentType : String
+    - size : Long
+    - bytes : byte[]
+  }
+
+  enum ChannelType {
+    PUBLIC
+    PRIVATE
+  }
+}
+
+' ── DTO ─────────────────────────────────────────────────────
+package "discodeit.dto" {
+
+  class UserDto <<record>> {
+    - id : UUID
+    - createdAt : Instant
+    - updatedAt : Instant
+    - username : String
+    - email : String
+    - profileId : UUID
+    - online : Boolean
+  }
+
+  class UserCreateRequest <<record>> {
+    - username : String
+    - email : String
+    - password : String
+  }
+
+  class UserUpdateRequest <<record>> {
+    - newUsername : String
+    - newEmail : String
+    - newPassword : String
+  }
+
+  class BinaryContentCreateRequest <<record>> {
+    - fileName : String
+    - contentType : String
+    - bytes : byte[]
+  }
+}
+
+' ── 서비스 계층 ──────────────────────────────────────────────
+package "discodeit.service" {
+  interface UserService
+  interface ChannelService
+  interface MessageService
+}
+
+package "discodeit.service.basic" {
+  class BasicUserService
+  class BasicChannelService
+  class BasicMessageService
+}
+
+' ── 저장소 계층 ──────────────────────────────────────────────
+package "discodeit.repository" {
+  interface UserRepository
+  interface ChannelRepository
+  interface MessageRepository
+  interface UserStatusRepository
+  interface ReadStatusRepository
+  interface BinaryContentRepository
+}
+
+package "discodeit.repository.jcf" {
+  class JCFUserRepository
+  class JCFChannelRepository
+  class JCFMessageRepository
+  class JCFUserStatusRepository
+  class JCFReadStatusRepository
+  class JCFBinaryContentRepository
+}
+
+package "discodeit.repository.file" {
+  class FileUserRepository
+  class FileChannelRepository
+  class FileMessageRepository
+  class FileUserStatusRepository
+  class FileReadStatusRepository
+  class FileBinaryContentRepository
+}
+
+package "discodeit.storage" {
+  class FileStore<T> {
+    - path : Path
+  }
+}
+
+' ── 실행 진입점 ──────────────────────────────────────────────
+package "discodeit" {
+  class DiscodeitApplication
+}
+
+' ── 상속 ────────────────────────────────────────────────────
+Common <|-- User
+Common <|-- Channel
+Common <|-- Message
+Common <|-- UserStatus
+Common <|-- ReadStatus
+
+' ── 도메인 간 id 참조 (객체 참조가 아니라 UUID 필드다) ─────────
+User ..> BinaryContent : profileId
+Channel *-- ChannelType
+UserStatus ..> User : userId
+ReadStatus ..> User : userId
+ReadStatus ..> Channel : channelId
+Message ..> Channel : channelId
+Message ..> User : authorId
+
+' ── 구현 ────────────────────────────────────────────────────
+UserService <|.. BasicUserService
+ChannelService <|.. BasicChannelService
+MessageService <|.. BasicMessageService
+
+UserRepository <|.. JCFUserRepository
+ChannelRepository <|.. JCFChannelRepository
+MessageRepository <|.. JCFMessageRepository
+UserStatusRepository <|.. JCFUserStatusRepository
+ReadStatusRepository <|.. JCFReadStatusRepository
+BinaryContentRepository <|.. JCFBinaryContentRepository
+
+UserRepository <|.. FileUserRepository
+ChannelRepository <|.. FileChannelRepository
+MessageRepository <|.. FileMessageRepository
+UserStatusRepository <|.. FileUserStatusRepository
+ReadStatusRepository <|.. FileReadStatusRepository
+BinaryContentRepository <|.. FileBinaryContentRepository
+
+' ── 의존성 주입 (Service는 다른 Service가 아니라 Repository만 본다) ──
+BasicUserService --> UserRepository
+BasicUserService --> BinaryContentRepository
+BasicUserService --> UserStatusRepository
+
+BasicChannelService --> ChannelRepository
+
+BasicMessageService --> MessageRepository
+BasicMessageService --> ChannelRepository
+BasicMessageService --> UserRepository
+
+' ── 파일 저장 공통 처리 ───────────────────────────────────────
+FileUserRepository --> FileStore
+FileChannelRepository --> FileStore
+FileMessageRepository --> FileStore
+FileUserStatusRepository --> FileStore
+FileReadStatusRepository --> FileStore
+FileBinaryContentRepository --> FileStore
+
+' ── 진입점 ──────────────────────────────────────────────────
+DiscodeitApplication ..> UserService
+DiscodeitApplication ..> ChannelService
+DiscodeitApplication ..> MessageService
+
+' ── DTO 사용 ────────────────────────────────────────────────
+UserService ..> UserDto
+UserService ..> UserCreateRequest
+UserService ..> UserUpdateRequest
+UserService ..> BinaryContentCreateRequest
+
+' ── 레이아웃 강제 ────────────────────────────────────────────
+' left to right direction만으로는 계층이 세로로 쌓인다.
+' 보이지 않는 링크로 "도메인 → DTO → 서비스 → 저장소 → 구현체" 순서를
+' 왼쪽에서 오른쪽으로 늘어놓게 한다. 화살표는 그려지지 않는다.
+Common         -[hidden]right- UserDto
+UserDto        -[hidden]right- UserService
+UserService    -[hidden]right- UserRepository
+UserRepository -[hidden]right- JCFUserRepository
+BinaryContent  -[hidden]right- BinaryContentCreateRequest
+
+legend left
+  실선 화살표(-->) : 필드로 갖는 의존성 (생성자 주입)
+  점선 화살표(..>) : id 참조 또는 사용 관계
+  점선 삼각형(<|..) : 인터페이스 구현
+  실선 삼각형(<|--) : 상속
+endlegend
+
+@enduml
