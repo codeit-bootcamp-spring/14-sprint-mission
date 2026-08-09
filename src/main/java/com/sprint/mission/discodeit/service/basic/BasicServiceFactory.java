@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.Getter;
 
 @Getter
@@ -24,6 +25,7 @@ public class BasicServiceFactory {
     private final ChannelService channelService;
     private final MessageService messageService;
     private final ReadStatusService readStatusService;
+    private final UserStatusService userStatusService;
 
     public BasicServiceFactory() {
         UserRepository userRepository = new FileUserRepository();
@@ -38,5 +40,6 @@ public class BasicServiceFactory {
         this.channelService = new BasicChannelService(channelRepository, userService, readStatusRepository, messageRepository);
         this.messageService = new BasicMessageService(messageRepository, channelRepository, userRepository, binaryContentRepository);
         this.readStatusService = new BasicReadStatusService(readStatusRepository, userRepository, channelRepository);
+        this.userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
     }
 }

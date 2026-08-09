@@ -40,6 +40,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
+    public List<BinaryContent> findAllByMessageId(UUID messageId) {
+        return binaryContentList.stream()
+                .filter(each -> each.getMessageId() != null && each.getMessageId().equals(messageId))
+                .toList();
+    }
+
+    @Override
     public BinaryContent findByUserIdAndChannelId(UUID userId, UUID channelId) {
         return binaryContentList.stream()
                 .filter(each -> each.getUserId() != null && each.getUserId().equals(userId))
