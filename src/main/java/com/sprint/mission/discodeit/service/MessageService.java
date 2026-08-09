@@ -18,6 +18,8 @@ public interface MessageService {
     // Read (전체 조회)
     List<MessageResponseDto> readAllMessage();
 
+    List<MessageResponseDto> findAllByChannelId(UUID channelId);
+
     // Update (메시지 내용 변경)
     MessageResponseDto updateMessage(UUID id, MessageUpdateRequestDto requestDto);
 

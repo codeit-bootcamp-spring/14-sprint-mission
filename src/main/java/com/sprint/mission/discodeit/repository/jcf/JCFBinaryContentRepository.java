@@ -21,18 +21,29 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent findById(UUID id) {
-        return binaryContentList.stream()
-                .filter(each -> each.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        for (BinaryContent each : binaryContentList) {
+            if (each.getId().equals(id)) {
+                return each;
+            }
+        }
+        return null;
     }
 
     @Override
     public BinaryContent findByUserId(UUID userId) {
+        for (BinaryContent each : binaryContentList) {
+            if (each.getUserId() != null && each.getUserId().equals(userId)) {
+                return each;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<BinaryContent> findAllByMessageId(UUID messageId) {
         return binaryContentList.stream()
-                .filter(each -> each.getUserId().equals(userId))
-                .findFirst()
-                .orElse(null);
+                .filter(each -> each.getMessageId() != null && each.getMessageId().equals(messageId))
+                .toList();
     }
 
     @Override

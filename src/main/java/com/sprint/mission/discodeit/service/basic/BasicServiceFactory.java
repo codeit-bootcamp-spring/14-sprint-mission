@@ -34,6 +34,6 @@ public class BasicServiceFactory {
 
         this.userService = new BasicUserService(userRepository, userStatusRepository, binaryContentRepository);
         this.channelService = new BasicChannelService(channelRepository, userService, readStatusRepository, messageRepository);
-        this.messageService = new BasicMessageService(messageRepository, channelService, userService);
+        this.messageService = new BasicMessageService(messageRepository, channelRepository, userRepository, binaryContentRepository);
     }
 }
