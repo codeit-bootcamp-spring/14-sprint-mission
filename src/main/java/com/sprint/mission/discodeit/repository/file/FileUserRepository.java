@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -20,11 +21,14 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
 
-    public FileUserRepository() {
-        //경로 여기서 생성하기
-        try {
-            Files.createDirectories(Paths.get("./user"));
-        } catch (IOException e) {
+    private final Path directory;
+
+    public FileUserRepository(
+            @Value("${discodeit.repository.file-directory}") String fileDirectory){
+        this.directory = Paths.get(fileDirectory, "user");
+        try{
+            Files.createDirectories(directory);
+        } catch (IOException e){
             throw new RuntimeException(e);
         }
     }
@@ -33,7 +37,7 @@ public class FileUserRepository implements UserRepository {
     public void save(User user) {
 
 
-        try (FileOutputStream fos = new FileOutputStream("./user/" + user.getId() + ".ser");
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(user.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(user);
         } catch (IOException e) {
@@ -44,7 +48,7 @@ public class FileUserRepository implements UserRepository {
     //생 객체를 넣어버려서
     @Override
     public Optional<User> findById(UUID id) {
-        try (FileInputStream fis = new FileInputStream("./user/" + id + ".ser");
+        try (FileInputStream fis = new FileInputStream(directory.resolve(id + ".ser").toFile());
              ObjectInputStream input = new ObjectInputStream(fis)) {
             return Optional.ofNullable((User) input.readObject());
         } catch (IOException | ClassNotFoundException e) {
@@ -56,7 +60,7 @@ public class FileUserRepository implements UserRepository {
     public List<User> findAll() {
         List<User> lists = new ArrayList<>();
         // 해당 위치 파일 다 긁어 오기
-        File[] files = new File("./user").listFiles((dir, name) -> name.endsWith(".ser"));
+        File[] files = directory.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
         if (files == null) {
             return List.of();
         }
@@ -77,7 +81,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void deleteById(UUID id) {
         try {
-            Files.deleteIfExists(Path.of("./user/" + id + ".ser"));
+            Files.deleteIfExists(directory.resolve(id + ".ser"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -91,7 +95,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void update(User user) {
-        try (FileOutputStream fos = new FileOutputStream("./user/" + user.getId() + ".ser");
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(user.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(user);
         } catch (IOException e) {

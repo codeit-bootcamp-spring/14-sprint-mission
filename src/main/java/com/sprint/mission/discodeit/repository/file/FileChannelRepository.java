@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -19,16 +20,21 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
 
-    @Override
-    public void save(Channel channel) {
-        // 중복코드 줄이기
+    private final Path directory;
+
+    public FileChannelRepository(
+            @Value("${discodeit.repository.file-directory}") String fileDirectory) {
+        this.directory = Paths.get(fileDirectory, "channel");
         try {
-            Files.createDirectories(Paths.get("./channel"));
-        }catch (IOException e){
+            Files.createDirectories(directory);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        try (FileOutputStream fos = new FileOutputStream("./channel/" + channel.getId()+".ser");
+    @Override
+    public void save(Channel channel) {
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(channel.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(channel);
         } catch (IOException e){
@@ -39,7 +45,7 @@ public class FileChannelRepository implements ChannelRepository {
     //생 객체를 넣어버려서
     @Override
     public Optional<Channel> findById(UUID id) {
-        try (FileInputStream fis = new FileInputStream("./channel/" + id +".ser");
+        try (FileInputStream fis = new FileInputStream(directory.resolve(id + ".ser").toFile());
              ObjectInputStream input = new ObjectInputStream(fis)) {
             return Optional.ofNullable((Channel) input.readObject());
         } catch (IOException | ClassNotFoundException e){
@@ -51,7 +57,7 @@ public class FileChannelRepository implements ChannelRepository {
     public List<Channel> findAll() {
         List<Channel> lists = new ArrayList<>();
         // 해당 위치 파일 다 긁어 오기
-        File[] files = new File("./channel").listFiles((dir, name) -> name.endsWith(".ser"));
+        File[] files = directory.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
 
         for (File file : files) {
             try (FileInputStream fis = new FileInputStream(file);
@@ -69,7 +75,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteById(UUID id) {
         try{
-            Files.deleteIfExists(Path.of("./channel/" + id + ".ser"));
+            Files.deleteIfExists(directory.resolve(id + ".ser"));
         } catch (IOException e){
             throw new RuntimeException(e);
         }

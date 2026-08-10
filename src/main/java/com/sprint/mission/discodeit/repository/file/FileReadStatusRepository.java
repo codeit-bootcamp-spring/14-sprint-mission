@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -21,14 +22,21 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileReadStatusRepository implements ReadStatusRepository {
 
+    private final Path directory;
+
+    public FileReadStatusRepository(
+            @Value("${discodeit.repository.file-directory}") String fileDirectory) {
+        this.directory = Paths.get(fileDirectory, "readStatus");
+        try {
+            Files.createDirectories(directory);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void save(ReadStatus readStatus) {
-        try{
-            Files.createDirectories(Paths.get("./readStatus"));
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        try (FileOutputStream fos = new FileOutputStream("./readStatus/"+readStatus.getId()+".ser");
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(readStatus.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(readStatus);
         } catch (IOException e) {
@@ -41,7 +49,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public List<ReadStatus> findAll(){
         List<ReadStatus> lists = new ArrayList<>();
-        File[] files = new File("./readStatus").listFiles((dir, name) -> name.endsWith(".ser"));
+        File[] files = directory.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
 
         for (File file : files) {
             try (FileInputStream fis = new FileInputStream(file);
@@ -81,7 +89,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public void deleteById(UUID id) {
         try {
-            Files.deleteIfExists(Path.of("./readStatus/" + id + ".ser"));
+            Files.deleteIfExists(directory.resolve(id + ".ser"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,7 +107,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     // id로 찾기
     @Override
     public Optional<ReadStatus> findById(UUID id){
-        try (FileInputStream fis = new FileInputStream("./readStatus/"+ id + ".ser");
+        try (FileInputStream fis = new FileInputStream(directory.resolve(id + ".ser").toFile());
              ObjectInputStream input = new ObjectInputStream(fis)) {
             return Optional.ofNullable((ReadStatus) input.readObject());
         } catch (IOException|ClassNotFoundException e) {
@@ -117,7 +125,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public void update(ReadStatus readStatus) {
 
-        try (FileOutputStream fos = new FileOutputStream("./readStatus/"+readStatus.getId()+".ser");
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(readStatus.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(readStatus);
         } catch (IOException e) {

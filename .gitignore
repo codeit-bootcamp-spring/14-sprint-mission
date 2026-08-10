@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+.idea/
+.gradle/
+build/
+out/
+*.ser
+user/
+channel/
+message/

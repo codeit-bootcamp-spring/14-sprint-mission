@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -20,14 +21,21 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    @Override
-    public void save(BinaryContent binaryContent) {
-        try{
-            Files.createDirectories(Path.of("./binaryContent"));
+    private final Path directory;
+
+    public FileBinaryContentRepository(
+            @Value("${discodeit.repository.file-directory}") String fileDirectory) {
+        this.directory = Path.of(fileDirectory, "binaryContent");
+        try {
+            Files.createDirectories(directory);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        try (FileOutputStream fos = new FileOutputStream("./binaryContent/" + binaryContent.getId()+".ser");
+    }
+
+    @Override
+    public void save(BinaryContent binaryContent) {
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(binaryContent.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(binaryContent);
         } catch (IOException e){
@@ -37,7 +45,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public Optional<BinaryContent> findById(UUID id) {
-        try (FileInputStream fis = new FileInputStream("./binaryContent/" + id +".ser");
+        try (FileInputStream fis = new FileInputStream(directory.resolve(id + ".ser").toFile());
              ObjectInputStream input = new ObjectInputStream(fis)) {
             return Optional.ofNullable((BinaryContent) input.readObject());
         } catch (IOException | ClassNotFoundException e){
@@ -50,7 +58,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     public List<BinaryContent> findAll() {
         List<BinaryContent> lists = new ArrayList<>();
         // 해당 위치 파일 다 긁어 오기
-        File[] files = new File("./binaryContent").listFiles((dir, name) -> name.endsWith(".ser"));
+        File[] files = directory.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
 
         for (File file : files) {
             try (FileInputStream fis = new FileInputStream(file);
@@ -74,7 +82,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public void deleteById(UUID id) {
         try{
-            Files.deleteIfExists(Path.of("./binaryContent/" + id + ".ser"));
+            Files.deleteIfExists(directory.resolve(id + ".ser"));
         } catch (IOException e){
             e.printStackTrace();
         }

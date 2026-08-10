@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -20,14 +21,21 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
 
+    private final Path directory;
+
+    public FileUserStatusRepository(
+            @Value("${discodeit.repository.file-directory}") String fileDirectory) {
+        this.directory = Paths.get(fileDirectory, "userStatus");
+        try {
+            Files.createDirectories(directory);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void save(UserStatus userStatus) {
-        try {
-            Files.createDirectories(Paths.get("./userStatus"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try (FileOutputStream fos = new FileOutputStream("./userStatus/" + userStatus.getId() + ".ser");
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(userStatus.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
 
             output.writeObject(userStatus);
@@ -51,7 +59,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public List<UserStatus> findAll() {
         List<UserStatus> lists = new ArrayList<>();
-        File[] files = new File("./userStatus").listFiles((dir, name) -> name.endsWith(".ser"));
+        File[] files = directory.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
         for (File file : files) {
             try (FileInputStream fis = new FileInputStream(file);
                  ObjectInputStream input = new ObjectInputStream(fis)) {
@@ -67,7 +75,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public void deleteById(UUID id) {
         try {
-            Files.deleteIfExists(Path.of("./userStatus/" + id + ".ser"));
+            Files.deleteIfExists(directory.resolve(id + ".ser"));
         } catch (IOException e) {
             throw new NoSuchElementException();
         }
@@ -76,7 +84,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Optional<UserStatus> findById(UUID id) {
-        try (FileInputStream fis = new FileInputStream("./userStatus/" + id + ".ser");
+        try (FileInputStream fis = new FileInputStream(directory.resolve(id + ".ser").toFile());
              ObjectInputStream input = new ObjectInputStream(fis)) {
             return Optional.ofNullable((UserStatus) input.readObject());
         } catch (IOException | ClassNotFoundException e) {
@@ -93,7 +101,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Optional<UserStatus> update(UserStatus userStatus) {
-        try (FileOutputStream fos = new FileOutputStream("./userStatus/" + userStatus.getId() + ".ser");
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(userStatus.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(userStatus);
         } catch (IOException e) {

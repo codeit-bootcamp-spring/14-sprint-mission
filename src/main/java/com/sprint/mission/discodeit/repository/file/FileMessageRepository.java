@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -20,15 +21,21 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
 
-    @Override
-    public void save(Message message) {
+    private final Path directory;
+
+    public FileMessageRepository(
+            @Value("${discodeit.repository.file-directory}") String fileDirectory) {
+        this.directory = Paths.get(fileDirectory, "message");
         try {
-            Files.createDirectories(Paths.get("./message"));
+            Files.createDirectories(directory);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        try (FileOutputStream fos = new FileOutputStream("./message/" + message.getId() + ".ser");
+    @Override
+    public void save(Message message) {
+        try (FileOutputStream fos = new FileOutputStream(directory.resolve(message.getId() + ".ser").toFile());
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
 
             output.writeObject(message);
@@ -40,7 +47,7 @@ public class FileMessageRepository implements MessageRepository {
     //생 객체를 넣어버려서
     @Override
     public Optional<Message> findById(UUID id) {
-        try (FileInputStream fis = new FileInputStream("./message/" + id + ".ser");
+        try (FileInputStream fis = new FileInputStream(directory.resolve(id + ".ser").toFile());
              ObjectInputStream input = new ObjectInputStream(fis)) {
             return Optional.ofNullable((Message) input.readObject());
         } catch (IOException | ClassNotFoundException e) {
@@ -52,7 +59,7 @@ public class FileMessageRepository implements MessageRepository {
     public List<Message> findAll() {
         List<Message> lists = new ArrayList<>();
         // 해당 위치 파일 다 긁어 오기
-        File[] files = new File("./message").listFiles((dir, name) -> name.endsWith(".ser"));
+        File[] files = directory.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
 
         for (File file : files) {
             try (FileInputStream fis = new FileInputStream(file);
@@ -70,7 +77,7 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void deleteById(UUID id) {
         try {
-            Files.deleteIfExists(Path.of("./message/" + id + ".ser"));
+            Files.deleteIfExists(directory.resolve(id + ".ser"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
