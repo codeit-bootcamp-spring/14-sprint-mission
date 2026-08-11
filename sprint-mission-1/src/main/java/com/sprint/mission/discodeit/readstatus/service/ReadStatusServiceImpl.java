@@ -10,21 +10,16 @@ import com.sprint.mission.discodeit.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ReadStatusServiceImpl implements ReadStatusService {
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
-
-    public ReadStatusServiceImpl(UserRepository userRepository, ChannelRepository channelRepository,
-        ReadStatusRepository readStatusRepository) {
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-        this.readStatusRepository = readStatusRepository;
-    }
 
     @Override
     public ReadStatusResponseDto readStatusCreate(

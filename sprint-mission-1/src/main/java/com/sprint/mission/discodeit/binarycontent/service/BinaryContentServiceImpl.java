@@ -6,16 +6,14 @@ import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BinaryContentServiceImpl implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
-
-    public BinaryContentServiceImpl(BinaryContentRepository binaryContentRepository) {
-        this.binaryContentRepository = binaryContentRepository;
-    }
 
     @Override
     public BinaryContentResponseDto binaryContentCreate(

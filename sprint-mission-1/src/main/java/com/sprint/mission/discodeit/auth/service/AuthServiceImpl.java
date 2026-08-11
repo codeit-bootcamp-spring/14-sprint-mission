@@ -6,19 +6,15 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
-
-    public AuthServiceImpl(UserRepository userRepository,
-        UserStatusRepository userStatusRepository) {
-        this.userRepository = userRepository;
-        this.userStatusRepository = userStatusRepository;
-    }
 
     public UserResponseDto login(LoginRequestDto loginRequestDto) {
         User user = userRepository.findByUserName(loginRequestDto.name())

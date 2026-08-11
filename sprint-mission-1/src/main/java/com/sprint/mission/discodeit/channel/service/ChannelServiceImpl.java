@@ -19,9 +19,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ChannelServiceImpl implements ChannelService {
 
     private final ChannelRepository channelRepository;
@@ -29,17 +31,6 @@ public class ChannelServiceImpl implements ChannelService {
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
-
-    public ChannelServiceImpl(ChannelRepository channelRepository, UserRepository userRepository,
-        MessageRepository messageRepository, ReadStatusRepository readStatusRepository,
-        BinaryContentRepository binaryContentRepository) {
-        this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
-        this.messageRepository = messageRepository;
-        this.readStatusRepository = readStatusRepository;
-        this.binaryContentRepository = binaryContentRepository;
-    }
-
 
     @Override
     public ChannelResponseDto channelCreate(

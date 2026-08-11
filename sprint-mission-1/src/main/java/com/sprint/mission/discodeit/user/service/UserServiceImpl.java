@@ -13,22 +13,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
-
-    public UserServiceImpl(UserRepository userRepository,
-        BinaryContentRepository binaryContentRepository,
-        UserStatusRepository userStatusRepository) {
-        this.userRepository = userRepository;
-        this.binaryContentRepository = binaryContentRepository;
-        this.userStatusRepository = userStatusRepository;
-    }
 
     @Override
     public UserResponseDto userCreate(UserCreateRequestDto userCreateRequestDto) {

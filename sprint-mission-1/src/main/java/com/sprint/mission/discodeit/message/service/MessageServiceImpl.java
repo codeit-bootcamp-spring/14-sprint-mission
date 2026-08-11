@@ -12,24 +12,17 @@ import com.sprint.mission.discodeit.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
-
-    public MessageServiceImpl(MessageRepository messageRepository,
-        ChannelRepository channelRepository, UserRepository userRepository,
-        BinaryContentRepository binaryContentRepository) {
-        this.messageRepository = messageRepository;
-        this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
-        this.binaryContentRepository = binaryContentRepository;
-    }
 
     @Override
     public MessageResponseDto messageCreate(MessageCreateRequestDto messageCreateRequestDto) {

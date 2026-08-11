@@ -8,20 +8,16 @@ import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserStatusServiceImpl implements UserStatusService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
-
-    public UserStatusServiceImpl(UserRepository userRepository,
-        UserStatusRepository userStatusRepository) {
-        this.userRepository = userRepository;
-        this.userStatusRepository = userStatusRepository;
-    }
-
+    
     @Override
     public UserStatusResponseDto userStatusCreate(
         UserStatusCreateRequestDto userStatusCreateRequestDto) {
