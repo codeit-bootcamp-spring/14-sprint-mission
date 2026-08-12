@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.readstatus.service;
 
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.global.exception.NotFoundException;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusUpdateRequestDto;
@@ -25,12 +26,10 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     public ReadStatusResponseDto readStatusCreate(
         ReadStatusCreateRequestDto readStatusCreateRequestDto) {
         channelRepository.findByChannel(readStatusCreateRequestDto.channelId())
-            .orElseThrow(() -> new IllegalArgumentException(
-                "존재하지 않는 채널입니다: " + readStatusCreateRequestDto.channelId()));
+            .orElseThrow(() -> NotFoundException.channel(readStatusCreateRequestDto.channelId()));
 
         userRepository.findByUser(readStatusCreateRequestDto.userId())
-            .orElseThrow(() -> new IllegalArgumentException(
-                "존재하지 않는 유저입니다: " + readStatusCreateRequestDto.userId()));
+            .orElseThrow(() -> NotFoundException.user(readStatusCreateRequestDto.userId()));
 
         return ReadStatusResponseDto.from(readStatusRepository.statusAdd(
             new ReadStatus(readStatusCreateRequestDto.channelId(),

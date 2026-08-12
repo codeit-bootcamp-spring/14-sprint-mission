@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.userstatus.service;
 
+import com.sprint.mission.discodeit.global.exception.DuplicateException;
+import com.sprint.mission.discodeit.global.exception.NotFoundException;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusResponseDto;
@@ -17,17 +19,15 @@ public class UserStatusServiceImpl implements UserStatusService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
-    
+
     @Override
     public UserStatusResponseDto userStatusCreate(
         UserStatusCreateRequestDto userStatusCreateRequestDto) {
         userRepository.findByUser(userStatusCreateRequestDto.userId())
-            .orElseThrow(() -> new IllegalArgumentException(
-                "존재하지 않는 유저입니다: " + userStatusCreateRequestDto.userId()));
+            .orElseThrow(() -> NotFoundException.user(userStatusCreateRequestDto.userId()));
 
         if (userStatusRepository.findByUserId(userStatusCreateRequestDto.userId()).isPresent()) {
-            throw new IllegalArgumentException(
-                "이미 상태를 정의한 유저입니다: " + userStatusCreateRequestDto.userId());
+            throw DuplicateException.userStatus(userStatusCreateRequestDto.userId());
         }
 
         return UserStatusResponseDto.from(

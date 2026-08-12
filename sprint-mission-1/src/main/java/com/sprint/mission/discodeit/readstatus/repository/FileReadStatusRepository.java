@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,7 +32,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            throw new RuntimeException("디렉토리 생성 실패", e);
+            throw new UncheckedIOException("디렉토리 생성 실패 - path: " + path, e);
         }
         readStatusLoad();
     }
@@ -45,7 +46,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
             new FileInputStream(filePath()))) {
             readStatusMap.putAll((Map<UUID, ReadStatus>) objectInputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("기존 채널 상태 데이터가 없습니다.");
+            throw new IllegalStateException("기존 채널 상태 데이터가 없습니다. - path: " + filePath(), e);
         }
     }
 
@@ -54,7 +55,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
             new FileOutputStream(filePath()))) {
             objectOutputStream.writeObject(readStatusMap);
         } catch (IOException e) {
-            throw new RuntimeException("채널 상태 저장에 실패했습니다.", e);
+            throw new UncheckedIOException("채널 상태 저장에 실패했습니다. - path: " + filePath(), e);
         }
     }
 

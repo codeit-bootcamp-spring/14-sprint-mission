@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.user.service;
 
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.global.exception.DuplicateException;
+import com.sprint.mission.discodeit.global.exception.NotFoundException;
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.user.dto.UserResponseDto;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
@@ -10,6 +12,7 @@ import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -27,13 +30,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto userCreate(UserCreateRequestDto userCreateRequestDto) {
         if (userRepository.findByUserName(userCreateRequestDto.name()).isPresent()) {
-            throw new IllegalArgumentException(
-                "이미 존재하는 유저 이름입니다: " + userCreateRequestDto.name());
+            throw DuplicateException.userName(userCreateRequestDto.name());
         }
 
         if (userRepository.findByUserEmail(userCreateRequestDto.email()).isPresent()) {
-            throw new IllegalArgumentException(
-                "이미 존재하는 이메일입니다: " + userCreateRequestDto.email());
+            throw DuplicateException.userEmail(userCreateRequestDto.email());
         }
 
         UUID binaryContentsId = null;
@@ -54,7 +55,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto) {
         User user = userRepository.findByUser(userId)
-            .orElseThrow(() -> new IllegalArgumentException("수정할 유저가 없습니다: " + userId));
+            .orElseThrow(() -> NotFoundException.user(userId));
 
         if (userUpdateRequestDto.name() != null) {
             user.updateName(userUpdateRequestDto.name());
@@ -76,9 +77,9 @@ public class UserServiceImpl implements UserService {
                     userUpdateRequestDto.profileImage().getBytes());
                 binaryContentRepository.binaryAdd(binaryContent);
             } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(
-                    "파일을 읽는데 실패했습니다: " + userUpdateRequestDto.profileImage().getOriginalFilename());
+                throw new UncheckedIOException(
+                    "파일을 읽는데 실패했습니다: " + userUpdateRequestDto.profileImage().getOriginalFilename(),
+                    e);
             }
             user.updateBinaryId(binaryContent.getBinaryContentId());
         }
@@ -86,17 +87,17 @@ public class UserServiceImpl implements UserService {
         userRepository.update(user);
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-            .orElseThrow(() -> new IllegalArgumentException("유저 상태가 없습니다: " + userId));
+            .orElseThrow(() -> NotFoundException.userStatusByUser(userId));
         return UserResponseDto.from(user, userStatus);
     }
 
     @Override
     public void userDelete(UUID userId) {
         User user = userRepository.findByUser(userId)
-            .orElseThrow(() -> new IllegalArgumentException("삭제할 유저가 없습니다: " + userId));
+            .orElseThrow(() -> NotFoundException.user(userId));
 
         userStatusRepository.delete(userStatusRepository.findByUserId(userId)
-            .orElseThrow(() -> new IllegalArgumentException("유저 상태가 없습니다: " + userId)));
+            .orElseThrow(() -> NotFoundException.userStatusByUser(userId)));
         if (!Objects.isNull(user.getBinaryId())) {
             binaryContentRepository.delete(user.getBinaryId());
         }
@@ -110,8 +111,7 @@ public class UserServiceImpl implements UserService {
         return users.stream()
             .map(user -> {
                 UserStatus userStatus = userStatusRepository.findByUserId(user.getUserId())
-                    .orElseThrow(
-                        () -> new IllegalArgumentException("유저 상태가 없습니다: " + user.getUserId()));
+                    .orElseThrow(() -> NotFoundException.userStatusByUser(user.getUserId()));
                 return UserResponseDto.from(user, userStatus);
             })
             .toList();
@@ -120,10 +120,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto findById(UUID userId) {
         User user = userRepository.findByUser(userId)
-            .orElseThrow(() -> new IllegalArgumentException("보고자 하는 유저가 없습니다: " + userId));
+            .orElseThrow(() -> NotFoundException.user(userId));
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-            .orElseThrow(() -> new IllegalArgumentException("유저 상태가 없습니다: " + userId));
+            .orElseThrow(() -> NotFoundException.userStatusByUser(userId));
 
         return UserResponseDto.from(user, userStatus);
     }

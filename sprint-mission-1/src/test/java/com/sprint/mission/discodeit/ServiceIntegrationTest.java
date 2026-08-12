@@ -127,7 +127,7 @@ class ServiceIntegrationTest {
      * (findAllByIdIn 은 현재 파라미터를 무시하고 전체를 반환 — 다음 미션에서 수정 예정)
      */
     private boolean binaryContentExists(UUID binaryContentId) {
-        return binaryContentService.findAll(binaryContentId).stream()
+        return binaryContentService.findAll().stream()
             .anyMatch(b -> b.binaryContentId().equals(binaryContentId));
     }
 

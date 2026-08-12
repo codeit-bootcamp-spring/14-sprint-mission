@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.binarycontent.repository;
 
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
             );
             return binaryAdd(binaryContent);
         } catch (IOException e) {
-            throw new RuntimeException("파일을 읽는데 실패했습니다: " + file.getOriginalFilename(), e);
+            throw new UncheckedIOException("파일을 읽는데 실패했습니다: " + file.getOriginalFilename(), e);
         }
     }
 }

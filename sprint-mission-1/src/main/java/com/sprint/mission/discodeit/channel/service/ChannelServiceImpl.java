@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.global.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.global.exception.NotFoundException;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
@@ -50,7 +52,7 @@ public class ChannelServiceImpl implements ChannelService {
 
         for (UUID userId : channelPrivateCreateRequestDto.participantIds()) {
             User user = userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저: " + userId));
+                .orElseThrow(() -> NotFoundException.user(userId));
 
             ReadStatus readStatus = new ReadStatus(channel.getChannelId(), user.getUserId(),
                 Instant.now());
@@ -63,10 +65,10 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     public void channelUpdate(UUID channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> new IllegalArgumentException("수정할 채널이 없습니다: " + channelId));
+            .orElseThrow(() -> NotFoundException.channel(channelId));
 
         if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
-            throw new IllegalArgumentException("비공개 채널은 수정할 수 없습니다: " + channelId);
+            throw InvalidOperationException.privateChannel(channelId);
         }
 
         channel.update(channelUpdateRequestDto.channelName(),
@@ -77,7 +79,7 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     public ChannelResponseDto findById(UUID channelId) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> new IllegalArgumentException("보고자 하는 채널이 없습니다: " + channelId));
+            .orElseThrow(() -> NotFoundException.channel(channelId));
         return toResponseDto(channel);
     }
 
@@ -118,7 +120,7 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     public void channelDelete(UUID channelId) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> new IllegalArgumentException("삭제할 채널이 없습니다: " + channelId));
+            .orElseThrow(() -> NotFoundException.channel(channelId));
 
         List<UUID> attachmentIds = messageRepository.findAllMessage(channelId).stream()
             .map(Message::getBinaryContentsId)

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +34,7 @@ public class FileUserRepository implements UserRepository {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            throw new RuntimeException("디렉토리 생성 실패", e);
+            throw new UncheckedIOException("디렉토리 생성 실패 - path: " + path, e);
         }
         userLoad();
     }
@@ -47,7 +48,7 @@ public class FileUserRepository implements UserRepository {
             new FileInputStream(filePath()))) {
             users.putAll((Map<UUID, User>) objectInputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("기존 유저 데이터가 없습니다.");
+            throw new IllegalStateException("기존 유저 데이터가 없습니다. - path: " + filePath(), e);
         }
     }
 
@@ -56,7 +57,7 @@ public class FileUserRepository implements UserRepository {
             new FileOutputStream(filePath()))) {
             objectOutputStream.writeObject(this.users);
         } catch (IOException e) {
-            throw new RuntimeException("유저 저장에 실패했습니다.", e);
+            throw new UncheckedIOException("유저 저장에 실패했습니다. - path: " + filePath(), e);
         }
     }
 

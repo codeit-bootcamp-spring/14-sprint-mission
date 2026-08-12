@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.message.service;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.global.exception.NotFoundException;
 import com.sprint.mission.discodeit.message.dto.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.message.dto.MessageResponseDto;
 import com.sprint.mission.discodeit.message.dto.MessageUpdateRequestDto;
@@ -27,12 +28,10 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public MessageResponseDto messageCreate(MessageCreateRequestDto messageCreateRequestDto) {
         channelRepository.findByChannel(messageCreateRequestDto.channelId())
-            .orElseThrow(() -> new IllegalArgumentException(
-                "존재하지 않는 채널입니다: " + messageCreateRequestDto.channelId()));
+            .orElseThrow(() -> NotFoundException.channel(messageCreateRequestDto.channelId()));
 
         userRepository.findByUser(messageCreateRequestDto.userId())
-            .orElseThrow(() -> new IllegalArgumentException(
-                "존재하지 않는 유저입니다: " + messageCreateRequestDto.userId()));
+            .orElseThrow(() -> NotFoundException.user(messageCreateRequestDto.userId()));
 
         List<UUID> binaryContentsId = new ArrayList<>();
         if (messageCreateRequestDto.attachments() != null) {
@@ -53,7 +52,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void messageUpdate(UUID messageId, MessageUpdateRequestDto messageUpdateRequestDto) {
         Message message = messageRepository.findByMessage(messageId)
-            .orElseThrow(() -> new IllegalArgumentException("수정할 메시지가 없습니다: " + messageId));
+            .orElseThrow(() -> NotFoundException.message(messageId));
 
         message.updateMessage(messageUpdateRequestDto.message());
         messageRepository.update(message);
@@ -62,7 +61,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void messageDelete(UUID messageId) {
         Message messages = messageRepository.findByMessage(messageId)
-            .orElseThrow(() -> new IllegalArgumentException("삭제할 메시지가 없습니다: " + messageId));
+            .orElseThrow(() -> NotFoundException.message(messageId));
 
         messages.getBinaryContentsId()
             .forEach(binaryContentRepository::delete);
@@ -80,7 +79,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public MessageResponseDto findById(UUID messageId) {
         Message message = messageRepository.findByMessage(messageId)
-            .orElseThrow(() -> new IllegalArgumentException("보고자 하는 메시지가 없습니다: " + messageId));
+            .orElseThrow(() -> NotFoundException.message(messageId));
 
         return MessageResponseDto.from(message);
     }
