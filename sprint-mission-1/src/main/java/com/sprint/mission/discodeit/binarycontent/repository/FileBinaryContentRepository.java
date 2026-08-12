@@ -78,7 +78,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn() {
+    public List<BinaryContent> findAll() {
         return binaryContentMap.values().stream()
             .toList();
     }

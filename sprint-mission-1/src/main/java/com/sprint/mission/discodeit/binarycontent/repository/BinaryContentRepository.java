@@ -13,7 +13,7 @@ public interface BinaryContentRepository {
 
     public BinaryContent findById(UUID binaryId);
 
-    public List<BinaryContent> findAllByIdIn();
+    public List<BinaryContent> findAll();
 
     BinaryContent toBinaryContent(MultipartFile file);
 }
