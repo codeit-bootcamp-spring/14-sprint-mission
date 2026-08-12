@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
             userCreateRequestDto.email(),
             binaryContentsId);
 
-        UserStatus userStatus = userStatusRepository.statusAdd(new UserStatus(user.getUserId()));
+        UserStatus userStatus = userStatusRepository.statusAdd(new UserStatus(user.getId()));
 
         return UserResponseDto.from(userRepository.userAdd(user), userStatus);
     }
@@ -110,8 +110,8 @@ public class UserServiceImpl implements UserService {
 
         return users.stream()
             .map(user -> {
-                UserStatus userStatus = userStatusRepository.findByUserId(user.getUserId())
-                    .orElseThrow(() -> NotFoundException.userStatusByUser(user.getUserId()));
+                UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                    .orElseThrow(() -> NotFoundException.userStatusByUser(user.getId()));
                 return UserResponseDto.from(user, userStatus);
             })
             .toList();

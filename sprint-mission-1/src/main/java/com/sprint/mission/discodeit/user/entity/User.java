@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.user.entity;
 
+import com.sprint.mission.discodeit.global.entity.BaseEntity;
 import jakarta.annotation.Nullable;
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NonNull;
@@ -11,14 +9,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class User implements Serializable {
+public class User extends BaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID userId = UUID.randomUUID();
-    private final Instant createdAt = Instant.now();
     private String password;
-    private Instant updatedAt;
     @NonNull
     private String userName;
     private String email;
@@ -34,21 +27,21 @@ public class User implements Serializable {
 
     public void updateName(String updateName) {
         this.userName = updateName;
-        this.updatedAt = Instant.now();
+        super.markUpdated();
     }
 
     public void updateEmail(String email) {
         this.email = email;
-        this.updatedAt = Instant.now();
+        super.markUpdated();
     }
 
     public void updatePassword(String password) {
         this.password = password;
-        this.updatedAt = Instant.now();
+        super.markUpdated();
     }
 
     public void updateBinaryId(UUID binaryId) {
         this.binaryId = binaryId;
-        this.updatedAt = Instant.now();
+        super.markUpdated();
     }
 }

@@ -1,21 +1,13 @@
 package com.sprint.mission.discodeit.channel.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import com.sprint.mission.discodeit.global.entity.BaseEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class Channel implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID channelId = UUID.randomUUID();
-    private final Instant createdAt = Instant.now();
-    private Instant updatedAt;
+public class Channel extends BaseEntity {
+    
     private String channelName;
     private ChannelType channelType = ChannelType.PUBLIC;
     private String description;
@@ -46,7 +38,7 @@ public class Channel implements Serializable {
             changed = true;
         }
         if (changed) {
-            this.updatedAt = Instant.now();
+            super.markUpdated();
         }
     }
 }

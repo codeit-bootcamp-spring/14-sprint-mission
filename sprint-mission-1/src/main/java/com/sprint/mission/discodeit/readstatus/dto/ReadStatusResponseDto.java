@@ -8,10 +8,10 @@ public record ReadStatusResponseDto(UUID id, UUID userId, UUID channelId, Instan
 
     public static ReadStatusResponseDto from(ReadStatus readStatus) {
         return new ReadStatusResponseDto(
-            readStatus.getReadStatusId(),
+            readStatus.getId(),
             readStatus.getUserId(),
             readStatus.getChannelId(),
-            readStatus.getLastReadAt()
+            readStatus.getUpdatedAt()
         );
     }
 }

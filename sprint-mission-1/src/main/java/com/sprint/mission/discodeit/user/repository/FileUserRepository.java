@@ -63,7 +63,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User userAdd(User user) {
-        this.users.put(user.getUserId(), user);
+        this.users.put(user.getId(), user);
         userFlush();
         return user;
     }
@@ -89,13 +89,13 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void delete(User user) {
-        users.remove(user.getUserId());
+        users.remove(user.getId());
         userFlush();
     }
 
     @Override
     public void update(User user) {
-        users.replace(user.getUserId(), user);
+        users.replace(user.getId(), user);
         userFlush();
     }
 

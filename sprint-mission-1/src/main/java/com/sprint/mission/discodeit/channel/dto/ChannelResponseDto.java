@@ -12,7 +12,7 @@ public record ChannelResponseDto(UUID id, String channelName, ChannelType channe
 
     public static ChannelResponseDto from(Channel channel) {
         return new ChannelResponseDto(
-            channel.getChannelId(),
+            channel.getId(),
             channel.getChannelName(),
             channel.getChannelType(),
             channel.getDescription(),
@@ -24,7 +24,7 @@ public record ChannelResponseDto(UUID id, String channelName, ChannelType channe
     // Public
     public static ChannelResponseDto from(Channel channel, Instant lastMessageAt) {
         return new ChannelResponseDto(
-            channel.getChannelId(),
+            channel.getId(),
             channel.getChannelName(),
             channel.getChannelType(),
             channel.getDescription(),
@@ -37,7 +37,7 @@ public record ChannelResponseDto(UUID id, String channelName, ChannelType channe
     public static ChannelResponseDto from(Channel channel, Instant lastMessageAt,
         List<UUID> userIds) {
         return new ChannelResponseDto(
-            channel.getChannelId(),
+            channel.getId(),
             channel.getChannelName(),
             channel.getChannelType(),
             channel.getDescription(),

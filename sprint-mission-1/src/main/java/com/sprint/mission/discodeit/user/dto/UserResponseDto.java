@@ -10,11 +10,11 @@ public record UserResponseDto(UUID id, String userName, String email, UUID binar
 
     public static UserResponseDto from(User user, UserStatus userStatus) {
         return new UserResponseDto(
-            user.getUserId(),
+            user.getId(),
             user.getUserName(),
             user.getEmail(),
             user.getBinaryId(),
-            userStatus.getUserStatusId(),
+            userStatus.getId(),
             userStatus.isOnline()
         );
     }

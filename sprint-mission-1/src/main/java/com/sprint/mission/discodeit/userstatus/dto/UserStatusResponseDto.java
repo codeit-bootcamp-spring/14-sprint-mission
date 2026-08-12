@@ -8,10 +8,10 @@ public record UserStatusResponseDto(UUID id, UUID userId, boolean online, Instan
 
     public static UserStatusResponseDto from(UserStatus userStatus) {
         return new UserStatusResponseDto(
-            userStatus.getUserStatusId(),
+            userStatus.getId(),
             userStatus.getUserId(),
             userStatus.isOnline(),
-            userStatus.getLastActiveAt()
+            userStatus.getUpdatedAt()
         );
     }
 }

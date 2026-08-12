@@ -24,8 +24,10 @@ public class BinaryContent implements Serializable {
     // 메시지에서 파일 List<UUID> 갖기
     @Serial
     private static final long serialVersionUID = 1L;
+
     UUID binaryContentId = UUID.randomUUID();
     Instant createdAt = Instant.now();
+    
     @Nullable
     private String fileName;
     private String contentType;

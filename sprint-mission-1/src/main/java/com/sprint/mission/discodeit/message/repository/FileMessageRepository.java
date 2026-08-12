@@ -63,7 +63,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message messageAdd(Message message) {
-        this.messages.put(message.getMessageId(), message);
+        this.messages.put(message.getId(), message);
         messageFlush();
         return message;
     }
@@ -75,13 +75,13 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void delete(Message message) {
-        messages.remove(message.getMessageId());
+        messages.remove(message.getId());
         messageFlush();
     }
 
     @Override
     public void update(Message message) {
-        messages.replace(message.getMessageId(), message);
+        messages.replace(message.getId(), message);
         messageFlush();
     }
 

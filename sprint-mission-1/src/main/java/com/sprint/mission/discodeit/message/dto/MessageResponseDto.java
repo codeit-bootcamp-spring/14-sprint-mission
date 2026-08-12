@@ -13,7 +13,7 @@ public record MessageResponseDto(UUID userId, UUID channelId, UUID messageId, St
         return new MessageResponseDto(
             message.getUserId(),
             message.getChannelId(),
-            message.getMessageId(),
+            message.getId(),
             message.getMessage(),
             message.getCreatedAt(),
             message.getBinaryContentsId()

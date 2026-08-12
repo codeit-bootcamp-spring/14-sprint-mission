@@ -64,7 +64,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel channelAdd(Channel channel) {
-        this.channels.put(channel.getChannelId(), channel);
+        this.channels.put(channel.getId(), channel);
         channelFlush();
         return channel;
     }
@@ -76,13 +76,13 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(Channel channel) {
-        channels.remove(channel.getChannelId());
+        channels.remove(channel.getId());
         channelFlush();
     }
 
     @Override
     public void update(Channel channel) {
-        channels.replace(channel.getChannelId(), channel);
+        channels.replace(channel.getId(), channel);
         channelFlush();
     }
 

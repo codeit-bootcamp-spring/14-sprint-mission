@@ -62,20 +62,20 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus statusAdd(UserStatus userStatus) {
-        userStatusMap.put(userStatus.getUserStatusId(), userStatus);
+        userStatusMap.put(userStatus.getId(), userStatus);
         userStatusFlush();
-        return userStatusMap.get(userStatus.getUserStatusId());
+        return userStatusMap.get(userStatus.getId());
     }
 
     @Override
     public void delete(UserStatus userStatus) {
-        userStatusMap.remove(userStatus.getUserStatusId());
+        userStatusMap.remove(userStatus.getId());
         userStatusFlush();
     }
 
     @Override
     public void update(UserStatus userStatus) {
-        userStatusMap.replace(userStatus.getUserStatusId(), userStatus);
+        userStatusMap.replace(userStatus.getId(), userStatus);
         userStatusFlush();
     }
 

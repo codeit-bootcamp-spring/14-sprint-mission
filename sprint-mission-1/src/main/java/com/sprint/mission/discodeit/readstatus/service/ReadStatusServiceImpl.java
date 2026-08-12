@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.readstatus.dto.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
         return ReadStatusResponseDto.from(readStatusRepository.statusAdd(
             new ReadStatus(readStatusCreateRequestDto.channelId(),
-                readStatusCreateRequestDto.userId(), Instant.now())));
+                readStatusCreateRequestDto.userId())));
     }
 
     @Override

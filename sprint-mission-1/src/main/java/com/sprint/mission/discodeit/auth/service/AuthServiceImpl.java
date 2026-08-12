@@ -26,8 +26,8 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidCredentialsException();
         }
 
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getUserId())
-            .orElseThrow(() -> NotFoundException.userStatusByUser(user.getUserId()));
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+            .orElseThrow(() -> NotFoundException.userStatusByUser(user.getId()));
 
         userStatus.userLogin();
         userStatusRepository.update(userStatus);

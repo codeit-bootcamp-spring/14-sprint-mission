@@ -54,8 +54,7 @@ public class ChannelServiceImpl implements ChannelService {
             User user = userRepository.findByUser(userId)
                 .orElseThrow(() -> NotFoundException.user(userId));
 
-            ReadStatus readStatus = new ReadStatus(channel.getChannelId(), user.getUserId(),
-                Instant.now());
+            ReadStatus readStatus = new ReadStatus(channel.getId(), user.getId());
             readStatusRepository.statusAdd(readStatus);
         }
 
@@ -90,7 +89,7 @@ public class ChannelServiceImpl implements ChannelService {
         List<UUID> myChannelIds = readStatusRepository.findByUserId(userId);
         List<Channel> myPrivateChannels = channelRepository.findAllByType(ChannelType.PRIVATE)
             .stream()
-            .filter(channel -> myChannelIds.contains(channel.getChannelId()))
+            .filter(channel -> myChannelIds.contains(channel.getId()))
             .toList();
 
         return Stream.concat(publicChannels.stream(), myPrivateChannels.stream())
@@ -101,7 +100,7 @@ public class ChannelServiceImpl implements ChannelService {
     // 채널 -> DTO로 변환
     // find랑 findAll이랑 겹쳐서 통합 사용을 위해 생성
     private ChannelResponseDto toResponseDto(Channel channel) {
-        List<Message> messages = messageRepository.findAllMessage(channel.getChannelId());
+        List<Message> messages = messageRepository.findAllMessage(channel.getId());
 
         Instant lastMessageAt = messages.stream()
             .map(Message::getCreatedAt)
@@ -110,7 +109,7 @@ public class ChannelServiceImpl implements ChannelService {
 
         if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
             List<UUID> participantIds = readStatusRepository.findByChannelId(
-                channel.getChannelId());
+                channel.getId());
             return ChannelResponseDto.from(channel, lastMessageAt, participantIds);
         }
 
