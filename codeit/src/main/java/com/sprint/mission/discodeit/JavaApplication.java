@@ -16,6 +16,9 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import lombok.RequiredArgsConstructor;
+
+
 
 public class JavaApplication {
     static User setupUser(UserService userService) {
@@ -39,10 +42,16 @@ public class JavaApplication {
         ChannelRepository channelRepository = new FileChannelRepository();
         MessageRepository messageRepository = new FileMessageRepository();
 
-        // 서비스 초기화
+//        // 서비스 초기화
         UserService userService = new BasicUserService(userRepository);
         ChannelService channelService = new BasicChannelService(channelRepository);
         MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
+
+
+        //spring context 횔용하여 서비스 초기화 대체
+//        UserService userService;
+//        MessageService messageService;
+//        ChannelService channelService;
 
         // 셋업
         User user = setupUser(userService);
