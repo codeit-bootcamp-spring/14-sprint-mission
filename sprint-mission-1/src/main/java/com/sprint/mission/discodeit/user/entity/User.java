@@ -1,21 +1,15 @@
 package com.sprint.mission.discodeit.user.entity;
 
 import com.sprint.mission.discodeit.global.entity.BaseEntity;
-import jakarta.annotation.Nullable;
 import java.util.UUID;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public class User extends BaseEntity {
 
-    private String password;
-    @NonNull
     private String userName;
+    private String password;
     private String email;
-    @Nullable
     private UUID binaryId;
 
     public User(String userName, String password, String email, UUID binaryId) {

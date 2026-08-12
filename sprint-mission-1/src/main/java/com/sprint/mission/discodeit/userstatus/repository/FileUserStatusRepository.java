@@ -43,6 +43,10 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     private void userStatusLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             userStatusMap.putAll((Map<UUID, UserStatus>) objectInputStream.readObject());

@@ -44,6 +44,10 @@ public class FileUserRepository implements UserRepository {
     }
 
     private void userLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             users.putAll((Map<UUID, User>) objectInputStream.readObject());
@@ -76,7 +80,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public Optional<User> findByUserName(String name) {
         return users.values().stream()
-            .filter(user -> name.equals(user.getUserName()))
+            .filter(user -> name.equals(user.getName()))
             .findFirst();
     }
 

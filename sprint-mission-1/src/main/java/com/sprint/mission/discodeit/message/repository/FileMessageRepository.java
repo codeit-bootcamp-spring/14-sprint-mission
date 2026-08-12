@@ -44,6 +44,10 @@ public class FileMessageRepository implements MessageRepository {
 
 
     private void messageLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             messages.putAll((Map<UUID, Message>) objectInputStream.readObject());

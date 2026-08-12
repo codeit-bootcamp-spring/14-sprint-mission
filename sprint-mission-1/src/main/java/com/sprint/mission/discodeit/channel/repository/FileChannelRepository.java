@@ -45,6 +45,10 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     private void channelLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             channels.putAll((Map<UUID, Channel>) objectInputStream.readObject());

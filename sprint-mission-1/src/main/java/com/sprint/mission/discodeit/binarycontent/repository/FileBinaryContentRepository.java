@@ -43,6 +43,10 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     private void binaryContentLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             binaryContentMap.putAll((Map<UUID, BinaryContent>) objectInputStream.readObject());

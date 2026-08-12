@@ -42,6 +42,10 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     private void readStatusLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             readStatusMap.putAll((Map<UUID, ReadStatus>) objectInputStream.readObject());
