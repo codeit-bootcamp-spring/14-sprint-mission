@@ -47,12 +47,6 @@ public class JavaApplication {
         ChannelService channelService = new BasicChannelService(channelRepository);
         MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
 
-
-        //spring context 횔용하여 서비스 초기화 대체
-//        UserService userService;
-//        MessageService messageService;
-//        ChannelService channelService;
-
         // 셋업
         User user = setupUser(userService);
         Channel channel = setupChannel(channelService);

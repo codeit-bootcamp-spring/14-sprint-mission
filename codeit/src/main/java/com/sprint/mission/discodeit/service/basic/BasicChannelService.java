@@ -13,12 +13,9 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-
-    public BasicChannelService(@Qualifier("FileChannelRepository") ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
 
 
     @Override

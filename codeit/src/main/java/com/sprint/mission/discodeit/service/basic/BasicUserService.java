@@ -13,12 +13,9 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-
-    public BasicUserService(@Qualifier("FileUserRepository") UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public User create(String username, String email, String password) {
