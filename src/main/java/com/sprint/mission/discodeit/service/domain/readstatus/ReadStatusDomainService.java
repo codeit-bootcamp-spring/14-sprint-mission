@@ -13,7 +13,7 @@ public interface ReadStatusDomainService {
     List<ReadStatus> findAllByChannelId(UUID channelId);
     List<ReadStatus> findAllByUserId(UUID userId);
     boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
-    ReadStatus update(UUID readStatusId);
+    ReadStatus update(ReadStatus updatingReadStatus);
     void delete(UUID readStatusId);
     void deleteAllByChannelId(UUID channelId);
 }

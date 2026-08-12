@@ -16,10 +16,7 @@ public interface MessageDomainService {
 
     Message findMostRecentByChannelId(UUID channelId);
 
-    Message update(
-            UUID messageId,
-            String updatedContent
-    );
+    Message update(Message updatingMessage);
 
     void delete(UUID messageId);
 

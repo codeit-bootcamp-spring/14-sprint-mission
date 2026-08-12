@@ -145,10 +145,11 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
                 messageId
         );
 
-        Message updatedMessage = messageDomainService.update(
-                messageId,
-                messageUpdateRequest.getContent()
-        );
+        Message message = messageDomainService.findById(messageId);
+        Message updatingMessage = message.copy();
+        updatingMessage.updateContent(messageUpdateRequest.getContent());
+
+        Message updatedMessage = messageDomainService.update(updatingMessage);
 
         log.info(
                 "Message 수정 완료: messageId={}",

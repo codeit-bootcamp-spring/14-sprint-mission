@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serial;
@@ -10,6 +12,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -44,7 +47,6 @@ public class Message implements Serializable {
         }
     }
 
-
     public static Message create(
             String content,
             UUID senderId,
@@ -61,5 +63,17 @@ public class Message implements Serializable {
             this.content = content;
             this.updatedAt = Instant.now();
         }
+    }
+
+    public Message copy() {
+        return new Message(
+                this.id,
+                this.createdAt,
+                this.updatedAt,
+                this.content,
+                this.senderId,
+                this.channelId,
+                this.attachmentIds
+        );
     }
 }

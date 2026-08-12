@@ -14,10 +14,7 @@ public interface UserDomainService {
 
     List<User> findAll();
 
-    User update(
-            UUID userId,
-            User userUpdates
-    );
+    User update(User updatingUser);
 
     void delete(UUID userId);
 }

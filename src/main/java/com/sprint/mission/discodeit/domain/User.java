@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serial;
@@ -9,6 +11,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -57,26 +60,36 @@ public class User implements Serializable {
     }
 
 
-    public void updateAccountDetails(User userUpdates) {
+    public void updateAccountDetails(
+            String username,
+            String email,
+            String password,
+            UUID profileId
+    ) {
         boolean isUpdated = false;
 
-        // username, email, password, profileId 중 하나만 바뀌어도 updatedAt timestamp가 바뀐다
-        if (Objects.nonNull(userUpdates.getUsername()) && !Objects.equals(userUpdates.getUsername(), username)) {
+        if (Objects.nonNull(username)
+                && !Objects.equals(username, this.username)) {
+            this.username = username;
             isUpdated = true;
-            this.username = userUpdates.getUsername();
         }
-        if (Objects.nonNull(userUpdates.getEmail()) && !Objects.equals(userUpdates.getEmail(), email)) {
+
+        if (Objects.nonNull(email)
+                && !Objects.equals(email, this.email)) {
+            this.email = email;
             isUpdated = true;
-            this.email = userUpdates.getEmail();
         }
-        if (Objects.nonNull(userUpdates.getPassword()) && !Objects.equals(userUpdates.getPassword(), password)) {
+
+        if (Objects.nonNull(password)
+                && !Objects.equals(password, this.password)) {
+            this.password = password;
             isUpdated = true;
-            this.password = userUpdates.getPassword();
         }
-        // 수정
-        if (Objects.nonNull(userUpdates.getProfileId()) && !Objects.equals(userUpdates.getProfileId(), profileId)) {
+
+        if (Objects.nonNull(profileId)
+                && !Objects.equals(profileId, this.profileId)) {
+            this.profileId = profileId;
             isUpdated = true;
-            this.profileId = userUpdates.getProfileId();
         }
 
         if (isUpdated) {
@@ -84,6 +97,18 @@ public class User implements Serializable {
         }
     }
 
+
+    public User copy() {
+        return new User(
+                this.id,
+                this.createdAt,
+                this.updatedAt,
+                this.profileId,
+                this.username,
+                this.email,
+                this.password
+        );
+    }
 
     public boolean matchesPassword(String password) {
         return Objects.equals(this.password, password);

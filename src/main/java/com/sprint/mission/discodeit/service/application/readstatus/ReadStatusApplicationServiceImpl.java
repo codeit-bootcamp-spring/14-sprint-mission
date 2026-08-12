@@ -83,15 +83,20 @@ public class ReadStatusApplicationServiceImpl implements ReadStatusApplicationSe
 
     @Override
     public ReadStatusResponseDto update(UUID readStatusId) {
-        ReadStatus readStatus = readStatusDomainService.update(readStatusId);
+        ReadStatus readStatus = readStatusDomainService.findById(readStatusId);
+        ReadStatus updatingReadStatus = readStatus.copy();
+        updatingReadStatus.markAsRead();
+
+        ReadStatus updatedReadStatus = readStatusDomainService.update(updatingReadStatus);
+
         log.debug(
                 "ReadStatus 읽음 시간 갱신: readStatusId={}, userId={}, channelId={}, lastReadAt={}",
-                readStatus.getId(),
-                readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastReadAt()
+                updatedReadStatus.getId(),
+                updatedReadStatus.getUserId(),
+                updatedReadStatus.getChannelId(),
+                updatedReadStatus.getLastReadAt()
         );
-        return ReadStatusResponseDto.from(readStatus);
+        return ReadStatusResponseDto.from(updatedReadStatus);
     }
 
     @Override

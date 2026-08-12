@@ -122,12 +122,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
             BinaryContentCreateRequestDto profileImageRequest
     ) {
         User user = userDomainService.findById(userId);
-        User originalUserState = User.create(
-                user.getUsername(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getProfileId()
-        );
+        User originalUserState = user.copy();
         UUID oldProfileId = user.getProfileId();
         BinaryContent oldProfileContent = findProfileImage(oldProfileId);
         UserStatus userStatus = userStatusDomainService.findByUserId(userId);
@@ -157,14 +152,15 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 );
             }
 
-            User userUpdates = User.create(
+            User updatingUser = user.copy();
+            updatingUser.updateAccountDetails(
                     userUpdateRequest.getUsername(),
                     userUpdateRequest.getEmail(),
                     userUpdateRequest.getPassword(),
                     newProfileId
             );
 
-            User updatedUser = userDomainService.update(userId, userUpdates);
+            User updatedUser = userDomainService.update(updatingUser);
             userUpdated = true;
 
             if (Objects.nonNull(newProfileContent) && Objects.nonNull(oldProfileId)) {
@@ -352,7 +348,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
 
         if (userUpdated) {
             try {
-                userDomainService.update(userId, originalUserState);
+                userDomainService.update(originalUserState);
             } catch (RuntimeException rollbackException) {
                 originalException.addSuppressed(rollbackException);
             }

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serial;
@@ -9,6 +11,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Channel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -53,28 +56,39 @@ public class Channel implements Serializable {
         );
     }
 
-    public void updateNameAndDescription(Channel channelUpdates) {
-        // 뭔가 수정 필요
+    public void updateNameAndDescription(
+            String name,
+            String description
+    ) {
         boolean isUpdated = false;
 
-        // channel name/ description이 그대로거나 비어있으면 update 안된거임
-        if (Objects.nonNull(channelUpdates.getName()) &&
-            !Objects.equals(channelUpdates.getName(), name)
+        if (Objects.nonNull(name) &&
+            !Objects.equals(name, this.name)
         ) {
             isUpdated = true;
-            this.name = channelUpdates.getName();
+            this.name = name;
         }
 
-        if (Objects.nonNull(channelUpdates.getDescription()) &&
-            !Objects.equals(channelUpdates.getDescription(), description)
+        if (Objects.nonNull(description) &&
+            !Objects.equals(description, this.description)
         ) {
             isUpdated = true;
-            this.description = channelUpdates.getDescription();
+            this.description = description;
         }
 
-        // 수정 됐다고 표시 (updatedAt 시간 변경)
         if (isUpdated) {
             this.updatedAt = Instant.now();
         }
+    }
+
+    public Channel copy() {
+        return new Channel(
+                this.id,
+                this.createdAt,
+                this.updatedAt,
+                this.name,
+                this.description,
+                this.channelType
+        );
     }
 }

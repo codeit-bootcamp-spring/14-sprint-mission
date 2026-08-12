@@ -103,17 +103,9 @@ public class ReadStatusDomainServiceImpl implements ReadStatusDomainService {
     }
 
     @Override
-    public ReadStatus update(UUID readStatusId) {
-        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() ->
-                        new CustomException(
-                                ExceptionType.READ_STATUS_NOT_FOUND,
-                                readStatusId
-                        )
-                );
-
-        readStatus.markAsRead();    // 메세지 읽음 표시
-        return readStatusRepository.save(readStatus);
+    public ReadStatus update(ReadStatus updatingReadStatus) {
+        findById(updatingReadStatus.getId());
+        return readStatusRepository.save(updatingReadStatus);
     }
 
     @Override

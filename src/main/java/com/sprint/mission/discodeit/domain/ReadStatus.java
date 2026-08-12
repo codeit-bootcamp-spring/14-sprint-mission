@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serial;
@@ -9,6 +11,7 @@ import java.util.UUID;
 
 // 사용자별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용.
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReadStatus implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -40,5 +43,16 @@ public class ReadStatus implements Serializable {
     public void markAsRead() {
         this.lastReadAt = Instant.now();
         this.updatedAt = lastReadAt;
+    }
+
+    public ReadStatus copy() {
+        return new ReadStatus(
+                this.id,
+                this.createdAt,
+                this.updatedAt,
+                this.userId,
+                this.channelId,
+                this.lastReadAt
+        );
     }
 }

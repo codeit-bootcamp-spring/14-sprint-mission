@@ -73,27 +73,37 @@ public class UserStatusApplicationServiceImpl implements UserStatusApplicationSe
     // UserStatus id로 lastActiveAt 시간 업데이트
     @Override
     public UserStatusResponseDto update(UUID userStatusId) {
-        UserStatus userStatus = userStatusDomainService.update(userStatusId);
+        UserStatus userStatus = userStatusDomainService.findById(userStatusId);
+        UserStatus updatingUserStatus = userStatus.copy();
+        updatingUserStatus.refreshLastActiveAt();
+
+        UserStatus updatedUserStatus = userStatusDomainService.update(updatingUserStatus);
+
         log.debug(
                 "UserStatus 갱신 완료: userStatusId={}, userId={}, lastActiveAt={}",
-                userStatus.getId(),
-                userStatus.getUserId(),
-                userStatus.getLastActiveAt()
+                updatedUserStatus.getId(),
+                updatedUserStatus.getUserId(),
+                updatedUserStatus.getLastActiveAt()
         );
-        return UserStatusResponseDto.from(userStatus);
+        return UserStatusResponseDto.from(updatedUserStatus);
     }
 
     // User id로 해당 user status의 lastActiveAt 시간 업데이트
     @Override
     public UserStatusResponseDto updateByUserId(UUID userId) {
-        UserStatus userStatus = userStatusDomainService.updateByUserId(userId);
+        UserStatus userStatus = userStatusDomainService.findByUserId(userId);
+        UserStatus updatingUserStatus = userStatus.copy();
+        updatingUserStatus.refreshLastActiveAt();
+
+        UserStatus updatedUserStatus = userStatusDomainService.update(updatingUserStatus);
+
         log.debug(
                 "UserStatus 갱신 완료: userId={}, userStatusId={}, lastActiveAt={}",
                 userId,
-                userStatus.getId(),
-                userStatus.getLastActiveAt()
+                updatedUserStatus.getId(),
+                updatedUserStatus.getLastActiveAt()
         );
-        return UserStatusResponseDto.from(userStatus);
+        return UserStatusResponseDto.from(updatedUserStatus);
     }
 
     @Override

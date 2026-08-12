@@ -73,19 +73,9 @@ public class UserStatusDomainServiceImpl implements UserStatusDomainService {
     }
 
     @Override
-    public UserStatus update(UUID userStatusId) {
-        UserStatus userStatus = findById(userStatusId);
-        userStatus.refreshLastActiveAt();
-        userStatusRepository.save(userStatus);
-        return userStatus;
-    }
-
-    @Override
-    public UserStatus updateByUserId(UUID userId) {
-        UserStatus userStatus = findByUserId(userId);
-        userStatus.refreshLastActiveAt();
-        userStatusRepository.save(userStatus);
-        return userStatus;
+    public UserStatus update(UserStatus updatingUserStatus) {
+        findById(updatingUserStatus.getId());
+        return userStatusRepository.save(updatingUserStatus);
     }
 
     @Override

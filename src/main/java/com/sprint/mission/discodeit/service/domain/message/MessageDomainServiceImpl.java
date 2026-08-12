@@ -65,13 +65,9 @@ public class MessageDomainServiceImpl implements MessageDomainService {
     }
 
     @Override
-    public Message update(
-            UUID messageId,
-            String updatedContent
-    ) {
-        Message originalMessage = findById(messageId);
-        originalMessage.updateContent(updatedContent);
-        return messageRepository.save(originalMessage);
+    public Message update(Message updatingMessage) {
+        findById(updatingMessage.getId());
+        return messageRepository.save(updatingMessage);
     }
 
     @Override

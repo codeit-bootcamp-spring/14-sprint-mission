@@ -9,6 +9,6 @@ public interface ChannelDomainService {
     Channel create(Channel channel);
     Channel findById(UUID channelId);
     List<Channel> findAll();
-    Channel update(UUID channelId, Channel channelUpdates);
+    Channel update(Channel updatingChannel);
     void delete(UUID channelId);
 }

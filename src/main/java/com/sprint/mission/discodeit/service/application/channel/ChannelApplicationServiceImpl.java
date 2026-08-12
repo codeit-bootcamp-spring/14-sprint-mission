@@ -167,18 +167,16 @@ public class ChannelApplicationServiceImpl implements ChannelApplicationService 
     ) {
         log.info("Channel 수정 시작: channelId={}", channelId);
 
-        channelDomainService.findById(channelId);
+        Channel channel = channelDomainService.findById(channelId);
         Instant mostRecentMessageAt = findMostRecentMessageAt(channelId);
 
-        Channel channelUpdates = Channel.createPublic(
+        Channel updatingChannel = channel.copy();
+        updatingChannel.updateNameAndDescription(
                 channelUpdateRequest.getName(),
                 channelUpdateRequest.getDescription()
         );
 
-        Channel updatedChannel = channelDomainService.update(
-                channelId,
-                channelUpdates
-        );
+        Channel updatedChannel = channelDomainService.update(updatingChannel);
 
         log.info("Channel 수정 완료: channelId={}", updatedChannel.getId());
 

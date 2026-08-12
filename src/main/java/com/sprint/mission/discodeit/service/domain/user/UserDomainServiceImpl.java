@@ -56,21 +56,14 @@ public class UserDomainServiceImpl implements UserDomainService {
     }
 
     @Override
-    public User update(
-            UUID userId,
-            User userUpdates
-    ) {
-        User originalUser = findById(userId);
+    public User update(User updatingUser) { // Replace 로직
+        User originalUser = findById(updatingUser.getId());
         validateUnique(
                 originalUser,
-                userUpdates.getUsername(),
-                userUpdates.getEmail()
+                updatingUser.getUsername(),
+                updatingUser.getEmail()
         );
-
-        // user 업데이트
-        originalUser.updateAccountDetails(userUpdates);
-
-        return userRepository.save(originalUser);
+        return userRepository.save(updatingUser);
     }
 
     private void validateUnique(

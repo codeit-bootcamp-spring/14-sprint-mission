@@ -15,9 +15,7 @@ public interface UserStatusDomainService {
 
     List<UserStatus> findAll();
 
-    UserStatus update(UUID userStatusId);
-
-    UserStatus updateByUserId(UUID userId);
+    UserStatus update(UserStatus updatingUserStatus);
 
     void delete(UUID userStatusId);
 }

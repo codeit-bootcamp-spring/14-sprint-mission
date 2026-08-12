@@ -46,19 +46,17 @@ public class ChannelDomainServiceImpl implements ChannelDomainService {
     }
 
     @Override
-    public Channel update(UUID channelId, Channel channelUpdates) {
-        Channel originalChannel = findById(channelId);
+    public Channel update(Channel updatingChannel) {
+        Channel originalChannel = findById(updatingChannel.getId());
 
         if (originalChannel.getChannelType() == ChannelType.PRIVATE) {
             throw new CustomException(
                     ExceptionType.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED,
-                    channelId
+                    updatingChannel.getId()
             );
         }
 
-        originalChannel.updateNameAndDescription(channelUpdates);
-
-        return channelRepository.save(originalChannel);
+        return channelRepository.save(updatingChannel);
     }
 
     @Override
