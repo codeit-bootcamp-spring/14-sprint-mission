@@ -51,57 +51,30 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
             MessageCreateRequestDto messageCreateRequest,
             List<BinaryContentCreateRequestDto> attachmentRequests
     ) {
+        UUID senderId = messageCreateRequest.getSenderId();
+        UUID channelId = messageCreateRequest.getChannelId();
+
         log.info(
                 "Message 생성 시작: senderId={}, channelId={}, attachmentCount={}",
-                messageCreateRequest.getSenderId(),
-                messageCreateRequest.getChannelId(),
+                senderId,
+                channelId,
                 Objects.nonNull(attachmentRequests)
                         ? attachmentRequests.size()
                         : 0
         );
 
-        // 존재하는지 검증
-        UUID senderId = messageCreateRequest.getSenderId();
-        UUID channelId = messageCreateRequest.getChannelId();
-        userDomainService.findById(messageCreateRequest.getSenderId());
-
-        // private 채널이면 그 채널의 참여자인지 확인
-        Channel channel = channelDomainService.findById(messageCreateRequest.getChannelId());
-        if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
-            boolean isParticipant = readStatusDomainService.existsByUserIdAndChannelId(senderId, channelId);
-
-            if (!isParticipant) {
-                log.warn(
-                        "PRIVATE Channel Message 생성 거부: userId={}, channelId={}",
-                        senderId,
-                        channelId
-                );
-
-                throw new CustomException(
-                        ExceptionType.CHANNEL_ACCESS_DENIED,
-                        senderId,
-                        channelId
-                );
-            }
-        }
+        validateMessageCreation(senderId, channelId);
 
         List<BinaryContent> createdAttachments = new ArrayList<>();
         Message createdMessage = null;
 
         try {
-            // 첨부파일 객체 생성 + 저장
-            List<UUID> attachmentIds = new ArrayList<>();
+            List<UUID> attachmentIds = createAttachments(
+                    attachmentRequests,
+                    createdAttachments
+            );
+
             if (Objects.nonNull(attachmentRequests)) {
-                for (BinaryContentCreateRequestDto attachmentRequest : attachmentRequests) {
-                    BinaryContent binaryContent = BinaryContent.create(
-                            attachmentRequest.getFileName(),
-                            attachmentRequest.getBytes()
-                    );
-                    BinaryContent createdAttachment =
-                            binaryContentDomainService.create(binaryContent);
-                    createdAttachments.add(createdAttachment);
-                    attachmentIds.add(createdAttachment.getId());
-                }
                 log.debug(
                         "Message 첨부파일 저장 완료: channelId={}, attachmentCount={}",
                         channelId,
@@ -109,13 +82,12 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
                 );
             }
 
-            Message message = Message.create(
+            createdMessage = messageDomainService.create(Message.create(
                     messageCreateRequest.getContent(),
-                    messageCreateRequest.getSenderId(),
-                    messageCreateRequest.getChannelId(),
+                    senderId,
+                    channelId,
                     attachmentIds
-            );
-            createdMessage = messageDomainService.create(message);
+            ));
 
             log.info(
                     "Message 생성 완료: messageId={}, senderId={}, channelId={}, attachmentCount={}",
@@ -127,24 +99,11 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
 
             return MessageResponseDto.from(createdMessage);
         } catch (RuntimeException originalException) {
-            if (Objects.nonNull(createdMessage)) {
-                try {
-                    messageDomainService.delete(createdMessage.getId());
-                } catch (RuntimeException rollbackException) {
-                    originalException.addSuppressed(rollbackException);
-                }
-            }
-
-            for (int index = createdAttachments.size() - 1; index >= 0; index--) {
-                try {
-                    binaryContentDomainService.delete(
-                            createdAttachments.get(index).getId()
-                    );
-                } catch (RuntimeException rollbackException) {
-                    originalException.addSuppressed(rollbackException);
-                }
-            }
-
+            rollbackMessageCreation(
+                    createdMessage,
+                    createdAttachments,
+                    originalException
+            );
             throw originalException;
         }
     }
@@ -202,24 +161,18 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
     @Override
     public void delete(UUID messageId) {
         Message message = messageDomainService.findById(messageId);
-        List<UUID> attachmentIds = message.getAttachmentIds();
-        List<BinaryContent> attachments = new ArrayList<>();
-
-        for (UUID attachmentId : attachmentIds) {
-            attachments.add(binaryContentDomainService.findById(attachmentId));
-        }
+        List<BinaryContent> attachments = findAttachments(message.getAttachmentIds());
 
         log.info(
                 "Message 삭제 시작: messageId={}, attachmentCount={}",
                 messageId,
-                attachmentIds.size()
+                attachments.size()
         );
 
         boolean messageDeleted = false;
         List<BinaryContent> deletedAttachments = new ArrayList<>();
 
         try {
-            // 참조를 가진 Message를 먼저 삭제하여 깨진 attachment 참조를 방지한다.
             messageDomainService.delete(messageId);
             messageDeleted = true;
 
@@ -230,25 +183,122 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
 
             log.info("Message 및 첨부파일 삭제 완료: messageId={}", messageId);
         } catch (RuntimeException originalException) {
-            for (int index = deletedAttachments.size() - 1; index >= 0; index--) {
-                try {
-                    binaryContentDomainService.create(
-                            deletedAttachments.get(index)
-                    );
-                } catch (RuntimeException rollbackException) {
-                    originalException.addSuppressed(rollbackException);
-                }
-            }
-
-            if (messageDeleted) {
-                try {
-                    messageDomainService.create(message);
-                } catch (RuntimeException rollbackException) {
-                    originalException.addSuppressed(rollbackException);
-                }
-            }
-
+            rollbackMessageDeletion(
+                    message,
+                    messageDeleted,
+                    deletedAttachments,
+                    originalException
+            );
             throw originalException;
+        }
+    }
+
+    private void validateMessageCreation(UUID senderId, UUID channelId) {
+        userDomainService.findById(senderId);
+        Channel channel = channelDomainService.findById(channelId);
+
+        if (channel.getChannelType() != ChannelType.PRIVATE) {
+            return;
+        }
+
+        boolean isParticipant =
+                readStatusDomainService.existsByUserIdAndChannelId(senderId, channelId);
+
+        if (isParticipant) {
+            return;
+        }
+
+        log.warn(
+                "PRIVATE Channel Message 생성 거부: userId={}, channelId={}",
+                senderId,
+                channelId
+        );
+
+        throw new CustomException(
+                ExceptionType.CHANNEL_ACCESS_DENIED,
+                senderId,
+                channelId
+        );
+    }
+
+    private List<UUID> createAttachments(
+            List<BinaryContentCreateRequestDto> attachmentRequests,
+            List<BinaryContent> createdAttachments
+    ) {
+        List<UUID> attachmentIds = new ArrayList<>();
+        if (Objects.isNull(attachmentRequests)) {
+            return attachmentIds;
+        }
+
+        for (BinaryContentCreateRequestDto attachmentRequest : attachmentRequests) {
+            BinaryContent attachment = BinaryContent.create(
+                    attachmentRequest.getFileName(),
+                    attachmentRequest.getBytes()
+            );
+            BinaryContent createdAttachment =
+                    binaryContentDomainService.create(attachment);
+
+            createdAttachments.add(createdAttachment);
+            attachmentIds.add(createdAttachment.getId());
+        }
+
+        return attachmentIds;
+    }
+
+    private List<BinaryContent> findAttachments(List<UUID> attachmentIds) {
+        List<BinaryContent> attachments = new ArrayList<>();
+
+        for (UUID attachmentId : attachmentIds) {
+            attachments.add(binaryContentDomainService.findById(attachmentId));
+        }
+
+        return attachments;
+    }
+
+    private void rollbackMessageCreation(
+            Message createdMessage,
+            List<BinaryContent> createdAttachments,
+            RuntimeException originalException
+    ) {
+        if (Objects.nonNull(createdMessage)) {
+            try {
+                messageDomainService.delete(createdMessage.getId());
+            } catch (RuntimeException rollbackException) {
+                originalException.addSuppressed(rollbackException);
+            }
+        }
+
+        for (int index = createdAttachments.size() - 1; index >= 0; index--) {
+            BinaryContent createdAttachment = createdAttachments.get(index);
+            try {
+                binaryContentDomainService.delete(createdAttachment.getId());
+            } catch (RuntimeException rollbackException) {
+                originalException.addSuppressed(rollbackException);
+            }
+        }
+    }
+
+    private void rollbackMessageDeletion(
+            Message message,
+            boolean messageDeleted,
+            List<BinaryContent> deletedAttachments,
+            RuntimeException originalException
+    ) {
+        for (int index = deletedAttachments.size() - 1; index >= 0; index--) {
+            BinaryContent deletedAttachment = deletedAttachments.get(index);
+            try {
+                binaryContentDomainService.create(deletedAttachment);
+            } catch (RuntimeException rollbackException) {
+                originalException.addSuppressed(rollbackException);
+            }
+        }
+
+        if (messageDeleted) {
+            try {
+                messageDomainService.create(message);
+            } catch (RuntimeException rollbackException) {
+                originalException.addSuppressed(rollbackException);
+            }
         }
     }
 }
