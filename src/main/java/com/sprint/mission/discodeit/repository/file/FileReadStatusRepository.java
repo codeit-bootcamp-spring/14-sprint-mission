@@ -28,18 +28,8 @@ public class FileReadStatusRepository
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        ReadStatus previousReadStatus =
-                readStatusMap.put(readStatus.getId(), readStatus);
-        try {
-            saveFile(readStatusMap);
-        } catch (RuntimeException exception) {
-            if (Objects.isNull(previousReadStatus)) {
-                readStatusMap.remove(readStatus.getId());
-            } else {
-                readStatusMap.put(previousReadStatus.getId(), previousReadStatus);
-            }
-            throw exception;
-        }
+        readStatusMap.put(readStatus.getId(), readStatus);
+        saveFile(readStatusMap);
         return readStatus;
     }
 
@@ -83,15 +73,8 @@ public class FileReadStatusRepository
 
     @Override
     public void delete(UUID readStatusId) {
-        ReadStatus deletedReadStatus = readStatusMap.remove(readStatusId);
-        try {
-            saveFile(readStatusMap);
-        } catch (RuntimeException exception) {
-            if (Objects.nonNull(deletedReadStatus)) {
-                readStatusMap.put(deletedReadStatus.getId(), deletedReadStatus);
-            }
-            throw exception;
-        }
+        readStatusMap.remove(readStatusId);
+        saveFile(readStatusMap);
     }
 
     @Override
@@ -110,15 +93,7 @@ public class FileReadStatusRepository
             readStatusMap.remove(readStatus.getId());
         }
 
-        // 파일 업데이트
-        try {
-            saveFile(readStatusMap);
-        } catch (RuntimeException exception) {
-            for (ReadStatus readStatus : readStatusesToDelete) {
-                readStatusMap.put(readStatus.getId(), readStatus);
-            }
-            throw exception;
-        }
+        saveFile(readStatusMap);
     }
 
 }

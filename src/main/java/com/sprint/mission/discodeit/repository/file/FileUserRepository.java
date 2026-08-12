@@ -28,17 +28,8 @@ public class FileUserRepository
 
     @Override
     public User save(User user) {
-        User previousUser = userMap.put(user.getId(), user);
-        try {
-            saveFile(userMap);
-        } catch (RuntimeException exception) {
-            if (Objects.isNull(previousUser)) {
-                userMap.remove(user.getId());
-            } else {
-                userMap.put(previousUser.getId(), previousUser);
-            }
-            throw exception;
-        }
+        userMap.put(user.getId(), user);
+        saveFile(userMap);
         return user;
     }
 
@@ -73,15 +64,8 @@ public class FileUserRepository
 
     @Override
     public void delete(UUID userId) {
-        User deletedUser = userMap.remove(userId);
-        try {
-            saveFile(userMap);
-        } catch (RuntimeException exception) {
-            if (Objects.nonNull(deletedUser)) {
-                userMap.put(deletedUser.getId(), deletedUser);
-            }
-            throw exception;
-        }
+        userMap.remove(userId);
+        saveFile(userMap);
     }
 
 }

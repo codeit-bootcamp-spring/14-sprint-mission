@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.service.domain.channel.ChannelDomainService;
 import com.sprint.mission.discodeit.service.domain.readstatus.ReadStatusDomainService;
 import com.sprint.mission.discodeit.service.domain.user.UserDomainService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -14,21 +15,13 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ReadStatusApplicationServiceImpl implements ReadStatusApplicationService {
 
     private final ReadStatusDomainService readStatusDomainService;
     private final UserDomainService userDomainService;
     private final ChannelDomainService channelDomainService;
 
-    public ReadStatusApplicationServiceImpl(
-            ReadStatusDomainService readStatusDomainService,
-            UserDomainService userDomainService,
-            ChannelDomainService channelDomainService
-    ) {
-        this.readStatusDomainService = readStatusDomainService;
-        this.userDomainService = userDomainService;
-        this.channelDomainService = channelDomainService;
-    }
 
     @Override
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto readStatusCreateRequest) {
@@ -52,6 +45,7 @@ public class ReadStatusApplicationServiceImpl implements ReadStatusApplicationSe
         return ReadStatusResponseDto.from(createdReadStatus);
     }
 
+
     @Override
     public ReadStatusResponseDto findById(UUID readStatusId) {
         log.debug(
@@ -61,6 +55,7 @@ public class ReadStatusApplicationServiceImpl implements ReadStatusApplicationSe
         ReadStatus readStatus = readStatusDomainService.findById(readStatusId);
         return ReadStatusResponseDto.from(readStatus);
     }
+
 
     @Override
     public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
@@ -72,21 +67,16 @@ public class ReadStatusApplicationServiceImpl implements ReadStatusApplicationSe
                         .map(ReadStatusResponseDto::from)
                         .toList();
 
-        log.debug(
-                "User ReadStatus 목록 조회 완료: userId={}, count={}",
-                userId,
-                responses.size()
-        );
+        log.debug("User ReadStatus 목록 조회 완료: userId={}, count={}", userId, responses.size());
 
         return responses;
     }
 
+
     @Override
     public ReadStatusResponseDto update(UUID readStatusId) {
-        ReadStatus readStatus = readStatusDomainService.findById(readStatusId);
-        ReadStatus updatingReadStatus = readStatus.copy();
+        ReadStatus updatingReadStatus = readStatusDomainService.findById(readStatusId);
         updatingReadStatus.markAsRead();
-
         ReadStatus updatedReadStatus = readStatusDomainService.update(updatingReadStatus);
 
         log.debug(
@@ -96,8 +86,10 @@ public class ReadStatusApplicationServiceImpl implements ReadStatusApplicationSe
                 updatedReadStatus.getChannelId(),
                 updatedReadStatus.getLastReadAt()
         );
+
         return ReadStatusResponseDto.from(updatedReadStatus);
     }
+
 
     @Override
     public void delete(UUID readStatusId) {

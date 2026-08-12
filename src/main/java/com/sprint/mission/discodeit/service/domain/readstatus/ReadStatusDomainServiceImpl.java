@@ -45,25 +45,11 @@ public class ReadStatusDomainServiceImpl implements ReadStatusDomainService {
     public List<ReadStatus> createAll(List<ReadStatus> readStatuses) {
         List<ReadStatus> createdReadStatuses = new ArrayList<>();
 
-        try {
-            for (ReadStatus readStatus : readStatuses) {
-                // 하나씩 this.create() 메소드를 활용해서 생성한다
-                createdReadStatuses.add(create(readStatus));
-            }
-
-            return createdReadStatuses;
-        } catch (RuntimeException originalException) {
-            for (int i = createdReadStatuses.size() - 1; i >= 0; i--) {
-                try {
-                    delete(createdReadStatuses.get(i).getId());
-                } catch (RuntimeException rollbackException) {
-                    originalException.addSuppressed(
-                            rollbackException
-                    );
-                }
-            }
-            throw originalException;
+        for (ReadStatus readStatus : readStatuses) {
+            createdReadStatuses.add(create(readStatus));
         }
+
+        return createdReadStatuses;
     }
 
 

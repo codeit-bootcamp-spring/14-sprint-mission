@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.service.domain.user.UserDomainService;
 import com.sprint.mission.discodeit.service.domain.userstatus.UserStatusDomainService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,18 +14,12 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserStatusApplicationServiceImpl implements UserStatusApplicationService {
 
     private final UserStatusDomainService userStatusDomainService;
     private final UserDomainService userDomainService;
 
-    public UserStatusApplicationServiceImpl(
-            UserStatusDomainService userStatusDomainService,
-            UserDomainService userDomainService
-    ) {
-        this.userStatusDomainService = userStatusDomainService;
-        this.userDomainService = userDomainService;
-    }
 
     @Override
     public UserStatusResponseDto create(
@@ -73,10 +68,8 @@ public class UserStatusApplicationServiceImpl implements UserStatusApplicationSe
     // UserStatus id로 lastActiveAt 시간 업데이트
     @Override
     public UserStatusResponseDto update(UUID userStatusId) {
-        UserStatus userStatus = userStatusDomainService.findById(userStatusId);
-        UserStatus updatingUserStatus = userStatus.copy();
+        UserStatus updatingUserStatus = userStatusDomainService.findById(userStatusId);
         updatingUserStatus.refreshLastActiveAt();
-
         UserStatus updatedUserStatus = userStatusDomainService.update(updatingUserStatus);
 
         log.debug(
@@ -85,16 +78,15 @@ public class UserStatusApplicationServiceImpl implements UserStatusApplicationSe
                 updatedUserStatus.getUserId(),
                 updatedUserStatus.getLastActiveAt()
         );
+
         return UserStatusResponseDto.from(updatedUserStatus);
     }
 
     // User id로 해당 user status의 lastActiveAt 시간 업데이트
     @Override
     public UserStatusResponseDto updateByUserId(UUID userId) {
-        UserStatus userStatus = userStatusDomainService.findByUserId(userId);
-        UserStatus updatingUserStatus = userStatus.copy();
+        UserStatus updatingUserStatus = userStatusDomainService.findByUserId(userId);
         updatingUserStatus.refreshLastActiveAt();
-
         UserStatus updatedUserStatus = userStatusDomainService.update(updatingUserStatus);
 
         log.debug(

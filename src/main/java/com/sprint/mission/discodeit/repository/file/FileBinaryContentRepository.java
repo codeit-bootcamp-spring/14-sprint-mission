@@ -29,22 +29,8 @@ public class FileBinaryContentRepository
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        // 이전에 binaryContent.getId()로 저장된 binaryContent가 있었다면 return하고 덮어씌운다
-        BinaryContent previousBinaryContent =
-                binaryContentMap.put(binaryContent.getId(), binaryContent);
-        try {
-            saveFile(binaryContentMap);
-        } catch (RuntimeException exception) {
-            if (previousBinaryContent == null) {
-                binaryContentMap.remove(binaryContent.getId());
-            } else {
-                binaryContentMap.put(
-                        previousBinaryContent.getId(),
-                        previousBinaryContent
-                );
-            }
-            throw exception;
-        }
+        binaryContentMap.put(binaryContent.getId(), binaryContent);
+        saveFile(binaryContentMap);
         return binaryContent;
     }
 
@@ -71,18 +57,8 @@ public class FileBinaryContentRepository
 
     @Override
     public void delete(UUID binaryContentId) {
-        BinaryContent deletedBinaryContent = binaryContentMap.remove(binaryContentId);
-        try {
-            saveFile(binaryContentMap);
-        } catch (RuntimeException exception) {
-            if (deletedBinaryContent != null) {
-                binaryContentMap.put(
-                        deletedBinaryContent.getId(),
-                        deletedBinaryContent
-                );
-            }
-            throw exception;
-        }
+        binaryContentMap.remove(binaryContentId);
+        saveFile(binaryContentMap);
     }
 
 }

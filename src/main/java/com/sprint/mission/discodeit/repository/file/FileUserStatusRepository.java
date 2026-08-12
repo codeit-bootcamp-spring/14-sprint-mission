@@ -28,18 +28,8 @@ public class FileUserStatusRepository
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        UserStatus previousUserStatus =
-                userStatusMap.put(userStatus.getId(), userStatus);
-        try {
-            saveFile(userStatusMap);
-        } catch (RuntimeException exception) {
-            if (Objects.isNull(previousUserStatus)) {
-                userStatusMap.remove(userStatus.getId());
-            } else {
-                userStatusMap.put(previousUserStatus.getId(), previousUserStatus);
-            }
-            throw exception;
-        }
+        userStatusMap.put(userStatus.getId(), userStatus);
+        saveFile(userStatusMap);
         return userStatus;
     }
 
@@ -62,15 +52,8 @@ public class FileUserStatusRepository
 
     @Override
     public void delete(UUID userStatusId) {
-        UserStatus deletedUserStatus = userStatusMap.remove(userStatusId);
-        try {
-            saveFile(userStatusMap);
-        } catch (RuntimeException exception) {
-            if (Objects.nonNull(deletedUserStatus)) {
-                userStatusMap.put(deletedUserStatus.getId(), deletedUserStatus);
-            }
-            throw exception;
-        }
+        userStatusMap.remove(userStatusId);
+        saveFile(userStatusMap);
     }
 
 }

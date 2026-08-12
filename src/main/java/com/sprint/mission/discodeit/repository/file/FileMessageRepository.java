@@ -28,17 +28,8 @@ public class FileMessageRepository
 
     @Override
     public Message save(Message message) {
-        Message previousMessage = messageMap.put(message.getId(), message);
-        try {
-            saveFile(messageMap);
-        } catch (RuntimeException exception) {
-            if (Objects.isNull(previousMessage)) {
-                messageMap.remove(message.getId());
-            } else {
-                messageMap.put(previousMessage.getId(), previousMessage);
-            }
-            throw exception;
-        }
+        messageMap.put(message.getId(), message);
+        saveFile(messageMap);
         return message;
     }
 
@@ -72,15 +63,8 @@ public class FileMessageRepository
 
     @Override
     public void delete(UUID messageId) {
-        Message deletedMessage = messageMap.remove(messageId);
-        try {
-            saveFile(messageMap);
-        } catch (RuntimeException exception) {
-            if (Objects.nonNull(deletedMessage)) {
-                messageMap.put(deletedMessage.getId(), deletedMessage);
-            }
-            throw exception;
-        }
+        messageMap.remove(messageId);
+        saveFile(messageMap);
     }
 
     @Override
@@ -99,15 +83,7 @@ public class FileMessageRepository
             messageMap.remove(message.getId());
         }
 
-        // 파일 저장
-        try {
-            saveFile(messageMap);
-        } catch (RuntimeException exception) {
-            for (Message message : messagesToDelete) {
-                messageMap.put(message.getId(), message);
-            }
-            throw exception;
-        }
+        saveFile(messageMap);
     }
 
 }

@@ -31,17 +31,8 @@ public class FileChannelRepository
 
     @Override
     public Channel save(Channel channel) {
-        Channel previousChannel = channelMap.put(channel.getId(), channel);
-        try {
-            saveFile(channelMap);
-        } catch (RuntimeException exception) {
-            if (previousChannel == null) {
-                channelMap.remove(channel.getId());
-            } else {
-                channelMap.put(previousChannel.getId(), previousChannel);
-            }
-            throw exception;
-        }
+        channelMap.put(channel.getId(), channel);
+        saveFile(channelMap);
         return channel;
     }
 
@@ -57,15 +48,8 @@ public class FileChannelRepository
 
     @Override
     public void delete(UUID channelId) {
-        Channel deletedChannel = channelMap.remove(channelId);
-        try {
-            saveFile(channelMap);
-        } catch (RuntimeException exception) {
-            if (deletedChannel != null) {
-                channelMap.put(deletedChannel.getId(), deletedChannel);
-            }
-            throw exception;
-        }
+        channelMap.remove(channelId);
+        saveFile(channelMap);
     }
 
 }
