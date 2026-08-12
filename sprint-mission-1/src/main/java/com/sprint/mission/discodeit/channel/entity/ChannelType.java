@@ -1,0 +1,31 @@
+package com.sprint.mission.discodeit.channel.entity;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Arrays;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@RequiredArgsConstructor
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+public enum ChannelType {
+    PUBLIC("public", "공개 채널"),
+    PRIVATE("private", "비공개 채널");
+
+    @JsonValue
+    String channelType;
+    String description;
+
+    @JsonCreator
+    public static ChannelType of(String channelType) {
+        return Arrays.stream(ChannelType.values())
+            .filter(type -> type.getChannelType().equalsIgnoreCase(channelType))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널 타입: " + channelType));
+    }
+}
