@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public class JCFMessageRepository implements MessageRepository {
     final List<Message> messageList;
 
@@ -35,8 +37,17 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageList.stream()
+                .filter(each -> each.getChannelId() != null && each.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
     public void delete(UUID id) {
         Message target = findById(id);
-        messageList.remove(target);
+        if (target != null) {
+            messageList.remove(target);
+        }
     }
 }

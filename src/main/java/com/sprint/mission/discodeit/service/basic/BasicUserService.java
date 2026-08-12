@@ -1,48 +1,120 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.userdto.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.userdto.UserResponseDto;
+import com.sprint.mission.discodeit.dto.userdto.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
+@Service
 public class BasicUserService implements UserService {
-    //아래 두줄의 코드가 의존성 주입하는 패턴임
-    //여기서 메인코드에서 File타입으로 받냐, JCF타입으로 받냐에 따라 아래의 메서드들이 완전히 바뀜
+
     private final UserRepository userRepository;
-    public BasicUserService(UserRepository userRepository) {
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
+
+    public BasicUserService(UserRepository userRepository,
+                            UserStatusRepository userStatusRepository,
+                            BinaryContentRepository binaryContentRepository) {
         this.userRepository = userRepository;
+        this.userStatusRepository = userStatusRepository;
+        this.binaryContentRepository = binaryContentRepository;
     }
+
     @Override
-    public User createUser(String email, String name) {
-        User user = new User(email, name);
-        /* 여기서 save()메서드가 어떻게 뭘 하는지 관심없음 그냥 인터페이스에
-        정의 되어있으니까 호출가능하고 타입에 따라 알아서 오버라이딩되니까 호출함 */
+    public UserResponseDto createUser(UserCreateRequestDto userCreateRequestDto) {
+        User user = userCreateRequestDto.toEntity();
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new IllegalArgumentException("이미 가입한 회원 이메일 입니다.");
+        }
+        if (userRepository.findByName(user.getName()) != null) {
+            throw new IllegalArgumentException("이미 가입한 회원 이름 입니다.");
+        }
         userRepository.save(user);
-        return user;
+
+        UserStatus userStatus = new UserStatus(user.getId());
+        userStatusRepository.save(userStatus);
+
+        // 프로필 이미지 데이터 들어왔으면 BinaryContent 생성 및 저장
+        if (userCreateRequestDto.getBinaryContentCreateRequestDto() != null) {
+            BinaryContent profileImage = userCreateRequestDto.getBinaryContentCreateRequestDto().toEntity();
+            binaryContentRepository.save(profileImage);
+        }
+
+        return UserResponseDto.from(user, userStatus);
     }
 
     @Override
-    public User readUser(UUID id) {
-        return userRepository.findById(id);
+    public UserResponseDto readUser(UUID id) {
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다: " + id);
+        }
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+        return UserResponseDto.from(user, userStatus);
     }
 
     @Override
-    public List<User> readAllUser() {
-        return userRepository.findAll();
+    public List<UserResponseDto> readAllUser() {
+        List<User> users = userRepository.findAll();
+        List<UserResponseDto> responses = new ArrayList<>();
+        for (User user : users) {
+            UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+            responses.add(UserResponseDto.from(user, userStatus));
+        }
+        return responses;
     }
 
     @Override
-    public void updateUser(UUID id, String name) {
+    //프로필 업데이트 -> 프로필사진이랑 이름
+    public UserResponseDto updateUser(UUID id, UserUpdateRequestDto requestDto) {
         User target = userRepository.findById(id);
-        target.setName(name);
+        if (Objects.isNull(target)) {
+            throw new RuntimeException("해당 유저가 존재하지 않습니다: " + id);
+        }
+        //이름 받으면 업데이트
+        if(requestDto.getName() != null) {
+            target.setName(requestDto.getName());
+        }
+        //컨텐츠 받으면 기존꺼 삭제하고 업데이트
+        if (requestDto.getProfileImageRequestDto() != null) {
+            BinaryContent oldContent = binaryContentRepository.findById(id);
+            if (target != null) { //삭제
+                binaryContentRepository.delete(oldContent.getId());
+            }
+            //새로 지정 후 저장
+            BinaryContent newContent = requestDto.getProfileImageRequestDto().toEntity();
+            binaryContentRepository.save(newContent);
+        }
         target.setUpdatedAt();
         userRepository.save(target);
+
+        UserStatus userStatus = userStatusRepository.findByUserId(id);
+        return UserResponseDto.from(target, userStatus);
     }
 
     @Override
     public void deleteUser(UUID id) {
         userRepository.delete(id);
+        //cacade: 유저삭제시 연쇄삭제
+        UserStatus userStatus = userStatusRepository.findByUserId(id);
+        if (userStatus != null) {
+            userStatusRepository.delete(userStatus.getId());
+        }
+        BinaryContent binaryContent = binaryContentRepository.findByUserId(id);
+        if (binaryContent != null) {
+            binaryContentRepository.delete(binaryContent.getId());
+        }
     }
 }

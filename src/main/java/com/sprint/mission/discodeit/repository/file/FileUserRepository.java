@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -54,4 +53,22 @@ public class FileUserRepository implements UserRepository {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public User findByEmail(String email) {
+        User target = userList.stream()
+                .filter(each -> each.getEmail().equals(email))
+                .findFirst()
+                .orElse(null);
+        return target;
+    }
+
+    @Override
+    public User findByName(String name){
+        User target = userList.stream()
+                .filter(each -> each.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+        return target;
+    };
 }
