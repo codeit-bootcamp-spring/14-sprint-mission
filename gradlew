@@ -1,7 +1,11 @@
 #!/bin/sh
 
 #
+<<<<<<< HEAD
+# Copyright © 2015 the original authors.
+=======
 # Copyright © 2015-2021 the original authors.
+>>>>>>> upstream/김수영
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +19,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+<<<<<<< HEAD
+# SPDX-License-Identifier: Apache-2.0
+#
+=======
+>>>>>>> upstream/김수영
 
 ##############################################################################
 #
@@ -55,7 +64,11 @@
 #       Darwin, MinGW, and NonStop.
 #
 #   (3) This script is generated from the Groovy template
+<<<<<<< HEAD
+#       https://github.com/gradle/gradle/blob/3d91ce3b8caaf77ad09f381f43615b715b53f72c/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+=======
 #       https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+>>>>>>> upstream/김수영
 #       within the Gradle project.
 #
 #       You can find Gradle at https://github.com/gradle/gradle/.
@@ -80,6 +93,13 @@ do
     esac
 done
 
+<<<<<<< HEAD
+# This is normally unused
+# shellcheck disable=SC2034
+APP_BASE_NAME=${0##*/}
+# Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
+APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
+=======
 APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
 
 APP_NAME="Gradle"
@@ -87,6 +107,7 @@ APP_BASE_NAME=${0##*/}
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+>>>>>>> upstream/김수영
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD=maximum
@@ -114,7 +135,10 @@ case "$( uname )" in                #(
   NONSTOP* )        nonstop=true ;;
 esac
 
+<<<<<<< HEAD
+=======
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+>>>>>>> upstream/김수영
 
 
 # Determine the Java command to use to start the JVM.
@@ -133,22 +157,42 @@ location of your Java installation."
     fi
 else
     JAVACMD=java
+<<<<<<< HEAD
+    if ! command -v java >/dev/null 2>&1
+    then
+        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+=======
     which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
+>>>>>>> upstream/김수영
 fi
 
 # Increase the maximum file descriptors if we can.
 if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
     case $MAX_FD in #(
       max*)
+<<<<<<< HEAD
+        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+=======
+>>>>>>> upstream/김수영
         MAX_FD=$( ulimit -H -n ) ||
             warn "Could not query maximum file descriptor limit"
     esac
     case $MAX_FD in  #(
       '' | soft) :;; #(
       *)
+<<<<<<< HEAD
+        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+=======
+>>>>>>> upstream/김수영
         ulimit -n "$MAX_FD" ||
             warn "Could not set maximum file descriptor limit to $MAX_FD"
     esac
@@ -165,7 +209,10 @@ fi
 # For Cygwin or MSYS, switch paths to Windows format before running java
 if "$cygwin" || "$msys" ; then
     APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
+<<<<<<< HEAD
+=======
     CLASSPATH=$( cygpath --path --mixed "$CLASSPATH" )
+>>>>>>> upstream/김수영
 
     JAVACMD=$( cygpath --unix "$JAVACMD" )
 
@@ -193,6 +240,29 @@ if "$cygwin" || "$msys" ; then
     done
 fi
 
+<<<<<<< HEAD
+
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+
+# Collect all arguments for the java command:
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and optsEnvironmentVar are not allowed to contain shell fragments,
+#     and any embedded shellness will be escaped.
+#   * For example: A user cannot expect ${Hostname} to be expanded, as it is an environment variable and will be
+#     treated as '${Hostname}' itself on the command line.
+
+set -- \
+        "-Dorg.gradle.appname=$APP_BASE_NAME" \
+        -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
+        "$@"
+
+# Stop when "xargs" is not available.
+if ! command -v xargs >/dev/null 2>&1
+then
+    die "xargs is not available"
+fi
+
+=======
 # Collect all arguments for the java command;
 #   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
 #     shell script including quotes and variable substitutions, so put them in
@@ -205,6 +275,7 @@ set -- \
         org.gradle.wrapper.GradleWrapperMain \
         "$@"
 
+>>>>>>> upstream/김수영
 # Use "xargs" to parse quoted args.
 #
 # With -n1 it outputs one arg per line, with the quotes and backslashes removed.

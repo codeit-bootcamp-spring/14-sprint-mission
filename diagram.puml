@@ -1,0 +1,121 @@
+@startuml
+
+class com.sprint.mission.discodeit.entity.Message {
+}
+
+
+class com.sprint.mission.discodeit.service.basic.BasicChannelService {
+}
+
+
+class com.sprint.mission.discodeit.entity.BinaryContent {
+}
+
+class com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository {
+}
+
+
+class com.sprint.mission.discodeit.repository.file.FileMessageRepository {
+}
+
+
+class com.sprint.mission.discodeit.service.basic.BasicMessageService {
+}
+
+
+interface com.sprint.mission.discodeit.repository.UserStatusRepository {
+}
+
+interface com.sprint.mission.discodeit.repository.MessageRepository {
+}
+
+class com.sprint.mission.discodeit.DiscodeitApplication {
+}
+
+interface com.sprint.mission.discodeit.repository.ReadStatusRepository {
+}
+
+interface com.sprint.mission.discodeit.repository.BinaryContentRepository {
+}
+
+class com.sprint.mission.discodeit.entity.ReadStatus {
+}
+
+
+interface com.sprint.mission.discodeit.service.UserService {
+}
+
+class com.sprint.mission.discodeit.service.basic.BasicUserService {
+}
+
+
+class com.sprint.mission.discodeit.entity.User {
+}
+
+
+class com.sprint.mission.discodeit.repository.file.FileUserRepository {
+}
+
+
+class com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository {
+}
+
+
+class com.sprint.mission.discodeit.dto.UserResponse {
+}
+
+interface com.sprint.mission.discodeit.repository.UserRepository {
+}
+
+class com.sprint.mission.discodeit.dto.UserCreateRequest {
+}
+
+interface com.sprint.mission.discodeit.service.ChannelService {
+}
+
+class com.sprint.mission.discodeit.repository.file.FileChannelRepository {
+}
+
+
+class com.sprint.mission.discodeit.repository.jcf.JCFUserRepository {
+}
+
+
+enum com.sprint.mission.discodeit.entity.ChannelType {
+}
+
+interface com.sprint.mission.discodeit.service.MessageService {
+}
+
+interface com.sprint.mission.discodeit.repository.ChannelRepository {
+}
+
+class com.sprint.mission.discodeit.entity.UserStatus {
+}
+
+
+class com.sprint.mission.discodeit.dto.UserUpdateRequest {
+}
+
+class com.sprint.mission.discodeit.entity.Channel {
+}
+
+
+
+
+java.io.Serializable <|.. com.sprint.mission.discodeit.entity.Message
+com.sprint.mission.discodeit.service.ChannelService <|.. com.sprint.mission.discodeit.service.basic.BasicChannelService
+java.io.Serializable <|.. com.sprint.mission.discodeit.entity.BinaryContent
+com.sprint.mission.discodeit.repository.ChannelRepository <|.. com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository
+com.sprint.mission.discodeit.repository.MessageRepository <|.. com.sprint.mission.discodeit.repository.file.FileMessageRepository
+com.sprint.mission.discodeit.service.MessageService <|.. com.sprint.mission.discodeit.service.basic.BasicMessageService
+java.io.Serializable <|.. com.sprint.mission.discodeit.entity.ReadStatus
+com.sprint.mission.discodeit.service.UserService <|.. com.sprint.mission.discodeit.service.basic.BasicUserService
+java.io.Serializable <|.. com.sprint.mission.discodeit.entity.User
+com.sprint.mission.discodeit.repository.UserRepository <|.. com.sprint.mission.discodeit.repository.file.FileUserRepository
+com.sprint.mission.discodeit.repository.MessageRepository <|.. com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository
+com.sprint.mission.discodeit.repository.ChannelRepository <|.. com.sprint.mission.discodeit.repository.file.FileChannelRepository
+com.sprint.mission.discodeit.repository.UserRepository <|.. com.sprint.mission.discodeit.repository.jcf.JCFUserRepository
+java.io.Serializable <|.. com.sprint.mission.discodeit.entity.UserStatus
+java.io.Serializable <|.. com.sprint.mission.discodeit.entity.Channel
+@enduml
