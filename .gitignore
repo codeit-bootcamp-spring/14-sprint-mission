@@ -41,3 +41,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+### 직렬화 저장 파일 ###
+data/

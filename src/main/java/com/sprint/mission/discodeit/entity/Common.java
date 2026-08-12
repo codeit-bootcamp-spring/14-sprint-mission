@@ -1,32 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Common {
+/**
+ * 공통 필드(id, createdAt, updatedAt)를 담는 상위 타입.
+ * 시간은 Instant로 통일했다. Long(epoch)과 달리 시간대 변환과 기간 연산을 타입이 제공한다.
+ */
+public class Common implements Serializable {
+    private static final long serialVersionUID = 2L;
+
     private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 
     public Common() {
-        long now = System.currentTimeMillis();
         this.id = UUID.randomUUID();
-        this.createdAt = now;
+        this.createdAt = Instant.now();
     }
 
     public UUID getId() {
         return id;
     }
 
-    public Long getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public Long getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
     protected void update() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
 }
