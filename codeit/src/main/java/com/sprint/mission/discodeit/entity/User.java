@@ -10,6 +10,7 @@ import java.util.UUID;
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private UUID profileImageID;
     private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
