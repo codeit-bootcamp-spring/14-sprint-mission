@@ -288,8 +288,9 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         for (User user : users) {
             UserStatus userStatus = userStatusMap.get(user.getId());
             if (Objects.isNull(userStatus)) {
-                throw new CustomException(
-                        ExceptionType.USER_STATUS_NOT_FOUND,
+                // 방어적 fail
+                log.warn(
+                        "UserStatus 누락됨: userId={}, isOnline=false 기본값으로 반환함",
                         user.getId()
                 );
             }
