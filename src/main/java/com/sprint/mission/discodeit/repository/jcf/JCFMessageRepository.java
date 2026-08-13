@@ -1,25 +1,19 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFMessageRepository implements MessageRepository {
 
     private final Map<UUID, Message> messageMap = new HashMap<>();
-
-    private JCFMessageRepository() {}
-
-    private static class LazyHolder {
-        private static final JCFMessageRepository INSTANCE = new JCFMessageRepository();
-    }
-
-    public static JCFMessageRepository getInstance() {
-        return LazyHolder.INSTANCE;
-    }
 
 
     @Override
@@ -29,10 +23,31 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message find(UUID id) {
-        return Optional.ofNullable(messageMap.get(id))
-                .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND));
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.ofNullable(messageMap.get(messageId));
     }
+
+
+    @Override
+    public Optional<Message> findMostRecentByChannelId(UUID channelId) {
+        Message mostRecentMessage = null;
+
+        for (Message currentMessage : messageMap.values()) {
+            if (!currentMessage.getChannelId().equals(channelId)) {
+                continue;
+            }
+
+            if (Objects.isNull(mostRecentMessage) ||
+                    currentMessage.getCreatedAt()
+                        .isAfter(mostRecentMessage.getCreatedAt())
+            ) {
+                mostRecentMessage = currentMessage;
+            }
+        }
+
+        return Optional.ofNullable(mostRecentMessage);
+    }
+
 
     @Override
     public List<Message> findAll() {
@@ -40,9 +55,24 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        if (messageMap.remove(id) == null) {
-            throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND);
+    public void delete(UUID messageId) {
+        messageMap.remove(messageId);
+    }
+
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        // 한 채널 안에 있는 모든 메시지
+        List<UUID> messageIdsToDelete = new ArrayList<>();
+
+        for (Message message : messageMap.values()) {
+            if (Objects.equals(message.getChannelId(), channelId)) {
+                messageIdsToDelete.add(message.getId());
+            }
+        }
+
+        for (UUID messageId : messageIdsToDelete) {
+            messageMap.remove(messageId);
         }
     }
 }
