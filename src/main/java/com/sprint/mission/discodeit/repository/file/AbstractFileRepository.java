@@ -25,6 +25,15 @@ public abstract class AbstractFileRepository<T extends Serializable> {
 
     @SuppressWarnings("unchecked")
     protected final Map<UUID, T> loadFile() {
+        if (Files.exists(filePath)) {
+            saveFile(new HashMap<>());
+            log.info(
+                    "{} 기존 파일 초기화 완료: file={}",
+                    domainName,
+                    filePath
+            );
+        }
+
         // try: 파일 로드
         try (ObjectInputStream inputStream =
                      new ObjectInputStream(new FileInputStream(filePath.toFile()))) {

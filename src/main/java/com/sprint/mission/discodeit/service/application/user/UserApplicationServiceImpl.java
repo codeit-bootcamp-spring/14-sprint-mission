@@ -54,7 +54,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 userCreateRequest.getUsername(),
                 userCreateRequest.getEmail(),
                 userCreateRequest.getPassword(),
-                createdProfileImage.getId()
+                (Objects.nonNull(createdProfileImage)) ? createdProfileImage.getId() : null
         ));
 
         // create user status to track last read time
