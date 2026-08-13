@@ -3,20 +3,125 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
-    private static final String FILE_PATH = "users.ser";
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
-    private static FileUserRepository instance;
+@Repository
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+public class FileUserRepository implements UserRepository {
+    Path DIRECTORY;
+    String EXTENSION = ".ser";
 
-    private FileUserRepository() {
-        super(FILE_PATH);
+    public FileUserRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    public static FileUserRepository getInstance(){
-        if (instance == null){
-            instance = new FileUserRepository();
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
+    @Override
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return instance;
+        return user;
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(userNullable);
+    }
+
+    @Override
+    public List<User> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return findAll().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return findAll().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public Optional<User> findByUsernameAndPassword(String username, String password) {
+        return findAll().stream()
+                .filter(user -> user.getUsername().equals(username) && user.getPassword().equals(password))
+                .findFirst();
     }
 }
-

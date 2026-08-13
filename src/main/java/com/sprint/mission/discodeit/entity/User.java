@@ -1,41 +1,56 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.AccessLevel;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.FieldDefaults;
 
 @Getter
-@ToString
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class User extends BaseEntity{
-    String name;
-    String email;
-    String nickname;
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private User(String name, String email, String nickname) {
-        super();
-        this.name = name;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    private String username;
+    private String email;
+    private String password;
+
+    private UUID profileId;
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.username = username;
         this.email = email;
-        this.nickname = nickname;
+        this.password = password;
     }
 
-    public static User create(String name, String email, String nickname){
-        return new User(name, email, nickname);
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public void changeName(String name){
-        this.name = name;
-        newUpdatedAt();
-    }
-
-    public void changeEmail(String email){
-        this.email = email;
-        newUpdatedAt();
-    }
-
-    public void changeNickname(String nickname){
-        this.nickname = nickname;
-        newUpdatedAt();
+    public void updateProfile(UUID newProfileId){
+        if (newProfileId != null && !newProfileId.equals(this.profileId)){
+            this.profileId = newProfileId;
+            this.updatedAt = Instant.now();
+        }
     }
 }

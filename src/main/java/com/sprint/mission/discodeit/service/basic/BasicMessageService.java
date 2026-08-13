@@ -1,62 +1,109 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import static com.sprint.mission.discodeit.service.basic.BasicChannelService.ERROR_CHANNEL_NOT_FOUND;
-import static com.sprint.mission.discodeit.service.basic.BasicUserService.ERROR_USER_NOT_FOUND;
-
+import com.sprint.mission.discodeit.dto.AttachmentRequest;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageResponse;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
 
+@Service
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    public static final String ERROR_MESSAGE_NOT_FOUND = "존재하지 않는 메시지입니다. ID: ";
+    MessageRepository messageRepository;
+    ChannelRepository channelRepository;
+    UserRepository userRepository;
+    BinaryContentRepository binaryContentRepository;
 
-    private final UserService userService;
-    private final ChannelService channelService;
-    private final MessageRepository messageRepository;
+    @Override
+    public MessageResponse create(MessageCreateRequest request) {
+        if (!channelRepository.existsById(request.channelId())) {
+            throw new NoSuchElementException("채널을 찾을 수 없습니다.");
+        }
+        if (!userRepository.existsById(request.authorId())) {
+            throw new NoSuchElementException("유저를 찾을 수 없습니다.");
+        }
 
-    public BasicMessageService(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
-        this.messageRepository = messageRepository;
-        this.userService = userService;
-        this.channelService = channelService;
+        Message message = new Message(request.content(), request.channelId(), request.authorId());
+
+        if (request.attachments() != null && !request.attachments().isEmpty()){
+            for (AttachmentRequest attachment : request.attachments()) {
+                BinaryContent binaryContent = new BinaryContent(
+                        attachment.bytes(),
+                        attachment.fileName(),
+                        attachment.contentType()
+                );
+                binaryContentRepository.save(binaryContent);
+                message.addAttachment(binaryContent.getId());
+            }
+        }
+
+        messageRepository.save(message);
+        return toResponse(message);
     }
 
     @Override
-    public Message create(UUID senderId, UUID channelId, String content) {
-        userService.read(senderId)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND + senderId));
-
-        channelService.read(channelId)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND + channelId));
-
-        Message message = Message.create(senderId, channelId, content);
-        return messageRepository.save(message);
+    public MessageResponse find(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("메세지를 찾을 수 없습니다."));
+        return toResponse(message);
     }
 
     @Override
-    public Optional<Message> read(UUID id) {
-        return messageRepository.findById(id);
+    public List<MessageResponse> findAllByChannelId(UUID channelId) {
+        if (!channelRepository.existsById(channelId)){
+            throw new NoSuchElementException("채널을 찾을 수 없습니다.");
+        }
+        return messageRepository.findByChannelId(channelId).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Override
-    public List<Message> readAll() {
-        return messageRepository.findAll();
+    public MessageResponse update(MessageUpdateRequest request) {
+        Message message = messageRepository.findById(request.messageId())
+                .orElseThrow(() -> new NoSuchElementException("메세지를 찾을 수 없습니다."));
+        message.update(request.newContent());
+        messageRepository.save(message);
+        return toResponse(message);
     }
 
     @Override
-    public void update(UUID id, String content) {
-        Message message = messageRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND + id));
-            message.changeContent(content);
-            messageRepository.save(message);
+    public void delete(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("메세지를 찾을 수 없습니다."));
+
+        if (message.getAttachmentIds() != null) {
+            for (UUID attachmentId : message.getAttachmentIds()) {
+                binaryContentRepository.deleteById(attachmentId);
+            }
+        }
+        messageRepository.deleteById(messageId);
     }
 
-    @Override
-    public void delete(UUID id) {
-        messageRepository.deleteById(id);
+    private MessageResponse toResponse(Message message) {
+        return new MessageResponse(
+                message.getId(),
+                message.getContent(),
+                message.getChannelId(),
+                message.getAuthorId(),
+                message.getAttachmentIds(),
+                message.getCreatedAt(),
+                message.getUpdatedAt()
+        );
     }
 }

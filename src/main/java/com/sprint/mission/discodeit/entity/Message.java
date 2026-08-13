@@ -1,33 +1,54 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.FieldDefaults;
 
 @Getter
-@ToString
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class Message extends BaseEntity{
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    final UUID senderId;
-    final UUID channelId;
-    String content;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
 
-    private Message(UUID senderId, UUID channelId, String content) {
-        super();
-        this.senderId = senderId;
+    private String content;
+
+    private UUID channelId;
+    private UUID authorId;
+
+    // 파일들의 ID 목록
+    private List<UUID> attachmentIds;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.content = content;
         this.channelId = channelId;
-        this.content = content;
+        this.authorId = authorId;
+        this.attachmentIds = new ArrayList<>();
     }
 
-    public static Message create(UUID senderId, UUID channelId, String content){
-        return new Message(senderId, channelId, content);
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public void changeContent(String content){
-        this.content = content;
-        newUpdatedAt();
+    public void addAttachment(UUID binaryContentId){
+        if (binaryContentId != null){
+            this.attachmentIds.add(binaryContentId);
+            this.updatedAt = Instant.now();
+        }
     }
 }

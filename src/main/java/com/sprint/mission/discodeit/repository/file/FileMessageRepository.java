@@ -3,19 +3,123 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
-    private static final String FILE_PATH = "messages.ser";
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
-    private static FileMessageRepository instance;
+@Repository
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+public class FileMessageRepository implements MessageRepository {
+    Path DIRECTORY;
+    String EXTENSION = ".ser";
 
     public FileMessageRepository() {
-        super(FILE_PATH);
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    public static FileMessageRepository getInstance() {
-        if (instance == null){
-            instance = new FileMessageRepository();
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
+    @Override
+    public Message save(Message message) {
+        Path path = resolvePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return instance;
+        return message;
+    }
+
+    @Override
+    public Optional<Message> findById(UUID id) {
+        Message messageNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(messageNullable);
+    }
+
+    @Override
+    public List<Message> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Message> findByChannelId(UUID channelId) {
+        // 이미 파일들을 다 읽어오는 findAll()을 활용하여 필터링합니다.
+        return findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<Message> messagesToDelete = findByChannelId(channelId);
+
+        for (Message message : messagesToDelete) {
+            deleteById(message.getId());
+        }
     }
 }

@@ -2,41 +2,62 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
+import java.util.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
+    private final Map<UUID, User> data;
 
-    private final Map<UUID, User> data = new HashMap<>();
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
+    }
 
     @Override
     public User save(User user) {
-        data.put(user.getId(), user);
+        this.data.put(user.getId(), user);
         return user;
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(data.values());
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        data.remove(id);
+        this.data.remove(id);
     }
 
     @Override
-    public void deleteAll() {
-        data.clear();
+    public boolean existsByUsername(String username) {
+        return this.data.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.data.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public Optional<User> findByUsernameAndPassword(String username, String password) {
+        return this.data.values().stream()
+                .filter(user -> user.getUsername().equals(username) && user.getPassword().equals(password))
+                .findFirst();
     }
 }
