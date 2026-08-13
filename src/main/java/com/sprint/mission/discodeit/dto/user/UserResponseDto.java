@@ -39,7 +39,7 @@ public class UserResponseDto {
                 user.getUsername(),
                 user.getEmail(),
                 user.getProfileId(),
-                userStatus != null && userStatus.isOnline()
+                userStatus.isOnline()
         );
     }
 }

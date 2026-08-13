@@ -11,7 +11,7 @@ import java.util.Objects;
 
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BinaryContentCreateRequestDto {
 

@@ -9,20 +9,19 @@ import lombok.experimental.FieldDefaults;
 
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class UserUpdateRequestDto {
+public class UserUpsertRequestDto {
     String username;
     String email;
     String password;
 
-    // 객체를 만들고 반환
-    public static UserUpdateRequestDto of(
+    // 팩토리 패턴
+    public static UserUpsertRequestDto of(
             String username,
             String email,
-            String password
-    ) {
-
+            String password) {
+        // 필수 입력 필드
         if (username == null || username.isBlank()) {
             throw new CustomException(ExceptionType.USER_USERNAME_IS_NULL);
         }
@@ -33,10 +32,6 @@ public class UserUpdateRequestDto {
             throw new CustomException(ExceptionType.USER_PASSWORD_IS_NULL);
         }
 
-        return new UserUpdateRequestDto(
-                username,
-                email,
-                password
-        );
+        return new UserUpsertRequestDto(username, email, password);
     }
 }

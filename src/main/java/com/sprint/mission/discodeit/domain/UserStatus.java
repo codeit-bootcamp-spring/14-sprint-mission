@@ -43,7 +43,7 @@ public class UserStatus implements Serializable {
     }
 
     public boolean isOnline() {
-        return Duration.between(lastActiveAt, Instant.now()).toMinutes() < 5;
+        return Duration.between(lastActiveAt, Instant.now()).toSeconds() < 10;
     }
 
     public UserStatus copy() {

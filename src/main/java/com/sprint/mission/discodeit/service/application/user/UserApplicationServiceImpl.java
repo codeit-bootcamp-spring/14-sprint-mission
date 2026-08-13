@@ -2,9 +2,8 @@ package com.sprint.mission.discodeit.service.application.user;
 
 import com.sprint.mission.discodeit.domain.*;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.service.domain.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.discodeit.service.domain.channel.ChannelDomainService;
 import com.sprint.mission.discodeit.service.domain.readstatus.ReadStatusDomainService;
@@ -29,7 +28,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
 
     @Override
     public UserResponseDto create(
-            UserCreateRequestDto userCreateRequest,
+            UserUpsertRequestDto userCreateRequest,
             BinaryContentCreateRequestDto profileImageRequest
     ) {
         // generate binary content
@@ -103,7 +102,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     @Override
     public UserResponseDto update(
             UUID userId,
-            UserUpdateRequestDto userUpdateRequest,
+            UserUpsertRequestDto userUpdateRequest,
             BinaryContentCreateRequestDto profileImageRequest
     ) {
         User updatingUser = userDomainService.findById(userId);
@@ -160,6 +159,26 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         );
 
         return UserResponseDto.from(updatedUser, userStatus);
+    }
+
+    @Override
+    public UserResponseDto activateUser(UUID userId) {
+        log.info("User 활성화 시작: userId={}", userId);
+
+        User user = userDomainService.findById(userId);
+        UserStatus activatingUserStatus = userStatusDomainService.findByUserId(userId);
+
+        activatingUserStatus.refreshLastActiveAt();
+
+        UserStatus activatedUserStatus = userStatusDomainService.update(activatingUserStatus);
+
+        log.info(
+                "User 활성화 완료: userId={}, lastActiveAt={}",
+                userId,
+                activatedUserStatus.getLastActiveAt()
+        );
+
+        return UserResponseDto.from(user, activatedUserStatus);
     }
 
     @Override

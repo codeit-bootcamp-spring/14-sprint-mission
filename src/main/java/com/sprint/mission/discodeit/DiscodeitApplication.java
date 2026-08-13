@@ -11,9 +11,8 @@ import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.application.auth.AuthApplicationService;
 import com.sprint.mission.discodeit.service.application.binarycontent.BinaryContentApplicationService;
@@ -54,7 +53,7 @@ public class DiscodeitApplication {
             System.out.println("\n===== 셋업 =====");
 
             UserResponseDto woody = userService.create(
-                    UserCreateRequestDto.of(
+                    UserUpsertRequestDto.of(
                             "woody",
                             "woody@codeit.com",
                             "woody1234"
@@ -67,7 +66,7 @@ public class DiscodeitApplication {
             );
 
             UserResponseDto alice = userService.create(
-                    UserCreateRequestDto.of(
+                    UserUpsertRequestDto.of(
                             "alice",
                             "alice@codeit.com",
                             "alice1234"
@@ -140,7 +139,7 @@ public class DiscodeitApplication {
 
             UserResponseDto updatedUser = userService.update(
                     woody.getId(),
-                    UserUpdateRequestDto.of(
+                    UserUpsertRequestDto.of(
                             "woody-updated",
                             "woody-new@codeit.com",
                             "woody5678"
