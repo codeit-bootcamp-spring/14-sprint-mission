@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Objects;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class LoginRequestDto {
     private final String username;
     private final String password;
