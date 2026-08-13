@@ -1,32 +1,23 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.config.FileProperties;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository extends FileAbstractRepository implements MessageRepository {
     private static final String FILE_NAME = "message.dir";
-    private static FileMessageRepository INSTANCE;
     private final Map<UUID, Message> cache = new HashMap<>();
 
-    private FileMessageRepository() {
-        super(FILE_NAME);
-        this.cache.putAll(super.load());
+    public FileMessageRepository(FileProperties properties) {
+        super(properties.getFileDirectory(), FILE_NAME);
+        cache.putAll(super.load());
     }
-
-
-    // 싱글턴
-    public static FileMessageRepository getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new FileMessageRepository();
-        }
-        return INSTANCE;
-    }
-
 
     @Override
     public void save(Message message) {
@@ -36,8 +27,8 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
 
 
     @Override
-    public Message findById(UUID id) {
-        return this.cache.get(id);
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(this.cache.get(id));
     }
 
     @Override
@@ -56,7 +47,7 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
 
 
     }
-    
+
     @Override
     public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
         return this.cache.values().stream()
@@ -80,6 +71,14 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
     @Override
     public void delete(UUID id) {
         this.cache.remove(id);
+        super.fileSave(this.cache);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        this.cache.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .forEach(message -> this.cache.remove(message.getId()));
         super.fileSave(this.cache);
     }
 }

@@ -1,31 +1,23 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.config.FileProperties;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository extends FileAbstractRepository implements ChannelRepository {
     private static final String FILE_NAME = "channel.dir";
-    private static FileChannelRepository INSTANCE;
     private final Map<UUID, Channel> cache = new HashMap<>();
 
-    private FileChannelRepository() {
-        super(FILE_NAME);
+    public FileChannelRepository(FileProperties properties) {
+        super(properties.getFileDirectory(), FILE_NAME);
         cache.putAll(super.load());
     }
-
-    // 싱글턴
-    public static FileChannelRepository getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new FileChannelRepository();
-        }
-        return INSTANCE;
-    }
-
 
     @Override
     public void save(Channel channel) {
@@ -34,8 +26,8 @@ public class FileChannelRepository extends FileAbstractRepository implements Cha
     }
 
     @Override
-    public Channel findById(UUID id) {
-        return this.cache.get(id);
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(this.cache.get(id));
     }
 
     @Override

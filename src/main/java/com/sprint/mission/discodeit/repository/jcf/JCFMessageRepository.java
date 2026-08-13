@@ -3,27 +3,15 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFMessageRepository implements MessageRepository {
-    private static JCFMessageRepository INSTANCE;
     private final Map<UUID, Message> data = new HashMap<>();
-
-    private JCFMessageRepository() {
-    }
-
-    // 싱글턴
-    public static JCFMessageRepository getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new JCFMessageRepository();
-        }
-        return INSTANCE;
-    }
-
 
     @Override
     public void save(Message message) {
@@ -31,8 +19,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID id) {
-        return data.get(id);
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
@@ -72,5 +60,12 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void delete(UUID id) {
         data.remove(id);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        this.data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .forEach(message -> this.data.remove(message.getId()));
     }
 }

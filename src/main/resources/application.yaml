@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: 14-sprint-mission
+
+
+discodeit:
+  repository:
+    type: file # jcf | file
+    file-directory: .discodeit
+
+
+file:
+  path: .upload-file-directory
