@@ -1,44 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
-import lombok.Setter;
-
-import java.io.Serializable;
-import java.util.UUID;
 
 @Getter
-public class Channel implements Serializable {
-    // 직렬화
-    private static final long serialVersionID = 1L;
-
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-
-    // 채널명, 채널설명
-    @Setter
+public class Channel extends BaseEntity {
+    // 채널타입, 채널명, 채널설명
+    private ChannelType type;
     private String channelName;
-    @Setter
     private String description;
 
     // 생성자
-    public Channel(String channelName, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
+    public Channel(ChannelType type, String channelName, String description) {
+        super();
+        this.type = type;
         this.channelName = channelName;
         this.description = description;
     }
 
-    // update()
-    public void update(String channelName, String description) {
-        this.updatedAt = System.currentTimeMillis();
+    // update(channelName)
+    public void updateChannelName(String channelName) {
+        this.channelName = channelName;
+        super.updateTime();
+    }
+
+    // update(description)
+    public void updateDescription(String description) {
+        this.description = description;
+        super.updateTime();
+    }
+
+    // update(channelName, description)
+    public void update(ChannelType type, String channelName, String description) {
+        this.type = type;
         this.channelName = channelName;
         this.description = description;
+        super.updateTime();
     }
 
     @Override
     public String toString() {
-        return "Channel{id=" + this.id + ", channelName=" + this.channelName + ", description=" + this.description + ", createdAt=" + this.createdAt + ", updatedAt=" + this.updatedAt + "}";
+        return "Channel{id=" + super.getId() + ", type=" + this.type + ", channelName=" + this.channelName + ", description=" + this.description + ", createdAt=" + super.getCreatedAt() + ", updatedAt=" + super.getUpdatedAt() + "}";
     }
 }
