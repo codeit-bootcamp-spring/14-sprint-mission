@@ -54,6 +54,14 @@ public class FileReadStatusRepository
     }
 
     @Override
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
+        return readStatusMap.values().stream()
+                .filter(readStatus -> Objects.equals(readStatus.getUserId(), userId))
+                .filter(readStatus -> Objects.equals(readStatus.getChannelId(), channelId))
+                .findFirst();
+    }
+
+    @Override
     public List<ReadStatus> findAll() {
         return readStatusMap.values().stream().toList();
     }

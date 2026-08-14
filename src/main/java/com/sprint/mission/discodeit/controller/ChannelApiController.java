@@ -15,33 +15,31 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 /**
- * [ ] 공개 채널을 생성할 수 있다.
- * [ ] 비공개 채널을 생성할 수 있다.
- * [ ] 공개 채널의 정보를 수정할 수 있다.
- * [ ] 채널을 삭제할 수 있다.
- * [ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
+현 * [X] 공개 채널을 생성할 수 있다.
+ * [X] 비공개 채널을 생성할 수 있다.
+ * [X] 공개 채널의 정보를 수정할 수 있다.
+ * [X] 채널을 삭제할 수 있다.
+ * [X] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
  */
-
-// 테스트하기!!!!!
 public class ChannelApiController {
 
     private final ChannelApplicationService channelApplicationService;
 
-    @PostMapping(value = "/api/channels")
+    @PostMapping("/api/channels")
     public ChannelResponseDto create(
             @Valid @RequestBody PublicChannelCreateRequestDto request
     ) {
         return channelApplicationService.createPublic(request);
     }
 
-    @PostMapping(value = "/api/channels/private")
+    @PostMapping("/api/channels/private")
     public ChannelResponseDto create(
             @Valid @RequestBody PrivateChannelCreateRequestDto request
     ) {
         return channelApplicationService.createPrivate(request);
     }
 
-    @PutMapping(value = "/api/channels/{id}")
+    @PutMapping("/api/channels/{id}")
     public ChannelResponseDto update(
             @Valid @PathVariable UUID id,
             @Valid @RequestBody ChannelUpdateRequestDto request
@@ -49,12 +47,12 @@ public class ChannelApiController {
         return channelApplicationService.update(id, request);
     }
 
-    @DeleteMapping(value = "/api/channels/{id}")
+    @DeleteMapping("/api/channels/{id}")
     public void delete(@Valid @PathVariable UUID id) {
         channelApplicationService.delete(id);
     }
 
-    @GetMapping(value = "/api/channels/{id}")
+    @GetMapping("/api/channels/{id}")
     public List<ChannelResponseDto> retrieveAccessible(@Valid @PathVariable UUID id) {
         return channelApplicationService.findAllByUserId(id);
     }

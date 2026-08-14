@@ -15,7 +15,7 @@ public class LoginApiController {
 
     private final AuthApplicationService authApplicationService;
 
-    @PostMapping(value = "/api/login")
+    @PostMapping("/api/login")
     public LoginResponseDto login(
             @Valid @RequestBody LoginRequestDto loginRequest
     ) {

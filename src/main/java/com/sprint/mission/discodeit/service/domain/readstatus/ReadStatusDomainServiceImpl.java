@@ -79,6 +79,23 @@ public class ReadStatusDomainServiceImpl implements ReadStatusDomainService {
     }
 
     @Override
+    public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+        if (Objects.isNull(userId)) {
+            throw new CustomException(ExceptionType.USER_ID_IS_NULL);
+        }
+        if (Objects.isNull(channelId)) {
+            throw new CustomException(ExceptionType.CHANNEL_ID_IS_NULL);
+        }
+
+        return readStatusRepository.findByUserIdAndChannelId(userId, channelId)
+                .orElseThrow(() -> new CustomException(
+                        ExceptionType.READ_STATUS_NOT_FOUND_BY_USER_AND_CHANNEL,
+                        userId,
+                        channelId
+                ));
+    }
+
+    @Override
     public boolean existsByUserIdAndChannelId(UUID userId, UUID channelId) {
         return readStatusRepository.existsByUserIdAndChannelId(userId, channelId);
     }

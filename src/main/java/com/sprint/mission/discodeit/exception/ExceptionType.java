@@ -181,6 +181,12 @@ public enum ExceptionType {
             "요청한 ReadStatus를 찾을 수 없습니다."
     ),
 
+    READ_STATUS_NOT_FOUND_BY_USER_AND_CHANNEL(
+            HttpStatus.NOT_FOUND,
+            "[READ_STATUS] ReadStatus를 찾을 수 없음. userId=%s, channelId=%s",
+            "요청한 User와 Channel의 ReadStatus를 찾을 수 없습니다."
+    ),
+
     READ_STATUS_ALREADY_EXISTS(
             HttpStatus.CONFLICT,
             "[READ_STATUS] ReadStatus가 이미 존재함. userId=%s, channelId=%s",
