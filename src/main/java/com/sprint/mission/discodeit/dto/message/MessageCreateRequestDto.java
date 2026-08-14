@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.message;
 
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,28 +12,17 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class MessageCreateRequestDto {
+
+    @NotBlank
     String content;
+
+    @NotBlank
     UUID senderId;
+
+    @NotBlank
     UUID channelId;
 
-    public static MessageCreateRequestDto of(
-            String content,
-            UUID senderId,
-            UUID channelId
-    ) {
-        if (Objects.isNull(content) || content.isBlank()) {
-            throw new CustomException(ExceptionType.MESSAGE_CONTENT_IS_NULL);
-        }
-        if (Objects.isNull(senderId)) {
-            throw new CustomException(ExceptionType.MESSAGE_SENDER_ID_IS_NULL);
-        }
-        if (Objects.isNull(channelId)) {
-            throw new CustomException(ExceptionType.MESSAGE_CHANNEL_ID_IS_NULL);
-        }
-
-        return new MessageCreateRequestDto(content, senderId, channelId);
-    }
 }

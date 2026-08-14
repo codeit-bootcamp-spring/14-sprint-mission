@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.UserAndBinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.UserAndBinaryContentUpsertRequestDto;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.discodeit.service.application.user.UserApplicationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +24,7 @@ public class UserApiController {
 
     @PostMapping("/api/users")
     public UserResponseDto create(
-            @RequestBody UserAndBinaryContentUpsertRequestDto upsertRequest
+            @Valid @RequestBody UserAndBinaryContentUpsertRequestDto upsertRequest
     ) {
         return userApplicationService.create(
                 upsertRequest.getUser(),    // UserCreateRequestDto
@@ -36,8 +34,8 @@ public class UserApiController {
 
     @PutMapping("/api/users/{id}")
     public UserResponseDto update(
-            @PathVariable UUID id,
-            @RequestBody UserAndBinaryContentUpsertRequestDto upsertRequest
+            @Valid @PathVariable UUID id,
+            @Valid @RequestBody UserAndBinaryContentUpsertRequestDto upsertRequest
     ) {
         return userApplicationService.update(
                 id,
@@ -47,7 +45,7 @@ public class UserApiController {
     }
 
     @DeleteMapping("/api/users/{id}")
-    public void delete(@PathVariable UUID id) {
+    public void delete(@Valid @PathVariable UUID id) {
         userApplicationService.delete(id);
     }
 
@@ -57,7 +55,7 @@ public class UserApiController {
     }
 
     @PatchMapping("/api/users/{id}/active")
-    public UserResponseDto activateUser(@PathVariable UUID id) {
+    public UserResponseDto activateUser(@Valid @PathVariable UUID id) {
         return userApplicationService.activateUser(id);
     }
 }

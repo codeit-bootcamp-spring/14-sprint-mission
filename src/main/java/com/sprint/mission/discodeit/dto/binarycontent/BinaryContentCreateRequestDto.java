@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.dto.binarycontent;
 
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +17,10 @@ import java.util.Objects;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BinaryContentCreateRequestDto {
 
+    @NotBlank
     String fileName;
+
+    @NotEmpty
     byte[] bytes;
 
     public static BinaryContentCreateRequestDto of(
