@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.*;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.domain.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.discodeit.service.domain.channel.ChannelDomainService;
 import com.sprint.mission.discodeit.service.domain.readstatus.ReadStatusDomainService;
@@ -12,6 +13,7 @@ import com.sprint.mission.discodeit.service.domain.userstatus.UserStatusDomainSe
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -26,20 +28,25 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     private final ChannelDomainService channelDomainService;
     private final ReadStatusDomainService readStatusDomainService;
 
+
     @Override
     public UserResponseDto create(
             UserUpsertRequestDto userCreateRequest,
-            BinaryContentCreateRequestDto profileImageRequest
+            MultipartFile profileImageRequest
     ) {
         // generate binary content
         BinaryContent createdProfileImage = (Objects.nonNull(profileImageRequest))
                 ? binaryContentDomainService.create(
-                    BinaryContent.create(
-                            profileImageRequest.getFileName(),
-                            profileImageRequest.getBytes()
-                    )
+                    BinaryContent.create(profileImageRequest)
                   )
                 : null;
+
+        if (Objects.nonNull(createdProfileImage)) {
+            log.info(
+                    "새 프로필 저장 완료: newProfileId={}",
+                    createdProfileImage
+            );
+        }
 
         log.info(
                 "User 생성 시작: username={}, email={}, profileImage={}",
@@ -103,7 +110,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     public UserResponseDto update(
             UUID userId,
             UserUpsertRequestDto userUpdateRequest,
-            BinaryContentCreateRequestDto profileImageRequest
+            MultipartFile profileImage
     ) {
         User updatingUser = userDomainService.findById(userId);
         UUID oldProfileId = updatingUser.getProfileId();
@@ -112,20 +119,19 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         log.info(
                 "User 수정 시작: userId={}, replaceProfile={}",
                 userId,
-                Objects.nonNull(profileImageRequest) ? "YES" : "N/A"
+                Objects.nonNull(profileImage) ? "YES" : "N/A"
         );
 
-        BinaryContent createdProfileImage = (Objects.nonNull(profileImageRequest))
+        BinaryContent createdProfileImage = (Objects.nonNull(profileImage))
                 ? binaryContentDomainService.create(
                         BinaryContent.create(
-                                profileImageRequest.getFileName(),
-                                profileImageRequest.getBytes()
+                                profileImage
                         )
                 )
                 : null;
 
         if (Objects.nonNull(createdProfileImage)) {
-            log.debug(
+            log.info(
                     "새 프로필 저장 완료: userId={}, newProfileId={}",
                     userId,
                     createdProfileImage
@@ -233,8 +239,6 @@ public class UserApplicationServiceImpl implements UserApplicationService {
 
             userResponses.add(UserResponseDto.from(user, userStatus));
         }
-
         return userResponses;
     }
-
 }

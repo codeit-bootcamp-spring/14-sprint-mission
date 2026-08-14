@@ -15,7 +15,10 @@ import com.sprint.mission.discodeit.service.domain.user.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 
 @Slf4j
@@ -37,20 +40,41 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
                 || accessibleChannelIds.contains(channel.getId());
     }
 
+    private List<UUID> createAttachments(
+            List<MultipartFile> attachmentFiles
+    ) {
+        if (Objects.isNull(attachmentFiles)
+                || attachmentFiles.isEmpty()) {
+            return List.of();
+        }
+
+        return attachmentFiles.stream()
+                .filter(Objects::nonNull)
+                .filter(file -> !file.isEmpty())
+                .map((multipartFile) -> {
+                    return binaryContentDomainService.create(
+                            BinaryContent.create(multipartFile)
+                    );
+                })
+                .map(BinaryContent::getId)
+                .toList();
+    }
+
 
     @Override
     public MessageResponseDto create(
             MessageCreateRequestDto messageCreateRequest,
-            List<BinaryContentCreateRequestDto> attachmentRequests
+            List<MultipartFile> attachments
     ) {
+        int numAttachments = Objects.isNull(attachments)
+                ? 0
+                : attachments.size();
 
         log.info(
                 "Message 생성 시작: senderId={}, channelId={}, attachmentCount={}",
                 messageCreateRequest.getSenderId(),
                 messageCreateRequest.getChannelId(),
-                Objects.nonNull(attachmentRequests)
-                        ? attachmentRequests.size()
-                        : 0
+                numAttachments
         );
 
         UUID senderId = userDomainService.findById(messageCreateRequest.getSenderId()).getId();
@@ -70,21 +94,10 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
             );
         }
 
-        List<UUID> attachmentIds = (Objects.nonNull(attachmentRequests))
-                ? attachmentRequests.stream()
-                    .map(request -> {
-                        BinaryContent attachment = BinaryContent.create(
-                                request.getFileName(),
-                                request.getBytes()
-                        );
-                        BinaryContent createdAttachment = binaryContentDomainService.create(attachment);
-                        return createdAttachment.getId();
-                    })
-                .toList()
-                : List.of();
+        List<UUID> attachmentIds = createAttachments(attachments);
 
-        if (Objects.nonNull(attachmentRequests)) {
-            log.debug(
+        if (Objects.nonNull(attachmentIds)) {
+            log.info(
                     "Message 첨부파일 저장 완료: channelId={}, attachmentCount={}",
                     channelId,
                     attachmentIds.size()

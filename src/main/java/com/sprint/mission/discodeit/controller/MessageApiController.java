@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.application.message.MessageApplicati
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,11 +27,19 @@ public class MessageApiController {
 
     @PostMapping("/api/messages")
     public MessageResponseDto create(
-            @Valid @RequestBody MessageAndAttachmentsCreateRequestDto request
+
+            @Valid @RequestPart("message")
+            MessageCreateRequestDto request,
+
+            @Valid @RequestPart(
+                    value = "attachments",
+                    required = false
+            )
+            List<MultipartFile> attachments
     ) {
         return messageApplicationService.create(
-                request.getMessage(),
-                request.getAttachments()
+                request,
+                attachments
         );
     }
 
