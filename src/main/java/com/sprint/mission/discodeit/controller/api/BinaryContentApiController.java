@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.service.application.binarycontent.BinaryContentApplicationService;
@@ -19,7 +19,7 @@ public class BinaryContentApiController {
 
     private final BinaryContentApplicationService binaryContentApplicationService;
 
-    @GetMapping("/api/find")
+    @GetMapping("/api/binaryContent/find")
     public BinaryContentResponseDto findById(
             @Valid @RequestParam("binaryContentId") UUID binaryContentId
     ) {
@@ -27,7 +27,7 @@ public class BinaryContentApiController {
     }
 
     // Binary content id의 list를 주면 그 id를 가진 binary content id들을 반환한다
-    @GetMapping("/api/findAllByIdIn")
+    @GetMapping("/api/binaryContent/findAllByIdIn")
     public List<BinaryContentResponseDto> findAllByIdIn(
             @Valid @RequestParam("binaryContentIds") List<UUID> binaryContentIds
     ) {

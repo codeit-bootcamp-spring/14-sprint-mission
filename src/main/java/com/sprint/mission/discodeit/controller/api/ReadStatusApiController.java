@@ -1,10 +1,9 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.service.application.readstatus.ReadStatusApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,17 +25,6 @@ public class ReadStatusApiController {
 
     // public ReadStatusResponseDto create(...) 는 구현 안 함
     // - User 만들거나, Channel 만들때 생성되는 로직으로 UserApplicationService에서 구현함
-
-    // user
-    // c460953e-b366-4052-a931-8e205c9cfcdb
-    // 6026289d-9b72-4cbc-a6d8-fd262c46adc3
-
-    // public channel
-    // a570a292-05ca-46e7-a58b-b0dea23fd13e
-
-    // private channel
-    // bfd82431-59fc-4877-91ee-01d638f086f7
-
 
     @PatchMapping("/users/read")
     public ResponseEntity<ReadStatusResponseDto> markAsRead(

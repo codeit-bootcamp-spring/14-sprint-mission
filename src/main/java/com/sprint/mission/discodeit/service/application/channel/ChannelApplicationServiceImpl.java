@@ -146,7 +146,7 @@ public class ChannelApplicationServiceImpl implements ChannelApplicationService 
         Channel updatingChannel = channelDomainService.findById(channelId);
         if (updatingChannel.getChannelType().equals(ChannelType.PRIVATE)) {
             log.warn("비공개 Channel 수정 불가: channelId={}", channelId);
-            throw new CustomException(ExceptionType.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED);
+            throw new CustomException(ExceptionType.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED, channelId);
         }
 
         updatingChannel.updateNameAndDescription(request.getName(), request.getDescription());
