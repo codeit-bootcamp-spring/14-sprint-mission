@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.application.auth;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.auth.LoginResponseDto;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +23,11 @@ public class AuthApplicationService {
 
     public LoginResponseDto login(LoginRequestDto loginRequest) {
         User user = userRepository.findByUsername(loginRequest.getUsername())    // username은 고유하다
-                .orElseThrow(() -> new CustomException(ExceptionType.LOGIN_FAILED));
+                .orElseThrow(() -> new DiscodeitException(ExceptionType.LOGIN_FAILED));
 
         if (!user.matchesPassword(loginRequest.getPassword())) {
             log.error("로그인 실패. username={}", loginRequest.getUsername());
-            throw new CustomException(ExceptionType.LOGIN_FAILED);
+            throw new DiscodeitException(ExceptionType.LOGIN_FAILED);
         }
 
         log.info("로그인 완료: username={}", user.getUsername());

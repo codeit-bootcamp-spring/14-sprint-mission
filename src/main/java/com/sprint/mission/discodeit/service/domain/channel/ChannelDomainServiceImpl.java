@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.domain.channel;
 
 import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.ChannelType;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,11 +33,11 @@ public class ChannelDomainServiceImpl implements ChannelDomainService {
     @Override
     public Channel findById(UUID channelId) {
         if (Objects.isNull(channelId)) {
-            throw new CustomException(ExceptionType.CHANNEL_ID_IS_NULL);
+            throw new DiscodeitException(ExceptionType.CHANNEL_ID_IS_NULL);
         }
 
         return channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND, channelId));
+                .orElseThrow(() -> new DiscodeitException(ExceptionType.CHANNEL_NOT_FOUND, channelId));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ChannelDomainServiceImpl implements ChannelDomainService {
         Channel originalChannel = findById(updatingChannel.getId());
 
         if (originalChannel.getChannelType() == ChannelType.PRIVATE) {
-            throw new CustomException(
+            throw new DiscodeitException(
                     ExceptionType.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED,
                     updatingChannel.getId()
             );

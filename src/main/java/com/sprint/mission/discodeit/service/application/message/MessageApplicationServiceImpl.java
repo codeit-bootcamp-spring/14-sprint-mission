@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.service.application.message;
 
 import com.sprint.mission.discodeit.domain.*;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.service.domain.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.discodeit.service.domain.channel.ChannelDomainService;
@@ -17,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.*;
 
 @Slf4j
@@ -86,7 +83,7 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
                     senderId,
                     channelId
             );
-            throw new CustomException(
+            throw new DiscodeitException(
                     ExceptionType.CHANNEL_ACCESS_DENIED,
                     senderId,
                     channelId

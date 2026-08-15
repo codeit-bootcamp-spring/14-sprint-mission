@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.domain.binarycontent;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,12 +32,12 @@ public class BinaryContentDomainServiceImpl implements BinaryContentDomainServic
     @Override
     public BinaryContent findById(UUID binaryContentId) {
         if (Objects.isNull(binaryContentId)) {
-            throw new CustomException(ExceptionType.BINARY_CONTENT_ID_IS_NULL);
+            throw new DiscodeitException(ExceptionType.BINARY_CONTENT_ID_IS_NULL);
         }
 
         return binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() ->
-                        new CustomException(
+                        new DiscodeitException(
                                 ExceptionType.BINARY_CONTENT_NOT_FOUND,
                                 binaryContentId
                         )

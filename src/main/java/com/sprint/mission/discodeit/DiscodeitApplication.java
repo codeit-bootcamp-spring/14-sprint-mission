@@ -1,31 +1,8 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
-import com.sprint.mission.discodeit.dto.auth.LoginResponseDto;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserUpsertRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.service.application.auth.AuthApplicationService;
-import com.sprint.mission.discodeit.service.application.binarycontent.BinaryContentApplicationService;
-import com.sprint.mission.discodeit.service.application.channel.ChannelApplicationService;
-import com.sprint.mission.discodeit.service.application.message.MessageApplicationService;
-import com.sprint.mission.discodeit.service.application.user.UserApplicationService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 
 @SpringBootApplication
 public class DiscodeitApplication {

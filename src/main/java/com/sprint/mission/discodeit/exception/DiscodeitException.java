@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.exception;
 import lombok.Getter;
 
 @Getter
-public class CustomException extends RuntimeException {
+public class DiscodeitException extends RuntimeException {
 
     private final ExceptionType type;
 
-    public CustomException(
+    public DiscodeitException(
             ExceptionType type,
             Object... errorData     // 가변 인자: 0-n개 처리할 수 있다
     ) {
@@ -15,7 +15,7 @@ public class CustomException extends RuntimeException {
         this.type = type;
     }
 
-    public CustomException(
+    public DiscodeitException(
             ExceptionType type,
             Throwable cause,
             Object... errorData

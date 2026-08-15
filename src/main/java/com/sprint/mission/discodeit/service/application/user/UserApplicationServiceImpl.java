@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.service.application.user;
 
 import com.sprint.mission.discodeit.domain.*;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.domain.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.discodeit.service.domain.channel.ChannelDomainService;
 import com.sprint.mission.discodeit.service.domain.readstatus.ReadStatusDomainService;

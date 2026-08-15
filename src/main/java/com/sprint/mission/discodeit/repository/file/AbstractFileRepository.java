@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,7 +66,7 @@ public abstract class AbstractFileRepository<T extends Serializable> {
                     filePath,
                     exception
             );
-            throw new CustomException(
+            throw new DiscodeitException(
                     ExceptionType.FILE_LOAD_FAILED,
                     exception,
                     filePath
@@ -110,7 +110,7 @@ public abstract class AbstractFileRepository<T extends Serializable> {
                     exception
             );
 
-            throw new CustomException(
+            throw new DiscodeitException(
                     ExceptionType.FILE_SAVE_FAILED,
                     exception,
                     filePath
