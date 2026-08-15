@@ -43,8 +43,7 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
     private List<UUID> createAttachments(
             List<MultipartFile> attachmentFiles
     ) {
-        if (Objects.isNull(attachmentFiles)
-                || attachmentFiles.isEmpty()) {
+        if (Objects.isNull(attachmentFiles) || attachmentFiles.isEmpty()) {
             return List.of();
         }
 
@@ -66,7 +65,7 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
             MessageCreateRequestDto messageCreateRequest,
             List<MultipartFile> attachments
     ) {
-        int numAttachments = Objects.isNull(attachments)
+        int numAttachments = (Objects.isNull(attachments))
                 ? 0
                 : attachments.size();
 

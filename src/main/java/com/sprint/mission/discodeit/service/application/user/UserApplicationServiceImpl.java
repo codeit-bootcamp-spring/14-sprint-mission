@@ -44,7 +44,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         if (Objects.nonNull(createdProfileImage)) {
             log.info(
                     "새 프로필 저장 완료: newProfileId={}",
-                    createdProfileImage
+                    createdProfileImage.getId()
             );
         }
 
@@ -134,7 +134,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
             log.info(
                     "새 프로필 저장 완료: userId={}, newProfileId={}",
                     userId,
-                    createdProfileImage
+                    createdProfileImage.getId()
             );
         }
 

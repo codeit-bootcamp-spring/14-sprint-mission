@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.discodeit.service.application.user.UserApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,44 +25,59 @@ public class UserApiController {
 
     private final UserApplicationService userApplicationService;
 
-    // ### Multipart로
     @PostMapping("/api/users")
-    public UserResponseDto create(
-            @Valid @RequestPart(value = "user") UserUpsertRequestDto userCreateRequest,
-            @Valid @RequestPart(value = "profile", required = false) MultipartFile profileImage
+    public ResponseEntity<UserResponseDto> create(
+            @Valid @RequestPart(value = "user")                         UserUpsertRequestDto userCreateRequest,
+            @Valid @RequestPart(value = "profile", required = false)    MultipartFile profileImage
     ) {
-        return userApplicationService.create(
-                userCreateRequest,
-                profileImage
-        );
+        UserResponseDto createdUser = userApplicationService.create(userCreateRequest, profileImage);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdUser);
     }
 
-    // ### Multipart로
-    @PutMapping("/api/users/{id}")
-    public UserResponseDto update(
-            @Valid @PathVariable UUID id,
-            @Valid @RequestPart UserUpsertRequestDto userUpdateRequest,
-            @Valid @RequestPart(required = false) MultipartFile profileImage
+    @PutMapping("/api/users")
+    public ResponseEntity<UserResponseDto> update(
+            @Valid @RequestParam("userId")                              UUID id,
+            @Valid @RequestPart("user")                                 UserUpsertRequestDto userUpdateRequest,
+            @Valid @RequestPart(value = "profile", required = false)    MultipartFile profileImage
     ) {
-        return userApplicationService.update(
-                id,
-                userUpdateRequest,
-                profileImage
-        );
+        UserResponseDto updatedUser =
+                userApplicationService.update(
+                        id,
+                        userUpdateRequest,
+                        profileImage
+                );
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedUser);
     }
 
-    @DeleteMapping("/api/users/{id}")
-    public void delete(@Valid @PathVariable UUID id) {
-        userApplicationService.delete(id);
+    @DeleteMapping("/api/users")
+    public ResponseEntity<Void> delete(
+            @Valid @RequestParam UUID userId
+    ) {
+        userApplicationService.delete(userId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(null);
     }
 
     @GetMapping("/api/users")
-    public List<UserResponseDto> retrieveAll() {
-        return userApplicationService.findAll();
+    public ResponseEntity<List<UserResponseDto>> retrieveAll() {
+        List<UserResponseDto> usersList = userApplicationService.findAll();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(usersList);
     }
 
-    @PatchMapping("/api/users/{id}/active")
-    public UserResponseDto activateUser(@Valid @PathVariable UUID id) {
-        return userApplicationService.activateUser(id);
+    @PatchMapping("/api/users/activate")
+    public ResponseEntity<UserResponseDto> activateUser(
+            @Valid @RequestParam UUID userId
+    ) {
+        UserResponseDto activatedUser = userApplicationService.activateUser(userId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(activatedUser);
     }
 }

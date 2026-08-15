@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.auth.LoginResponseDto;
 import com.sprint.mission.discodeit.service.application.auth.AuthApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,9 +18,12 @@ public class LoginApiController {
     private final AuthApplicationService authApplicationService;
 
     @PostMapping("/api/login")
-    public LoginResponseDto login(
+    public ResponseEntity<LoginResponseDto> login(
             @Valid @RequestBody LoginRequestDto loginRequest
     ) {
-        return authApplicationService.login(loginRequest);
+        LoginResponseDto loginResponse = authApplicationService.login(loginRequest);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(loginResponse);
     }
 }

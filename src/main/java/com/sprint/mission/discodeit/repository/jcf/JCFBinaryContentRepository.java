@@ -31,6 +31,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
         return binaryContentMap.values().stream().toList();
     }
 
+    // Binary content id를 list로 주면 그 id를 가진 binary content를 반환한다.
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
         return binaryContentIds.stream()

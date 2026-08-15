@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.MessageAndAttachmentsCreateRequestDto;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.service.application.message.MessageApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,43 +26,51 @@ public class MessageApiController {
     private final MessageApplicationService messageApplicationService;
 
     @PostMapping("/api/messages")
-    public MessageResponseDto create(
-
-            @Valid @RequestPart("message")
-            MessageCreateRequestDto request,
-
-            @Valid @RequestPart(
-                    value = "attachments",
-                    required = false
-            )
-            List<MultipartFile> attachments
+    public ResponseEntity<MessageResponseDto> create(
+            @Valid @RequestPart("message")                                  MessageCreateRequestDto request,
+            @Valid @RequestPart(value = "attachments", required = false)    List<MultipartFile> attachments
     ) {
-        return messageApplicationService.create(
-                request,
-                attachments
-        );
+        MessageResponseDto createdMessage =
+                messageApplicationService.create(
+                        request,
+                        attachments
+                );
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdMessage);
     }
 
 
-    @PutMapping("/api/messages/{id}")
-    public MessageResponseDto update(
-            @Valid @PathVariable UUID id,
+    @PutMapping("/api/messages")
+    public ResponseEntity<MessageResponseDto> update(
+            @Valid @RequestParam UUID messageId,
             @Valid @RequestBody MessageUpdateRequestDto request
     ) {
-        return messageApplicationService.update(id, request);
+        MessageResponseDto updatedMessage = messageApplicationService.update(messageId, request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedMessage);
     }
 
 
-    @DeleteMapping("/api/messages/{id}")
-    public void delete(@PathVariable UUID id) {
-        messageApplicationService.delete(id);
-    }
-
-
-    @GetMapping("/api/channels/{channelId}/messages")
-    public List<MessageResponseDto> retrieveAllFromChannel(
-            @PathVariable UUID channelId
+    @DeleteMapping("/api/messages")
+    public ResponseEntity<Void> delete(
+            @Valid @RequestParam UUID messageId
     ) {
-        return messageApplicationService.findAllByChannelId(channelId);
+        messageApplicationService.delete(messageId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(null);
+    }
+
+
+    @GetMapping("/api/messages")
+    public ResponseEntity<List<MessageResponseDto>> retrieveAllFromChannel(
+            @Valid @RequestParam UUID channelId
+    ) {
+        List<MessageResponseDto> channelMessageList = messageApplicationService.findAllByChannelId(channelId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(channelMessageList);
     }
 }
