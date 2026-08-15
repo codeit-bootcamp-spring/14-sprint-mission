@@ -16,6 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/channels")
 /**
  * [X] 공개 채널을 생성할 수 있다.
  * [X] 비공개 채널을 생성할 수 있다.
@@ -27,7 +28,7 @@ public class ChannelApiController {
 
     private final ChannelApplicationService channelApplicationService;
 
-    @PostMapping("/api/channels")
+    @PostMapping
     public ResponseEntity<ChannelResponseDto> create(
             @Valid @RequestBody PublicChannelCreateRequestDto request
     ) {
@@ -37,7 +38,7 @@ public class ChannelApiController {
                 .body(createdPublicChannel);
     }
 
-    @PostMapping("/api/channels/private")
+    @PostMapping("/private")
     public ResponseEntity<ChannelResponseDto> create(
             @Valid @RequestBody PrivateChannelCreateRequestDto request
     ) {
@@ -48,7 +49,7 @@ public class ChannelApiController {
     }
 
     // patch로? <- 어떻게 달라질지
-    @PutMapping("/api/channels")
+    @PutMapping
     public ResponseEntity<ChannelResponseDto> update(
             @Valid @RequestParam UUID channelId,
             @Valid @RequestBody ChannelUpdateRequestDto request
@@ -59,7 +60,7 @@ public class ChannelApiController {
                 .body(updatedChannel);
     }
 
-    @DeleteMapping("/api/channels")
+    @DeleteMapping
     public ResponseEntity<Void> delete(
             @Valid @RequestParam UUID channelId
     ) {
@@ -69,7 +70,7 @@ public class ChannelApiController {
                 .body(null);
     }
 
-    @GetMapping("/api/channels")
+    @GetMapping
     public ResponseEntity<List<ChannelResponseDto>> retrieveAccessible(
             @Valid @RequestParam UUID userId
     ) {

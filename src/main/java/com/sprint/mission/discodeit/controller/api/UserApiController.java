@@ -21,11 +21,12 @@ import java.util.UUID;
 // [x] 사용자를 삭제할 수 있다.
 // [x] 모든 사용자를 조회할 수 있다.
 // [x] 사용자의 온라인 상태를 업데이트할 수 있다.
+@RequestMapping("/api/users")
 public class UserApiController {
 
     private final UserApplicationService userApplicationService;
 
-    @PostMapping("/api/users")
+    @PostMapping
     public ResponseEntity<UserResponseDto> create(
             @Valid @RequestPart(value = "user")                         UserUpsertRequestDto userCreateRequest,
             @Valid @RequestPart(value = "profile", required = false)    MultipartFile profileImage
@@ -36,7 +37,7 @@ public class UserApiController {
                 .body(createdUser);
     }
 
-    @PutMapping("/api/users")
+    @PutMapping
     public ResponseEntity<UserResponseDto> update(
             @Valid @RequestParam("userId")                              UUID id,
             @Valid @RequestPart("user")                                 UserUpsertRequestDto userUpdateRequest,
@@ -53,7 +54,7 @@ public class UserApiController {
                 .body(updatedUser);
     }
 
-    @DeleteMapping("/api/users")
+    @DeleteMapping
     public ResponseEntity<Void> delete(
             @Valid @RequestParam UUID userId
     ) {
@@ -63,7 +64,7 @@ public class UserApiController {
                 .body(null);
     }
 
-    @GetMapping("/api/users")
+    @GetMapping
     public ResponseEntity<List<UserResponseDto>> retrieveAll() {
         List<UserResponseDto> usersList = userApplicationService.findAll();
         return ResponseEntity
@@ -71,7 +72,7 @@ public class UserApiController {
                 .body(usersList);
     }
 
-    @PatchMapping("/api/users/activate")
+    @PatchMapping("/activate")
     public ResponseEntity<UserResponseDto> activateUser(
             @Valid @RequestParam UUID userId
     ) {

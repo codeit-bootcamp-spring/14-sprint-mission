@@ -16,6 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/messages")
 //메시지 관리
 //[X] 메시지를 보낼 수 있다.
 //[X] 메시지를 수정할 수 있다.
@@ -25,7 +26,7 @@ public class MessageApiController {
 
     private final MessageApplicationService messageApplicationService;
 
-    @PostMapping("/api/messages")
+    @PostMapping
     public ResponseEntity<MessageResponseDto> create(
             @Valid @RequestPart("message")                                  MessageCreateRequestDto request,
             @Valid @RequestPart(value = "attachments", required = false)    List<MultipartFile> attachments
@@ -41,7 +42,7 @@ public class MessageApiController {
     }
 
 
-    @PutMapping("/api/messages")
+    @PutMapping
     public ResponseEntity<MessageResponseDto> update(
             @Valid @RequestParam UUID messageId,
             @Valid @RequestBody MessageUpdateRequestDto request
@@ -53,7 +54,7 @@ public class MessageApiController {
     }
 
 
-    @DeleteMapping("/api/messages")
+    @DeleteMapping
     public ResponseEntity<Void> delete(
             @Valid @RequestParam UUID messageId
     ) {
@@ -64,7 +65,7 @@ public class MessageApiController {
     }
 
 
-    @GetMapping("/api/messages")
+    @GetMapping
     public ResponseEntity<List<MessageResponseDto>> retrieveAllFromChannel(
             @Valid @RequestParam UUID channelId
     ) {

@@ -14,7 +14,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 //바이너리 파일 다운로드
-//[ ] 바이너리 파일을 1개 또는 여러 개 조회할 수 있다. -- 어떻게 테스트 해야?
+//[X] 바이너리 파일을 1개 또는 여러 개 조회할 수 있다.
 public class BinaryContentApiController {
 
     private final BinaryContentApplicationService binaryContentApplicationService;

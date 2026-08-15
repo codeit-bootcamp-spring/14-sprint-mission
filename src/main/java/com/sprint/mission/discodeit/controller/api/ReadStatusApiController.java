@@ -26,7 +26,7 @@ public class ReadStatusApiController {
     // public ReadStatusResponseDto create(...) 는 구현 안 함
     // - User 만들거나, Channel 만들때 생성되는 로직으로 UserApplicationService에서 구현함
 
-    @PatchMapping("/users/read")
+    @PatchMapping("/read")
     public ResponseEntity<ReadStatusResponseDto> markAsRead(
             @Valid @RequestParam UUID userId,
             @Valid @RequestParam UUID channelId
@@ -37,7 +37,7 @@ public class ReadStatusApiController {
                 .body(readStatusMarkedAsRead);
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public ResponseEntity<List<ReadStatusResponseDto>> retrieveAllByUserId(
             @Valid @RequestParam UUID userId
     ) {
