@@ -16,7 +16,7 @@ public class AuthController {
     private final AuthService authService;
 
     // 사용자 로그인
-    @RequestMapping(method = RequestMethod.GET, value = "/api/auth")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/auth")
     public void login(
         @Valid @RequestBody LoginRequestDto loginRequestDto) {
         authService.login(loginRequestDto);

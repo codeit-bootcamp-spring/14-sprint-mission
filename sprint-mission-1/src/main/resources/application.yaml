@@ -1,4 +1,5 @@
 discodeit:
+  seed: true
   repository:
     type: jcf   # jcf | file
     file-directory: .discodeit

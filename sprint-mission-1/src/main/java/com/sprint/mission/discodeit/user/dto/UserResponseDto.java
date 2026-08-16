@@ -11,7 +11,7 @@ public record UserResponseDto(UUID id, String userName, String email, UUID binar
     public static UserResponseDto from(User user, UserStatus userStatus) {
         return new UserResponseDto(
             user.getId(),
-            user.getUserName(),
+            user.getName(),
             user.getEmail(),
             user.getBinaryId(),
             userStatus.getId(),

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.userstatus.service;
 
-import com.sprint.mission.discodeit.global.exception.DuplicateException;
-import com.sprint.mission.discodeit.global.exception.NotFoundException;
+import com.sprint.mission.discodeit.global.exception.DiscodeitException;
+import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusResponseDto;
@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.userstatus.dto.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,16 @@ public class UserStatusServiceImpl implements UserStatusService {
     public UserStatusResponseDto userStatusCreate(
         UserStatusCreateRequestDto userStatusCreateRequestDto) {
         userRepository.findByUser(userStatusCreateRequestDto.userId())
-            .orElseThrow(() -> NotFoundException.user(userStatusCreateRequestDto.userId()));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.USER_NOT_FOUND,
+                Map.of("userId", userStatusCreateRequestDto.userId())
+            ));
 
         if (userStatusRepository.findByUserId(userStatusCreateRequestDto.userId()).isPresent()) {
-            throw DuplicateException.userStatus(userStatusCreateRequestDto.userId());
+            throw new DiscodeitException(
+                ExceptionType.USER_STATUS_CONFLICT,
+                Map.of("userId", userStatusCreateRequestDto.userId())
+            );
         }
 
         return UserStatusResponseDto.from(

@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.auth.service;
 
 import com.sprint.mission.discodeit.auth.dto.LoginRequestDto;
-import com.sprint.mission.discodeit.global.exception.InvalidCredentialsException;
-import com.sprint.mission.discodeit.global.exception.NotFoundException;
+import com.sprint.mission.discodeit.global.exception.DiscodeitException;
+import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.user.dto.UserResponseDto;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +21,22 @@ public class AuthServiceImpl implements AuthService {
 
     public UserResponseDto login(LoginRequestDto loginRequestDto) {
         User user = userRepository.findByUserName(loginRequestDto.name())
-            .orElseThrow(InvalidCredentialsException::new);
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.AUTH_INVALID
+            ));
 
         if (!user.getPassword().equals(loginRequestDto.password())) {
-            throw new InvalidCredentialsException();
+            throw new DiscodeitException(
+                ExceptionType.AUTH_INVALID
+            );
         }
 
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-            .orElseThrow(() -> NotFoundException.userStatusByUser(user.getId()));
+            .orElseThrow(
+                () -> new DiscodeitException(
+                    ExceptionType.USER_STATUS_MISSING_FOR_USER,
+                    Map.of("userId", user.getId()
+                    )));
 
         userStatus.userLogin();
         userStatusRepository.update(userStatus);

@@ -7,35 +7,39 @@ import lombok.Getter;
 @Getter
 public class User extends BaseEntity {
 
-    private String userName;
+    private String name;
     private String password;
     private String email;
     private UUID binaryId;
 
-    public User(String userName, String password, String email, UUID binaryId) {
-        this.userName = userName;
+    private User(String name, String password, String email, UUID binaryId) {
+        this.name = name;
         this.password = password;
         this.email = email;
         this.binaryId = binaryId;
     }
 
-    public void updateName(String updateName) {
-        this.userName = updateName;
+    public static User create(String name, String password, String email, UUID binaryId) {
+        return new User(name, password, email, binaryId);
+    }
+
+    public void update(String name, String password, String email) {
+        if (name != null) {
+            this.name = name;
+        }
+        if (password != null) {
+            this.password = password;
+        }
+        if (email != null) {
+            this.email = email;
+        }
         super.markUpdated();
     }
 
-    public void updateEmail(String email) {
-        this.email = email;
-        super.markUpdated();
-    }
-
-    public void updatePassword(String password) {
-        this.password = password;
-        super.markUpdated();
-    }
-
-    public void updateBinaryId(UUID binaryId) {
-        this.binaryId = binaryId;
-        super.markUpdated();
+    public void updateProfile(UUID binaryId) {
+        if (binaryId != null) {
+            this.binaryId = binaryId;
+            markUpdated();
+        }
     }
 }

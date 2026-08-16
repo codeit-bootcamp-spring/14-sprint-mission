@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class Channel extends BaseEntity {
-    
+
     private String channelName;
     private ChannelType channelType = ChannelType.PUBLIC;
     private String description;
@@ -16,16 +16,12 @@ public class Channel extends BaseEntity {
         this.channelType = channelType;
     }
 
-    public Channel(String channelName, ChannelType channelType) {
-        this.channelName = channelName;
-        this.channelType = channelType;
-    }
-
     public Channel(String channelName, ChannelType channelType, String description) {
         this.channelName = channelName;
         this.channelType = channelType;
         this.description = description;
     }
+
 
     public void update(String channelName, String description) {
         boolean changed = false;

@@ -8,8 +8,8 @@ import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
-import com.sprint.mission.discodeit.global.exception.InvalidOperationException;
-import com.sprint.mission.discodeit.global.exception.NotFoundException;
+import com.sprint.mission.discodeit.global.exception.DiscodeitException;
+import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -52,7 +53,10 @@ public class ChannelServiceImpl implements ChannelService {
 
         for (UUID userId : channelPrivateCreateRequestDto.participantIds()) {
             User user = userRepository.findByUser(userId)
-                .orElseThrow(() -> NotFoundException.user(userId));
+                .orElseThrow(() -> new DiscodeitException(
+                    ExceptionType.USER_NOT_FOUND,
+                    Map.of("userId", userId)
+                ));
 
             ReadStatus readStatus = new ReadStatus(channel.getId(), user.getId());
             readStatusRepository.statusAdd(readStatus);
@@ -64,10 +68,16 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     public void channelUpdate(UUID channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> NotFoundException.channel(channelId));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId)
+            ));
 
         if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
-            throw InvalidOperationException.privateChannel(channelId);
+            throw new DiscodeitException(
+                ExceptionType.PRIVATE_CHANNEL_UPDATE_DENIED,
+                Map.of("channelId", channelId)
+            );
         }
 
         channel.update(channelUpdateRequestDto.channelName(),
@@ -78,7 +88,10 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     public ChannelResponseDto findById(UUID channelId) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> NotFoundException.channel(channelId));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId)
+            ));
         return toResponseDto(channel);
     }
 
@@ -119,7 +132,10 @@ public class ChannelServiceImpl implements ChannelService {
     @Override
     public void channelDelete(UUID channelId) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> NotFoundException.channel(channelId));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId)
+            ));
 
         List<UUID> attachmentIds = messageRepository.findAllMessage(channelId).stream()
             .map(Message::getBinaryContentsId)

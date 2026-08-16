@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.readstatus.service;
 
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
-import com.sprint.mission.discodeit.global.exception.NotFoundException;
+import com.sprint.mission.discodeit.global.exception.DiscodeitException;
+import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusUpdateRequestDto;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,10 +27,16 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     public ReadStatusResponseDto readStatusCreate(
         ReadStatusCreateRequestDto readStatusCreateRequestDto) {
         channelRepository.findByChannel(readStatusCreateRequestDto.channelId())
-            .orElseThrow(() -> NotFoundException.channel(readStatusCreateRequestDto.channelId()));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("channelId", readStatusCreateRequestDto.channelId())
+            ));
 
         userRepository.findByUser(readStatusCreateRequestDto.userId())
-            .orElseThrow(() -> NotFoundException.user(readStatusCreateRequestDto.userId()));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.USER_NOT_FOUND,
+                Map.of("userId", readStatusCreateRequestDto.userId())
+            ));
 
         return ReadStatusResponseDto.from(readStatusRepository.statusAdd(
             new ReadStatus(readStatusCreateRequestDto.channelId(),
