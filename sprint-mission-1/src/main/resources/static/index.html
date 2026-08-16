@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discodeit</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<header class="app-header">
+    <div class="app-header__inner">
+        <div class="brand">Discodeit</div>
+
+        <div class="session" id="session">
+            <span class="session__empty" id="sessionEmpty">로그인하지 않았습니다</span>
+            <div class="session__user" id="sessionUser" hidden>
+                <img class="session__avatar" id="sessionAvatar" src="/images/default-avatar.svg" alt="">
+                <span class="session__name" id="sessionName"></span>
+            </div>
+            <button class="btn btn--primary" id="loginBtn" type="button">로그인</button>
+            <button class="btn btn--ghost" id="logoutBtn" type="button" hidden>로그아웃</button>
+        </div>
+    </div>
+
+    <nav class="tabs" id="tabs">
+        <button class="tab is-active" type="button" data-tab="users">사용자</button>
+        <button class="tab" type="button" data-tab="channels">채널</button>
+        <button class="tab" type="button" data-tab="chat">채팅</button>
+        <button class="tab" type="button" data-tab="readStatus">읽음 상태</button>
+        <button class="tab" type="button" data-tab="files">파일</button>
+    </nav>
+</header>
+
+<main class="container">
+
+    <!-- ================= 사용자 ================= -->
+    <section class="panel is-active" data-panel="users">
+        <div class="panel__head">
+            <h1>사용자 목록</h1>
+            <button class="btn btn--primary" id="userCreateBtn" type="button">사용자 추가</button>
+        </div>
+        <div class="user-list" id="userList"></div>
+    </section>
+
+    <!-- ================= 채널 ================= -->
+    <section class="panel" data-panel="channels">
+        <div class="panel__head">
+            <h1>채널 목록</h1>
+            <div class="panel__actions">
+                <button class="btn btn--primary" id="publicChannelCreateBtn" type="button">공개 채널</button>
+                <button class="btn btn--secondary" id="privateChannelCreateBtn" type="button">비공개 채널</button>
+            </div>
+        </div>
+        <p class="hint" id="channelHint"></p>
+        <div class="card-list" id="channelList"></div>
+    </section>
+
+    <!-- ================= 채팅 ================= -->
+    <section class="panel" data-panel="chat">
+        <div class="chat">
+            <aside class="chat__sidebar">
+                <div class="chat__sidebar-title">채널</div>
+                <div class="chat__channels" id="chatChannelList"></div>
+            </aside>
+
+            <div class="chat__main">
+                <div class="chat__header" id="chatHeader">
+                    <span class="chat__title">채널을 선택하세요</span>
+                </div>
+
+                <div class="chat__notice">
+                    메시지 목록 조회 API가 없어 <strong>이 세션에서 보낸 메시지만</strong> 표시됩니다.
+                    수정 · 삭제는 서버에 실제로 반영됩니다.
+                </div>
+
+                <div class="chat__messages" id="chatMessages"></div>
+
+                <form class="chat__form" id="chatForm">
+                    <input class="chat__input" id="chatInput" type="text"
+                           placeholder="메시지를 입력하세요" autocomplete="off" disabled>
+                    <button class="btn btn--primary" type="submit" id="chatSendBtn" disabled>전송</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= 읽음 상태 ================= -->
+    <section class="panel" data-panel="readStatus">
+        <div class="panel__head">
+            <h1>읽음 상태</h1>
+            <button class="btn btn--primary" id="readStatusCreateBtn" type="button">읽음 상태 생성</button>
+        </div>
+
+        <div class="card">
+            <div class="card__title">id로 조회</div>
+            <form class="inline-form" id="readStatusFindForm">
+                <input class="input" id="readStatusFindInput" type="text"
+                       placeholder="readStatus id (UUID)" autocomplete="off">
+                <button class="btn btn--secondary" type="submit">조회</button>
+            </form>
+            <div class="card-list" id="readStatusResult"></div>
+        </div>
+    </section>
+
+    <!-- ================= 파일 ================= -->
+    <section class="panel" data-panel="files">
+        <div class="panel__head">
+            <h1>파일</h1>
+            <button class="btn btn--secondary" id="fileReloadBtn" type="button">새로고침</button>
+        </div>
+        <div class="file-grid" id="fileList"></div>
+    </section>
+
+</main>
+
+<!-- ================= 모달 ================= -->
+<div class="modal" id="modal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__box" role="dialog" aria-modal="true">
+        <div class="modal__head">
+            <h2 class="modal__title" id="modalTitle"></h2>
+            <button class="modal__close" type="button" data-close aria-label="닫기">&times;</button>
+        </div>
+        <form id="modalForm">
+            <div class="modal__body" id="modalBody"></div>
+            <div class="modal__foot">
+                <button class="btn btn--ghost" type="button" data-close>취소</button>
+                <button class="btn btn--primary" type="submit" id="modalSubmit">확인</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast-area" id="toastArea"></div>
+
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
