@@ -1,11 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.JCF.JCFUserService;
 
 public class JavaApplication {
     public static void main(String[] args){
@@ -59,14 +56,14 @@ public class JavaApplication {
         */
 
 
-       //조회(단건)
+        //조회(단건)
         System.out.println(service.find(user1.getId()).getName());
 
         //조회(다건)
         for (User user : service.findAll()) {
             System.out.println(
                 "이름 : " + user.getName() +
-                " 나이 : " + user.getAge()
+                    " 나이 : " + user.getAge()
             );
         }
 

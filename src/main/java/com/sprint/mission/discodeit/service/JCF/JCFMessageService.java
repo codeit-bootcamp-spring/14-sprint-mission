@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.JCF;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -44,11 +44,10 @@ public class JCFMessageService implements MessageService {
     @Override
     public void delete(UUID id) {
 
-    Message found = find(id);
+        Message found = find(id);
 
-    if (found !=null){
-        messages.remove(found);
-    }
+        if (found !=null){
+            messages.remove(found);
+        }
     }
 }
-

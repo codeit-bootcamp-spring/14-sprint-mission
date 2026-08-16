@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.JCF;
 
 
 import com.sprint.mission.discodeit.entity.Channel;
@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 
 public class JCFChannelService implements ChannelService {
 
@@ -19,11 +20,11 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel find(UUID id) {
-       for (Channel channel : channels){
-           if(channel.getId().equals(id)){
-               return channel;
-           }
-       }
+        for (Channel channel : channels){
+            if(channel.getId().equals(id)){
+                return channel;
+            }
+        }
         return null;
     }
 
@@ -45,10 +46,10 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void delete(UUID id) {
 
-    Channel found  = find(id);
+        Channel found  = find(id);
 
-    if (found !=null){
-        channels.remove(found);
-    }
+        if (found !=null){
+            channels.remove(found);
+        }
     }
 }

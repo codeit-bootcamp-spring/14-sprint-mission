@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.JCF;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
@@ -31,21 +31,21 @@ public class JCFUserService implements UserService {
 
     @Override
     public User update(User user) {
-       User found = find(user.getId());
+        User found = find(user.getId());
 
-       if (found != null){
-           found.update(user.getName(), user.getAge());
-       }
-       return found;
+        if (found != null){
+            found.update(user.getName(), user.getAge());
+        }
+        return found;
     }
 
     @Override
     public void delete(UUID id) {
 
-    User found = find(id);
+        User found = find(id);
 
-    if (found !=null){
-        users.remove(found);
-    }
+        if (found !=null){
+            users.remove(found);
+        }
     }
 }
