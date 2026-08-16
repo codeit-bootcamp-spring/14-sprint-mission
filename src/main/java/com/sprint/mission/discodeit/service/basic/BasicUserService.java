@@ -1,4 +1,4 @@
-package com.sprint.mission.service.basic;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -27,7 +28,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public User findById(UUID id) {
-        User user = userRepository.findById(id);
+        User user = Optional.ofNullable(userRepository.findById(id))
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         log.info("사용자 조회 : id={}", user.getId());
 
         return user;
@@ -55,6 +57,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID id) {
+        Optional.ofNullable(userRepository.findById(id))
+                        .orElseThrow(() -> new IllegalArgumentException("삭제할 사용자가 없습니다."));
         userRepository.delete(id);
         log.info("사용자 삭제 완료 : id={}", id);
     }
