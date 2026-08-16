@@ -49,7 +49,7 @@ public class UserController {
         userService.deleteUser(id);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{id}/status", method = RequestMethod.PATCH)
     public UserStatusResponseDto updateStatus(@PathVariable UUID id,
                                               @RequestBody UserStatusUpdateRequestDto dto) {
     return userStatusService.updateUserStatus(id,dto);

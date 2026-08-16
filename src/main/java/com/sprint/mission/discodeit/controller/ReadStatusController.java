@@ -27,7 +27,7 @@ public class ReadStatusController {
         return readStatusService.updateReadStatus(id,dto);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "")
+    @RequestMapping(method = RequestMethod.GET, value = "")
     public List<ReadStatusResponseDto> read(@RequestParam UUID userId) {
         return readStatusService.findAllByUserId(userId);
     }
