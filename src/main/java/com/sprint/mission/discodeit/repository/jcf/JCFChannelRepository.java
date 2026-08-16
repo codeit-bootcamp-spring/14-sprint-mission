@@ -18,6 +18,9 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void save(Channel channel) {
+        if (findById(channel.getId()) != null) {
+            return;
+        }
         channelList.add(channel);
     }
 

@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
 public class ChannelController {
-    private ChannelService channelService;
+    private final ChannelService channelService;
 
     @RequestMapping(method = RequestMethod.POST, value = "/public")
     public ChannelResponseDto createPublic(@RequestBody ChannelCreateRequestDto dto) {

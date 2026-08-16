@@ -18,6 +18,9 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void save(BinaryContent binaryContent) {
+        if (findById(binaryContent.getId()) != null) {
+            return;
+        }
         binaryContentList.add(binaryContent);
     }
 

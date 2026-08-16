@@ -18,6 +18,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void save(ReadStatus readStatus) {
+        if (findById(readStatus.getId()) != null) {
+            return;
+        }
         readStatusList.add(readStatus);
     }
 

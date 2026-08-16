@@ -52,7 +52,7 @@ public class UserController {
     @RequestMapping(value = "/{id}/status", method = RequestMethod.PATCH)
     public UserStatusResponseDto updateStatus(@PathVariable UUID id,
                                               @RequestBody UserStatusUpdateRequestDto dto) {
-    return userStatusService.updateUserStatus(id,dto);
+    return userStatusService.updateUserStatusByUserId(id,dto);
     }
 
 

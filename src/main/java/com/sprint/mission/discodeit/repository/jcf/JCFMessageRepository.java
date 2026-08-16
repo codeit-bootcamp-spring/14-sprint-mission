@@ -18,6 +18,9 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void save(Message message) {
+        if (findById(message.getId()) != null) {
+            return;
+        }
         messageList.add(message);
     }
 

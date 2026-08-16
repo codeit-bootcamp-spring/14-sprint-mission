@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
 public class MessageController {
-    MessageService messageService;
+    private final MessageService messageService;
 
     @RequestMapping(method = RequestMethod.POST, value = "")
     public MessageResponseDto send(@RequestBody MessageCreateRequestDto dto) {
@@ -29,7 +29,7 @@ public class MessageController {
         return messageService.updateMessage(id, dto);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{id}")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public void delete(@PathVariable UUID id) {
         messageService.deleteMessage(id);
     }

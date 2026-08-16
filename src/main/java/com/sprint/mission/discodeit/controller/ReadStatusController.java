@@ -21,7 +21,7 @@ public class ReadStatusController {
         return readStatusService.createReadStatus(dto);
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
     public ReadStatusResponseDto modify(@PathVariable UUID id,
                                         @RequestBody ReadStatusUpdateRequestDto dto) {
         return readStatusService.updateReadStatus(id,dto);
