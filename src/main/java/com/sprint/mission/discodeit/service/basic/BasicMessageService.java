@@ -1,24 +1,35 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
-
-    public BasicMessageService(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
-    }
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
+        Optional.ofNullable(userRepository.findById(authorId))
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Optional.ofNullable(channelRepository.findById(channelId))
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
+
         Message message = new Message(content, channelId, authorId);
         Message savedMessage = messageRepository.save(message);
         log.info("메시지 생성 완료 : id={}", savedMessage.getId());

@@ -4,17 +4,14 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-//@SpringBootApplication
+@SpringBootApplication
 public class Application {
     static User setupUser(UserService userService) {
         User user = userService.create("woody", "woody@codeit.com", "1234");
@@ -35,17 +32,12 @@ public class Application {
     }
 
     public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
         // 서비스 초기화
-        // TODO Basic*Service 구현체를 초기화하세요.
-        // JCF 저장 방식
-//        UserService userService = new BasicUserService(new JCFUserRepository());
-//        ChannelService channelService = new BasicChannelService(new JCFChannelRepository());
-//        MessageService messageService = new BasicMessageService(new JCFMessageRepository());
-
-        // File 저장 방식
-        UserService userService = new BasicUserService(new FileUserRepository());
-        ChannelService channelService = new BasicChannelService(new FileChannelRepository());
-        MessageService messageService = new BasicMessageService(new FileMessageRepository());
+        // TODO context에서 Bean을 조회하여 각 서비스 구현체 할당 코드 작성하세요.
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
 
         // 셋업
         User user = setupUser(userService);

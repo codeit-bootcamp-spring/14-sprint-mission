@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
 @Slf4j
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private static final String FILE_NAME = "messages.dat";
 

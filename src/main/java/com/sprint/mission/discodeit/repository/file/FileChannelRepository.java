@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
 @Slf4j
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_NAME = "channels.dat";
 
