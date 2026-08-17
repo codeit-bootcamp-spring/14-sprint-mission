@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discodeit</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ===== 로그인 / 회원가입 화면 ===== -->
+  <section id="auth-screen" class="auth-screen">
+    <div class="auth-box">
+      <h1 class="logo">Discodeit</h1>
+
+      <!-- 로그인 폼 -->
+      <form id="login-form" class="auth-form">
+        <h2>로그인</h2>
+        <label>사용자 이름
+          <input type="text" id="login-username" required autocomplete="username" />
+        </label>
+        <label>비밀번호
+          <input type="password" id="login-password" required autocomplete="current-password" />
+        </label>
+        <button type="submit" class="btn primary">로그인</button>
+        <p class="switch-text">계정이 없나요?
+          <a href="#" id="show-register">회원가입</a>
+        </p>
+        <p id="login-error" class="error-text"></p>
+      </form>
+
+      <!-- 회원가입 폼 -->
+      <form id="register-form" class="auth-form hidden">
+        <h2>회원가입</h2>
+        <label>사용자 이름
+          <input type="text" id="register-username" required />
+        </label>
+        <label>이메일
+          <input type="email" id="register-email" required />
+        </label>
+        <label>비밀번호
+          <input type="password" id="register-password" required autocomplete="new-password" />
+        </label>
+        <label>프로필 이미지 (선택)
+          <input type="file" id="register-profile" accept="image/*" />
+        </label>
+        <button type="submit" class="btn primary">가입하기</button>
+        <p class="switch-text">이미 계정이 있나요?
+          <a href="#" id="show-login">로그인</a>
+        </p>
+        <p id="register-error" class="error-text"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== 메인 화면 ===== -->
+  <section id="main-screen" class="main-screen hidden">
+
+    <!-- 좌측: 채널 목록 -->
+    <aside class="channel-sidebar">
+      <div class="sidebar-header">
+        <span>채널</span>
+        <button id="open-channel-modal" class="btn icon" title="채널 만들기">＋</button>
+      </div>
+      <ul id="channel-list" class="channel-list"></ul>
+      <div class="me-bar">
+        <div class="avatar small" id="me-avatar"></div>
+        <div class="me-info">
+          <span id="me-name"></span>
+          <span id="me-email" class="sub"></span>
+        </div>
+        <button id="logout-btn" class="btn icon" title="로그아웃">⎋</button>
+      </div>
+    </aside>
+
+    <!-- 중앙: 메시지 -->
+    <main class="chat-area">
+      <div class="chat-header">
+        <span id="current-channel-title">채널을 선택하세요</span>
+        <span id="current-channel-memo" class="sub"></span>
+        <span class="spacer"></span>
+        <button id="edit-channel-btn" class="btn small hidden">채널 수정</button>
+        <button id="delete-channel-btn" class="btn small danger hidden">채널 삭제</button>
+      </div>
+      <div id="message-list" class="message-list">
+        <p class="placeholder">좌측에서 채널을 선택하면 메시지가 표시됩니다.</p>
+      </div>
+      <form id="message-form" class="message-form hidden">
+        <input type="text" id="message-input" placeholder="메시지 보내기" autocomplete="off" />
+        <button type="submit" class="btn primary">전송</button>
+      </form>
+    </main>
+
+    <!-- 우측: 유저 목록 -->
+    <aside class="user-sidebar">
+      <div class="sidebar-header"><span>사용자</span></div>
+      <ul id="user-list" class="user-list"></ul>
+    </aside>
+  </section>
+
+  <!-- ===== 채널 생성/수정 모달 ===== -->
+  <div id="channel-modal" class="modal-backdrop hidden">
+    <div class="modal">
+      <h2 id="channel-modal-title">채널 만들기</h2>
+      <form id="channel-form">
+        <label>채널 유형
+          <select id="channel-type">
+            <option value="PUBLIC">PUBLIC</option>
+            <option value="PRIVATE">PRIVATE</option>
+          </select>
+        </label>
+        <label>채널 이름
+          <input type="text" id="channel-title" required />
+        </label>
+        <label>메모
+          <input type="text" id="channel-memo" />
+        </label>
+        <label>참여자 선택</label>
+        <div id="channel-user-checks" class="check-list"></div>
+        <div class="modal-actions">
+          <button type="button" id="channel-cancel" class="btn">취소</button>
+          <button type="submit" class="btn primary">저장</button>
+        </div>
+        <p id="channel-error" class="error-text"></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

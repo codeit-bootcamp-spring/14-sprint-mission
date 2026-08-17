@@ -1,23 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.authLogin.AuthLoginRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.AuthenticationFailedException;
-import com.sprint.mission.discodeit.exception.NoSuchElementException;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
-import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.auth.dto.AuthLoginRequestDto;
+import com.sprint.mission.discodeit.auth.application.basic.BasicAuthService;
+import com.sprint.mission.discodeit.user.dto.UserRequestDto;
+import com.sprint.mission.discodeit.user.dto.UserResponseDto;
+import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.user.domain.User;
+import com.sprint.mission.discodeit.common.exception.AuthenticationFailedException;
+import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.user.repository.UserRepository;
+import com.sprint.mission.discodeit.binaryContent.repository.jcf.JCFBinaryContentRepository;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserStatusRepository;
+import com.sprint.mission.discodeit.auth.application.AuthService;
+import com.sprint.mission.discodeit.user.application.UserService;
+import com.sprint.mission.discodeit.user.application.basic.BasicUserService;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,16 +69,16 @@ class BasicUserServiceTest {
     void 유저를_생성하고_업데이트하면_조회할_수_있으며_로그인할_수_있다_그리고_비밀번호_다를_시_에러를_낸다(){
         byte[] image = {1,2,3,4,5,6,8};
         UserResponseDto created = userService.create(new UserRequestDto("김양햔", "hyan@naver.com", "1234", image));
-        UserUpdateRequestDto request = new UserUpdateRequestDto(created.id(), created.profileId(),"새김양현",
-                "new@naver.com", "newPassword", null);
+        UserUpdateRequestDto request = new UserUpdateRequestDto(created.profileId(),"새김양현",
+                "new@naver.com", "password", null);
 
-        userService.update(request);
+        userService.update(created.id(), request);
 
         UserResponseDto found = userService.find(created.id());
         assertEquals("새김양현", found.userName());
         assertEquals("new@naver.com", found.email());
 
-        AuthLoginRequestDto login = new AuthLoginRequestDto("새김양현", "newPassword");
+        AuthLoginRequestDto login = new AuthLoginRequestDto("새김양현", "password");
         assertDoesNotThrow(() -> authService.login(login));
         assertThrows(AuthenticationFailedException.class, () -> authService.login(new AuthLoginRequestDto("새김양현", "1234")));
     }

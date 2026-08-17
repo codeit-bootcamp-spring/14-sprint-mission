@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.NoSuchElementException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.message.dto.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.message.dto.MessageResponseDto;
+import com.sprint.mission.discodeit.message.dto.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.binaryContent.domain.BinaryContent;
+import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.message.repository.MessageRepository;
+import com.sprint.mission.discodeit.binaryContent.repository.jcf.JCFBinaryContentRepository;
+import com.sprint.mission.discodeit.channel.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.message.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.message.application.basic.BasicMessageService;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.message.application.MessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -85,8 +85,8 @@ class BasicMessageServiceTest {
         messageService.create(new MessageCreateRequestDto(List.of(), "수정 전", channelId, author));
         MessageResponseDto saved = messageService.findAllByChannelId(channelId).stream().findFirst().orElseThrow();
 
-        messageService.update(new MessageUpdateRequestDto(
-                saved.id(), "수정 후", channelId, author, List.of()));
+        messageService.update(saved.id(), new MessageUpdateRequestDto(
+               "수정 후", channelId, author, List.of()));
 
         // 반환값이 아니라 원래 id로 다시 조회해서 검증한다
         MessageResponseDto found = messageService.find(saved.id());

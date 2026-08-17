@@ -1,15 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.authLogin.AuthLoginRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.exception.AuthenticationFailedException;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
-import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.auth.dto.AuthLoginRequestDto;
+import com.sprint.mission.discodeit.auth.application.basic.BasicAuthService;
+import com.sprint.mission.discodeit.user.dto.UserRequestDto;
+import com.sprint.mission.discodeit.user.dto.UserResponseDto;
+import com.sprint.mission.discodeit.common.exception.AuthenticationFailedException;
+import com.sprint.mission.discodeit.user.repository.UserRepository;
+import com.sprint.mission.discodeit.binaryContent.repository.jcf.JCFBinaryContentRepository;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserStatusRepository;
+import com.sprint.mission.discodeit.auth.application.AuthService;
+import com.sprint.mission.discodeit.user.application.UserService;
+import com.sprint.mission.discodeit.user.application.basic.BasicUserService;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

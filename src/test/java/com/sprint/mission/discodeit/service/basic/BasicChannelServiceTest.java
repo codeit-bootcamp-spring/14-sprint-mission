@@ -1,24 +1,22 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.NoSuchElementException;
-import com.sprint.mission.discodeit.exception.PrivateChannelUpdateNotAllowedException;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.*;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
-import lombok.RequiredArgsConstructor;
+import com.sprint.mission.discodeit.channel.dto.ChannelCreateRequestDto;
+import com.sprint.mission.discodeit.channel.dto.ChannelResponseDto;
+import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.channel.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.channel.application.basic.BasicChannelService;
+import com.sprint.mission.discodeit.channel.domain.ChannelType;
+import com.sprint.mission.discodeit.message.domain.Message;
+import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.common.exception.PrivateChannelUpdateNotAllowedException;
+import com.sprint.mission.discodeit.message.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.message.repository.MessageRepository;
+import com.sprint.mission.discodeit.readStatus.repository.jcf.JCFReadStatusRepository;
+import com.sprint.mission.discodeit.readStatus.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.channel.application.ChannelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.validation.MessageCodesResolver;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,10 +85,10 @@ class BasicChannelServiceTest {
         List<UUID> userIds = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
         ChannelResponseDto created = channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, "제목", "메모 내용", userIds));
 
-        ChannelUpdateRequestDto updated = new ChannelUpdateRequestDto(created.id(), created.channelType(), created.title(), created.memo(),
+        ChannelUpdateRequestDto updated = new ChannelUpdateRequestDto(created.channelType(), created.title(), created.memo(),
                 created.userIds());
 
-        assertThrows(PrivateChannelUpdateNotAllowedException.class, () -> channelService.update(updated));
+        assertThrows(PrivateChannelUpdateNotAllowedException.class, () -> channelService.update(created.id(), updated));
 
     }
 

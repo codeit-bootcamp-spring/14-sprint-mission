@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.exception.NoSuchElementException;
-import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.binaryContent.application.basic.BasicBinaryContentService;
+import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.binaryContent.repository.jcf.JCFBinaryContentRepository;
+import com.sprint.mission.discodeit.binaryContent.application.BinaryContentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

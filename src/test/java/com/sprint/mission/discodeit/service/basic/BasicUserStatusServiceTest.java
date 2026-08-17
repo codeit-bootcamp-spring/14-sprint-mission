@@ -1,19 +1,20 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserRequestDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.DuplicateStatus;
-import com.sprint.mission.discodeit.exception.NoSuchElementException;
-import com.sprint.mission.discodeit.exception.NotFoundUserException;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
-import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.user.dto.UserRequestDto;
+import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.user.domain.User;
+import com.sprint.mission.discodeit.user.domain.UserStatus;
+import com.sprint.mission.discodeit.common.exception.DuplicateStatus;
+import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.common.exception.NotFoundUserException;
+import com.sprint.mission.discodeit.user.repository.UserRepository;
+import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserStatusRepository;
+import com.sprint.mission.discodeit.user.application.UserStatusService;
+import com.sprint.mission.discodeit.user.application.basic.BasicUserStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
