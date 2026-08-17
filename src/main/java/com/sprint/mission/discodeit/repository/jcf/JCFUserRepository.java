@@ -20,8 +20,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findById(UUID id) {
-        User user = Optional.ofNullable(data.get(id))
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        User user = data.get(id);
         log.debug("JCF 사용자 데이터 조회 : id={}", id);
 
         return user;
@@ -39,8 +38,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void delete(UUID id) {
-        User targetUser = Optional.ofNullable(data.get(id))
-                .orElseThrow(() -> new IllegalArgumentException("삭제할 사용자가 없습니다."));
+        User targetUser = findById(id);
 
         data.remove(targetUser.getId());
         log.debug("JCF 사용자 데이터 삭제 : id={}", id);

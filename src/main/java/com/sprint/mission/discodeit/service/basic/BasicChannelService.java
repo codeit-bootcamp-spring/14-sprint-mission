@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -28,7 +29,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel findById(UUID id) {
-        Channel channel = channelRepository.findById(id);
+        Channel channel = Optional.ofNullable(channelRepository.findById(id))
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
         log.info("채널 조회 : id={}", channel.getId());
 
         return channel;
@@ -56,6 +58,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID id) {
+        Optional.ofNullable(channelRepository.findById(id))
+                        .orElseThrow(() -> new IllegalArgumentException("삭제할 채널이 없습니다."));
         channelRepository.delete(id);
         log.info("채널 삭제 완료 : id={}", id);
     }

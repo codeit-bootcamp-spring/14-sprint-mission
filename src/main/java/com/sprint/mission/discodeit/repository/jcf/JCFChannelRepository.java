@@ -20,8 +20,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID id) {
-        Channel channel = Optional.ofNullable(data.get(id))
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
+        Channel channel = data.get(id);
         log.debug("JCF 채널 데이터 조회 : id={}", id);
 
         return channel;
@@ -39,8 +38,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(UUID id) {
-        Channel targetChannel = Optional.ofNullable(data.get(id))
-                .orElseThrow(() -> new IllegalArgumentException("삭제할 채널이 없습니다."));
+        Channel targetChannel = findById(id);
 
         data.remove(targetChannel.getId());
         log.debug("JCF 채널 데이터 삭제 : id={}", id);

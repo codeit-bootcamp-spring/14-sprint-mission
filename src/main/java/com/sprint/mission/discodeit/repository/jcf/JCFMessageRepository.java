@@ -20,8 +20,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID id) {
-        Message message = Optional.ofNullable(data.get(id))
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메시지입니다."));
+        Message message = data.get(id);
         log.debug("JCF 메시지 데이터 조회 : id={}", id);
 
         return message;
@@ -39,8 +38,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void delete(UUID id) {
-        Message targetMessage = Optional.ofNullable(data.get(id))
-                        .orElseThrow(() -> new IllegalArgumentException("삭제할 메시지가 없습니다."));
+        Message targetMessage = findById(id);
 
         data.remove(targetMessage.getId());
         log.debug("JCF 메시지 데이터 삭제 : id={}", id);
