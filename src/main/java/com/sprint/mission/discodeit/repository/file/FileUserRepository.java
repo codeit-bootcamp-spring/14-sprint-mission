@@ -10,18 +10,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
 @Repository
 public class FileUserRepository implements UserRepository {
 
-    private static final Path DEFAULT_PATH = Path.of("data", "repository", "users.ser");
+    private static final String FILE_NAME = "users.ser";
 
     private final FileStore<User> store;
 
     // 생성자가 여럿이면 Spring이 어느 것을 쓸지 눈에 안 보임.
-    public FileUserRepository() {
-        this.store = new FileStore<>(DEFAULT_PATH);
+    public FileUserRepository(@Value("${discodeit.repository.file-directory:data/repository}") String fileDirectory) {
+        this.store = new FileStore<>(Path.of(fileDirectory, FILE_NAME));
     }
 
     @Override
@@ -35,6 +38,13 @@ public class FileUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(store.load().get(id));
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return store.load().values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
     @Override

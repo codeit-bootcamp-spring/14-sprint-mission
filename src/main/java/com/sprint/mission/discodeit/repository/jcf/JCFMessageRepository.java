@@ -9,7 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
+@Repository
 public class JCFMessageRepository implements MessageRepository {
 
     private final Map<UUID, Message> data;
@@ -32,6 +36,13 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         return new ArrayList<>(data.values());
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override

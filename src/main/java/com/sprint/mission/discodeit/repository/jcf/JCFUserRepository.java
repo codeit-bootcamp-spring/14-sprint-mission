@@ -9,7 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
+@Repository
 public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> data;
@@ -27,6 +31,13 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return data.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
     @Override

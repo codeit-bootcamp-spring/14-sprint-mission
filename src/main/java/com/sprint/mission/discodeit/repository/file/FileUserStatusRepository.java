@@ -10,17 +10,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository {
 
-    private static final Path DEFAULT_PATH = Path.of("data", "repository", "user-statuses.ser");
+    private static final String FILE_NAME = "user-statuses.ser";
 
     private final FileStore<UserStatus> store;
 
-    public FileUserStatusRepository() {
-        this.store = new FileStore<>(DEFAULT_PATH);
+    public FileUserStatusRepository(@Value("${discodeit.repository.file-directory:data/repository}") String fileDirectory) {
+        this.store = new FileStore<>(Path.of(fileDirectory, FILE_NAME));
     }
 
     @Override

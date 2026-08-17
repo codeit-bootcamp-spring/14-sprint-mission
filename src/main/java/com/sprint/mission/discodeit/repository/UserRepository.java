@@ -14,6 +14,9 @@ public interface UserRepository {
     /** 없을 수 있다는 것을 타입에 드러낸다. 없을 때의 처리는 Service가 정함. */
     Optional<User> findById(UUID id);
 
+    /** 로그인처럼 username으로 엔티티 자체가 필요할 때 쓴다. existsByUsername과 달리 값을 돌려준다. */
+    Optional<User> findByUsername(String username);
+
     List<User> findAll();
 
     void deleteById(UUID id);
