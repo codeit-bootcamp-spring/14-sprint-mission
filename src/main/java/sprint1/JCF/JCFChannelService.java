@@ -29,7 +29,6 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel find(UUID channelId) {
         Channel channelNullable = this.data.get(channelId);
-
         return Optional.ofNullable(channelNullable)
             .orElseThrow(
                 () -> new NoSuchElementException("Channel with id " + channelId + " not found"));

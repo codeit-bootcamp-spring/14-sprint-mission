@@ -14,16 +14,23 @@ import sprint1.service.UserService;
 public class JCFMessageService implements MessageService {
 
     private final Map<UUID, Message> data;
+    //
+    private final ChannelService channelService;
+    private final UserService userService;
 
-    public JCFMessageService() {
+    /*public JCFMessageService() {
         this.data = new HashMap<>();
+    }*/
+
+    public JCFMessageService(ChannelService channelService, UserService userService) {
+        this.data = new HashMap<>();
+        this.channelService = channelService;
+        this.userService = userService;
     }
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
 
-        ChannelService channelService = new JCFChannelService();
-        UserService userService = new JCFUserService();
         try {
             channelService.find(channelId);
             userService.find(authorId);
