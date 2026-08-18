@@ -68,7 +68,6 @@ public class UserServiceImpl implements UserService {
             ));
 
         if (userUpdateRequestDto.profileImage() != null) {
-            binaryContentRepository.delete(user.getBinaryId());
             BinaryContent binaryContent;
             try {
                 binaryContent = new BinaryContent(
@@ -80,6 +79,9 @@ public class UserServiceImpl implements UserService {
                 throw new UncheckedIOException(
                     "파일을 읽는데 실패했습니다: " + userUpdateRequestDto.profileImage().getOriginalFilename(),
                     e);
+            }
+            if (Objects.nonNull(user.getBinaryId())) {
+                binaryContentRepository.delete(user.getBinaryId());
             }
             user.updateProfile(binaryContent.getBinaryContentId());
         }
@@ -110,7 +112,7 @@ public class UserServiceImpl implements UserService {
                 ExceptionType.USER_STATUS_MISSING_FOR_USER,
                 Map.of("userId", user.getId()
                 ))));
-        if (!Objects.isNull(user.getBinaryId())) {
+        if (Objects.nonNull(user.getBinaryId())) {
             binaryContentRepository.delete(user.getBinaryId());
         }
         userRepository.delete(user);
