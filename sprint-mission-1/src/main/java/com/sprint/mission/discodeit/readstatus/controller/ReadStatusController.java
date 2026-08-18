@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.readstatus.service.ReadStatusService;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,22 +21,28 @@ public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api/readStatus")
-    public ReadStatusResponseDto create(
+    @RequestMapping(method = RequestMethod.POST, value = "/api/v1/read-statuses")
+    public ResponseEntity<ReadStatusResponseDto> create(
         @Valid @RequestBody ReadStatusCreateRequestDto readStatusCreateRequestDto) {
-        return readStatusService.readStatusCreate(readStatusCreateRequestDto);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(readStatusService.readStatusCreate(readStatusCreateRequestDto));
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/api/readStatus/{id}")
-    public void update(
+    @RequestMapping(method = RequestMethod.PATCH, value = "/api/v1/read-statuses/{id}")
+    public ResponseEntity<ReadStatusResponseDto> update(
         @PathVariable UUID id,
         @Valid @RequestBody ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
-        readStatusService.readStatusUpdate(id, readStatusUpdateRequestDto);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(readStatusService.readStatusUpdate(id, readStatusUpdateRequestDto));
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/api/readStatus/{id}/find")
-    public ReadStatusResponseDto find(
+    @RequestMapping(method = RequestMethod.GET, value = "/api/v1/read-statuses/{id}")
+    public ResponseEntity<ReadStatusResponseDto> find(
         @PathVariable UUID id) {
-        return readStatusService.findReadStatus(id);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(readStatusService.findReadStatus(id));
     }
 }
