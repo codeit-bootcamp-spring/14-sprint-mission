@@ -1,8 +1,8 @@
 package sprint1.JCF;
 
-import com.example.demo.levelTest1.entity.Channel;
-import com.example.demo.levelTest1.entity.ChannelType;
-import com.example.demo.levelTest1.service.ChannelService;
+import sprint1.entity.Channel;
+import sprint1.entity.ChannelType;
+import sprint1.service.ChannelService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,13 +41,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID channelId, ChannelType newChannel) {
+    public Channel update(UUID channelId, String newName, String newDescription) {
         Channel channelNullable = this.data.get(channelId);
         Channel channel = Optional.ofNullable(channelNullable)
-            .orElseThrow(
-                () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
-
-        channel.update(newChannel);
+            .orElseThrow(() -> new NoSuchElementException("Channel with id" + channelId + " not found"));
+        channel.update(newName, newDescription);
 
         return channel;
     }
@@ -57,7 +55,6 @@ public class JCFChannelService implements ChannelService {
         if (!this.data.containsKey(channelId)) {
             throw new NoSuchElementException(
                 new NoSuchElementException("Channel with id " + channelId + " not found"));
-
         }
         this.data.remove(channelId);
     }

@@ -1,6 +1,6 @@
 package sprint1.service;
 
-import com.example.demo.levelTest1.entity.Message;
+import sprint1.entity.Message;
 import java.util.List;
 import java.util.UUID;
 

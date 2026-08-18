@@ -1,17 +1,17 @@
 package sprint1;
 
-import static com.example.demo.levelTest1.entity.ChannelType.PRIVATE;
+import static sprint1.entity.ChannelType.PRIVATE;
 
-import com.example.demo.levelTest1.JCF.JCFChannelService;
-import com.example.demo.levelTest1.JCF.JCFMessageService;
-import com.example.demo.levelTest1.JCF.JCFUserService;
-import com.example.demo.levelTest1.entity.Channel;
-import com.example.demo.levelTest1.entity.ChannelType;
-import com.example.demo.levelTest1.entity.Message;
-import com.example.demo.levelTest1.entity.User;
-import com.example.demo.levelTest1.service.ChannelService;
-import com.example.demo.levelTest1.service.MessageService;
-import com.example.demo.levelTest1.service.UserService;
+import sprint1.JCF.JCFChannelService;
+import sprint1.JCF.JCFMessageService;
+import sprint1.JCF.JCFUserService;
+import sprint1.entity.Channel;
+import sprint1.entity.ChannelType;
+import sprint1.entity.Message;
+import sprint1.entity.User;
+import sprint1.service.ChannelService;
+import sprint1.service.MessageService;
+import sprint1.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +30,7 @@ public class JavaApplication {
         System.out.println("유저 조회(다건): " + foundUsers.size());
 
         //수정
-        User updatedUser = userService.update(user1.getId(), "gisao");
+        User updatedUser = userService.update(user1.getId(), "gisao", "a20@naver.com", "12345");
         System.out.println("회원 아이디 수정: " + updatedUser.getUsername());
 
         // 삭제
@@ -53,7 +53,7 @@ public class JavaApplication {
         System.out.println("채널 조회(다건): " + foundChannels.size());
 
         //수정
-        Channel updatedChannel = channelService.update(channel.getId(), PRIVATE);
+        Channel updatedChannel = channelService.update(channel.getId(), "ziseo","이서버로가자");
         System.out.println("채널 타입 수정:" + updatedChannel.getType());
 
         //삭제

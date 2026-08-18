@@ -4,16 +4,13 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 
+@Getter
 public class Channel {
 
-    @Getter
     private UUID id;
-    @Getter
     private Long createdAt;
-    @Getter
     private Long updatedAt;
     //
-    @Getter
     private ChannelType type;
     private String name;
     private String description;
@@ -27,17 +24,19 @@ public class Channel {
         this.description = description;
     }
 
-    public void update(ChannelType newType) {
+    public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
-        if (newType != null && !newType.equals(this.type)) {
-            this.type = newType;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
             anyValueUpdated = true;
         }
-
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
         if (anyValueUpdated) {
             this.updatedAt = Instant.now().getEpochSecond();
         }
-
     }
 
     public String toString() {

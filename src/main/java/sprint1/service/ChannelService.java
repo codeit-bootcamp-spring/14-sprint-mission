@@ -1,7 +1,7 @@
 package sprint1.service;
 
-import com.example.demo.levelTest1.entity.Channel;
-import com.example.demo.levelTest1.entity.ChannelType;
+import sprint1.entity.Channel;
+import sprint1.entity.ChannelType;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +13,7 @@ public interface ChannelService {
 
     List<Channel> findAll();
 
-    Channel update(UUID channelId, ChannelType newChannel);
+    Channel update(UUID channelId, String newName, String newDescription);
 
     void delete(UUID channelId);
 }

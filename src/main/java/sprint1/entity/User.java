@@ -3,17 +3,13 @@ package sprint1.entity;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
-
+@Getter
 public class User {
 
-    @Getter
     private UUID id;
-    @Getter
     private Long createdAt;
-    @Getter
     private Long updatedAt;
     //
-    @Getter
     private String username;
     private String email;
     private String password;
@@ -27,10 +23,18 @@ public class User {
         this.password = password;
     }
 
-    public void update(String newUsername) {
+    public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && newPassword.equals(this.password)) {
+            this.password = newPassword;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {

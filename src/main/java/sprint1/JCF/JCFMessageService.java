@@ -1,13 +1,15 @@
 package sprint1.JCF;
 
-import com.example.demo.levelTest1.entity.Message;
-import com.example.demo.levelTest1.service.MessageService;
+import sprint1.entity.Message;
+import sprint1.service.ChannelService;
+import sprint1.service.MessageService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import sprint1.service.UserService;
 
 public class JCFMessageService implements MessageService {
 
@@ -19,6 +21,17 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
+
+        ChannelService channelService = new JCFChannelService();
+        UserService userService = new JCFUserService();
+        try {
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
+
+
         Message message = new Message(content, channelId, authorId);
         this.data.put(message.getId(), message);
 

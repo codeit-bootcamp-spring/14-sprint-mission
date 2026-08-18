@@ -1,6 +1,6 @@
 package sprint1.service;
 
-import com.example.demo.levelTest1.entity.User;
+import sprint1.entity.User;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +13,7 @@ public interface UserService {
 
     List<User> findAll();
 
-    User update(UUID userId, String newUsername);
+    User update(UUID userId, String newUsername, String newEmail, String newPassword);
 
     void delete(UUID userId);
 }

@@ -1,7 +1,7 @@
 package sprint1.JCF;
 
-import com.example.demo.levelTest1.entity.User;
-import com.example.demo.levelTest1.service.UserService;
+import sprint1.entity.User;
+import sprint1.service.UserService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,14 +40,15 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, String newUsername) {
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         User userNullable = this.data.get(userId);
         User user = Optional.ofNullable(userNullable)
-            .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-
-        user.update(newUsername);
+            .orElseThrow(() -> new NoSuchElementException("User with id" + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
 
         return user;
+
+
     }
 
     @Override

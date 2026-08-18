@@ -4,16 +4,13 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 
+@Getter
 public class Message {
 
-    @Getter
     private UUID id;
-    @Getter
     private Long createdAt;
-    @Getter
     private Long updatedAt;
     //
-    @Getter
     private String content;
     private UUID channelId;
     private UUID authorId;
