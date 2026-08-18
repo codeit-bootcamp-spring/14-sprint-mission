@@ -73,8 +73,26 @@ public enum ExceptionType {
         Level.WARN,
         HttpStatus.UNAUTHORIZED,
         "아이디 또는 비밀번호가 올바르지 않습니다"
-    );
+    ),
 
+    
+    VALIDATION_FAILED(
+        Level.WARN,
+        HttpStatus.BAD_REQUEST,
+        "요청 값이 올바르지 않습니다"
+    ),
+
+    INVALID_PARAMETER(
+        Level.WARN,
+        HttpStatus.BAD_REQUEST,
+        "요청 파라미터 형식이 올바르지 않습니다."
+    ),
+
+    INTERNAL_ERROR(
+        Level.ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        "서버 내부 오류가 발생했습니다"
+    );
 
     Level level;
     HttpStatus status;

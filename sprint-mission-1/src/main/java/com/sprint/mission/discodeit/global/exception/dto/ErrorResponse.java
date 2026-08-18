@@ -8,6 +8,10 @@ public record ErrorResponse(
 ) {
 
     public static ErrorResponse of(ExceptionType type) {
-        return new ErrorResponse(type.getStatus().toString(), type.getMessage());
+        return new ErrorResponse(type.name(), type.getMessage());
+    }
+
+    public static ErrorResponse of(ExceptionType type, String message) {
+        return new ErrorResponse(type.name(), message);
     }
 }
