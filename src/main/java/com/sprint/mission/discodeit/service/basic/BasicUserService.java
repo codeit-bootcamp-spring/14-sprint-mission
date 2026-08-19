@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.*;
-import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,14 +16,14 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class BasicUserService implements UserService {
+public class BasicUserService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    @Override
+
     public User createAccount(UserCreationDto dto) {
         // 1. 선택적으로 프로필 이미지를 등록할 수 있어야 한다.
         // 다른 필드들은 필수로 받아야한다는 뜻?
@@ -43,7 +42,7 @@ public class BasicUserService implements UserService {
         return userRepository.create(user);
     }
 
-    @Override
+
     public UserResponseDto getUser(UUID id) {
         // 1. 사용자 온라인 정보를 포함시켜야 한다.
         // 2. 패스워드 정보는 제외해야 한다.
@@ -56,7 +55,6 @@ public class BasicUserService implements UserService {
         return UserResponseDto.of(user, userStatus);
     }
 
-    @Override
     public List<UserResponseDto> getAllUsers() {
         // 1. 사용자 온라인 정보를 포함시켜야 한다.
         // 2. 패스워드 정보는 제외해야 한다.
@@ -69,7 +67,6 @@ public class BasicUserService implements UserService {
         return dtos;
     }
 
-    @Override
     public void updateUser(UUID id, @Valid UserUpdateDto dto) {
         // 1. 선택적으로 프로필 이미지를 대체할 수 있어야 한다.
         // 2. DTO를 활용해 파라미터를 그룹화한다.
@@ -86,7 +83,6 @@ public class BasicUserService implements UserService {
 
     }
 
-    @Override
     public void deleteAccount(UUID id) {
         User toBeDeleted = userRepository.findById(id)
                         .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));

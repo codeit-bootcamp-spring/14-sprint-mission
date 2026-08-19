@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.*;
-import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,14 +18,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class BasicMessageService implements MessageService {
+public class BasicMessageService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    @Override
     public Message createMessage(@Valid MessageCreationDto dto) {
         UUID userId = dto.getUserId();
         UUID channelId = dto.getChannelId();
@@ -47,28 +45,23 @@ public class BasicMessageService implements MessageService {
         return messageRepository.create(message);
     }
 
-    @Override
     public Optional<Message> getMessage(UUID id) {
         return messageRepository.findById(id);
     }
 
-    @Override
     public List<Message> getAllMessages() {
         return messageRepository.findAll();
     }
 
-    @Override
     public List<Message> getAllByChannelId(UUID channelId) {
         return messageRepository.findAllByChannelId(channelId);
     }
 
     // TODO 구현은 나중에, 앤티티 수정해야 해서 너무 오래 걸릴 듯,,
-    @Override
     public void updateMessage(UUID id, MessageUpdateDto dto) {
         messageRepository.updateContent(id, dto.getContent());
     }
 
-    @Override
     public void deleteMessage(UUID id) {
         // binaryContent 필드에 다른 필드의 id가 없어서, 다른 엔티티에서 조회해야하는 번거로움
         Message toBeDeleted = messageRepository.findById(id)

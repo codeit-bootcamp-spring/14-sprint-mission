@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,13 +21,12 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class BasicChannelService implements ChannelService {
+public class BasicChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    @Override
     public Channel createChannel(@Valid ChannelCreationDto dto) {
         // 1. PUBLIC 채널 생성은 기존 로직 유지
         Channel channel = dto.toChannel();
@@ -48,7 +46,6 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.create(channel);
     }
 
-    @Override
     public ChannelResponseDto getChannel(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
@@ -73,12 +70,10 @@ public class BasicChannelService implements ChannelService {
 
     // 3. 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
     // 4. PUBLIC인 전체조회, PRIVATE은 User가 참여한 채널만 조회하도록
-    @Override
     public List<Channel> getAllChannels() {
         return channelRepository.findAll();
     }
 
-    @Override
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
         // userId로 readStatus에서 channel 찾아서 반환
         // public은 전부 포함해야 함. private은 소속된 채널만
@@ -91,12 +86,10 @@ public class BasicChannelService implements ChannelService {
 
     // TODO 1. DTO 활용해 파라미터 그룹화
     // TODO 2. PRIVATE 채널은 수정할 수 없음
-    @Override
     public void updateChannelName(UUID id, ChannelUpdateNameDto dto) {
         channelRepository.updateName(id, dto.getName());
     }
 
-    @Override
     public void deleteChannel(UUID id) {
         // 채널 내부 message 삭제
         messageRepository.deleteAllByChannelId(id);
