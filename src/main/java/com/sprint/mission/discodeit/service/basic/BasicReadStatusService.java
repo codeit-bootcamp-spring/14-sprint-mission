@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusResponse;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -21,7 +22,7 @@ public class BasicReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    public ReadStatus create(UUID userId, UUID channelId) {
+    public ReadStatusResponse create(UUID userId, UUID channelId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
         Channel channel = channelRepository.findById(channelId)
@@ -30,8 +31,10 @@ public class BasicReadStatusService {
         if (readStatusRepository.existsByUserAndChannel(user.getId(), channel.getId())) {
             throw new CustomException(ExceptionType.READSTATUS_ALREADY_EXISTS);
         }
+        ReadStatus readStatus = new ReadStatus(userId, channelId);
+        ReadStatus created = readStatusRepository.create(readStatus);
 
-        return new ReadStatus(userId, channelId);
+        return ReadStatusResponse.of(created);
     }
 
     public ReadStatus getReadStatus(UUID id) {
@@ -39,15 +42,19 @@ public class BasicReadStatusService {
                 .orElseThrow(() -> new CustomException(ExceptionType.READSTATUS_NOT_FOUND_IN_DATABASE));
     }
 
-    public List<ReadStatus> getAllReadStatusByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
+    public List<ReadStatusResponse> getAllReadStatusByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatusResponse::of)
+                .toList();
     }
 
-    public void updateReadStatus(UUID id) {
+    public List<ReadStatusResponse> updateReadStatus(UUID channelId) {
         // 요구사항 : DTO를 활용해 파라미터를 그룹화합니다 (수정 대상 객체의 id 파라미터, 수정할 값 파라미터)
         // 아니 근데 readStatus애서 수정할 필드라곤 마지막 메시지 읽은 시간밖에 없어서 파라미터도 필요 없는데
         // 왜 DTO를 만들라고 했을까?
-        readStatusRepository.update(id);
+        return readStatusRepository.updateByChannelId(channelId).stream()
+                .map(ReadStatusResponse::of)
+                .toList();
     }
 
     public void deleteReadStatus(UUID id) {

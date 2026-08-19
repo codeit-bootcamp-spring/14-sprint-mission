@@ -53,8 +53,14 @@ public class JCFReadStatusRepository extends AbstractJCFRepository<ReadStatus>
     }
 
     @Override
-    public void update(UUID id) {
-        findById(id).ifPresent(readStatus -> readStatus.update());
+    public List<ReadStatus> updateByChannelId(UUID channelId) {
+        List<ReadStatus> channelReadStatus = super.STORE.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
+        for (ReadStatus eachReadStatus : channelReadStatus) {
+            eachReadStatus.update();
+        }
+        return channelReadStatus;
     }
 
     @Override
