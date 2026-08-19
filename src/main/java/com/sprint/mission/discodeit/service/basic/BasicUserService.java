@@ -63,14 +63,16 @@ public class BasicUserService implements UserService {
             .orElseThrow(() -> new RuntimeException("유저 상태 정보가 없습니다."));
         boolean online = userStatus.isOnline();
         return UserResponseDto.from(user, online);
+
     }
 
     @Override
-    public void update(User user, String updatedname, String updatedemail) {
+    public UserResponseDto update(UUID id, String updatedname, String updatedemail) {
         read(user.getId());
         user.setName(updatedname);
         user.setEmail(updatedemail);
         userRepository.save(user);
+        return UserResponseDto.from(user);
     }
 
     @Override
@@ -80,8 +82,13 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserResponseDto> findAll() {
+        return userRepository.findAll().stream()
+            .map(user -> {UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("유저 상태 정보가 없습니다."));
+                boolean online = userStatus.isOnline();
+                return UserResponseDto.from(user, online);})
+            .toList();
     }
 
 }
