@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.readstatus.dto.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.readstatus.service.ReadStatusService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
+@Tag(name = "ReadStatus", description = "ReadStatus Api")
 public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
+    @Operation(summary = "읽음 상태 조회")
     @RequestMapping(method = RequestMethod.GET, value = "/api/readStatuses")
     public ResponseEntity<List<ReadStatusResponseDto>> findAll(
         @RequestParam UUID userId
@@ -33,6 +37,7 @@ public class ReadStatusController {
             .body(readStatusService.findAllByUserId(userId));
     }
 
+    @Operation(summary = "읽음 상태 생성")
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/api/readStatuses")
     public ResponseEntity<ReadStatusResponseDto> create(
@@ -42,6 +47,7 @@ public class ReadStatusController {
             .body(readStatusService.readStatusCreate(readStatusCreateRequestDto));
     }
 
+    @Operation(summary = "읽음 상태 수정")
     @RequestMapping(method = RequestMethod.PATCH, value = "/api/readStatuses/{readStatusId}")
     public ResponseEntity<ReadStatusResponseDto> update(
         @PathVariable UUID readStatusId,

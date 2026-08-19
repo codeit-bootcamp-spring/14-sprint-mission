@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.auth.controller;
 import com.sprint.mission.discodeit.auth.dto.LoginRequestDto;
 import com.sprint.mission.discodeit.auth.service.AuthService;
 import com.sprint.mission.discodeit.user.dto.UserResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
+@Tag(name = "Auth", description = "Auth Api")
 public class AuthController {
 
     private final AuthService authService;
 
-    // 사용자 로그인
+    @Operation(summary = "사용자 로그인")
     @RequestMapping(method = RequestMethod.POST, value = "/api/auth/login")
     public ResponseEntity<UserResponse> login(
         @Valid @RequestBody LoginRequestDto loginRequestDto) {

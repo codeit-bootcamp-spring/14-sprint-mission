@@ -30,8 +30,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
 
     @Override
-    public List<BinaryContentResponseDto> findAll() {
-        List<BinaryContent> binaryContents = binaryContentRepository.findAll();
+    public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIds) {
+        List<BinaryContent> binaryContents = binaryContentRepository.findAllByIdIn(
+            binaryContentIds);
 
         return binaryContents.stream()
             .map(BinaryContentResponseDto::from)

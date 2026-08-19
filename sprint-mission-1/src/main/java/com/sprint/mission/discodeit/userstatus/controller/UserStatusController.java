@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.userstatus.controller;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusResponseDto;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.userstatus.service.UserStatusService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
+@Tag(name = "UserStatus", description = "UserStatus Api")
 public class UserStatusController {
 
     private final UserStatusService userStatusService;
 
-    // 사용자 상태 업데이트
+    @Operation(summary = "사용자 상태 수정")
     @RequestMapping(method = RequestMethod.PATCH, value = "/api/users/{userId}/userStatus")
     public ResponseEntity<UserStatusResponseDto> userStatusUpdate(
         @PathVariable UUID userId,

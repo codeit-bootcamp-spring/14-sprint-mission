@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.dto.UserResponse;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -23,11 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
+@Tag(name = "User", description = "User Api")
 public class UserController {
 
     private final UserService userService;
 
-    // 사용자 등록
+    @Operation(summary = "사용자 생성")
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(
         method = RequestMethod.POST,
@@ -41,7 +44,7 @@ public class UserController {
             .body(userService.userCreate(userCreateRequestDto, profile));
     }
 
-    // 사용자 수정
+    @Operation(summary = "사용자 수정")
     @RequestMapping(method = RequestMethod.PATCH,
         value = "/api/users/{userId}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -54,7 +57,7 @@ public class UserController {
             .body(userService.userUpdate(userId, userUpdateRequestDto, profile));
     }
 
-    // 사용자 삭제
+    @Operation(summary = "사용자 삭제")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/api/users/{userId}")
     public ResponseEntity<Void> delete(
@@ -66,7 +69,7 @@ public class UserController {
             .build();
     }
 
-    // 전체 사용자 조회
+    @Operation(summary = "전체 사용자 조회")
     @RequestMapping(method = RequestMethod.GET, value = "/api/users")
     public ResponseEntity<List<UserDto>> findAll() {
         return ResponseEntity
