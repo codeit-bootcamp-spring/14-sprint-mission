@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -16,12 +16,12 @@ public class BasicAuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 
-    public UserResponseDto login(String name, String password) {
+    public UserDto login(String name, String password) {
         User retrieved = userRepository.findByNameAndPassword(name, password)
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
         UserStatus userStatus = userStatusRepository.findByUserId(retrieved.getId())
                 .orElseThrow(() -> new CustomException(ExceptionType.USERSTATUS_NOT_FOUND_IN_DATABASE));
         userStatus.updateLastSeenAt();
-        return UserResponseDto.of(retrieved, userStatus);
+        return UserDto.of(retrieved, userStatus);
     }
 }

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.*;
@@ -21,11 +21,10 @@ public class BasicUserService {
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
 
-
-    public UserResponseDto createAccount(String name,
-                              String email,
-                              String password,
-                              @Nullable UUID profileId
+    public UserDto createAccount(String name,
+                                 String email,
+                                 String password,
+                                 @Nullable UUID profileId
                               ) {
         // 1. 선택적으로 프로필 이미지를 등록할 수 있어야 한다.
         // 2. username과 email은 다른 유저와 달라야 한다.
@@ -37,11 +36,11 @@ public class BasicUserService {
         User user = new User(name, email, password, profileId);
         UserStatus userStatus = userStatusRepository.create(new UserStatus(user.getId()));
         User created = userRepository.create(user);
-        return UserResponseDto.of(created, userStatus);
+        return UserDto.of(created, userStatus);
     }
 
 
-    public UserResponseDto getUser(UUID id) {
+    public UserDto getUser(UUID id) {
         // 1. 사용자 온라인 정보를 포함시켜야 한다.
         // 2. 패스워드 정보는 제외해야 한다.
         User user = userRepository.findById(id)
@@ -50,14 +49,14 @@ public class BasicUserService {
         UserStatus userStatus = userStatusRepository.findByUserId(id)
                 .orElseThrow(() -> new CustomException(ExceptionType.USERSTATUS_NOT_FOUND_IN_DATABASE));
 
-        return UserResponseDto.of(user, userStatus);
+        return UserDto.of(user, userStatus);
     }
 
-    public List<UserResponseDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         // 1. 사용자 온라인 정보를 포함시켜야 한다.
         // 2. 패스워드 정보는 제외해야 한다.
         List<User> users = userRepository.findAll();
-        List<UserResponseDto> dtos = new ArrayList<>();
+        List<UserDto> dtos = new ArrayList<>();
         for (User user : users) {
             dtos.add(getUser(user.getId()));
         }
@@ -65,7 +64,7 @@ public class BasicUserService {
         return dtos;
     }
 
-    public UserResponseDto updateUser(UUID id,
+    public UserDto updateUser(UUID id,
                            String name, String email, String password, UUID profileId) {
         // 1. 선택적으로 프로필 이미지를 대체할 수 있어야 한다.
         // 2. DTO를 활용해 파라미터를 그룹화한다.
@@ -76,10 +75,10 @@ public class BasicUserService {
         userRepository.update(id, name, email, password, profileId);
         User updated = userRepository.findById(id).orElseThrow();
         UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
-        return UserResponseDto.of(updated, userStatus);
+        return UserDto.of(updated, userStatus);
     }
 
-    public UserResponseDto deleteAccount(UUID id) {
+    public UserDto deleteAccount(UUID id) {
         User deleted = userRepository.findById(id)
                         .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
         UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
@@ -95,6 +94,6 @@ public class BasicUserService {
         userStatusRepository.deleteByUserId(id);
         userRepository.deleteById(id);
 
-        return UserResponseDto.of(deleted, userStatus);
+        return UserDto.of(deleted, userStatus);
     }
 }

@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.user.UserCreationDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +24,7 @@ public class UserApiController {
     private final BasicUserService userService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public UserResponseDto create(@Valid @RequestBody UserCreationDto request) {
+    public UserDto create(@Valid @RequestBody UserCreationDto request) {
         return userService.createAccount(
                 request.getName(),
                 request.getEmail(),
@@ -32,7 +34,7 @@ public class UserApiController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public UserResponseDto update(@PathVariable UUID id,
+    public UserDto update(@PathVariable UUID id,
                                   @Valid @RequestBody UserUpdateDto request) {
         return userService.updateUser(
                 id,
@@ -44,17 +46,19 @@ public class UserApiController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public UserResponseDto delete(@PathVariable UUID id) {
+    public UserDto delete(@PathVariable UUID id) {
         return userService.deleteAccount(id);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<UserResponseDto> readAll() {
-        return userService.getAllUsers();
+    @RequestMapping(method = RequestMethod.GET, value = "/findAll")
+    public ResponseEntity<List<UserDto>> readAll() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.getAllUsers());
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public UserResponseDto read(@PathVariable UUID id) {
+    public UserDto read(@PathVariable UUID id) {
         return userService.getUser(id);
     }
 }

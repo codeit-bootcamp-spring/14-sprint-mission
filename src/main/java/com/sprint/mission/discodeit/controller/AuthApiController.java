@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class AuthApiController {
     private final BasicAuthService authService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public UserResponseDto login(@Valid @RequestBody LoginRequestDto requestDto) {
+    public UserDto login(@Valid @RequestBody LoginRequestDto requestDto) {
         return authService.login(requestDto.name(), requestDto.password());
     }
 }
