@@ -65,7 +65,7 @@ public class BasicUserService {
         return dtos;
     }
 
-    public void updateUser(UUID id,
+    public UserResponseDto updateUser(UUID id,
                            String name, String email, String password, UUID profileId) {
         // 1. 선택적으로 프로필 이미지를 대체할 수 있어야 한다.
         // 2. DTO를 활용해 파라미터를 그룹화한다.
@@ -74,22 +74,27 @@ public class BasicUserService {
         }
 
         userRepository.update(id, name, email, password, profileId);
-
+        User updated = userRepository.findById(id).orElseThrow();
+        UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
+        return UserResponseDto.of(updated, userStatus);
     }
 
-    public void deleteAccount(UUID id) {
-        User toBeDeleted = userRepository.findById(id)
+    public UserResponseDto deleteAccount(UUID id) {
+        User deleted = userRepository.findById(id)
                         .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
-        UUID profileId = toBeDeleted.getProfileId();
+        UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
+        UUID profileId = deleted.getProfileId();
 
         // binary content가 Null일 수도 있어서 여기서 검사했는데 마음에 안듦
         // 이게 최선..?
         if (Objects.nonNull(profileId)) {
-            binaryContentRepository.deleteById(toBeDeleted.getProfileId());
+            binaryContentRepository.deleteById(deleted.getProfileId());
         }
         readStatusRepository.deleteByUserId(id);
         messageRepository.deleteAllByUserId(id);
         userStatusRepository.deleteByUserId(id);
         userRepository.deleteById(id);
+
+        return UserResponseDto.of(deleted, userStatus);
     }
 }
