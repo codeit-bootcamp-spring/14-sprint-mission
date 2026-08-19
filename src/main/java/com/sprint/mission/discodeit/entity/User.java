@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
@@ -21,17 +22,17 @@ public class User extends BasicEntity {
 
 
 
+    public void update(String name, String email) {
+        if (name != null) {
+            this.name = name;
+        }
+        if (email != null) {
+            this.email = email;
+        }
 
-
-
-    public void setName(String name) {
-        this.name = name;
-        this.updatedAt = Instant.now();
     }
-
-    public void setEmail(String email) {
-        this.email = email;
-        this.updatedAt = Instant.now();
+    public void updateProfileId(UUID profileId) {
+        this.profileId = profileId;
     }
 
     @Override

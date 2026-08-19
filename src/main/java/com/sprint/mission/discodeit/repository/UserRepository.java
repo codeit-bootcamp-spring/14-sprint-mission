@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserRepository {
-    public void save(User user);
-    public User findById(UUID id);
-    public List<User> findAll();
-    public void deleteById(UUID id);
+    void save(User user);
+    User findById(UUID id);
+    List<User> findAll();
+    void deleteById(UUID id);
     boolean existsByEmail(String email);
     boolean existsByName(String name);
 
