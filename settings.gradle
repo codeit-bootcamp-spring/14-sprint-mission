@@ -1,1 +1,3 @@
-rootProject.name = '1-sprint-mission'
+rootProject.name = 'discodeit'
+include 'discodeit-core'
+include 'discodeit-api'
