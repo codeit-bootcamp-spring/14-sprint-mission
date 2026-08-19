@@ -2,13 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.dto.user.UserCreationDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.*;
-import jakarta.validation.Valid;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,22 +22,22 @@ public class BasicUserService {
     private final ReadStatusRepository readStatusRepository;
 
 
-    public User createAccount(UserCreationDto dto) {
+    public UserResponseDto createAccount(String name,
+                              String email,
+                              String password,
+                              @Nullable UUID profileId
+                              ) {
         // 1. 선택적으로 프로필 이미지를 등록할 수 있어야 한다.
-        // 다른 필드들은 필수로 받아야한다는 뜻?
-        String name = dto.getName();
-        String email = dto.getEmail();
-
         // 2. username과 email은 다른 유저와 달라야 한다.
         if(userRepository.existsByNameOrEmail(name, email)) {
             throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);
         }
 
         // 3. UserStatus를 같이 생성해야 한다.
-        User user = dto.toUser();
-        userStatusRepository.create(new UserStatus(user.getId()));
-
-        return userRepository.create(user);
+        User user = new User(name, email, password, profileId);
+        UserStatus userStatus = userStatusRepository.create(new UserStatus(user.getId()));
+        User created = userRepository.create(user);
+        return UserResponseDto.of(created, userStatus);
     }
 
 
@@ -67,17 +65,13 @@ public class BasicUserService {
         return dtos;
     }
 
-    public void updateUser(UUID id, @Valid UserUpdateDto dto) {
+    public void updateUser(UUID id,
+                           String name, String email, String password, UUID profileId) {
         // 1. 선택적으로 프로필 이미지를 대체할 수 있어야 한다.
         // 2. DTO를 활용해 파라미터를 그룹화한다.
         if (!userRepository.existsById(id)) {
             throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
         }
-
-        String name = dto.getName();
-        String email = dto.getEmail();
-        String password = dto.getPassword();
-        UUID profileId = dto.getProfileId();
 
         userRepository.update(id, name, email, password, profileId);
 

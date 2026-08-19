@@ -3,12 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.*;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +22,7 @@ public class BasicMessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    public Message createMessage(@Valid MessageCreationDto dto) {
-        UUID userId = dto.getUserId();
-        UUID channelId = dto.getChannelId();
-
+    public Message createMessage(String content, UUID userId, UUID channelId, List<UUID> attachmentIds) {
         if (!userRepository.existsById(userId)) {
             throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
         }
@@ -41,7 +35,7 @@ public class BasicMessageService {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
-        Message message = dto.toMessage();
+        Message message = new Message(content, userId, channelId, attachmentIds);
         return messageRepository.create(message);
     }
 
@@ -58,8 +52,8 @@ public class BasicMessageService {
     }
 
     // TODO 구현은 나중에, 앤티티 수정해야 해서 너무 오래 걸릴 듯,,
-    public void updateMessage(UUID id, MessageUpdateDto dto) {
-        messageRepository.updateContent(id, dto.getContent());
+    public void updateMessage(UUID id, String content) {
+        messageRepository.updateContent(id, content);
     }
 
     public void deleteMessage(UUID id) {

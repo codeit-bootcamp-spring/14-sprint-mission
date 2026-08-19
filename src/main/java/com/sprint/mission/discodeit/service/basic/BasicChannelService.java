@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -12,7 +11,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +25,9 @@ public class BasicChannelService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    public Channel createChannel(@Valid ChannelCreationDto dto) {
+    public Channel createChannel(Channel channel, List<UUID> userIds) {
         // 1. PUBLIC 채널 생성은 기존 로직 유지
-        Channel channel = dto.toChannel();
         UUID channelId = channel.getId();
-        List<UUID> userIds = dto.getUserIds();
 
         if (!userRepository.existsAllByIds(userIds)) {
             throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);

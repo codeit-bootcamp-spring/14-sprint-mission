@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,7 +8,6 @@ import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +21,17 @@ public class BasicReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    public ReadStatus create(@Valid ReadStatusCreateDto dto) {
-        User user = userRepository.findById(dto.getUserId())
+    public ReadStatus create(UUID userId, UUID channelId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
-        Channel channel = channelRepository.findById(dto.getChannelId())
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
 
         if (readStatusRepository.existsByUserAndChannel(user.getId(), channel.getId())) {
             throw new CustomException(ExceptionType.READSTATUS_ALREADY_EXISTS);
         }
 
-        return dto.toReadStatus();
+        return new ReadStatus(userId, channelId);
     }
 
     public ReadStatus getReadStatus(UUID id) {

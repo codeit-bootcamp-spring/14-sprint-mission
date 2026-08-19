@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
@@ -18,8 +17,7 @@ public class BasicUserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
 
-    public UserStatus create(UserStatusCreateDto dto) {
-        UUID userId = dto.getUserId();
+    public UserStatus create(UUID userId) {
         if(!userRepository.existsById(userId)) {
             throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
         }
@@ -27,7 +25,8 @@ public class BasicUserStatusService {
             throw new CustomException(ExceptionType.USERSTATUS_ALREADY_EXISTS);
         }
 
-        return userStatusRepository.create(dto.toUserStatus());
+        UserStatus userStatus = new UserStatus(userId);
+        return userStatusRepository.create(userStatus);
     }
 
     public UserStatus getUserStatus(UUID id) {
