@@ -1,15 +1,12 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.domain.channel;
 
-import com.sprint.mission.discodeit.entity.common.ModifiableEntity;
+import com.sprint.mission.discodeit.domain.common.ModifiableEntity;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serial;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @ToString(onlyExplicitlyIncluded = true)
 @Getter

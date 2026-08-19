@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 
 import java.util.List;
 import java.util.UUID;

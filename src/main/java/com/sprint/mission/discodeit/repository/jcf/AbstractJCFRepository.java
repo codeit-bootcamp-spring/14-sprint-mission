@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.common.BasicEntity;
+import com.sprint.mission.discodeit.domain.common.BasicEntity;
 import com.sprint.mission.discodeit.repository.CrudRepository;
 
 import java.util.*;

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 
 import java.util.Optional;
 import java.util.UUID;

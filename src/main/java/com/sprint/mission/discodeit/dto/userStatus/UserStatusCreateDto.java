@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.userStatus;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 

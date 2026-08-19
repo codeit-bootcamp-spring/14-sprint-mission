@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import lombok.Value;
 
 import java.util.UUID;

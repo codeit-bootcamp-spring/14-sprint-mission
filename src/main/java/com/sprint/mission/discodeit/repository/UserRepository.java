@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.domain.user.User;
 import jakarta.annotation.Nullable;
 
 import java.util.List;

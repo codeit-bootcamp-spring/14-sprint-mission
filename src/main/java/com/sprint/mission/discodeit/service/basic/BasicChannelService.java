@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.channel.ChannelType;
+import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;

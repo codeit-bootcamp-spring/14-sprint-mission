@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.domain.message.Message;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Value;

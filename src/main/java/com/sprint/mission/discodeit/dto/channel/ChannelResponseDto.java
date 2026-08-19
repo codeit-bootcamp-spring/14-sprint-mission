@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.domain.channel.Channel;
 import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 

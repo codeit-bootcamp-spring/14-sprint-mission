@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.common;
+package com.sprint.mission.discodeit.domain.common;
 
 import lombok.Getter;
 

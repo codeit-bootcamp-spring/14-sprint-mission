@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.domain.userstatus;
 
-import com.sprint.mission.discodeit.entity.common.ModifiableEntity;
+import com.sprint.mission.discodeit.domain.common.ModifiableEntity;
 import lombok.Getter;
 import lombok.ToString;
 
