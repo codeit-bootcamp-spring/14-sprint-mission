@@ -55,7 +55,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void messageUpdate(UUID messageId, MessageUpdateRequestDto messageUpdateRequestDto) {
+    public MessageResponseDto messageUpdate(UUID messageId,
+        MessageUpdateRequestDto messageUpdateRequestDto) {
         Message message = messageRepository.findByMessage(messageId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.MESSAGE_NOT_FOUND,
@@ -64,6 +65,8 @@ public class MessageServiceImpl implements MessageService {
 
         message.updateMessage(messageUpdateRequestDto.newContent());
         messageRepository.update(message);
+
+        return MessageResponseDto.from(message);
     }
 
     @Override

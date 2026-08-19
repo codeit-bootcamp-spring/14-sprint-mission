@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.channel.controller;
 import com.sprint.mission.discodeit.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPublicCreateRequestDto;
+import com.sprint.mission.discodeit.channel.dto.ChannelResponse;
 import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class ChannelController {
     private final ChannelService channelService;
 
     // 공개 채널 생성
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/api/channels/public")
     public ResponseEntity<ChannelDto> publicCreate(
         @Valid @RequestBody ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
@@ -34,6 +37,7 @@ public class ChannelController {
     }
 
     // 비공개 채널 생성
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/api/channels/private")
     public ResponseEntity<ChannelDto> privateCreate(
         @Valid @RequestBody ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
@@ -44,17 +48,24 @@ public class ChannelController {
 
     // 공개 채널 수정
     @RequestMapping(method = RequestMethod.PATCH, value = "/api/channels/{channelId}")
-    public void update(
+    public ResponseEntity<ChannelResponse> update(
         @PathVariable UUID channelId,
         @Valid @RequestBody ChannelUpdateRequestDto channelUpdateRequestDto) {
-        channelService.channelUpdate(channelId, channelUpdateRequestDto);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(channelService.channelUpdate(channelId, channelUpdateRequestDto));
     }
 
     // 채널 삭제
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/api/channels/{channelId}")
-    public void delete(
+    public ResponseEntity<Void> delete(
         @PathVariable UUID channelId) {
         channelService.channelDelete(channelId);
+
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build();
     }
 
     // 특정 사용자의 채널 목록 조회

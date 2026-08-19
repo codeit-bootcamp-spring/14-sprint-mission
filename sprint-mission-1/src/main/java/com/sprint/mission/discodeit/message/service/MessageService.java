@@ -10,7 +10,8 @@ public interface MessageService {
 
     MessageResponseDto messageCreate(MessageCreateRequestDto messageCreateRequestDto);
 
-    void messageUpdate(UUID messageId, MessageUpdateRequestDto messageUpdateRequestDto);
+    MessageResponseDto messageUpdate(UUID messageId,
+        MessageUpdateRequestDto messageUpdateRequestDto);
 
     void messageDelete(UUID messageId);
 

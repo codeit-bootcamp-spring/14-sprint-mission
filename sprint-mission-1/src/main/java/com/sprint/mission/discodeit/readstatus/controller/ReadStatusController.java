@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "api/readStatuses")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/readStatuses")
     public ResponseEntity<List<ReadStatusResponseDto>> findAll(
         @RequestParam UUID userId
     ) {
@@ -32,6 +33,7 @@ public class ReadStatusController {
             .body(readStatusService.findAllByUserId(userId));
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/api/readStatuses")
     public ResponseEntity<ReadStatusResponseDto> create(
         @Valid @RequestBody ReadStatusCreateRequestDto readStatusCreateRequestDto) {

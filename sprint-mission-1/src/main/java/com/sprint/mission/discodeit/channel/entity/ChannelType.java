@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.channel.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
 import lombok.AccessLevel;
@@ -11,7 +10,6 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @RequiredArgsConstructor
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum ChannelType {
     PUBLIC("PUBLIC", "공개 채널"),

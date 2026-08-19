@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentReposi
 import com.sprint.mission.discodeit.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPublicCreateRequestDto;
+import com.sprint.mission.discodeit.channel.dto.ChannelResponse;
 import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
@@ -66,7 +67,8 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public void channelUpdate(UUID channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
+    public ChannelResponse channelUpdate(UUID channelId,
+        ChannelUpdateRequestDto channelUpdateRequestDto) {
         Channel channel = channelRepository.findByChannel(channelId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.CHANNEL_NOT_FOUND,
@@ -83,6 +85,8 @@ public class ChannelServiceImpl implements ChannelService {
         channel.update(channelUpdateRequestDto.newName(),
             channelUpdateRequestDto.newDescription());
         channelRepository.update(channel);
+
+        return ChannelResponse.from(channel);
     }
 
     @Override

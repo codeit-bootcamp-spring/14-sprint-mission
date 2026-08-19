@@ -29,7 +29,7 @@ public class BinaryContentController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/binaryContents")
     public ResponseEntity<List<BinaryContentResponseDto>> findAll(
-        @RequestParam List<UUID> binaryContentIds
+        @RequestParam List<UUID> binaryContentIds /*TODO 사용하는 메서드 생성*/
     ) {
         return ResponseEntity
             .status(HttpStatus.OK)

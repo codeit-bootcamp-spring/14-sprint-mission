@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.global.exception.DiscodeitException;
 import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.user.dto.UserDto;
+import com.sprint.mission.discodeit.user.dto.UserResponse;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserDto userCreate(UserCreateRequestDto userCreateRequestDto) {
+    public UserResponse userCreate(UserCreateRequestDto userCreateRequestDto) {
         if (userRepository.findByUserName(userCreateRequestDto.username()).isPresent()) {
             throw new DiscodeitException(
                 ExceptionType.USER_NAME_CONFLICT,
@@ -52,11 +53,11 @@ public class UserServiceImpl implements UserService {
 
         UserStatus userStatus = userStatusRepository.statusAdd(new UserStatus(user.getId()));
 
-        return UserDto.from(userRepository.userAdd(user), userStatus);
+        return UserResponse.from(userRepository.userAdd(user));
     }
 
     @Override
-    public UserDto userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto) {
+    public UserResponse userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto) {
         User user = userRepository.findByUser(userId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_NOT_FOUND,
@@ -92,7 +93,7 @@ public class UserServiceImpl implements UserService {
                 ExceptionType.USER_STATUS_MISSING_FOR_USER,
                 Map.of("authorId", user.getId()
                 )));
-        return UserDto.from(user, userStatus);
+        return UserResponse.from(user);
     }
 
     @Override

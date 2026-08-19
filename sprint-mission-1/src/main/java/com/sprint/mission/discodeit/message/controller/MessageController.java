@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "api/messages")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/messages")
     public ResponseEntity<List<MessageResponseDto>> findAll(
         @RequestParam UUID channelId
     ) {
@@ -32,6 +33,7 @@ public class MessageController {
             .body(messageService.findAllByChannelId(channelId));
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/api/messages")
     public ResponseEntity<MessageResponseDto> create(
         @Valid @RequestBody MessageCreateRequestDto messageCreateRequestDto) {
@@ -41,15 +43,22 @@ public class MessageController {
     }
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/api/messages/{messageId}")
-    public void update(
+    public ResponseEntity<MessageResponseDto> update(
         @PathVariable UUID messageId,
         @Valid @RequestBody MessageUpdateRequestDto messageUpdateRequestDto) {
-        messageService.messageUpdate(messageId, messageUpdateRequestDto);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(messageService.messageUpdate(messageId, messageUpdateRequestDto));
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/api/messages/{messageId}")
-    public void delete(
+    public ResponseEntity<Void> delete(
         @PathVariable UUID messageId) {
         messageService.messageDelete(messageId);
+
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build();
     }
 }

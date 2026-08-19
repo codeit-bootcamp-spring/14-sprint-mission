@@ -4,14 +4,17 @@ import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserStatusResponseDto(UUID id, UUID userId, boolean online, Instant lastActiveAt) {
+public record UserStatusResponseDto(UUID id, Instant createdAt, Instant updatedAt, UUID userId,
+                                    boolean online, Instant lastActiveAt) {
 
     public static UserStatusResponseDto from(UserStatus userStatus) {
         return new UserStatusResponseDto(
             userStatus.getId(),
+            userStatus.getCreatedAt(),
+            userStatus.getUpdatedAt(),
             userStatus.getUserId(),
             userStatus.isOnline(),
-            userStatus.getUpdatedAt()
+            userStatus.getLastActiveAt()
         );
     }
 }
