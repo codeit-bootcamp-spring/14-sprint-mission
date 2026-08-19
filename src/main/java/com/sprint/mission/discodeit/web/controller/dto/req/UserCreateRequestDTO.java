@@ -10,11 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreateRequestDTO {
-    String userId;
+    String email;
     String userPassword;
     String checkPassword;
     String name;
-    String email;
     Integer age;
 
     //파일 이미지

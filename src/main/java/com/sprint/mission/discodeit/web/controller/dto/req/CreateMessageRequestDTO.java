@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class CreateMessageRequestDTO {
     UUID userId;
-    UUID channelId;
     String content;
     List<MultipartFile> imageList;  //안들어올수도있음
 }

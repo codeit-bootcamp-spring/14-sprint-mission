@@ -2,4 +2,8 @@ spring:
   application:
     name: discodeit
 
-file.dir: /main/file/
+file.dir: /src/main/file/
+
+
+file:
+  upload-dir: ${user.home}/Desktop/mission-file/

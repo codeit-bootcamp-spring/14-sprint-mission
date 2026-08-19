@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserUpdateRequestDTO {
-    String password;
+    String name;
 }

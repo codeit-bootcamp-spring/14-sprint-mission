@@ -9,8 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageUpdateRequestDTO {
-    UUID messageId;
-    UUID userId;
-    UUID channelId;
     String content;
 }
