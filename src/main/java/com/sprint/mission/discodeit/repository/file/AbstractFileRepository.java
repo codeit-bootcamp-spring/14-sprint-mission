@@ -43,11 +43,11 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
     }
 
     @Override
-    public void deleteById(UUID id) {
-        findById(id).ifPresent(retrieved -> {
-            buffer.remove(id);
-            writeFromBufferToFile();
-        });
+    public T deleteById(UUID id) {
+        T toBeRemoved = buffer.get(id);
+        buffer.remove(id);
+        writeFromBufferToFile();
+        return toBeRemoved;
     }
 
     private Map<UUID, T> readFile() {
