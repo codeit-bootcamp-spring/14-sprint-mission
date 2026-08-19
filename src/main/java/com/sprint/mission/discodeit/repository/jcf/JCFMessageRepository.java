@@ -25,8 +25,10 @@ public class JCFMessageRepository extends AbstractJCFRepository<Message>
     }
 
     @Override
-    public void updateContent(UUID id, String content) {
-        findById(id).ifPresent(retrieved -> retrieved.updateContent(content));
+    public Message updateContent(UUID id, String content) {
+        Message updating = super.STORE.get(id);
+        Message updated = updating.updateContent(content);
+        return updated;
     }
 
     @Override

@@ -29,11 +29,11 @@ public class FileMessageRepository extends AbstractFileRepository<Message>
     }
 
     @Override
-    public void updateContent(UUID id, String content) {
-        findById(id).ifPresent(retrieved -> {
-            retrieved.updateContent(content);
-            super.writeFromBufferToFile();
-        });
+    public Message updateContent(UUID id, String content) {
+        Message updating = super.buffer.get(id);
+        Message updated = updating.updateContent(content);
+        super.writeFromBufferToFile();
+        return updated;
     }
 
     @Override

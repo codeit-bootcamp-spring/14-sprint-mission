@@ -41,9 +41,9 @@ public final class Message extends ModifiableEntity {
         this(content, userId, channelId, null);
     }
 
-    public void updateContent(String content) {
+    public Message updateContent(String content) {
         this.content = content;
-
         super.markedAsUpdate();
+        return this;
     }
 }

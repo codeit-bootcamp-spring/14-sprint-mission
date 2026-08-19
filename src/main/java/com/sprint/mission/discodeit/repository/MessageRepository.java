@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface MessageRepository extends CrudRepository<Message>{
     List<Message> findAllByChannelId(UUID channelId);
 
-    void updateContent(UUID id, String content);
+    Message updateContent(UUID id, String content);
 
     void deleteAllByUserId(UUID userId);
 
