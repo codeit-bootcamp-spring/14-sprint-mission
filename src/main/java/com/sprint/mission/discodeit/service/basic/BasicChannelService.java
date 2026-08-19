@@ -96,10 +96,11 @@ public class BasicChannelService {
         return createChannelResponseDto(updated);
     }
 
-    public void deleteChannel(UUID id) {
+    public ChannelResponseDto deleteChannel(UUID id) {
         // 채널 내부 message 삭제
         messageRepository.deleteAllByChannelId(id);
-        channelRepository.deleteById(id);
         readStatusRepository.deleteByChannelId(id);
+        Channel deleted = channelRepository.deleteById(id);
+        return createChannelResponseDto(deleted);
     }
 }

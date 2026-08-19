@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -36,5 +37,15 @@ public class ChannelApiController {
         );
     }
 
+    // 3. 채널을 삭제할 수 있다.
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    public ChannelResponseDto deleteChannel(@PathVariable UUID id) {
+        return channelService.deleteChannel(id);
+    }
 
+    // 4. 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
+    @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
+    public List<ChannelResponseDto> getAllChannels(@PathVariable UUID userId) {
+        return channelService.getAllChannelsByUserId(userId);
+    }
 }
