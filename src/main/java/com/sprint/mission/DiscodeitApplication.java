@@ -19,8 +19,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class DiscodeitApplication {
 	static User setupUser(UserService userService) {
-		User user = new User("민준", "minjun@naver.com");
-		userService.create(user);
+		User user = new User("민준", "minjun@naver.com",null);
+		userService.create(user, );
 		return user;
 	}
 
@@ -38,7 +38,7 @@ public class DiscodeitApplication {
 	static void runTest(UserRepository userRepository,
 		ChannelRepository channelRepository,
 		MessageRepository messageRepository) {
-		UserService userService = new BasicUserService(userRepository);
+		UserService userService = new BasicUserService(userRepository, "");
 		ChannelService channelService = new BasicChannelService(channelRepository);
 		MessageService messageService = new BasicMessageService(messageRepository, userRepository, channelRepository);
 

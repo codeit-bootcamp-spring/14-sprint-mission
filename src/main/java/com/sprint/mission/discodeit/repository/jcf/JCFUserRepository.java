@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
@@ -46,5 +47,13 @@ public class JCFUserRepository implements UserRepository {
     public boolean existsByName(String name) {
         return data.values().stream()
             .anyMatch(user -> user.getName().equals(name));
+    }
+
+    @Override
+    public Optional<User> findByName(String name) {
+        return data.values().stream()
+            .filter(user -> user.getName().equals(name))
+            .findFirst();
+
     }
 }
