@@ -21,10 +21,9 @@ public class FileChannelRepository extends AbstractFileRepository<Channel>
     }
 
     @Override
-    public void updateName(UUID id, String name) {
-        findById(id).ifPresent(retrieved -> {
-            retrieved.updateName(name);
-            super.writeFromBufferToFile();
-        });
+    public Channel updateName(UUID id, String name) {
+        Channel updated = super.buffer.get(id).updateName(name);
+        super.writeFromBufferToFile();
+        return updated;
     }
 }

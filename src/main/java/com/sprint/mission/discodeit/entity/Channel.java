@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.common.ModifiableEntity;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -27,9 +29,12 @@ public final class Channel extends ModifiableEntity {
         this.name = name;
     }
 
-    public void updateName(String name) {
+    public Channel updateName(String name) {
+        if(channelType.equals(ChannelType.PRIVATE)) {
+            throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
+        }
         this.name = name;
-
         super.markedAsUpdate();
+        return this;
     }
 }

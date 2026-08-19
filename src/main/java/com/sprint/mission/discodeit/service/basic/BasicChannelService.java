@@ -25,8 +25,31 @@ public class BasicChannelService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    public Channel createChannel(Channel channel, List<UUID> userIds) {
-        // 1. PUBLIC 채널 생성은 기존 로직 유지
+    private ChannelResponseDto createChannelResponseDto(Channel channel) {
+        UUID channelId = channel.getId();
+        Instant messageLastSentAt = messageRepository.findLatestMessageByChannelId(channelId)
+                .orElse(null);
+        List<UUID> userIds = readStatusRepository.findAllUserIdsByChannelId(channel.getId());
+
+        return ChannelResponseDto.of(
+                channel,
+                messageLastSentAt,
+                isChannelPrivate(channel) ? userIds : null
+        );
+    }
+
+    private boolean isChannelPrivate(Channel channel) {
+        return channel.getChannelType().equals(ChannelType.PRIVATE);
+    }
+
+    private boolean isChannelPublic(Channel channel) {
+        return channel.getChannelType().equals(ChannelType.PUBLIC);
+    }
+
+    public ChannelResponseDto createChannel(ChannelType channelType,
+                                            String name,
+                                            List<UUID> userIds) {
+        Channel channel = new Channel(channelType, name);
         UUID channelId = channel.getId();
 
         if (!userRepository.existsAllByIds(userIds)) {
@@ -37,27 +60,17 @@ public class BasicChannelService {
         List<ReadStatus> readStatuses = userIds.stream()
                 .map(userId -> new ReadStatus(userId, channelId))
                 .toList();
-
         readStatusRepository.createAll(readStatuses);
-        return channelRepository.create(channel);
+
+        Channel created = channelRepository.create(channel);
+        return createChannelResponseDto(created);
     }
 
     public ChannelResponseDto getChannel(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
 
-        // 메시지는 당연히 없을 수도 있는데 예외를 던지면 안되지 않을까?
-        Instant messageLastSentAt = messageRepository.findLatestMessageByChannelId(id)
-                .orElse(null);
-
-        List<UUID> userIds = readStatusRepository.findAllUserIdsByChannelId(channel.getId());
-
-
-        return ChannelResponseDto.of(
-                channel,
-                messageLastSentAt,
-                channel.getChannelType().equals(ChannelType.PRIVATE) ? userIds : null
-        );
+        return createChannelResponseDto(channel);
     }
 
     // 1. DTO를 활용해 가장 최근 메시지의 시간 정보 포함
@@ -66,24 +79,21 @@ public class BasicChannelService {
 
     // 3. 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
     // 4. PUBLIC인 전체조회, PRIVATE은 User가 참여한 채널만 조회하도록
-    public List<Channel> getAllChannels() {
-        return channelRepository.findAll();
-    }
-
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
         // userId로 readStatus에서 channel 찾아서 반환
         // public은 전부 포함해야 함. private은 소속된 채널만
-        return getAllChannels().stream()
-                .filter(channel -> channel.getChannelType().equals(ChannelType.PUBLIC)
+        return channelRepository.findAll().stream()
+                .filter(channel -> isChannelPublic(channel)
                         || readStatusRepository.existsByUserAndChannel(userId, channel.getId()))
-                .map(channel -> this.getChannel(channel.getId()))
+                .map(this::createChannelResponseDto)
                 .toList();
     }
 
     // TODO 1. DTO 활용해 파라미터 그룹화
     // TODO 2. PRIVATE 채널은 수정할 수 없음
-    public void updateChannelName(UUID id, ChannelUpdateNameDto dto) {
-        channelRepository.updateName(id, dto.getName());
+    public ChannelResponseDto updateChannelName(UUID id, String name) {
+        Channel updated = channelRepository.updateName(id, name);
+        return createChannelResponseDto(updated);
     }
 
     public void deleteChannel(UUID id) {

@@ -15,9 +15,12 @@ public enum ExceptionType {
     CHANNEL_NOT_FOUND_IN_DATABASE("Channel 미존재", "Database에서 해당 Channel 찾을 수 없음", "등록되지 않은 Channel입니다."),
     MESSAGE_NOT_FOUND_IN_DATABASE("Message 미존재", "Database에서 해당 Message 찾을 수 없음", "등록되지 않은 Message입니다."),
     READSTATUS_NOT_FOUND_IN_DATABASE("ReadStatus 미존재", "Database에서 해당 ReadStatus 찾을 수 없음", "등록되지 않은 ReadStatus입니다."),
+
     // NO_ACCESS
     NO_ACCESS_TO_CHANNEL("Channel 권한 없음", "등록되지 않은 User는 PRIVATE채널에 접근할 수 없습니다", "Channel에 접근할 수 없습니다."),
 
+    // CANNOT_MODIFY
+    CHANNEL_CANNOT_BE_MODIFIED("채널 정보 수정 불가", "PRIVATE 채널의 정보는 수정할 수 없습니다", "PRIVATE 채널의 정보는 수정할 수 없습니다."),
 
     // 이거 두개는 뭔가 비슷한듯 다른듯 접미사를 통일할지 말지 잘 모르겠음
     // ALREADY_EXISTS

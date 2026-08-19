@@ -17,7 +17,7 @@ public class JCFChannelRepository extends AbstractJCFRepository<Channel>
         implements ChannelRepository {
 
     @Override
-    public void updateName(UUID id, String name) {
-        findById(id).ifPresent(retrieved -> retrieved.updateName(name));
+    public Channel updateName(UUID id, String name) {
+        return super.STORE.get(id).updateName(name);
     }
 }
