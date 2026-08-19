@@ -29,7 +29,7 @@ public class ChannelController {
     // 공개 채널 생성
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/api/channels/public")
-    public ResponseEntity<ChannelDto> publicCreate(
+    public ResponseEntity<ChannelResponse> publicCreate(
         @Valid @RequestBody ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -39,7 +39,7 @@ public class ChannelController {
     // 비공개 채널 생성
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/api/channels/private")
-    public ResponseEntity<ChannelDto> privateCreate(
+    public ResponseEntity<ChannelResponse> privateCreate(
         @Valid @RequestBody ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
         return ResponseEntity
             .status(HttpStatus.CREATED)

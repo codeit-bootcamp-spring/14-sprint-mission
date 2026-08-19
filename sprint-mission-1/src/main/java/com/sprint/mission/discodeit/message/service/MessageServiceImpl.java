@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.message.service;
 
+import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.global.exception.DiscodeitException;
@@ -10,11 +11,13 @@ import com.sprint.mission.discodeit.message.dto.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,8 @@ public class MessageServiceImpl implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public MessageResponseDto messageCreate(MessageCreateRequestDto messageCreateRequestDto) {
+    public MessageResponseDto messageCreate(MessageCreateRequestDto messageCreateRequestDto,
+        List<MultipartFile> attachments) {
         channelRepository.findByChannel(messageCreateRequestDto.channelId())
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.CHANNEL_NOT_FOUND,
@@ -39,17 +43,18 @@ public class MessageServiceImpl implements MessageService {
                 Map.of("authorId", messageCreateRequestDto.authorId())
             ));
 
-//        List<UUID> binaryContentsId = new ArrayList<>();
-//        if (messageCreateRequestDto.attachments() != null) {
-//            binaryContentsId = messageCreateRequestDto.attachments()
-//                .stream()
-//                .map(binaryContentRepository::toBinaryContent)
-//                .map(BinaryContent::getId)
-//                .toList();
-//        }
+        List<UUID> binaryContentsId = new ArrayList<>();
+        if (attachments != null) {
+            binaryContentsId = attachments
+                .stream()
+                .map(binaryContentRepository::toBinaryContent)
+                .map(BinaryContent::getId)
+                .toList();
+        }
 
         Message newMessage = new Message(messageCreateRequestDto.authorId(),
-            messageCreateRequestDto.channelId(), messageCreateRequestDto.content());
+            messageCreateRequestDto.channelId(), messageCreateRequestDto.content(),
+            binaryContentsId);
 
         return MessageResponseDto.from(messageRepository.messageAdd(newMessage));
     }

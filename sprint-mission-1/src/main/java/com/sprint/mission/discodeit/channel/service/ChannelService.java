@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    ChannelDto channelCreate(ChannelPublicCreateRequestDto channelPublicCreateRequestDto);
+    ChannelResponse channelCreate(ChannelPublicCreateRequestDto channelPublicCreateRequestDto);
 
-    ChannelDto privateChannelCreate(
+    ChannelResponse privateChannelCreate(
         ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto);
 
     ChannelResponse channelUpdate(UUID channelId, ChannelUpdateRequestDto channelUpdateRequestDto);

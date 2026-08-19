@@ -37,16 +37,16 @@ public class ChannelServiceImpl implements ChannelService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public ChannelDto channelCreate(
+    public ChannelResponse channelCreate(
         ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
         Channel channel = new Channel(channelPublicCreateRequestDto.name(),
             ChannelType.PUBLIC, channelPublicCreateRequestDto.description());
         channelRepository.channelAdd(channel);
-        return toResponseDto(channel);
+        return ChannelResponse.from(channel);
     }
 
     @Override
-    public ChannelDto privateChannelCreate(
+    public ChannelResponse privateChannelCreate(
         ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
         Channel channel = new Channel(ChannelType.PRIVATE);
 
@@ -63,7 +63,7 @@ public class ChannelServiceImpl implements ChannelService {
             readStatusRepository.statusAdd(readStatus);
         }
 
-        return toResponseDto(channel);
+        return ChannelResponse.from(channel);
     }
 
     @Override

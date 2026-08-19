@@ -10,13 +10,15 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RequiredArgsConstructor
@@ -27,22 +29,29 @@ public class UserController {
 
     // 사용자 등록
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(method = RequestMethod.POST, value = "/api/users")
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/api/users",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> create(
-        @Valid @RequestBody UserCreateRequestDto userCreateRequestDto) {
+        @Valid @RequestPart(value = "userCreateRequest") UserCreateRequestDto userCreateRequestDto,
+        @RequestPart(value = "profile", required = false) MultipartFile profile) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(userService.userCreate(userCreateRequestDto));
+            .body(userService.userCreate(userCreateRequestDto, profile));
     }
 
     // 사용자 수정
-    @RequestMapping(method = RequestMethod.PATCH, value = "/api/users/{userId}")
+    @RequestMapping(method = RequestMethod.PATCH,
+        value = "/api/users/{userId}",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> update(
         @PathVariable UUID userId,
-        @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+        @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequestDto userUpdateRequestDto,
+        @RequestPart(value = "profile", required = false) MultipartFile profile) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(userService.userUpdate(userId, userUpdateRequestDto));
+            .body(userService.userUpdate(userId, userUpdateRequestDto, profile));
     }
 
     // 사용자 삭제

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.user.service;
 
+import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.global.exception.DiscodeitException;
 import com.sprint.mission.discodeit.global.exception.ExceptionType;
@@ -11,12 +12,15 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +31,8 @@ public class UserServiceImpl implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserResponse userCreate(UserCreateRequestDto userCreateRequestDto) {
+    public UserResponse userCreate(UserCreateRequestDto userCreateRequestDto,
+        MultipartFile profile) {
         if (userRepository.findByUserName(userCreateRequestDto.username()).isPresent()) {
             throw new DiscodeitException(
                 ExceptionType.USER_NAME_CONFLICT,
@@ -42,14 +47,14 @@ public class UserServiceImpl implements UserService {
             );
         }
 
-//        UUID binaryContentsId = null;
-//        if (userCreateRequestDto.profileImage() != null) {
-//            binaryContentsId = binaryContentRepository.toBinaryContent(
-//                userCreateRequestDto.profileImage()).getId();
-//        }
+        UUID binaryContentsId = null;
+        if (profile != null) {
+            binaryContentsId = binaryContentRepository.toBinaryContent(
+                profile).getId();
+        }
 
         User user = User.create(userCreateRequestDto.username(), userCreateRequestDto.password(),
-            userCreateRequestDto.email());
+            userCreateRequestDto.email(), binaryContentsId);
 
         UserStatus userStatus = userStatusRepository.statusAdd(new UserStatus(user.getId()));
 
@@ -57,31 +62,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto) {
+    public UserResponse userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto,
+        MultipartFile profile) {
         User user = userRepository.findByUser(userId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_NOT_FOUND,
                 Map.of("authorId", userId)
             ));
 
-//        if (userUpdateRequestDto.profileImage() != null) {
-//            BinaryContent binaryContent;
-//            try {
-//                binaryContent = new BinaryContent(
-//                    userUpdateRequestDto.profileImage().getOriginalFilename(),
-//                    userUpdateRequestDto.profileImage().getContentType(),
-//                    userUpdateRequestDto.profileImage().getBytes());
-//                binaryContentRepository.binaryAdd(binaryContent);
-//            } catch (IOException e) {
-//                throw new UncheckedIOException(
-//                    "파일을 읽는데 실패했습니다: " + userUpdateRequestDto.profileImage().getOriginalFilename(),
-//                    e);
-//            }
-//            if (Objects.nonNull(user.getProfileId())) {
-//                binaryContentRepository.delete(user.getProfileId());
-//            }
-//            user.updateProfile(binaryContent.getId());
-//        }
+        if (profile != null) {
+            BinaryContent binaryContent;
+            try {
+                binaryContent = new BinaryContent(
+                    profile.getOriginalFilename(),
+                    profile.getContentType(),
+                    profile.getBytes());
+                binaryContentRepository.binaryAdd(binaryContent);
+            } catch (IOException e) {
+                throw new UncheckedIOException(
+                    "파일을 읽는데 실패했습니다: " + profile.getOriginalFilename(),
+                    e);
+            }
+            if (Objects.nonNull(user.getProfileId())) {
+                binaryContentRepository.delete(user.getProfileId());
+            }
+            user.updateProfile(binaryContent.getId());
+        }
 
         user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newPassword(),
             userUpdateRequestDto.newEmail());
