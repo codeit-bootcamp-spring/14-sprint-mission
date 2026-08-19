@@ -21,12 +21,12 @@ public class UserStatusController {
     private final UserStatusService userStatusService;
 
     // 사용자 상태 업데이트
-    @RequestMapping(method = RequestMethod.PATCH, value = "/api/v1/user-statuses/{id}")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/api/users/{userId}/userStatus")
     public ResponseEntity<UserStatusResponseDto> userStatusUpdate(
-        @PathVariable UUID id,
+        @PathVariable UUID userId,
         @Valid @RequestBody UserStatusUpdateRequestDto userStatusUpdateRequestDto) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(userStatusService.userStatusUpdate(id, userStatusUpdateRequestDto));
+            .body(userStatusService.userStatusUpdateByUserId(userId, userStatusUpdateRequestDto));
     }
 }

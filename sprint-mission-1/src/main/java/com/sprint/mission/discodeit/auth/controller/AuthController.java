@@ -19,7 +19,7 @@ public class AuthController {
     private final AuthService authService;
 
     // 사용자 로그인
-    @RequestMapping(method = RequestMethod.POST, value = "/api/v1/auth/login")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/auth/login")
     public ResponseEntity<UserResponseDto> login(
         @Valid @RequestBody LoginRequestDto loginRequestDto) {
 

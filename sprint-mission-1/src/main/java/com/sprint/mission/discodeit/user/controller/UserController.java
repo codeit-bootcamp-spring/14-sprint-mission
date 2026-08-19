@@ -24,7 +24,7 @@ public class UserController {
     private final UserService userService;
 
     // 사용자 등록
-    @RequestMapping(method = RequestMethod.POST, value = "/api/v1/users")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/users")
     public ResponseEntity<UserResponseDto> create(
         @Valid @RequestBody UserCreateRequestDto userCreateRequestDto) {
         return ResponseEntity
@@ -33,24 +33,24 @@ public class UserController {
     }
 
     // 사용자 수정
-    @RequestMapping(method = RequestMethod.PATCH, value = "/api/v1/users/{id}")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/api/users/{userId}")
     public ResponseEntity<UserResponseDto> update(
-        @PathVariable UUID id,
+        @PathVariable UUID userId,
         @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(userService.userUpdate(id, userUpdateRequestDto));
+            .body(userService.userUpdate(userId, userUpdateRequestDto));
     }
 
     // 사용자 삭제
-    @RequestMapping(method = RequestMethod.DELETE, value = "/api/v1/users/{id}")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/api/users/{userId}")
     public void delete(
-        @PathVariable UUID id) {
-        userService.userDelete(id);
+        @PathVariable UUID userId) {
+        userService.userDelete(userId);
     }
 
     // 전체 사용자 조회
-    @RequestMapping(method = RequestMethod.GET, value = "/api/v1/users")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/users")
     public ResponseEntity<List<UserResponseDto>> findAll() {
         return ResponseEntity
             .status(HttpStatus.OK)

@@ -59,6 +59,27 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
 
     @Override
+    public UserStatusResponseDto userStatusUpdateByUserId(UUID userId,
+        UserStatusUpdateRequestDto userStatusUpdateRequestDto) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow((
+            () -> new DiscodeitException(
+                ExceptionType.USER_STATUS_MISSING_FOR_USER,
+                Map.of("userId", userId
+                ))));
+
+        if (userStatusUpdateRequestDto.userId() != null) {
+            userStatus.updateUserId(userStatusUpdateRequestDto.userId());
+        }
+        if (userStatusUpdateRequestDto.lastActiveAt() != null) {
+            userStatus.updateAt(userStatusUpdateRequestDto.lastActiveAt());
+        }
+
+        userStatusRepository.update(userStatus);
+
+        return UserStatusResponseDto.from(userStatus);
+    }
+
+    @Override
     public void userStatusDelete(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId);
         userStatusRepository.delete(userStatus);
