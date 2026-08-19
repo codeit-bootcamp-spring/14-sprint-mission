@@ -8,7 +8,7 @@ public record BinaryContentResponseDto(UUID binaryContentId, String fileName, St
 
     public static BinaryContentResponseDto from(BinaryContent binaryContent) {
         return new BinaryContentResponseDto(
-            binaryContent.getBinaryContentId(),
+            binaryContent.getId(),
             binaryContent.getFileName(),
             binaryContent.getContentType(),
             binaryContent.getBytes()

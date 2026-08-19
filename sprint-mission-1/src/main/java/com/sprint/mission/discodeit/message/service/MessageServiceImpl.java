@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.message.service;
 
-import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.global.exception.DiscodeitException;
@@ -11,7 +10,6 @@ import com.sprint.mission.discodeit.message.dto.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,24 +33,23 @@ public class MessageServiceImpl implements MessageService {
                 Map.of("channelId", messageCreateRequestDto.channelId())
             ));
 
-        userRepository.findByUser(messageCreateRequestDto.userId())
+        userRepository.findByUser(messageCreateRequestDto.authorId())
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_NOT_FOUND,
-                Map.of("userId", messageCreateRequestDto.userId())
+                Map.of("authorId", messageCreateRequestDto.authorId())
             ));
 
-        List<UUID> binaryContentsId = new ArrayList<>();
-        if (messageCreateRequestDto.attachments() != null) {
-            binaryContentsId = messageCreateRequestDto.attachments()
-                .stream()
-                .map(binaryContentRepository::toBinaryContent)
-                .map(BinaryContent::getBinaryContentId)
-                .toList();
-        }
+//        List<UUID> binaryContentsId = new ArrayList<>();
+//        if (messageCreateRequestDto.attachments() != null) {
+//            binaryContentsId = messageCreateRequestDto.attachments()
+//                .stream()
+//                .map(binaryContentRepository::toBinaryContent)
+//                .map(BinaryContent::getId)
+//                .toList();
+//        }
 
-        Message newMessage = new Message(messageCreateRequestDto.userId(),
-            messageCreateRequestDto.channelId(), messageCreateRequestDto.message(),
-            binaryContentsId);
+        Message newMessage = new Message(messageCreateRequestDto.authorId(),
+            messageCreateRequestDto.channelId(), messageCreateRequestDto.content());
 
         return MessageResponseDto.from(messageRepository.messageAdd(newMessage));
     }
@@ -65,7 +62,7 @@ public class MessageServiceImpl implements MessageService {
                 Map.of("messageId", messageId)
             ));
 
-        message.updateMessage(messageUpdateRequestDto.message());
+        message.updateMessage(messageUpdateRequestDto.newContent());
         messageRepository.update(message);
     }
 
@@ -77,7 +74,7 @@ public class MessageServiceImpl implements MessageService {
                 Map.of("messageId", messageId)
             ));
 
-        messages.getBinaryContentsId()
+        messages.getAttachmentIds()
             .forEach(binaryContentRepository::delete);
 
         messageRepository.delete(messages);

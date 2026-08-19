@@ -35,7 +35,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
         userRepository.findByUser(readStatusCreateRequestDto.userId())
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_NOT_FOUND,
-                Map.of("userId", readStatusCreateRequestDto.userId())
+                Map.of("authorId", readStatusCreateRequestDto.userId())
             ));
 
         return ReadStatusResponseDto.from(readStatusRepository.statusAdd(
@@ -48,8 +48,8 @@ public class ReadStatusServiceImpl implements ReadStatusService {
         ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId);
 
-        if (readStatusUpdateRequestDto.lastReadAt() != null) {
-            readStatus.updateAt(readStatusUpdateRequestDto.lastReadAt());
+        if (readStatusUpdateRequestDto.newLastReadAt() != null) {
+            readStatus.updateAt(readStatusUpdateRequestDto.newLastReadAt());
         }
 
         readStatusRepository.update(readStatus);

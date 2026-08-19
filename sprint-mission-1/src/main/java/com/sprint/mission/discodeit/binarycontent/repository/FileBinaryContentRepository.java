@@ -66,7 +66,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent binaryAdd(BinaryContent binaryContent) {
-        binaryContentMap.put(binaryContent.getBinaryContentId(), binaryContent);
+        binaryContentMap.put(binaryContent.getId(), binaryContent);
         binaryContentFlush();
         return binaryContent;
     }

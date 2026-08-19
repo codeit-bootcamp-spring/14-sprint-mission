@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.auth.service;
 import com.sprint.mission.discodeit.auth.dto.LoginRequestDto;
 import com.sprint.mission.discodeit.global.exception.DiscodeitException;
 import com.sprint.mission.discodeit.global.exception.ExceptionType;
-import com.sprint.mission.discodeit.user.dto.UserResponseDto;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
@@ -19,8 +19,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 
-    public UserResponseDto login(LoginRequestDto loginRequestDto) {
-        User user = userRepository.findByUserName(loginRequestDto.name())
+    public UserDto login(LoginRequestDto loginRequestDto) {
+        User user = userRepository.findByUserName(loginRequestDto.username())
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.AUTH_INVALID
             ));
@@ -35,12 +35,12 @@ public class AuthServiceImpl implements AuthService {
             .orElseThrow(
                 () -> new DiscodeitException(
                     ExceptionType.USER_STATUS_MISSING_FOR_USER,
-                    Map.of("userId", user.getId()
+                    Map.of("authorId", user.getId()
                     )));
 
         userStatus.userLogin();
         userStatusRepository.update(userStatus);
 
-        return UserResponseDto.from(user, userStatus);
+        return UserDto.from(user, userStatus);
     }
 }

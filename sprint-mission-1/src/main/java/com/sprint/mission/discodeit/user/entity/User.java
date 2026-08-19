@@ -7,25 +7,35 @@ import lombok.Getter;
 @Getter
 public class User extends BaseEntity {
 
-    private String name;
+    private String username;
     private String password;
     private String email;
-    private UUID binaryId;
+    private UUID profileId;
 
-    private User(String name, String password, String email, UUID binaryId) {
-        this.name = name;
+    private User(String username, String password, String email, UUID profileId) {
+        this.username = username;
         this.password = password;
         this.email = email;
-        this.binaryId = binaryId;
+        this.profileId = profileId;
+    }
+
+    private User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
     }
 
     public static User create(String name, String password, String email, UUID binaryId) {
         return new User(name, password, email, binaryId);
     }
 
+    public static User create(String name, String password, String email) {
+        return new User(name, password, email);
+    }
+
     public void update(String name, String password, String email) {
         if (name != null) {
-            this.name = name;
+            this.username = name;
         }
         if (password != null) {
             this.password = password;
@@ -38,7 +48,7 @@ public class User extends BaseEntity {
 
     public void updateProfile(UUID binaryId) {
         if (binaryId != null) {
-            this.binaryId = binaryId;
+            this.profileId = binaryId;
             markUpdated();
         }
     }

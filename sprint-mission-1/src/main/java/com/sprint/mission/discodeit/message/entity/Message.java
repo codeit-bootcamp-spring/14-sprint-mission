@@ -12,22 +12,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Message extends BaseEntity {
 
-    private final UUID userId;
+    private final UUID authorId;
     private final UUID channelId;
     @NonNull
-    private String message;
-    private List<UUID> binaryContentsId;
+    private String content;
+    private List<UUID> attachmentIds;
 
-    public Message(UUID userId, UUID channelId, String message, List<UUID> binaryContentsId) {
-        this.userId = userId;
+    public Message(UUID authorId, UUID channelId, String content, List<UUID> attachmentIds) {
+        this.authorId = authorId;
         this.channelId = channelId;
-        this.message = message;
-        this.binaryContentsId = binaryContentsId;
+        this.content = content;
+        this.attachmentIds = attachmentIds;
     }
 
     public void updateMessage(String updateMessage) {
-        if (updateMessage != null && !updateMessage.equals(this.message)) {
-            this.message = updateMessage;
+        if (updateMessage != null && !updateMessage.equals(this.content)) {
+            this.content = updateMessage;
             super.markUpdated();
         }
     }

@@ -19,7 +19,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent binaryAdd(BinaryContent binaryContent) {
-        binaryContentMap.put(binaryContent.getBinaryContentId(), binaryContent);
+        binaryContentMap.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
 

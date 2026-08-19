@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.user.controller;
 
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
-import com.sprint.mission.discodeit.user.dto.UserResponseDto;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.service.UserService;
 import jakarta.validation.Valid;
@@ -25,7 +25,7 @@ public class UserController {
 
     // 사용자 등록
     @RequestMapping(method = RequestMethod.POST, value = "/api/users")
-    public ResponseEntity<UserResponseDto> create(
+    public ResponseEntity<UserDto> create(
         @Valid @RequestBody UserCreateRequestDto userCreateRequestDto) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -34,7 +34,7 @@ public class UserController {
 
     // 사용자 수정
     @RequestMapping(method = RequestMethod.PATCH, value = "/api/users/{userId}")
-    public ResponseEntity<UserResponseDto> update(
+    public ResponseEntity<UserDto> update(
         @PathVariable UUID userId,
         @Valid @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
         return ResponseEntity
@@ -51,7 +51,7 @@ public class UserController {
 
     // 전체 사용자 조회
     @RequestMapping(method = RequestMethod.GET, value = "/api/users")
-    public ResponseEntity<List<UserResponseDto>> findAll() {
+    public ResponseEntity<List<UserDto>> findAll() {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(userService.findAll());

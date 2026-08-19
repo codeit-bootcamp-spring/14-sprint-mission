@@ -11,12 +11,12 @@ public record MessageResponseDto(UUID userId, UUID channelId, UUID messageId, St
 
     public static MessageResponseDto from(Message message) {
         return new MessageResponseDto(
-            message.getUserId(),
+            message.getAuthorId(),
             message.getChannelId(),
             message.getId(),
-            message.getMessage(),
+            message.getContent(),
             message.getCreatedAt(),
-            message.getBinaryContentsId()
+            message.getAttachmentIds()
         );
     }
 }

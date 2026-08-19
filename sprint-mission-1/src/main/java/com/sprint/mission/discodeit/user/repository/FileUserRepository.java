@@ -80,7 +80,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public Optional<User> findByUserName(String name) {
         return users.values().stream()
-            .filter(user -> name.equals(user.getName()))
+            .filter(user -> name.equals(user.getUsername()))
             .findFirst();
     }
 

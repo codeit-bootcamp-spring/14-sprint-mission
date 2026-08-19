@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.auth.controller;
 
 import com.sprint.mission.discodeit.auth.dto.LoginRequestDto;
 import com.sprint.mission.discodeit.auth.service.AuthService;
-import com.sprint.mission.discodeit.user.dto.UserResponseDto;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ public class AuthController {
 
     // 사용자 로그인
     @RequestMapping(method = RequestMethod.POST, value = "/api/auth/login")
-    public ResponseEntity<UserResponseDto> login(
+    public ResponseEntity<UserDto> login(
         @Valid @RequestBody LoginRequestDto loginRequestDto) {
 
         return ResponseEntity

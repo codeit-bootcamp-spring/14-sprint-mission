@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public record ChannelPublicCreateRequestDto(
     @NotBlank
-    String channelName,
+    String name,
     @NotBlank
     String description) {
 

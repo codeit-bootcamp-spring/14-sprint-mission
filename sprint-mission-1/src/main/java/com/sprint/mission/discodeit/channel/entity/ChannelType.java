@@ -14,8 +14,8 @@ import lombok.experimental.FieldDefaults;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum ChannelType {
-    PUBLIC("public", "공개 채널"),
-    PRIVATE("private", "비공개 채널");
+    PUBLIC("PUBLIC", "공개 채널"),
+    PRIVATE("PRIVATE", "비공개 채널");
 
     @JsonValue
     String channelType;

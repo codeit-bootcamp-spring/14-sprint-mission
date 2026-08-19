@@ -12,6 +12,7 @@ public class ReadStatus extends BaseEntity {
 
     private final UUID channelId;
     private final UUID userId;
+    private Instant lastReadAt;
 
     public ReadStatus(UUID channelId, UUID userId) {
         this.channelId = channelId;
@@ -19,7 +20,7 @@ public class ReadStatus extends BaseEntity {
         super.markUpdated();
     }
 
-    public void updateAt(Instant updatedAt) {
-        super.updateAt(updatedAt);
+    public void updateAt(Instant lastReadAt) {
+        this.lastReadAt = lastReadAt;
     }
 }

@@ -1,18 +1,15 @@
 package com.sprint.mission.discodeit.user.service;
 
-import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.global.exception.DiscodeitException;
 import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
-import com.sprint.mission.discodeit.user.dto.UserResponseDto;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,11 +26,11 @@ public class UserServiceImpl implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserResponseDto userCreate(UserCreateRequestDto userCreateRequestDto) {
-        if (userRepository.findByUserName(userCreateRequestDto.name()).isPresent()) {
+    public UserDto userCreate(UserCreateRequestDto userCreateRequestDto) {
+        if (userRepository.findByUserName(userCreateRequestDto.username()).isPresent()) {
             throw new DiscodeitException(
                 ExceptionType.USER_NAME_CONFLICT,
-                Map.of("userName", userCreateRequestDto.name())
+                Map.of("userName", userCreateRequestDto.username())
             );
         }
 
@@ -44,59 +41,58 @@ public class UserServiceImpl implements UserService {
             );
         }
 
-        UUID binaryContentsId = null;
-        if (userCreateRequestDto.profileImage() != null) {
-            binaryContentsId = binaryContentRepository.toBinaryContent(
-                userCreateRequestDto.profileImage()).getBinaryContentId();
-        }
+//        UUID binaryContentsId = null;
+//        if (userCreateRequestDto.profileImage() != null) {
+//            binaryContentsId = binaryContentRepository.toBinaryContent(
+//                userCreateRequestDto.profileImage()).getId();
+//        }
 
-        User user = User.create(userCreateRequestDto.name(), userCreateRequestDto.password(),
-            userCreateRequestDto.email(),
-            binaryContentsId);
+        User user = User.create(userCreateRequestDto.username(), userCreateRequestDto.password(),
+            userCreateRequestDto.email());
 
         UserStatus userStatus = userStatusRepository.statusAdd(new UserStatus(user.getId()));
 
-        return UserResponseDto.from(userRepository.userAdd(user), userStatus);
+        return UserDto.from(userRepository.userAdd(user), userStatus);
     }
 
     @Override
-    public UserResponseDto userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto) {
+    public UserDto userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto) {
         User user = userRepository.findByUser(userId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_NOT_FOUND,
-                Map.of("userId", userId)
+                Map.of("authorId", userId)
             ));
 
-        if (userUpdateRequestDto.profileImage() != null) {
-            BinaryContent binaryContent;
-            try {
-                binaryContent = new BinaryContent(
-                    userUpdateRequestDto.profileImage().getOriginalFilename(),
-                    userUpdateRequestDto.profileImage().getContentType(),
-                    userUpdateRequestDto.profileImage().getBytes());
-                binaryContentRepository.binaryAdd(binaryContent);
-            } catch (IOException e) {
-                throw new UncheckedIOException(
-                    "파일을 읽는데 실패했습니다: " + userUpdateRequestDto.profileImage().getOriginalFilename(),
-                    e);
-            }
-            if (Objects.nonNull(user.getBinaryId())) {
-                binaryContentRepository.delete(user.getBinaryId());
-            }
-            user.updateProfile(binaryContent.getBinaryContentId());
-        }
+//        if (userUpdateRequestDto.profileImage() != null) {
+//            BinaryContent binaryContent;
+//            try {
+//                binaryContent = new BinaryContent(
+//                    userUpdateRequestDto.profileImage().getOriginalFilename(),
+//                    userUpdateRequestDto.profileImage().getContentType(),
+//                    userUpdateRequestDto.profileImage().getBytes());
+//                binaryContentRepository.binaryAdd(binaryContent);
+//            } catch (IOException e) {
+//                throw new UncheckedIOException(
+//                    "파일을 읽는데 실패했습니다: " + userUpdateRequestDto.profileImage().getOriginalFilename(),
+//                    e);
+//            }
+//            if (Objects.nonNull(user.getProfileId())) {
+//                binaryContentRepository.delete(user.getProfileId());
+//            }
+//            user.updateProfile(binaryContent.getId());
+//        }
 
-        user.update(userUpdateRequestDto.name(), userUpdateRequestDto.password(),
-            userUpdateRequestDto.email());
+        user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newPassword(),
+            userUpdateRequestDto.newEmail());
 
         userRepository.update(user);
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_STATUS_MISSING_FOR_USER,
-                Map.of("userId", user.getId()
+                Map.of("authorId", user.getId()
                 )));
-        return UserResponseDto.from(user, userStatus);
+        return UserDto.from(user, userStatus);
     }
 
     @Override
@@ -104,22 +100,22 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUser(userId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_NOT_FOUND,
-                Map.of("userId", userId)
+                Map.of("authorId", userId)
             ));
 
         userStatusRepository.delete(userStatusRepository.findByUserId(userId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_STATUS_MISSING_FOR_USER,
-                Map.of("userId", user.getId()
+                Map.of("authorId", user.getId()
                 ))));
-        if (Objects.nonNull(user.getBinaryId())) {
-            binaryContentRepository.delete(user.getBinaryId());
+        if (Objects.nonNull(user.getProfileId())) {
+            binaryContentRepository.delete(user.getProfileId());
         }
         userRepository.delete(user);
     }
 
     @Override
-    public List<UserResponseDto> findAll() {
+    public List<UserDto> findAll() {
         List<User> users = userRepository.findAllUser();
 
         return users.stream()
@@ -127,27 +123,27 @@ public class UserServiceImpl implements UserService {
                 UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                     .orElseThrow(() -> new DiscodeitException(
                         ExceptionType.USER_STATUS_MISSING_FOR_USER,
-                        Map.of("userId", user.getId()
+                        Map.of("authorId", user.getId()
                         )));
-                return UserResponseDto.from(user, userStatus);
+                return UserDto.from(user, userStatus);
             })
             .toList();
     }
 
     @Override
-    public UserResponseDto findById(UUID userId) {
+    public UserDto findById(UUID userId) {
         User user = userRepository.findByUser(userId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_NOT_FOUND,
-                Map.of("userId", userId)
+                Map.of("authorId", userId)
             ));
 
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.USER_STATUS_MISSING_FOR_USER,
-                Map.of("userId", user.getId()
+                Map.of("authorId", user.getId()
                 )));
 
-        return UserResponseDto.from(user, userStatus);
+        return UserDto.from(user, userStatus);
     }
 }

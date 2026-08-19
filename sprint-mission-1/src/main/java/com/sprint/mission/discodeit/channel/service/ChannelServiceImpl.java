@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.channel.service;
 
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPublicCreateRequestDto;
-import com.sprint.mission.discodeit.channel.dto.ChannelResponseDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
@@ -36,16 +36,16 @@ public class ChannelServiceImpl implements ChannelService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public ChannelResponseDto channelCreate(
+    public ChannelDto channelCreate(
         ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
-        Channel channel = new Channel(channelPublicCreateRequestDto.channelName(),
+        Channel channel = new Channel(channelPublicCreateRequestDto.name(),
             ChannelType.PUBLIC, channelPublicCreateRequestDto.description());
         channelRepository.channelAdd(channel);
         return toResponseDto(channel);
     }
 
     @Override
-    public ChannelResponseDto privateChannelCreate(
+    public ChannelDto privateChannelCreate(
         ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
         Channel channel = new Channel(ChannelType.PRIVATE);
 
@@ -55,7 +55,7 @@ public class ChannelServiceImpl implements ChannelService {
             User user = userRepository.findByUser(userId)
                 .orElseThrow(() -> new DiscodeitException(
                     ExceptionType.USER_NOT_FOUND,
-                    Map.of("userId", userId)
+                    Map.of("authorId", userId)
                 ));
 
             ReadStatus readStatus = new ReadStatus(channel.getId(), user.getId());
@@ -73,20 +73,20 @@ public class ChannelServiceImpl implements ChannelService {
                 Map.of("channelId", channelId)
             ));
 
-        if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
             throw new DiscodeitException(
                 ExceptionType.PRIVATE_CHANNEL_UPDATE_DENIED,
                 Map.of("channelId", channelId)
             );
         }
 
-        channel.update(channelUpdateRequestDto.channelName(),
-            channelUpdateRequestDto.description());
+        channel.update(channelUpdateRequestDto.newName(),
+            channelUpdateRequestDto.newDescription());
         channelRepository.update(channel);
     }
 
     @Override
-    public ChannelResponseDto findById(UUID channelId) {
+    public ChannelDto findById(UUID channelId) {
         Channel channel = channelRepository.findByChannel(channelId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.CHANNEL_NOT_FOUND,
@@ -96,7 +96,7 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
         List<Channel> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC);
 
         List<UUID> myChannelIds = readStatusRepository.findByUserId(userId);
@@ -112,7 +112,7 @@ public class ChannelServiceImpl implements ChannelService {
 
     // 채널 -> DTO로 변환
     // find랑 findAll이랑 겹쳐서 통합 사용을 위해 생성
-    private ChannelResponseDto toResponseDto(Channel channel) {
+    private ChannelDto toResponseDto(Channel channel) {
         List<Message> messages = messageRepository.findAllMessage(channel.getId());
 
         Instant lastMessageAt = messages.stream()
@@ -120,13 +120,13 @@ public class ChannelServiceImpl implements ChannelService {
             .max(Instant::compareTo)
             .orElse(null);
 
-        if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
             List<UUID> participantIds = readStatusRepository.findByChannelId(
                 channel.getId());
-            return ChannelResponseDto.from(channel, lastMessageAt, participantIds);
+            return ChannelDto.from(channel, lastMessageAt, participantIds);
         }
 
-        return ChannelResponseDto.from(channel, lastMessageAt);
+        return ChannelDto.from(channel, lastMessageAt);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class ChannelServiceImpl implements ChannelService {
             ));
 
         List<UUID> attachmentIds = messageRepository.findAllMessage(channelId).stream()
-            .map(Message::getBinaryContentsId)
+            .map(Message::getAttachmentIds)
             .filter(Objects::nonNull)
             .flatMap(List::stream)
             .toList();

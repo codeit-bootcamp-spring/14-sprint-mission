@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.channel.controller;
 
+import com.sprint.mission.discodeit.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPublicCreateRequestDto;
-import com.sprint.mission.discodeit.channel.dto.ChannelResponseDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ public class ChannelController {
 
     // 공개 채널 생성
     @RequestMapping(method = RequestMethod.POST, value = "/api/channels/public")
-    public ResponseEntity<ChannelResponseDto> publicCreate(
+    public ResponseEntity<ChannelDto> publicCreate(
         @Valid @RequestBody ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -35,7 +35,7 @@ public class ChannelController {
 
     // 비공개 채널 생성
     @RequestMapping(method = RequestMethod.POST, value = "/api/channels/private")
-    public ResponseEntity<ChannelResponseDto> privateCreate(
+    public ResponseEntity<ChannelDto> privateCreate(
         @Valid @RequestBody ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -59,7 +59,7 @@ public class ChannelController {
 
     // 특정 사용자의 채널 목록 조회
     @RequestMapping(method = RequestMethod.GET, value = "/api/channels")
-    public ResponseEntity<List<ChannelResponseDto>> findAllByUserId(
+    public ResponseEntity<List<ChannelDto>> findAllByUserId(
         @RequestParam UUID userId) {
         return ResponseEntity
             .status(HttpStatus.OK)
