@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.event.Level;
-import org.springframework.http.HttpStatus;
 
 import java.net.HttpURLConnection;
 import java.util.Objects;
@@ -297,6 +296,13 @@ public enum DiscodeitExceptionType implements ExceptionType {
             HttpURLConnection.HTTP_INTERNAL_ERROR,
         "[REPOSITORY] 파일 저장 실패. file=%s",
                 "데이터를 저장하지 못했습니다."
+    ),
+
+    FILE_IS_EMPTY(
+            Level.ERROR,
+            HttpURLConnection.HTTP_BAD_REQUEST,
+            "[MULTIPART] 빈 파일. file=%s",
+            "파일이 비어있습니다."
     );
 
     Level logLevel;

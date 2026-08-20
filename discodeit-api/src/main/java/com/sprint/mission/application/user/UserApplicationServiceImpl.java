@@ -1,8 +1,12 @@
 package com.sprint.mission.application.user;
 
+import com.sprint.mission.DiscodeitException;
 import com.sprint.mission.domain.*;
 import com.sprint.mission.controller.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.controller.dto.user.UserResponseDto;
+import com.sprint.mission.exception.DiscodeitExceptionType;
+import com.sprint.mission.multipart.MultipartFileConverter;
+import com.sprint.mission.multipart.MultipartFileDto;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.service.channel.ChannelDomainService;
 import com.sprint.mission.service.readstatus.ReadStatusDomainService;
@@ -13,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -25,6 +30,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     private final UserStatusDomainService userStatusDomainService;
     private final ChannelDomainService channelDomainService;
     private final ReadStatusDomainService readStatusDomainService;
+    private final MultipartFileConverter multipartFileConverter;
 
 
     @Override
@@ -33,13 +39,10 @@ public class UserApplicationServiceImpl implements UserApplicationService {
             MultipartFile profileImageRequest
     ) {
         // generate binary content
-        BinaryContent createdProfileImage = (Objects.nonNull(profileImageRequest))
-                ? binaryContentDomainService.create(
-                    BinaryContent.create(profileImageRequest)
-                  )
-                : null;
+        BinaryContent createdProfileImage = null;
 
-        if (Objects.nonNull(createdProfileImage)) {
+        if (Objects.nonNull(profileImageRequest)) {
+            createdProfileImage = createBinaryContent(profileImageRequest);
             log.info(
                     "새 프로필 저장 완료: newProfileId={}",
                     createdProfileImage.getId()
@@ -83,6 +86,18 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         return UserResponseDto.from(createdUser, createdUserStatus);
     }
 
+    private BinaryContent createBinaryContent(MultipartFile profileImageRequest) {
+        MultipartFileDto converted = multipartFileConverter.convert(profileImageRequest);
+
+        BinaryContent binaryContent = BinaryContent.create(
+                converted.getFileName(),
+                converted.getContentType(),
+                converted.getBytes()
+        );
+
+        return binaryContentDomainService.create(binaryContent);
+    }
+
     @Override
     public UserResponseDto findById(UUID userId) {
         log.debug("User 단일 조회: userId={}", userId);
@@ -120,15 +135,10 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 Objects.nonNull(profileImage) ? "YES" : "N/A"
         );
 
-        BinaryContent createdProfileImage = (Objects.nonNull(profileImage))
-                ? binaryContentDomainService.create(
-                        BinaryContent.create(
-                                profileImage
-                        )
-                )
-                : null;
-
-        if (Objects.nonNull(createdProfileImage)) {
+        // 프로필 사진 있으면 생성
+        BinaryContent createdProfileImage = null;
+        if (Objects.nonNull(profileImage)) {
+            createdProfileImage = createBinaryContent(profileImage);
             log.info(
                     "새 프로필 저장 완료: userId={}, newProfileId={}",
                     userId,

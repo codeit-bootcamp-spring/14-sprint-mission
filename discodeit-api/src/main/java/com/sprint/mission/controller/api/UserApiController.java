@@ -31,8 +31,8 @@ public class UserApiController {
 
     @PostMapping
     public ResponseEntity<UserResponseDto> create(
-            @Valid @RequestPart(value = "user")                         UserUpsertRequestDto userCreateRequest,
-            @Valid @RequestPart(value = "profile", required = false)    MultipartFile profileImage
+            @RequestPart(value = "user")                         UserUpsertRequestDto userCreateRequest,
+            @RequestPart(value = "profile", required = false)    MultipartFile profileImage
     ) {
         UserResponseDto createdUser = userApplicationService.create(userCreateRequest, profileImage);
         return ResponseEntity
@@ -43,8 +43,8 @@ public class UserApiController {
     @PutMapping("/{userId}")
     public ResponseEntity<UserResponseDto> update(
             @NotNull @PathVariable                                      UUID userId,
-            @Valid @RequestPart("user")                                 UserUpsertRequestDto userUpdateRequest,
-            @Valid @RequestPart(value = "profile", required = false)    MultipartFile profileImage
+            @RequestPart("user")                                 UserUpsertRequestDto userUpdateRequest,
+            @RequestPart(value = "profile", required = false)    MultipartFile profileImage
     ) {
         UserResponseDto updatedUser =
                 userApplicationService.update(

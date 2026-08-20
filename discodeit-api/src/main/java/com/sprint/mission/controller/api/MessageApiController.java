@@ -31,8 +31,8 @@ public class MessageApiController {
 
     @PostMapping
     public ResponseEntity<MessageResponseDto> create(
-            @Valid @RequestPart("message")                                  MessageCreateRequestDto request,
-            @Valid @RequestPart(value = "attachments", required = false)    List<MultipartFile> attachments
+            @RequestPart("message")                                  MessageCreateRequestDto request,
+            @RequestPart(value = "attachments", required = false)    List<MultipartFile> attachments
     ) {
         MessageResponseDto createdMessage =
                 messageApplicationService.create(

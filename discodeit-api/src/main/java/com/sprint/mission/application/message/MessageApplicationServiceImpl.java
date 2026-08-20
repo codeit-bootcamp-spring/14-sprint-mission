@@ -6,6 +6,7 @@ import com.sprint.mission.controller.dto.message.MessageResponseDto;
 import com.sprint.mission.controller.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
+import com.sprint.mission.multipart.MultipartFileConverter;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.service.channel.ChannelDomainService;
 import com.sprint.mission.service.message.MessageDomainService;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -28,6 +30,7 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
     private final ChannelDomainService channelDomainService;
     private final BinaryContentDomainService binaryContentDomainService;
     private final ReadStatusDomainService readStatusDomainService;
+    private final MultipartFileConverter multipartFileConverter;
 
     private boolean isAccessible(
             Channel channel,
@@ -46,12 +49,13 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
 
         return attachmentFiles.stream()
                 .filter(Objects::nonNull)
-                .filter(file -> !file.isEmpty())
-                .map((multipartFile) -> {
-                    return binaryContentDomainService.create(
-                            BinaryContent.create(multipartFile)
-                    );
-                })
+                .map(multipartFileConverter::convert)
+                .map(converted -> BinaryContent.create(
+                        converted.getFileName(),
+                        converted.getContentType(),
+                        converted.getBytes()
+                ))
+                .map(binaryContentDomainService::create)
                 .map(BinaryContent::getId)
                 .toList();
     }

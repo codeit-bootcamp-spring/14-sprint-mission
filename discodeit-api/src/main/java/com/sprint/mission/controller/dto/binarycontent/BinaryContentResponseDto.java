@@ -16,13 +16,15 @@ import java.util.UUID;
 public class BinaryContentResponseDto {
     UUID id;
     String fileName;
+    String contentType;
     byte[] bytes;
 
     public static BinaryContentResponseDto from(BinaryContent binaryContent) {
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
                 binaryContent.getFileName(),
-                binaryContent.getBytes().clone()
+                binaryContent.getContentType(),
+                binaryContent.getBytes()
         );
     }
 }
