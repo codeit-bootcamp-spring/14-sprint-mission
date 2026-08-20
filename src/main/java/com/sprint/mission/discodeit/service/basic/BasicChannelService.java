@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -24,31 +23,19 @@ public class BasicChannelService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    private ChannelResponseDto createChannelResponseDto(Channel channel) {
-        UUID channelId = channel.getId();
-        Instant messageLastSentAt = messageRepository.findLatestMessageByChannelId(channelId)
-                .orElse(null);
-        List<UUID> userIds = readStatusRepository.findAllUserIdsByChannelId(channel.getId());
-
-        return ChannelResponseDto.of(
-                channel,
-                messageLastSentAt,
-                isChannelPrivate(channel) ? userIds : null
-        );
-    }
-
-    private boolean isChannelPrivate(Channel channel) {
-        return channel.getChannelType().equals(ChannelType.PRIVATE);
-    }
-
     private boolean isChannelPublic(Channel channel) {
         return channel.getChannelType().equals(ChannelType.PUBLIC);
     }
 
-    public ChannelResponseDto createChannel(ChannelType channelType,
-                                            String name,
-                                            List<UUID> userIds) {
-        Channel channel = new Channel(channelType, name);
+    public ChannelResponseDto createPublicChannel(String name,
+                                                  String description) {
+        Channel channel = Channel.createPublicChannel(name, description);
+        Channel created = channelRepository.create(channel);
+        return ChannelResponseDto.of(created);
+    }
+
+    public ChannelResponseDto createPrivateChannel(List<UUID> userIds) {
+        Channel channel = Channel.createPrivateChannel(userIds);
         UUID channelId = channel.getId();
 
         if (!userRepository.existsAllByIds(userIds)) {
@@ -62,14 +49,14 @@ public class BasicChannelService {
         readStatusRepository.createAll(readStatuses);
 
         Channel created = channelRepository.create(channel);
-        return createChannelResponseDto(created);
+        return ChannelResponseDto.of(created);
     }
 
     public ChannelResponseDto getChannel(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
 
-        return createChannelResponseDto(channel);
+        return ChannelResponseDto.of(channel);
     }
 
     // 1. DTO를 활용해 가장 최근 메시지의 시간 정보 포함
@@ -84,7 +71,7 @@ public class BasicChannelService {
         return channelRepository.findAll().stream()
                 .filter(channel -> isChannelPublic(channel)
                         || readStatusRepository.existsByUserAndChannel(userId, channel.getId()))
-                .map(this::createChannelResponseDto)
+                .map(ChannelResponseDto::of)
                 .toList();
     }
 
@@ -92,7 +79,7 @@ public class BasicChannelService {
     // TODO 2. PRIVATE 채널은 수정할 수 없음
     public ChannelResponseDto updateChannelName(UUID id, String name) {
         Channel updated = channelRepository.updateName(id, name);
-        return createChannelResponseDto(updated);
+        return ChannelResponseDto.of(updated);
     }
 
     public ChannelResponseDto deleteChannel(UUID id) {
@@ -100,6 +87,6 @@ public class BasicChannelService {
         messageRepository.deleteAllByChannelId(id);
         readStatusRepository.deleteByChannelId(id);
         Channel deleted = channelRepository.deleteById(id);
-        return createChannelResponseDto(deleted);
+        return ChannelResponseDto.of(deleted);
     }
 }

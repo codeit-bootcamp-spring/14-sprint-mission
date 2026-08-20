@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,15 +20,25 @@ public class ChannelApiController {
     private final BasicChannelService channelService;
 
     // 1. 공개 채널을 생성할 수 있다.
-    // 2. 비공개 채널을 생성할 수 있다.
-    @RequestMapping(method = RequestMethod.POST)
-    public ChannelResponseDto createPublic(@Valid @RequestBody ChannelCreationDto request) {
-        return channelService.createChannel(
-                request.getChannelType(),
-                request.getName(),
-                request.getUserIds()
+    @ResponseStatus(HttpStatus.CREATED)
+    @RequestMapping(method = RequestMethod.POST, value = "/public")
+    public ChannelResponseDto createPublicChannel(@Valid @RequestBody PublicChannelCreateDto request) {
+        return channelService.createPublicChannel(
+                request.name(),
+                request.description()
         );
     }
+
+    // TODO 유저 없어서 테스트 진행 불가. 유저 다 구현 후 여기부터 진행
+    // 2. 비공개 채널을 생성할 수 있다.
+    @ResponseStatus(HttpStatus.CREATED)
+    @RequestMapping(method = RequestMethod.POST, value = "/private")
+    public ChannelResponseDto createPrivateChannel(@Valid @RequestBody PrivateChannelCreateDto request) {
+        return channelService.createPrivateChannel(
+                request.participantIds()
+        );
+    }
+
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
     public ChannelResponseDto updateChannelName(@PathVariable UUID id,

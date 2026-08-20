@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serial;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ToString(onlyExplicitlyIncluded = true)
 @Getter
@@ -16,14 +19,29 @@ public final class Channel extends ModifiableEntity {
 
     @ToString.Include
     private String name;
+    @ToString.Include
+    private String description;
 
     @ToString.Include
     private final ChannelType channelType;
 
-    public Channel(ChannelType channelType, String name) {
+    private Channel(ChannelType channelType, String name, String description) {
         super();
         this.channelType = channelType;
         this.name = name;
+        this.description = description;
+    }
+
+    public static Channel createPublicChannel(String name, String description) {
+        return new Channel(ChannelType.PUBLIC, name, description);
+    }
+
+    public static Channel createPrivateChannel(List<UUID> usersId) {
+        String name = usersId.stream()
+                .map(UUID::toString)
+                .collect(Collectors.joining(", "));
+        String description = null;
+        return new Channel(ChannelType.PRIVATE, name, description);
     }
 
     public Channel updateName(String name) {
