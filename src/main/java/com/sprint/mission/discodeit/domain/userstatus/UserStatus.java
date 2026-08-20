@@ -36,9 +36,10 @@ public class UserStatus extends ModifiableEntity {
         return super.now().isBefore(threshold);
     }
 
-    public void update() {
+    public UserStatus updateLastActiveAt(Instant newLastActiveAt) {
+        this.lastSeenAt = newLastActiveAt;
         markedAsUpdate();
-        this.lastSeenAt = super.getUpdatedAt();
+        return this;
     }
 }
 

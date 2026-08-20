@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,12 +39,8 @@ public class JCFUserStatusRepository extends AbstractJCFRepository<UserStatus>
     }
 
     @Override
-    public void update(UUID id) {
-        findById(id).ifPresent(userStatus -> userStatus.update());
-    }
-
-    @Override
-    public void updateByUserId(UUID userId) {
-        findByUserId(userId).ifPresent(userStatus -> userStatus.update());
+    public UserStatus updateLastActiveAtByUserId(UUID userId, Instant newLastActiveAt) {
+        UserStatus updating = super.STORE.get(userId);
+        return updating.updateLastActiveAt(newLastActiveAt);
     }
 }

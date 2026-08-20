@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import com.sprint.mission.discodeit.dto.user.UserDto;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.repository.*;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -24,14 +26,14 @@ public class BasicUserService {
     public UserDto createAccount(String name,
                                  String email,
                                  String password,
-                                 @Nullable UUID profileId
-                              ) {
+                                 @Nullable MultipartFile profile) {
         // 1. 선택적으로 프로필 이미지를 등록할 수 있어야 한다.
         // 2. username과 email은 다른 유저와 달라야 한다.
-        if(userRepository.existsByNameOrEmail(name, email)) {
+        if (userRepository.existsByNameOrEmail(name, email)) {
             throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);
         }
 
+        UUID profileId = binaryContentRepository.create(new BinaryContent(profile)).getId();
         // 3. UserStatus를 같이 생성해야 한다.
         User user = new User(name, email, password, profileId);
         UserStatus userStatus = userStatusRepository.create(new UserStatus(user.getId()));
@@ -65,12 +67,21 @@ public class BasicUserService {
     }
 
     public UserDto updateUser(UUID id,
-                           String name, String email, String password, UUID profileId) {
+                              String name, String email, String password,
+                              @Nullable MultipartFile profile) {
+        if (userRepository.existsByNameOrEmail(name, email)) {
+            throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);
+        }
+
         // 1. 선택적으로 프로필 이미지를 대체할 수 있어야 한다.
         // 2. DTO를 활용해 파라미터를 그룹화한다.
-        if (!userRepository.existsById(id)) {
-            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
-        }
+        User updating = userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
+
+        UUID profileId = (Objects.nonNull(profile)) ?
+                binaryContentRepository.create(new BinaryContent(profile)).getId() : null;
+
+
 
         userRepository.update(id, name, email, password, profileId);
         User updated = userRepository.findById(id).orElseThrow();
@@ -80,7 +91,7 @@ public class BasicUserService {
 
     public UserDto deleteAccount(UUID id) {
         User deleted = userRepository.findById(id)
-                        .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
+                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
         UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
         UUID profileId = deleted.getProfileId();
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import com.sprint.mission.discodeit.dto.user.UserStatusDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -8,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,12 +40,10 @@ public class BasicUserStatusService {
         return userStatusRepository.findAll();
     }
 
-    public void update(UUID id) {
-        userStatusRepository.update(id);
-    }
 
-    public void updateByUserId(UUID userId) {
-        userStatusRepository.updateByUserId(userId);
+    public UserStatusDto updateByUserId(UUID userId, Instant newLastActiveAt) {
+        UserStatus updatedUserStatus = userStatusRepository.updateLastActiveAtByUserId(userId, newLastActiveAt);
+        return UserStatusDto.of(updatedUserStatus);
     }
 
     public void delete(UUID id) {

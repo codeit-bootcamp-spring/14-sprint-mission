@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.user.UserCreationDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.UserStatusDto;
+import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,43 +21,55 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserApiController {
     private final BasicUserService userService;
+    private final BasicUserStatusService userStatusService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST)
-    public UserDto create(@Valid @RequestBody UserCreationDto request) {
+    public UserDto create(@Valid @RequestPart(required = true) UserCreateRequest userCreateRequest,
+                          @RequestPart(required = false) MultipartFile profile) {
         return userService.createAccount(
-                request.getName(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getProfileId()
+                userCreateRequest.username(),
+                userCreateRequest.email(),
+                userCreateRequest.password(),
+                profile
         );
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public UserDto update(@PathVariable UUID id,
-                                  @Valid @RequestBody UserUpdateDto request) {
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}")
+    public UserDto update(@PathVariable UUID userId,
+                          @Valid @RequestPart UserUpdateRequest userUpdateRequest,
+                          @RequestPart(required = false) MultipartFile profile) {
         return userService.updateUser(
-                id,
-                request.getName(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getProfileId()
+                userId,
+                userUpdateRequest.newUsername(),
+                userUpdateRequest.newEmail(),
+                userUpdateRequest.newPassword(),
+                profile
         );
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public UserDto delete(@PathVariable UUID id) {
-        return userService.deleteAccount(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
+    public void delete(@PathVariable UUID userId) {
+        userService.deleteAccount(userId);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/findAll")
-    public ResponseEntity<List<UserDto>> readAll() {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(userService.getAllUsers());
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.GET)
+    public List<UserDto> findAll() {
+        return userService.getAllUsers();
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public UserDto read(@PathVariable UUID id) {
         return userService.getUser(id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}/userStatus")
+    public UserStatusDto updateUserStatusByUserId(@PathVariable UUID userId,
+                                                  @Valid @RequestBody UserStatusUpdateRequest request) {
+        return userStatusService.updateByUserId(userId, request.newLastActiveAt());
     }
 }

@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthApiController {
     private final BasicAuthService authService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, value = "/login")
     public UserDto login(@Valid @RequestBody LoginRequestDto requestDto) {
-        return authService.login(requestDto.name(), requestDto.password());
+        return authService.login(requestDto.username(), requestDto.password());
     }
 }
