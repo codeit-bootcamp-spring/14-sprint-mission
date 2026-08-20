@@ -1,9 +1,8 @@
 package com.sprint.mission.application.message;
 
-import com.sprint.mission.dto.binarycontent.BinaryContentCreateRequestDto;
-import com.sprint.mission.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.dto.message.MessageResponseDto;
-import com.sprint.mission.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.controller.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.controller.dto.message.MessageResponseDto;
+import com.sprint.mission.controller.dto.message.MessageUpdateRequestDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

@@ -1,12 +1,12 @@
 package com.sprint.mission.application.channel;
 
 import com.sprint.mission.domain.*;
-import com.sprint.mission.dto.channel.ChannelResponseDto;
-import com.sprint.mission.dto.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.dto.channel.PrivateChannelCreateRequestDto;
-import com.sprint.mission.dto.channel.PublicChannelCreateRequestDto;
-import com.sprint.mission.exception.DiscodeitException;
-import com.sprint.mission.exception.ExceptionType;
+import com.sprint.mission.controller.dto.channel.ChannelResponseDto;
+import com.sprint.mission.controller.dto.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.controller.dto.channel.PrivateChannelCreateRequestDto;
+import com.sprint.mission.controller.dto.channel.PublicChannelCreateRequestDto;
+import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.service.channel.ChannelDomainService;
 import com.sprint.mission.service.message.MessageDomainService;
@@ -146,7 +146,7 @@ public class ChannelApplicationServiceImpl implements ChannelApplicationService 
         Channel updatingChannel = channelDomainService.findById(channelId);
         if (updatingChannel.getChannelType().equals(ChannelType.PRIVATE)) {
             log.warn("비공개 Channel 수정 불가: channelId={}", channelId);
-            throw new DiscodeitException(ExceptionType.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED, channelId);
+            throw new DiscodeitException(DiscodeitExceptionType.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED, channelId);
         }
 
         updatingChannel.updateNameAndDescription(request.getName(), request.getDescription());

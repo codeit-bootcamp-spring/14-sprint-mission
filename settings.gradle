@@ -1,3 +1,5 @@
 rootProject.name = 'discodeit'
 include 'discodeit-core'
 include 'discodeit-api'
+include 'discodeit-common'
+include 'discodeit-web-helper'

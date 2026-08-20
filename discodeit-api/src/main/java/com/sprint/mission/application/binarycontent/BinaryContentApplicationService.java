@@ -1,7 +1,6 @@
 package com.sprint.mission.application.binarycontent;
 
-import com.sprint.mission.dto.binarycontent.BinaryContentCreateRequestDto;
-import com.sprint.mission.dto.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.controller.dto.binarycontent.BinaryContentResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

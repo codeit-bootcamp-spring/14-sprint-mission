@@ -1,8 +1,8 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.dto.message.MessageResponseDto;
-import com.sprint.mission.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.controller.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.controller.dto.message.MessageResponseDto;
+import com.sprint.mission.controller.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.application.message.MessageApplicationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

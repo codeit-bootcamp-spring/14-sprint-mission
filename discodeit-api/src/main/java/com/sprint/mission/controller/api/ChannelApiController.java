@@ -1,9 +1,9 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.dto.channel.ChannelResponseDto;
-import com.sprint.mission.dto.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.dto.channel.PrivateChannelCreateRequestDto;
-import com.sprint.mission.dto.channel.PublicChannelCreateRequestDto;
+import com.sprint.mission.controller.dto.channel.ChannelResponseDto;
+import com.sprint.mission.controller.dto.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.controller.dto.channel.PrivateChannelCreateRequestDto;
+import com.sprint.mission.controller.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.application.channel.ChannelApplicationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

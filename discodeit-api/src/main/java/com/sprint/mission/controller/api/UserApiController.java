@@ -1,7 +1,7 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.dto.user.UserResponseDto;
-import com.sprint.mission.dto.user.UserUpsertRequestDto;
+import com.sprint.mission.controller.dto.user.UserResponseDto;
+import com.sprint.mission.controller.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.application.user.UserApplicationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

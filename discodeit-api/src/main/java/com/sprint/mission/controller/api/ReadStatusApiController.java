@@ -1,8 +1,7 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.dto.readstatus.ReadStatusResponseDto;
+import com.sprint.mission.controller.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.application.readstatus.ReadStatusApplicationService;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

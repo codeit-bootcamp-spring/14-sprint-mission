@@ -1,7 +1,7 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.dto.auth.LoginRequestDto;
-import com.sprint.mission.dto.auth.LoginResponseDto;
+import com.sprint.mission.controller.dto.auth.LoginRequestDto;
+import com.sprint.mission.controller.dto.auth.LoginResponseDto;
 import com.sprint.mission.application.auth.AuthApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

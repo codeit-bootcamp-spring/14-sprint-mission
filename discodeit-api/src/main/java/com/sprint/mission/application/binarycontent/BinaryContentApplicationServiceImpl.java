@@ -1,7 +1,7 @@
 package com.sprint.mission.application.binarycontent;
 
 import com.sprint.mission.domain.BinaryContent;
-import com.sprint.mission.dto.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.controller.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

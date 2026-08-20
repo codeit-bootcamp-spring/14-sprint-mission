@@ -1,8 +1,8 @@
 package com.sprint.mission.service.readstatus;
 
 import com.sprint.mission.domain.ReadStatus;
-import com.sprint.mission.exception.DiscodeitException;
-import com.sprint.mission.exception.ExceptionType;
+import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.ReadStatusRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class ReadStatusDomainServiceImpl implements ReadStatusDomainService {
                 readStatus.getChannelId()
         )) {
             throw new DiscodeitException(
-                    ExceptionType.READ_STATUS_ALREADY_EXISTS,
+                    DiscodeitExceptionType.READ_STATUS_ALREADY_EXISTS,
                     readStatus.getUserId(),
                     readStatus.getChannelId()
             );
@@ -56,13 +56,13 @@ public class ReadStatusDomainServiceImpl implements ReadStatusDomainService {
     @Override
     public ReadStatus findById(UUID readStatusId) {
         if (Objects.isNull(readStatusId)) {
-            throw new DiscodeitException(ExceptionType.READ_STATUS_ID_IS_NULL);
+            throw new DiscodeitException(DiscodeitExceptionType.READ_STATUS_ID_IS_NULL);
         }
 
         return readStatusRepository.findById(readStatusId)
                 .orElseThrow(() ->
                         new DiscodeitException(
-                                ExceptionType.READ_STATUS_NOT_FOUND,
+                                DiscodeitExceptionType.READ_STATUS_NOT_FOUND,
                                 readStatusId
                         )
                 );
@@ -81,15 +81,15 @@ public class ReadStatusDomainServiceImpl implements ReadStatusDomainService {
     @Override
     public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
         if (Objects.isNull(userId)) {
-            throw new DiscodeitException(ExceptionType.USER_ID_IS_NULL);
+            throw new DiscodeitException(DiscodeitExceptionType.USER_ID_IS_NULL);
         }
         if (Objects.isNull(channelId)) {
-            throw new DiscodeitException(ExceptionType.CHANNEL_ID_IS_NULL);
+            throw new DiscodeitException(DiscodeitExceptionType.CHANNEL_ID_IS_NULL);
         }
 
         return readStatusRepository.findByUserIdAndChannelId(userId, channelId)
                 .orElseThrow(() -> new DiscodeitException(
-                        ExceptionType.READ_STATUS_NOT_FOUND_BY_USER_AND_CHANNEL,
+                        DiscodeitExceptionType.READ_STATUS_NOT_FOUND_BY_USER_AND_CHANNEL,
                         userId,
                         channelId
                 ));

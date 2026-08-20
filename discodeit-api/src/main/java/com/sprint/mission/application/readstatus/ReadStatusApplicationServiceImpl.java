@@ -1,7 +1,7 @@
 package com.sprint.mission.application.readstatus;
 
 import com.sprint.mission.domain.ReadStatus;
-import com.sprint.mission.dto.readstatus.ReadStatusResponseDto;
+import com.sprint.mission.controller.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.service.channel.ChannelDomainService;
 import com.sprint.mission.service.readstatus.ReadStatusDomainService;
 import com.sprint.mission.service.user.UserDomainService;

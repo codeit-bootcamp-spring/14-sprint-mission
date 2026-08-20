@@ -1,6 +1,6 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.dto.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.controller.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.application.binarycontent.BinaryContentApplicationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

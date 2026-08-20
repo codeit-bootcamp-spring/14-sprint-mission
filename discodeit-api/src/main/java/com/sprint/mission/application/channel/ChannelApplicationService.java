@@ -1,9 +1,9 @@
 package com.sprint.mission.application.channel;
 
-import com.sprint.mission.dto.channel.ChannelResponseDto;
-import com.sprint.mission.dto.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.dto.channel.PrivateChannelCreateRequestDto;
-import com.sprint.mission.dto.channel.PublicChannelCreateRequestDto;
+import com.sprint.mission.controller.dto.channel.ChannelResponseDto;
+import com.sprint.mission.controller.dto.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.controller.dto.channel.PrivateChannelCreateRequestDto;
+import com.sprint.mission.controller.dto.channel.PublicChannelCreateRequestDto;
 
 import java.util.List;
 import java.util.UUID;

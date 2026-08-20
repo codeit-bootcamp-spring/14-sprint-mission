@@ -1,11 +1,11 @@
 package com.sprint.mission.application.message;
 
 import com.sprint.mission.domain.*;
-import com.sprint.mission.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.dto.message.MessageResponseDto;
-import com.sprint.mission.dto.message.MessageUpdateRequestDto;
-import com.sprint.mission.exception.DiscodeitException;
-import com.sprint.mission.exception.ExceptionType;
+import com.sprint.mission.controller.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.controller.dto.message.MessageResponseDto;
+import com.sprint.mission.controller.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.service.channel.ChannelDomainService;
 import com.sprint.mission.service.message.MessageDomainService;
@@ -84,7 +84,7 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
                     channelId
             );
             throw new DiscodeitException(
-                    ExceptionType.CHANNEL_ACCESS_DENIED,
+                    DiscodeitExceptionType.CHANNEL_ACCESS_DENIED,
                     senderId,
                     channelId
             );

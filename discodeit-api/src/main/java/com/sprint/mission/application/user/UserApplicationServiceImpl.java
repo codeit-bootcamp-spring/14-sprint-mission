@@ -1,8 +1,8 @@
 package com.sprint.mission.application.user;
 
 import com.sprint.mission.domain.*;
-import com.sprint.mission.dto.user.UserUpsertRequestDto;
-import com.sprint.mission.dto.user.UserResponseDto;
+import com.sprint.mission.controller.dto.user.UserUpsertRequestDto;
+import com.sprint.mission.controller.dto.user.UserResponseDto;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.service.channel.ChannelDomainService;
 import com.sprint.mission.service.readstatus.ReadStatusDomainService;
