@@ -6,6 +6,7 @@ import com.sprint.mission.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.application.channel.ChannelApplicationService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,9 +50,9 @@ public class ChannelApiController {
     }
 
     // patch로? <- 어떻게 달라질지
-    @PutMapping
+    @PutMapping("/{channelId}")
     public ResponseEntity<ChannelResponseDto> update(
-            @Valid @RequestParam UUID channelId,
+            @NotNull @PathVariable UUID channelId,
             @Valid @RequestBody ChannelUpdateRequestDto request
     ) {
         ChannelResponseDto updatedChannel = channelApplicationService.update(channelId, request);
@@ -60,19 +61,19 @@ public class ChannelApiController {
                 .body(updatedChannel);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{channelId}")
     public ResponseEntity<Void> delete(
-            @Valid @RequestParam UUID channelId
+            @NotNull @PathVariable UUID channelId
     ) {
         channelApplicationService.delete(channelId);
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body(null);
+                .noContent()
+                .build();
     }
 
-    @GetMapping
+    @GetMapping("/{userId}")
     public ResponseEntity<List<ChannelResponseDto>> retrieveAccessible(
-            @Valid @RequestParam UUID userId
+            @NotNull @PathVariable UUID userId
     ) {
         List<ChannelResponseDto> accssibleChannelList = channelApplicationService.findAllByUserId(userId);
         return ResponseEntity

@@ -4,9 +4,11 @@ import com.sprint.mission.dto.user.UserResponseDto;
 import com.sprint.mission.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.application.user.UserApplicationService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ import java.util.UUID;
 // [x] 모든 사용자를 조회할 수 있다.
 // [x] 사용자의 온라인 상태를 업데이트할 수 있다.
 @RequestMapping("/api/users")
+@Validated
 public class UserApiController {
 
     private final UserApplicationService userApplicationService;
@@ -37,15 +40,15 @@ public class UserApiController {
                 .body(createdUser);
     }
 
-    @PutMapping
+    @PutMapping("/{userId}")
     public ResponseEntity<UserResponseDto> update(
-            @Valid @RequestParam("userId")                              UUID id,
+            @NotNull @PathVariable                                      UUID userId,
             @Valid @RequestPart("user")                                 UserUpsertRequestDto userUpdateRequest,
             @Valid @RequestPart(value = "profile", required = false)    MultipartFile profileImage
     ) {
         UserResponseDto updatedUser =
                 userApplicationService.update(
-                        id,
+                        userId,
                         userUpdateRequest,
                         profileImage
                 );
@@ -54,14 +57,14 @@ public class UserApiController {
                 .body(updatedUser);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> delete(
-            @Valid @RequestParam UUID userId
+            @NotNull @PathVariable UUID userId
     ) {
         userApplicationService.delete(userId);
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body(null);
+                .noContent()
+                .build();
     }
 
     @GetMapping
@@ -72,9 +75,9 @@ public class UserApiController {
                 .body(usersList);
     }
 
-    @PatchMapping("/activate")
+    @PatchMapping("/{userId}/activate")
     public ResponseEntity<UserResponseDto> activateUser(
-            @Valid @RequestParam UUID userId
+            @NotNull @PathVariable UUID userId
     ) {
         UserResponseDto activatedUser = userApplicationService.activateUser(userId);
         return ResponseEntity
