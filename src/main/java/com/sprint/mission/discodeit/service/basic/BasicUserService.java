@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.UserResponseDto;
-import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.IService.UserService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;

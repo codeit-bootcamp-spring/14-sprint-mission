@@ -1,20 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.BinaryContentCtreateRequestDto;
-import com.sprint.mission.discodeit.dto.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.IService.MessageService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.IService;
 
-import com.sprint.mission.discodeit.dto.UserStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.UserStatusResponseDto;
-import com.sprint.mission.discodeit.dto.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDto;
 import java.util.List;
 import java.util.UUID;
 

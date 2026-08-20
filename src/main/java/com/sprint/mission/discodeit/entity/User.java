@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 

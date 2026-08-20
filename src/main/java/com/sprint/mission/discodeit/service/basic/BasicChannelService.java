@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.ChannelUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.PrivateChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.PublicChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -11,8 +11,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.IService.ChannelService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -109,7 +108,7 @@ public class BasicChannelService  implements ChannelService {
 
         List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(id);
         for (ReadStatus readStatus : readStatuses) {
-            readStatusRepository.delete(readStatus.getId());
+            readStatusRepository.deleteById(readStatus.getId());
         }
 
     }
