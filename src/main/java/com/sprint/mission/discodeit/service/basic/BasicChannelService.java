@@ -64,14 +64,14 @@ public class BasicChannelService  implements ChannelService {
             .orElse(null);
 
         List<UUID> participantIds = channel.getType() == ChannelType.PRIVATE
-            ? readStatusRepository.findAll(channel.getId()).stream().map(ReadStatus::getUserId).toList()
+            ? readStatusRepository.findAllByChannelId(channel.getId()).stream().map(ReadStatus::getUserId).toList()
             : List.of();
 
         return ChannelResponseDto.from(channel, participantIds, lastMessageAt);
     }
 
     @Override
-    public ChannelResponseDto update(Integer id, ChannelUpdateRequestDto updateRequest) {
+    public ChannelResponseDto update(UUID id, ChannelUpdateRequestDto updateRequest) {
         Channel channel = channelRepository.findById(id);
         if (Objects.isNull(channel)) {
             throw new RuntimeException("존재하지 않는 채널입니다.");
@@ -107,7 +107,7 @@ public class BasicChannelService  implements ChannelService {
         }
 
 
-        List<ReadStatus> readStatuses = readStatusRepository.findAll(id);
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(id);
         for (ReadStatus readStatus : readStatuses) {
             readStatusRepository.delete(readStatus.getId());
         }

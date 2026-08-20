@@ -13,7 +13,7 @@ public interface ChannelService  {
     ChannelResponseDto createPublic(PublicChannelCreateRequestDto request);
     ChannelResponseDto createPrivate(PrivateChannelCreateRequestDto request);
     ChannelResponseDto find(UUID id);
-    ChannelResponseDto update(Integer id, ChannelUpdateRequestDto updateRequest);
+    ChannelResponseDto update(UUID id, ChannelUpdateRequestDto updateRequest);
     void delete(UUID id);
     List<Channel> findAll();
 

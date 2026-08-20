@@ -30,6 +30,7 @@ public class Channel extends BasicEntity {
         if (description != null) {
             this.description = description;
         }
+        this.updatedAt = Instant.now();
     }
 
 

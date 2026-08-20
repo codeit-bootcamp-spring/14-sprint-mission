@@ -13,11 +13,12 @@ public class Message extends BasicEntity {
     private UUID channel_id;
     private List<UUID> attachmentIds;
 
-    public Message(String text, UUID user_id, UUID channel_id) {
+    public Message(String text, UUID user_id, UUID channel_id, List<UUID> attachmentIds) {
         super();
         this.text = text;
         this.user_id = user_id;
         this.channel_id = channel_id;
+        this.attachmentIds = attachmentIds;
     }
 
 
