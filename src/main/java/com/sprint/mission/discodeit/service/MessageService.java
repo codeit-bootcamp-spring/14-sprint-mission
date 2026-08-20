@@ -2,10 +2,15 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.entity.Message;
+import java.util.List;
 
-public interface MessageService extends Service<Message> {
+public interface MessageService {
 
-    void update(Message message, String newtext);
+    MessageResponseDto create(MessageCreateRequestDto request);
+    List<MessageResponseDto> findAllByChaanelId(Integer id);
+    MessageResponseDto update(Integer id, MessageUpdateRequestDto request);
+    void delete(Integer id);
+
 
 
 }

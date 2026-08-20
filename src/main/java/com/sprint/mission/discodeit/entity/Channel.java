@@ -7,15 +7,30 @@ import lombok.Getter;
 @Getter
 public class Channel extends BasicEntity {
 
-
+    private ChannelType type;
     private String name;
+    private String description;
 
-    public Channel(String name) {
+    public Channel(ChannelType type, String name, String description) {
         super();
+        this.type = type;
         this.name = name;
+        this.description = description;
+    }
+    public Channel(ChannelType type) {
+        super();
+        this.type = type;
     }
 
 
+    public void update(String name, String description) {
+        if (name != null) {
+            this.name = name;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+    }
 
 
     public void setName(String name) {
