@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,12 +54,12 @@ public class JCFReadStatusRepository extends AbstractJCFRepository<ReadStatus>
     }
 
     @Override
-    public List<ReadStatus> updateByChannelId(UUID channelId) {
+    public List<ReadStatus> updateByChannelId(UUID channelId, Instant newLastReadAt) {
         List<ReadStatus> channelReadStatus = super.STORE.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .toList();
         for (ReadStatus eachReadStatus : channelReadStatus) {
-            eachReadStatus.update();
+            eachReadStatus.update(newLastReadAt);
         }
         return channelReadStatus;
     }
@@ -75,5 +76,10 @@ public class JCFReadStatusRepository extends AbstractJCFRepository<ReadStatus>
         return findAllByChannelId(channelId).stream()
                 .map(readStatus -> readStatus.getUserId())
                 .toList();
+    }
+
+    @Override
+    public ReadStatus update(UUID publicReadStatusId, Instant newLastReadAt) {
+        return super.STORE.get(publicReadStatusId).update(newLastReadAt);
     }
 }

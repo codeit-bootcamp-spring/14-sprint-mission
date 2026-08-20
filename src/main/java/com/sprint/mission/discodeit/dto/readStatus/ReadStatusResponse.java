@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record ReadStatusResponse(UUID readStatusId,
+public record ReadStatusResponse(UUID id,
                                  UUID userId,
                                  UUID channelId,
                                  Instant lastReadAt) {

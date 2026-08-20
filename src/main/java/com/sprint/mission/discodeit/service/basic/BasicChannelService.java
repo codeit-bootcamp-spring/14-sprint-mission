@@ -44,7 +44,7 @@ public class BasicChannelService {
 
         // 참여 User의 정보를 받아 User 별 ReadStatus 정보 생성
         List<ReadStatus> readStatuses = userIds.stream()
-                .map(userId -> new ReadStatus(userId, channelId))
+                .map(userId -> new ReadStatus(userId, channelId, null))
                 .toList();
         readStatusRepository.createAll(readStatuses);
 

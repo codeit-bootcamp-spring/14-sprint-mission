@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -61,12 +62,12 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     }
 
     @Override
-    public List<ReadStatus> updateByChannelId(UUID channelId) {
+    public List<ReadStatus> updateByChannelId(UUID channelId, Instant newLastReadAt) {
         List<ReadStatus> channelReadStatus = super.buffer.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .toList();
         for (ReadStatus eachReadStatus : channelReadStatus) {
-            eachReadStatus.update();
+            eachReadStatus.update(newLastReadAt);
         }
         super.writeFromBufferToFile();
         return channelReadStatus;
@@ -85,5 +86,11 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
         return findAllByChannelId(channelId).stream()
                 .map(readStatus -> readStatus.getUserId())
                 .toList();
+    }
+
+    @Override
+    public ReadStatus update(UUID publicReadStatusId, Instant newLastReadAt) {
+        return super.buffer.get(publicReadStatusId)
+                .update(newLastReadAt);
     }
 }

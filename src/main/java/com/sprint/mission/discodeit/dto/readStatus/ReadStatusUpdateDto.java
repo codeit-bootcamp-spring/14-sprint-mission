@@ -1,4 +1,9 @@
 package com.sprint.mission.discodeit.dto.readStatus;
 
-public record ReadStatusUpdateDto() {
+import jakarta.validation.constraints.NotNull;
+
+import java.time.Instant;
+
+public record ReadStatusUpdateDto(@NotNull Instant newLastReadAt) {
+
 }

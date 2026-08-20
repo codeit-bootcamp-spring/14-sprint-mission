@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class BasicReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    public ReadStatusResponse create(UUID userId, UUID channelId) {
+    public ReadStatusResponse create(UUID userId, UUID channelId, Instant lastReadAt) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
         Channel channel = channelRepository.findById(channelId)
@@ -31,7 +32,7 @@ public class BasicReadStatusService {
         if (readStatusRepository.existsByUserAndChannel(user.getId(), channel.getId())) {
             throw new CustomException(ExceptionType.READSTATUS_ALREADY_EXISTS);
         }
-        ReadStatus readStatus = new ReadStatus(userId, channelId);
+        ReadStatus readStatus = new ReadStatus(userId, channelId, lastReadAt);
         ReadStatus created = readStatusRepository.create(readStatus);
 
         return ReadStatusResponse.of(created);
@@ -48,13 +49,10 @@ public class BasicReadStatusService {
                 .toList();
     }
 
-    public List<ReadStatusResponse> updateReadStatus(UUID channelId) {
-        // 요구사항 : DTO를 활용해 파라미터를 그룹화합니다 (수정 대상 객체의 id 파라미터, 수정할 값 파라미터)
-        // 아니 근데 readStatus애서 수정할 필드라곤 마지막 메시지 읽은 시간밖에 없어서 파라미터도 필요 없는데
-        // 왜 DTO를 만들라고 했을까?
-        return readStatusRepository.updateByChannelId(channelId).stream()
-                .map(ReadStatusResponse::of)
-                .toList();
+    public ReadStatusResponse updateReadStatus(UUID publicReadStatusId, Instant newLastReadAt) {
+        ReadStatus updated = readStatusRepository.update(publicReadStatusId, newLastReadAt);
+        return ReadStatusResponse.of(updated);
+
     }
 
     public void deleteReadStatus(UUID id) {

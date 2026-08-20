@@ -19,15 +19,16 @@ public class ReadStatus extends ModifiableEntity {
 
     private Instant lastReadAt;
 
-    public ReadStatus(UUID userId, UUID channelId) {
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         super();
         this.userId = userId;
         this.channelId = channelId;
-        lastReadAt = now();
+        this.lastReadAt = lastReadAt;
     }
 
-    public void update() {
-        lastReadAt = now();
+    public ReadStatus update(Instant newLastReadAt) {
+        this.lastReadAt = newLastReadAt;
         markedAsUpdate();
+        return this;
     }
 }
