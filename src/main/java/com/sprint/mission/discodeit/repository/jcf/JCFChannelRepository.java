@@ -17,7 +17,7 @@ public class JCFChannelRepository extends AbstractJCFRepository<Channel>
         implements ChannelRepository {
 
     @Override
-    public Channel updateName(UUID id, String name) {
-        return super.STORE.get(id).updateName(name);
+    public Channel updateNameAndDescription(UUID id, String name, String description) {
+        return super.STORE.get(id).updateNameAndDescription(name, description);
     }
 }

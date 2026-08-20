@@ -39,13 +39,14 @@ public class ChannelApiController {
         );
     }
 
-
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
-    public ChannelResponseDto updateChannelName(@PathVariable UUID id,
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{publicChannelId}")
+    public ChannelResponseDto updateChannelName(@PathVariable UUID publicChannelId,
                                                 @Valid @RequestBody ChannelUpdateNameDto request) {
         return channelService.updateChannelName(
-                id,
-                request.getName()
+                publicChannelId,
+                request.newName(),
+                request.newDescription()
         );
     }
 
@@ -56,8 +57,9 @@ public class ChannelApiController {
     }
 
     // 4. 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
-    @RequestMapping(method = RequestMethod.GET, value = "/{userId}")
-    public List<ChannelResponseDto> getAllChannels(@PathVariable UUID userId) {
+    @RequestMapping(method = RequestMethod.GET)
+    public List<ChannelResponseDto> getAllChannels(@RequestParam UUID userId) {
         return channelService.getAllChannelsByUserId(userId);
     }
+
 }

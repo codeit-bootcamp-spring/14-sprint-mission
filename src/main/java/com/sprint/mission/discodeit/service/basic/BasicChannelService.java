@@ -77,8 +77,9 @@ public class BasicChannelService {
 
     // TODO 1. DTO 활용해 파라미터 그룹화
     // TODO 2. PRIVATE 채널은 수정할 수 없음
-    public ChannelResponseDto updateChannelName(UUID id, String name) {
-        Channel updated = channelRepository.updateName(id, name);
+    public ChannelResponseDto updateChannelName(UUID id,
+                                                String name, String description) {
+        Channel updated = channelRepository.updateNameAndDescription(id, name, description);
         return ChannelResponseDto.of(updated);
     }
 
