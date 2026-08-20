@@ -1,5 +1,10 @@
 package com.sprint.mission.discodeit.dto.userstatus;
 
-public record UserStatusUpdateDto() {
+import java.time.Instant;
+import java.util.UUID;
+
+public record UserStatusUpdateDto(
+    Instant lastActiveAt
+) {
 
 }

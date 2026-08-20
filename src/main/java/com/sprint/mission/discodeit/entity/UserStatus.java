@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class UserStatus extends BasicEntity{
     private final UUID userId;
-    private final Instant lastActiveAt;
+    private Instant lastActiveAt;
 
     public UserStatus(UUID userId, Instant lastActiveAt){
         super();
@@ -17,5 +17,10 @@ public class UserStatus extends BasicEntity{
     }
     public boolean isOnline() {
         return this.lastActiveAt.isAfter(Instant.now().minus(Duration.ofMinutes(5)));
+    }
+    public void update(Instant lastActiveAt) {
+        if (lastActiveAt != null) {
+            this.lastActiveAt = lastActiveAt;
+        }
     }
 }
