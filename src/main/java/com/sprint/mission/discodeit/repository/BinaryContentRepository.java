@@ -6,5 +6,5 @@ import java.util.UUID;
 public interface BinaryContentRepository {
 
     BinaryContent save(BinaryContent binaryContent);
-    void deleteById(UUID id);
+    void delete(UUID id);
 }

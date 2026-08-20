@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.entity;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 public class UserStatus extends BasicEntity{
     private final UUID userId;
     private final Instant lastActiveAt;
