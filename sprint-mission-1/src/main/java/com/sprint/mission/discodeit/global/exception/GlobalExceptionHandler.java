@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartException;
 
 @Slf4j
 @RestControllerAdvice
@@ -62,6 +64,35 @@ public class GlobalExceptionHandler {
             .status(type.getStatus())
             .body(ErrorResponse.of(type, detail));
 
+    }
+
+    // Json이 깨졌을 때, 읽을 수 없을 때
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleNotReadable(
+        HttpMessageNotReadableException exception) {
+        ExceptionType type = ExceptionType.INVALID_PARAMETER;
+
+        String detail = exception.getMessage();
+
+        logMessage(type, exception, detail);
+        return ResponseEntity
+            .status(type.getStatus())
+            .body(ErrorResponse.of(type, detail));
+    }
+
+    // 파일 처리 시 오류
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ErrorResponse> handleMultipart(
+        MultipartException exception) {
+        ExceptionType type = ExceptionType.MULTIPART_FAILED;
+
+        String detail = exception.getMessage();
+
+        logMessage(type, exception, detail);
+
+        return ResponseEntity
+            .status(type.getStatus())
+            .body(ErrorResponse.of(type, detail));
     }
 
     @ExceptionHandler(Exception.class)

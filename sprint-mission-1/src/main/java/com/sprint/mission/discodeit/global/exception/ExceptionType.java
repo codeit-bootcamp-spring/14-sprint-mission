@@ -75,7 +75,7 @@ public enum ExceptionType {
         "아이디 또는 비밀번호가 올바르지 않습니다"
     ),
 
-    
+
     VALIDATION_FAILED(
         Level.WARN,
         HttpStatus.BAD_REQUEST,
@@ -86,6 +86,12 @@ public enum ExceptionType {
         Level.WARN,
         HttpStatus.BAD_REQUEST,
         "요청 파라미터 형식이 올바르지 않습니다."
+    ),
+
+    MULTIPART_FAILED(
+        Level.WARN,
+        HttpStatus.BAD_REQUEST,
+        "파일 처리에서 오류가 발생했습니다."
     ),
 
     INTERNAL_ERROR(
