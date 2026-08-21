@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.application.ChannelApplication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,13 +17,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/channels")
 public class ChannelApiController {
-    private final BasicChannelService channelService;
+    private final ChannelApplication channelApplication;
 
     // 1. 공개 채널을 생성할 수 있다.
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/public")
     public ChannelResponseDto createPublicChannel(@Valid @RequestBody PublicChannelCreateDto request) {
-        return channelService.createPublicChannel(
+        return channelApplication.createPublicChannel(
                 request.name(),
                 request.description()
         );
@@ -34,7 +34,7 @@ public class ChannelApiController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, value = "/private")
     public ChannelResponseDto createPrivateChannel(@Valid @RequestBody PrivateChannelCreateDto request) {
-        return channelService.createPrivateChannel(
+        return channelApplication.createPrivateChannel(
                 request.participantIds()
         );
     }
@@ -43,7 +43,7 @@ public class ChannelApiController {
     @RequestMapping(method = RequestMethod.PATCH, value = "/{publicChannelId}")
     public ChannelResponseDto updateChannelName(@PathVariable UUID publicChannelId,
                                                 @Valid @RequestBody ChannelUpdateNameDto request) {
-        return channelService.updateChannelName(
+        return channelApplication.updateChannelName(
                 publicChannelId,
                 request.newName(),
                 request.newDescription()
@@ -54,14 +54,14 @@ public class ChannelApiController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ChannelResponseDto deleteChannel(@PathVariable UUID id) {
-        return channelService.deleteChannel(id);
+        return channelApplication.deleteChannel(id);
     }
 
     // 4. 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.GET)
     public List<ChannelResponseDto> getAllChannels(@RequestParam UUID userId) {
-        return channelService.getAllChannelsByUserId(userId);
+        return channelApplication.getAllChannelsByUserId(userId);
     }
 
 }

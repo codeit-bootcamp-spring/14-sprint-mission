@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.application.MessageApplication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,14 +17,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/messages")
 public class MessageApiController {
-    private final BasicMessageService messageService;
+    private final MessageApplication messageApplication;
 
     // 1. 메세지를 보낼 수 있다.
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST)
     public MessageResponseDto createMessage(@Valid @RequestPart MessageCreateRequest messageCreateRequest,
                                             @RequestPart(required = false) List<MultipartFile> attachments) {
-        return messageService.createMessage(
+        return messageApplication.createMessage(
                 messageCreateRequest.content(),
                 messageCreateRequest.channelId(),
                 messageCreateRequest.authorId(),
@@ -37,19 +37,19 @@ public class MessageApiController {
     @RequestMapping(method = RequestMethod.PATCH, value = "/{messageId}")
     public MessageResponseDto updateMessage(@PathVariable UUID messageId,
                                             @Valid @RequestBody MessageUpdateDto request) {
-        return messageService.updateMessage(messageId, request.newContent());
+        return messageApplication.updateMessage(messageId, request.newContent());
     }
 
     // 3. 메세지를 삭제할 수 있다.
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/{messageId}")
     public MessageResponseDto deleteMessage(@PathVariable UUID messageId) {
-        return messageService.deleteMessage(messageId);
+        return messageApplication.deleteMessage(messageId);
     }
 
     // 4. 특정 채널의 메세지 목록을 조회할 수 있다.
     @RequestMapping(method = RequestMethod.GET)
     public List<MessageResponseDto> getChannelMessages(@RequestParam UUID channelId) {
-        return messageService.getAllByChannelId(channelId);
+        return messageApplication.getAllByChannelId(channelId);
     }
 }

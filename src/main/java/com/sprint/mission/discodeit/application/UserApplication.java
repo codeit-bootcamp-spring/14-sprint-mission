@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.user.User;
@@ -16,7 +16,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class BasicUserService {
+public class UserApplication {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final UserStatusRepository userStatusRepository;

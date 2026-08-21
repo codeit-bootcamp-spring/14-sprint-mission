@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class BasicBinaryContentService{
+public class BinaryContentApplication {
     private final BinaryContentRepository binaryContentRepository;
 
     public BinaryContent create(BinaryContent binaryContent) {

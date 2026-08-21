@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
+import com.sprint.mission.discodeit.application.BinaryContentApplication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +15,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/binaryContents")
 public class BinaryContentApiController {
-    private final BasicBinaryContentService binaryContentService;
+    private final BinaryContentApplication binaryContentApplication;
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.GET)
     public List<BinaryContentResponseDto> getBinaryContents(@RequestParam List<UUID> binaryContentIds) {
-        return binaryContentService.getAllBinaryContents(binaryContentIds);
+        return binaryContentApplication.getAllBinaryContents(binaryContentIds);
     }
 
     // 심화 요구사항
     @RequestMapping(method = RequestMethod.GET, value = "/find/{binaryContentId}")
     public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable UUID binaryContentId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(binaryContentService.getBinaryContent(binaryContentId));
+                .body(binaryContentApplication.getBinaryContent(binaryContentId));
     }
 }

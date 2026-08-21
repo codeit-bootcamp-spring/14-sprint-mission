@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import com.sprint.mission.discodeit.dto.user.UserStatusDto;
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class BasicUserStatusService {
+public class UserStatusApplication {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
 

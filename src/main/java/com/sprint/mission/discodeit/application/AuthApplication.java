@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BasicAuthService {
+public class AuthApplication {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 

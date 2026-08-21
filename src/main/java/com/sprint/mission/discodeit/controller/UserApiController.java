@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
+import com.sprint.mission.discodeit.application.UserApplication;
+import com.sprint.mission.discodeit.application.UserStatusApplication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,14 +20,14 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 public class UserApiController {
-    private final BasicUserService userService;
-    private final BasicUserStatusService userStatusService;
+    private final UserApplication userApplication;
+    private final UserStatusApplication userStatusApplication;
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST)
     public UserDto create(@Valid @RequestPart(required = true) UserCreateRequest userCreateRequest,
                           @RequestPart(required = false) MultipartFile profile) {
-        return userService.createAccount(
+        return userApplication.createAccount(
                 userCreateRequest.username(),
                 userCreateRequest.email(),
                 userCreateRequest.password(),
@@ -40,7 +40,7 @@ public class UserApiController {
     public UserDto update(@PathVariable UUID userId,
                           @Valid @RequestPart UserUpdateRequest userUpdateRequest,
                           @RequestPart(required = false) MultipartFile profile) {
-        return userService.updateUser(
+        return userApplication.updateUser(
                 userId,
                 userUpdateRequest.newUsername(),
                 userUpdateRequest.newEmail(),
@@ -52,24 +52,24 @@ public class UserApiController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
     public void delete(@PathVariable UUID userId) {
-        userService.deleteAccount(userId);
+        userApplication.deleteAccount(userId);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.GET)
     public List<UserDto> findAll() {
-        return userService.getAllUsers();
+        return userApplication.getAllUsers();
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public UserDto read(@PathVariable UUID id) {
-        return userService.getUser(id);
+        return userApplication.getUser(id);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}/userStatus")
     public UserStatusDto updateUserStatusByUserId(@PathVariable UUID userId,
                                                   @Valid @RequestBody UserStatusUpdateRequest request) {
-        return userStatusService.updateByUserId(userId, request.newLastActiveAt());
+        return userStatusApplication.updateByUserId(userId, request.newLastActiveAt());
     }
 }
