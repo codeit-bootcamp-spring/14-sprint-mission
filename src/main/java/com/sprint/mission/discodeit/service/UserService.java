@@ -59,6 +59,12 @@ public class UserService {
         return validateExistsAndThenFindById(id).update(name, email, password, profileId);
     }
 
+    public void validateExistsByName(String name) {
+        if(!userRepository.existsByName(name)) {
+            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
+        }
+    }
+
     public void validateAllExists(List<UUID> userIds) {
         userIds.stream()
                 .filter(userId -> !userRepository.existsById(userId))
