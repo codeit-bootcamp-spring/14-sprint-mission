@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -10,17 +13,18 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
+import java.util.stream.Stream;
 
-@Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileUserStatusRepository implements UserStatusRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserStatusRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", UserStatus.class.getSimpleName());
+    public FileUserStatusRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, UserStatus.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -66,9 +70,16 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return findAll().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
+    }
+
+    @Override
     public List<UserStatus> findAll() {
-        try {
-            return Files.list(DIRECTORY)
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
@@ -88,34 +99,23 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public boolean existsById(UUID id) {
-        return Files.exists(resolvePath(id));
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
     @Override
     public void deleteById(UUID id) {
+        Path path = resolvePath(id);
         try {
-            Files.deleteIfExists(resolvePath(id));
+            Files.delete(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Optional<UserStatus> findByUserId(UUID userId) {
-        return findAll().stream()
-                .filter(status -> status.getUserId().equals(userId))
-                .findFirst();
-    }
-
-    @Override
     public void deleteByUserId(UUID userId) {
-        // 유저 아이디로 대상을 찾은 후, 그 객체의 고유 ID를 이용해 파일을 삭제합니다.
-        findByUserId(userId).ifPresent(status -> deleteById(status.getId()));
-    }
-
-    @Override
-    public boolean existsByUserId(UUID userId) {
-        return findAll().stream()
-                .anyMatch(status -> status.getUserId().equals(userId));
+        this.findByUserId(userId)
+                .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
     }
 }

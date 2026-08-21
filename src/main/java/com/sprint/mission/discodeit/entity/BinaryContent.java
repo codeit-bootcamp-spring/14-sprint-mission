@@ -1,30 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;import lombok.Getter;
+import java.util.UUID;
 
 @Getter
 public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    // 공통 필드(수정 불가능 객체라서 update 삭제함.)
     private UUID id;
     private Instant createdAt;
-
-    // [이미지, 파일](파일명 & 확장자 종류가 필드) 등 바이너리 데이터(필드)를 표현하는 도메인 모델
-    // 사용자의 프로필 이미지, 메시지에 첨부된 파일을 저장하기 위해 활용
-    // 참조 필드
-    private byte[] bytes;
+    //
     private String fileName;
+    private Long size;
     private String contentType;
+    private byte[] bytes;
 
-    public BinaryContent(byte[] bytes, String fileName, String contentType) {
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-
-        this.bytes = bytes;
+        //
         this.fileName = fileName;
+        this.size = size;
         this.contentType = contentType;
+        this.bytes = bytes;
     }
 }

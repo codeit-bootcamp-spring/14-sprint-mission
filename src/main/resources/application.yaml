@@ -1,8 +1,7 @@
 spring:
   application:
-    name: sprintMission3
+    name: discodeit
 
-# application.yaml
 discodeit:
   repository:
     type: file   # jcf | file
