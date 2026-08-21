@@ -59,12 +59,21 @@ public class UserService {
         return validateExistsAndThenFindById(id).update(name, email, password, profileId);
     }
 
-    private User validateExistsAndThenFindById(UUID id) {
+    public void validateAllExists(List<UUID> userIds) {
+        userIds.stream()
+                .filter(userId -> !userRepository.existsById(userId))
+                .findAny()
+                .ifPresent(id -> {
+                    throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
+                });
+    }
+
+    public User validateExistsAndThenFindById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
     }
 
-    private void validateNameAndEmailAvailable(String name, String email) {
+    public void validateNameAndEmailAvailable(String name, String email) {
         if (userRepository.existsByNameOrEmail(name, email)) {
             throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);
         }
