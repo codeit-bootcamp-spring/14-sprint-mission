@@ -7,18 +7,16 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public record MessageResponseDto(@NotNull UUID messageId,
+public record MessageResponseDto(@NotNull UUID id,
                                  @NotBlank String content,
-                                 @NotNull UUID userId,
                                  @NotNull UUID channelId,
-                                 List<UUID> attachmentIds) {
+                                 @NotNull UUID authorId) {
     public static MessageResponseDto of(Message message) {
         return new MessageResponseDto(
                 message.getId(),
                 message.getContent(),
-                message.getUserId(),
                 message.getChannelId(),
-                message.getAttachmentIds()
+                message.getUserId()
         );
     }
 }
