@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binarycontentdto.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontentdto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.CustomRuntimeException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,8 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContentResponseDto readBinaryContent(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id);
         if (Objects.isNull(binaryContent)) {
-            throw new RuntimeException("해당 BinaryContent가 존재하지 않습니다:");
+            // throw new RuntimeException("해당 BinaryContent가 존재하지 않습니다:");
+            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
         }
         return BinaryContentResponseDto.from(binaryContent);
     }

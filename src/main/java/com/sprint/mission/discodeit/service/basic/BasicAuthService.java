@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.authdto.AuthCreateRequestDto;
 import com.sprint.mission.discodeit.dto.userdto.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.CustomRuntimeException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -23,7 +25,8 @@ public class BasicAuthService implements AuthService {
     public UserResponseDto login(AuthCreateRequestDto authCreateRequestDto) {
         User user = userRepository.findByName(authCreateRequestDto.getName());
         if (Objects.isNull(user)) {
-            throw new RuntimeException("올바른 이름을 입력해주세요.");
+            // throw new RuntimeException("올바른 이름을 입력해주세요.");
+            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
         }
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
         return UserResponseDto.from(user, userStatus);
