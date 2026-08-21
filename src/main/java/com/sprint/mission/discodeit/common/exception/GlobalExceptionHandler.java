@@ -1,7 +1,5 @@
-package com.sprint.mission.discodeit.common;
+package com.sprint.mission.discodeit.common.exception;
 
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 import org.springframework.http.ResponseEntity;

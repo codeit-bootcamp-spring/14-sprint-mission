@@ -1,18 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.ChannelType;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.*;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,20 +24,31 @@ public class BasicMessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    public MessageResponseDto createMessage(String content, UUID userId, UUID channelId, List<UUID> attachmentIds) {
+    public MessageResponseDto createMessage(String content, UUID channelId, UUID userId,
+                                            @Nullable List<MultipartFile> attachments) {
         if (!userRepository.existsById(userId)) {
             throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
         }
 
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
 
         // PRIVATE 채널의 경우 소속된 User만 Message 생성 가능
         if (channel.getChannelType().equals(ChannelType.PRIVATE) && !readStatusRepository.existsByUserAndChannel(userId, channelId)) {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
-        Message message = new Message(content, userId, channelId, attachmentIds);
+        List<UUID> createdAttachmentIds = null;
+        if (Objects.nonNull(attachments)) {
+            createdAttachmentIds = attachments.stream()
+                    .map(eachAttachment -> {
+                        BinaryContent createdAttachment = new BinaryContent(eachAttachment);
+                        return binaryContentRepository.create(createdAttachment).getId();
+                    })
+                    .toList();
+        }
+
+        Message message = new Message(content, userId, channelId, createdAttachmentIds);
         Message created = messageRepository.create(message);
         return MessageResponseDto.of(created);
     }

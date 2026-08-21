@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.domain.channel;
 
 import com.sprint.mission.discodeit.domain.common.ModifiableEntity;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import lombok.Getter;
 import lombok.ToString;
 
