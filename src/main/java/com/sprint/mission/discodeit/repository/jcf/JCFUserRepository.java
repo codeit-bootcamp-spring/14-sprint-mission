@@ -23,6 +23,12 @@ public class JCFUserRepository extends AbstractJCFRepository<User>
     }
 
     @Override
+    public boolean existsByName(String name) {
+        return super.STORE.values().stream()
+                .anyMatch(user -> user.getName().equals(name));
+    }
+
+    @Override
     public boolean existsAllByIds(List<UUID> ids) {
         return ids.stream()
                 .allMatch(id -> existsById(id));

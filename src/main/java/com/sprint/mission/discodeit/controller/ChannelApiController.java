@@ -58,6 +58,7 @@ public class ChannelApiController {
     }
 
     // 4. 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
+    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.GET)
     public List<ChannelResponseDto> getAllChannels(@RequestParam UUID userId) {
         return channelService.getAllChannelsByUserId(userId);

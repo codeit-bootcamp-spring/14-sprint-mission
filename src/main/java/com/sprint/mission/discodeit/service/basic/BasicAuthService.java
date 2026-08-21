@@ -17,6 +17,10 @@ public class BasicAuthService {
     private final UserStatusRepository userStatusRepository;
 
     public UserDto login(String name, String password) {
+        if (!userRepository.existsByName(name)) {
+            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
+        }
+
         User retrieved = userRepository.findByNameAndPassword(name, password)
                 .orElseThrow(() -> new CustomException(ExceptionType.LOGIN_FAILED));
         UserStatus userStatus = userStatusRepository.findByUserId(retrieved.getId())
