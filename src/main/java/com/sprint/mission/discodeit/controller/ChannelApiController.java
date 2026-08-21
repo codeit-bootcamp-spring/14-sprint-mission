@@ -51,6 +51,7 @@ public class ChannelApiController {
     }
 
     // 3. 채널을 삭제할 수 있다.
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ChannelResponseDto deleteChannel(@PathVariable UUID id) {
         return channelService.deleteChannel(id);
