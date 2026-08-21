@@ -25,11 +25,10 @@ public class JCFUserStatusRepository extends AbstractJCFRepository<UserStatus>
     }
 
     @Override
-    public void deleteByUserId(UUID userId) {
-        findAll().stream()
-                .filter(userStatus -> userStatus.getUserId().equals(userId))
-                .map(userStatus -> userStatus.getId())
-                .forEach(id -> deleteById(id));
+    public UserStatus deleteByUserId(UUID userId) {
+        UserStatus deleting = findByUserId(userId).orElse(null);
+        UserStatus deleted = deleteById(deleting.getId());
+        return deleted;
     }
 
     @Override

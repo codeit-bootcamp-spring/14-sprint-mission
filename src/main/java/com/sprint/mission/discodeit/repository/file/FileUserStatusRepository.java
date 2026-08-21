@@ -30,12 +30,11 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     }
 
     @Override
-    public void deleteByUserId(UUID userId) {
-        super.buffer.values().stream()
-                .filter(userStatus -> userStatus.getUserId().equals(userId))
-                .map(userStatus -> userStatus.getId())
-                .forEach(id -> deleteById(id));
+    public UserStatus deleteByUserId(UUID userId) {
+        UserStatus deleting = findByUserId(userId).orElse(null);
+        UserStatus deleted = deleteById(deleting.getId());
         super.writeFromBufferToFile();
+        return deleted;
     }
 
     @Override

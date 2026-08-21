@@ -50,8 +50,9 @@ public class JCFUserRepository extends AbstractJCFRepository<User>
     }
 
     @Override
-    public void update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
-        findById(id).ifPresent(user -> user.update(name, email, password, profileId));
+    public User update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
+        User updating = findById(id).orElseThrow();
+        return updating.update(name, email, password, profileId);
     }
 
 }

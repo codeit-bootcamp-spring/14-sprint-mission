@@ -56,9 +56,11 @@ public class FileUserRepository extends AbstractFileRepository<User>
     }
 
     @Override
-    public void update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
-        findById(id).ifPresent(user -> user.update(name, email, password, profileId));
+    public User update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
+        User toBeUpdated = super.buffer.get(id);
+        User updated = toBeUpdated.update(name, email, password, profileId);
         super.writeFromBufferToFile();
+        return updated;
     }
 
 
