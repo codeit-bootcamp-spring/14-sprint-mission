@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.userdto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.CustomRuntimeException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -36,10 +38,12 @@ public class BasicUserService implements UserService {
     public UserResponseDto createUser(UserCreateRequestDto userCreateRequestDto) {
         User user = userCreateRequestDto.toEntity();
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            throw new IllegalArgumentException("이미 가입한 회원 이메일 입니다.");
+            // throw new IllegalArgumentException("이미 가입한 회원 이메일 입니다.");
+            throw new CustomRuntimeException(ExceptionType.DATABASE_CONNECTION_FAILED);
         }
         if (userRepository.findByName(user.getName()) != null) {
-            throw new IllegalArgumentException("이미 가입한 회원 이름 입니다.");
+            // throw new IllegalArgumentException("이미 가입한 회원 이름 입니다.");
+            throw new CustomRuntimeException(ExceptionType.DATABASE_CONNECTION_FAILED);
         }
         userRepository.save(user);
 
@@ -59,7 +63,8 @@ public class BasicUserService implements UserService {
     public UserResponseDto readUser(UUID id) {
         User user = userRepository.findById(id);
         if (user == null) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다: " + id);
+            // throw new IllegalArgumentException("존재하지 않는 유저입니다: " + id);
+            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
         }
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
         return UserResponseDto.from(user, userStatus);
@@ -81,7 +86,8 @@ public class BasicUserService implements UserService {
     public UserResponseDto updateUser(UUID id, UserUpdateRequestDto requestDto) {
         User target = userRepository.findById(id);
         if (Objects.isNull(target)) {
-            throw new RuntimeException("해당 유저가 존재하지 않습니다: " + id);
+            // throw new RuntimeException("해당 유저가 존재하지 않습니다: " + id);
+            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
         }
         //이름 받으면 업데이트
         if(requestDto.getName() != null) {

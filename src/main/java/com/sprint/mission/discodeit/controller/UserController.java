@@ -3,49 +3,57 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.userdto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.userdto.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userdto.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.userstatusdto.UserStatusResponseDto;
+import com.sprint.mission.discodeit.dto.userstatusdto.UserStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.ser.bean.UnwrappingBeanSerializer;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/users")
 @RequiredArgsConstructor
+@RequestMapping("/api/users")
 public class UserController {
-
     private final UserService userService;
+    private final UserStatusService userStatusService;
 
-    @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserCreateRequestDto requestDto) {
-        UserResponseDto response = userService.createUser(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public UserResponseDto create(@RequestBody UserCreateRequestDto dto) {
+        UserResponseDto newUser = userService.createUser(dto);
+        log.info("유저 생성 완료, 유저 이름: " + newUser.getName());
+        return newUser;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> readUser(@PathVariable UUID id) {
-        UserResponseDto response = userService.readUser(id);
-        return ResponseEntity.ok(response);
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public List<UserResponseDto> getList() {
+        return userService.readAllUser();
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponseDto>> readAllUser() {
-        List<UserResponseDto> responses = userService.readAllUser();
-        return ResponseEntity.ok(responses);
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    public UserResponseDto update(@PathVariable UUID id,
+                                  @RequestBody UserUpdateRequestDto dto) {
+        UserResponseDto target = userService.updateUser(id, dto);
+        return target;
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID id, @RequestBody UserUpdateRequestDto requestDto) {
-        UserResponseDto response = userService.updateUser(id, requestDto);
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public void delete(@PathVariable UUID id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
     }
+
+    @RequestMapping(value = "/{id}/status", method = RequestMethod.PATCH)
+    public UserStatusResponseDto updateStatus(@PathVariable UUID id,
+                                              @RequestBody UserStatusUpdateRequestDto dto) {
+    return userStatusService.updateUserStatusByUserId(id,dto);
+    }
+
+
 }

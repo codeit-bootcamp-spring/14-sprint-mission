@@ -18,6 +18,9 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
+        if (findById(user.getId()) != null) {
+            return;
+        }
         userList.add(user);
     }
 

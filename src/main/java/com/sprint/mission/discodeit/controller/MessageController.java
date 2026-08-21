@@ -1,51 +1,41 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.channeldto.ChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channeldto.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.messagedto.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.messagedto.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.messagedto.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@RequestMapping("/api/messages")
 public class MessageController {
-
     private final MessageService messageService;
 
-    @PostMapping
-    public ResponseEntity<MessageResponseDto> createMessage(@RequestBody MessageCreateRequestDto requestDto) {
-        MessageResponseDto response = messageService.createMessage(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @RequestMapping(method = RequestMethod.POST, value = "")
+    public MessageResponseDto send(@RequestBody MessageCreateRequestDto dto) {
+        return messageService.createMessage(dto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MessageResponseDto> readMessage(@PathVariable UUID id) {
-        MessageResponseDto response = messageService.readMessage(id);
-        return ResponseEntity.ok(response);
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
+    public MessageResponseDto modify(@PathVariable UUID id,
+                                     @RequestBody MessageUpdateRequestDto dto) {
+        return messageService.updateMessage(id, dto);
     }
 
-    @GetMapping
-    public ResponseEntity<List<MessageResponseDto>> readAllMessage() {
-        List<MessageResponseDto> responses = messageService.readAllMessage();
-        return ResponseEntity.ok(responses);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable UUID id, @RequestBody MessageUpdateRequestDto requestDto) {
-        MessageResponseDto response = messageService.updateMessage(id, requestDto);
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable UUID id) {
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    public void delete(@PathVariable UUID id) {
         messageService.deleteMessage(id);
-        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "")
+    public List<MessageResponseDto> getMessageListByChannelId(@RequestParam UUID id) {
+        return messageService.findAllByChannelId(id);
     }
 }

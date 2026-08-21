@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.CustomRuntimeException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -45,7 +47,8 @@ public class BasicChannelService implements ChannelService {
                     .filter(each -> Objects.isNull(userService.readUser(each)))
                     .findFirst()
                     .ifPresent(each -> {
-                        throw new RuntimeException("존재하지 않는 유저입니다: ");
+                        // throw new RuntimeException("존재하지 않는 유저입니다: ");
+                        throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
                     });
         }
         List<UUID> memberIdList = requestDto.getMemberIds() == null ?
@@ -67,7 +70,8 @@ public class BasicChannelService implements ChannelService {
                     .filter(each -> Objects.isNull(userService.readUser(each)))
                     .findFirst()
                     .ifPresent(each -> {
-                        throw new RuntimeException("존재하지 않는 유저입니다: ");
+                        // throw new RuntimeException("존재하지 않는 유저입니다: ");
+                        throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
                     });
         }
 
@@ -88,7 +92,8 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto readChannel(UUID id) {
         Channel channel = channelRepository.findById(id);
         if (Objects.isNull(channel)) {
-            throw new RuntimeException("해당 채널이 존재하지 않습니다: " + id);
+            // throw new RuntimeException("해당 채널이 존재하지 않습니다: " + id);
+            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
         }
         Instant lastMessageAt = getLastMessageAt(id);
         return ChannelResponseDto.from(channel, lastMessageAt);
@@ -123,20 +128,24 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto updateChannel(UUID id, ChannelUpdateRequestDto requestDto) {
         Channel target = channelRepository.findById(id);
         if (Objects.isNull(target)) {
-            throw new RuntimeException("해당 채널이 존재하지 않습니다.");
+            // throw new RuntimeException("해당 채널이 존재하지 않습니다.");
+            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
         }
         if (target.getChannelType() == ChannelType.PRIVATE) {
-            throw new IllegalArgumentException("PRIVATE 채널은 수정할 수 없습니다.");
+            // throw new IllegalArgumentException("PRIVATE 채널은 수정할 수 없습니다.");
+            throw new CustomRuntimeException(ExceptionType.DATABASE_CONNECTION_FAILED);
         }
         if (Objects.isNull(requestDto.getChannelName()) || requestDto.getChannelName().isBlank()) {
-            throw new RuntimeException("유효하지 않은 채널명 입니다.");
+            // throw new RuntimeException("유효하지 않은 채널명 입니다.");
+            throw new CustomRuntimeException(ExceptionType.DATABASE_CONNECTION_FAILED);
         }
         target.setChannelName(requestDto.getChannelName());
 
         if (requestDto.getMemberIds() != null && !requestDto.getMemberIds().isEmpty()) {
             for (UUID memberId : requestDto.getMemberIds()) {
                 if (Objects.isNull(userService.readUser(memberId))) {
-                    throw new RuntimeException("존재하지 않는 유저입니다: " + memberId);
+                    // throw new RuntimeException("존재하지 않는 유저입니다: " + memberId);
+                    throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
                 }
             }
             target.setMemberIds(new ArrayList<>(requestDto.getMemberIds()));
