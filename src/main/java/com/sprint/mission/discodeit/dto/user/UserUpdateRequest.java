@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
 
-public record UserUpdateRequest(@NotNull String newUsername,
-                                @NotNull String newEmail,
-                                @NotNull String newPassword) {
+public record UserUpdateRequest(@Nullable String newUsername,
+                                @Nullable String newEmail,
+                                @Nullable String newPassword) {
 
 }

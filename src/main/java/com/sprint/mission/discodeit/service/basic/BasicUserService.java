@@ -67,7 +67,7 @@ public class BasicUserService {
     }
 
     public UserDto updateUser(UUID id,
-                              String name, String email, String password,
+                              @Nullable String name, @Nullable String email, @Nullable String password,
                               @Nullable MultipartFile profile) {
         if (userRepository.existsByNameOrEmail(name, email)) {
             throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);

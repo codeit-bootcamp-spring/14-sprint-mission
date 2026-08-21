@@ -35,10 +35,9 @@ public final class User extends ModifiableEntity {
     }
 
     public void update(String name, String email, String password, @Nullable  UUID profileId) {
-        validateNotNullAndThenAssign(name, ()-> this.name = name);
-        validateNotNullAndThenAssign(email, () -> this.email = email);
-        validateNotNullAndThenAssign(password, () -> this.password = password);
-
+        assignIfNotNull(name, ()-> this.name = name);
+        assignIfNotNull(email, () -> this.email = email);
+        assignIfNotNull(password, () -> this.password = password);
         assignIfNotNull(profileId, () -> this.profileId = profileId);
 
         super.markedAsUpdate();
