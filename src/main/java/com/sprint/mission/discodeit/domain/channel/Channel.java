@@ -46,7 +46,7 @@ public final class Channel extends ModifiableEntity {
 
     public Channel updateNameAndDescription(String name, String description) {
         if(channelType.equals(ChannelType.PRIVATE)) {
-            throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
+            throw new CustomException(ExceptionType.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED);
         }
         this.name = name;
         this.description = description;

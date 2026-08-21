@@ -27,7 +27,7 @@ public enum ExceptionType {
     NO_ACCESS_TO_CHANNEL(HttpStatus.FORBIDDEN, "Channel 권한 없음", "등록되지 않은 User는 PRIVATE채널에 접근할 수 없습니다", "Channel에 접근할 수 없습니다."),
 
     // CANNOT_MODIFY
-    CHANNEL_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "채널 정보 수정 불가", "PRIVATE 채널의 정보는 수정할 수 없습니다", "PRIVATE 채널의 정보는 수정할 수 없습니다."),
+    PRIVATE_CHANNEL_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "채널 정보 수정 불가", "PRIVATE 채널의 정보는 수정할 수 없습니다", "PRIVATE 채널의 정보는 수정할 수 없습니다."),
 
     // 이거 두개는 뭔가 비슷한듯 다른듯 접미사를 통일할지 말지 잘 모르겠음
     // ALREADY_EXISTS
