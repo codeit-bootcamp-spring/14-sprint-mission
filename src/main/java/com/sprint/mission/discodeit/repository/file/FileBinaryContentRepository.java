@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,50 +10,41 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public class FileMessageRepository implements MessageRepository {
+public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    protected Path filePath = Path.of("message.ser");
+    protected Path filePath = Path.of("binaryContent.ser");
 
     @Override
-    public void save(Message message) {
-        Map<UUID, Message> data = loadData();
-        data.put(message.getId(),message);
+    public void save(BinaryContent binaryContent) {
+        Map<UUID, BinaryContent> data = loadData();
+        data.put(binaryContent.getId(), binaryContent);
         saveData(data);
     }
 
     @Override
-    public Message findById(UUID id) {
+    public BinaryContent findById(UUID id) {
         return loadData().get(id);
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(loadData().values());
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        return loadData().values().stream()
+            .filter(binaryContent ->  ids.contains(binaryContent.getId()))
+            .toList();
     }
 
     @Override
     public void deleteById(UUID id) {
-        Map<UUID, Message> data = loadData();
+        Map<UUID, BinaryContent> data = loadData();
         data.remove(id);
         saveData(data);
     }
-
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return loadData().values().stream()
-            .filter(message -> message.getChannel_id().equals(channelId))
-            .toList();
-    }
-
-    public void saveData(Map<UUID,Message> data){
+    public void saveData(Map<UUID, BinaryContent> data){
         try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))){
             objectOutputStream.writeObject(data);
         } catch (IOException e) {
@@ -61,11 +52,11 @@ public class FileMessageRepository implements MessageRepository {
         }
 
     }
-    public Map<UUID, Message> loadData(){
+    public Map<UUID, BinaryContent> loadData(){
         if(!Files.exists(filePath))
             return new HashMap<>();
         try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath.toFile()))){
-            return (Map<UUID, Message>) objectInputStream.readObject();
+            return (Map<UUID, BinaryContent>) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

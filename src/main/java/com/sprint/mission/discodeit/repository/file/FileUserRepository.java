@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
@@ -42,6 +43,25 @@ public class FileUserRepository implements UserRepository {
         Map<UUID, User> data = loadData();
         data.remove(id);
         saveData(data);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return  loadData().values().stream()
+            .anyMatch(user -> user.getName().equals(email));
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return  loadData().values().stream()
+            .anyMatch(user -> user.getName().equals(name));
+    }
+
+    @Override
+    public Optional<User> findByName(String name) {
+        return loadData().values().stream()
+            .filter(user -> user.getName().equals(name))
+            .findFirst();
     }
 
     public void saveData(Map<UUID,User> data){
