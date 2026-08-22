@@ -37,22 +37,12 @@ public class UserStatus implements Serializable {
         return new UserStatus(userId);
     }
 
-    public void refreshLastActiveAt() {
-        this.lastActiveAt = Instant.now();
-        this.updatedAt = this.lastActiveAt;
+    public void updateLastActiveAt(Instant newLastActiveAt) {
+        this.lastActiveAt = newLastActiveAt;
+        this.updatedAt = Instant.now();
     }
 
     public boolean isOnline() {
-        return Duration.between(lastActiveAt, Instant.now()).toSeconds() < 10;
-    }
-
-    public UserStatus copy() {
-        return new UserStatus(
-                this.id,
-                this.createdAt,
-                this.updatedAt,
-                this.userId,
-                this.lastActiveAt
-        );
+        return Duration.between(lastActiveAt, Instant.now()).toMinutes() < 5;
     }
 }

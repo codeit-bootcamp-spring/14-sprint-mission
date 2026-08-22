@@ -18,20 +18,22 @@ import java.util.UUID;
 public class MessageResponseDto {
 
     UUID id;
-    String content;
-    UUID senderId;
-    UUID channelId;
-    List<UUID> attachmentIds;
+    Instant createdAt;
     Instant updatedAt;
+    String content;
+    UUID channelId;
+    UUID authorId;
+    List<UUID> attachmentIds;
 
     public static MessageResponseDto from(Message message) {
         return new MessageResponseDto(
                 message.getId(),
+                message.getCreatedAt(),
+                message.getUpdatedAt(),
                 message.getContent(),
-                message.getSenderId(),
                 message.getChannelId(),
-                message.getAttachmentIds(),
-                message.getUpdatedAt()
+                message.getSenderId(),
+                message.getAttachmentIds()
         );
     }
 }

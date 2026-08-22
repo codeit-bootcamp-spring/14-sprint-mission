@@ -1,9 +1,9 @@
 package com.sprint.mission.application.message;
 
 import com.sprint.mission.domain.*;
-import com.sprint.mission.controller.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.controller.dto.message.MessageCreateRequest;
 import com.sprint.mission.controller.dto.message.MessageResponseDto;
-import com.sprint.mission.controller.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.controller.dto.message.MessageUpdateRequest;
 import com.sprint.mission.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.multipart.MultipartFileConverter;
@@ -15,13 +15,14 @@ import com.sprint.mission.service.user.UserDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class MessageApplicationServiceImpl implements MessageApplicationService {
 
@@ -32,13 +33,6 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
     private final ReadStatusDomainService readStatusDomainService;
     private final MultipartFileConverter multipartFileConverter;
 
-    private boolean isAccessible(
-            Channel channel,
-            Set<UUID> accessibleChannelIds
-    ) {
-        return channel.getChannelType() == ChannelType.PUBLIC
-                || accessibleChannelIds.contains(channel.getId());
-    }
 
     private List<UUID> createAttachments(
             List<MultipartFile> attachmentFiles
@@ -63,7 +57,7 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
 
     @Override
     public MessageResponseDto create(
-            MessageCreateRequestDto messageCreateRequest,
+            MessageCreateRequest messageCreateRequest,
             List<MultipartFile> attachments
     ) {
         int numAttachments = (Objects.isNull(attachments))
@@ -72,14 +66,17 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
 
         log.info(
                 "Message 생성 시작: senderId={}, channelId={}, attachmentCount={}",
-                messageCreateRequest.getSenderId(),
+                messageCreateRequest.getAuthorId(),
                 messageCreateRequest.getChannelId(),
                 numAttachments
         );
 
-        UUID senderId = userDomainService.findById(messageCreateRequest.getSenderId()).getId();
-        UUID channelId = channelDomainService.findById(messageCreateRequest.getChannelId()).getId();
-        boolean senderCanAccess = readStatusDomainService.existsByUserIdAndChannelId(senderId, channelId);
+        UUID senderId = userDomainService.findById(messageCreateRequest.getAuthorId()).getId();
+        Channel channel = channelDomainService.findById(messageCreateRequest.getChannelId());
+        UUID channelId = channel.getId();
+        // 공개 채널이거나 접근 가능한 비공개 채널
+        boolean senderCanAccess = channel.getChannelType() == ChannelType.PUBLIC
+                || readStatusDomainService.existsByUserIdAndChannelId(senderId, channelId);
 
         if (!senderCanAccess) {
             log.warn(
@@ -149,7 +146,7 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
     @Override
     public MessageResponseDto update(
             UUID messageId,
-            MessageUpdateRequestDto messageUpdateRequest
+            MessageUpdateRequest messageUpdateRequest
     ) {
         log.info(
                 "Message 수정 시작: messageId={}",
@@ -157,7 +154,7 @@ public class MessageApplicationServiceImpl implements MessageApplicationService 
         );
 
         Message updatingMessage = messageDomainService.findById(messageId);
-        updatingMessage.updateContent(messageUpdateRequest.getContent());
+        updatingMessage.updateContent(messageUpdateRequest.getNewContent());
         Message updatedMessage = messageDomainService.update(updatingMessage);
 
         log.info(

@@ -1,26 +1,26 @@
-package com.sprint.mission.controller.dto.user;
+package com.sprint.mission.controller.dto.message;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class UserUpsertRequestDto {
+public class MessageCreateRequest {
 
     @NotBlank
-    String username;
+    String content;
 
-    @Email
-    @NotBlank
-    String email;
+    @NotNull
+    UUID channelId;
 
-    @NotBlank
-    String password;
+    @NotNull
+    UUID authorId;
 
 }

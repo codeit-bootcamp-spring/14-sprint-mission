@@ -9,7 +9,6 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,27 +17,20 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ChannelResponseDto {
     UUID id;
+    Instant createdAt;
+    Instant updatedAt;
+    ChannelType type;
     String name;
     String description;
-    ChannelType channelType;
-    Instant updatedAt;
 
-    Instant mostRecentMessageAt;
-    List<UUID> participantUserIds;
-
-    public static ChannelResponseDto from(
-            Channel channel,
-            Instant mostRecentMessageAt,
-            List<UUID> participantUserIds
-    ) {
+    public static ChannelResponseDto from(Channel channel) {
         return new ChannelResponseDto(
                 channel.getId(),
-                channel.getName(),
-                channel.getDescription(),
-                channel.getChannelType(),
+                channel.getCreatedAt(),
                 channel.getUpdatedAt(),
-                mostRecentMessageAt,
-                List.copyOf(participantUserIds)
+                channel.getChannelType(),
+                channel.getName(),
+                channel.getDescription()
         );
     }
 }

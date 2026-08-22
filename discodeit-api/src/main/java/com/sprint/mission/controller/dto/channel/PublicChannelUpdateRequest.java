@@ -1,4 +1,4 @@
-package com.sprint.mission.controller.dto.message;
+package com.sprint.mission.controller.dto.channel;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
@@ -9,9 +9,12 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class MessageUpdateRequestDto {
+public class PublicChannelUpdateRequest {
 
     @NotBlank
-    String content;
+    String name;
+
+    @NotBlank
+    String description;
 
 }

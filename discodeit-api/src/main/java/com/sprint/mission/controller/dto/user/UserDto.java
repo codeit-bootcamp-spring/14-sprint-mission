@@ -15,7 +15,7 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class UserResponseDto {
+public class UserDto {
 
     UUID id;
     Instant createdAt;
@@ -27,19 +27,19 @@ public class UserResponseDto {
     Boolean online;
 
 
-    // UserResponseDto를 통해
-    public static UserResponseDto from(
+    // UserDto 통해
+    public static UserDto from(
             User user,
             UserStatus userStatus
     ) {
-        return new UserResponseDto(
+        return new UserDto(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getProfileId(),
-                userStatus.isOnline()
+                userStatus != null && userStatus.isOnline()
         );
     }
 }

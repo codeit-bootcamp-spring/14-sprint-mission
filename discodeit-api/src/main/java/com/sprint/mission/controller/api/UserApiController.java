@@ -1,12 +1,17 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.controller.dto.user.UserResponseDto;
-import com.sprint.mission.controller.dto.user.UserUpsertRequestDto;
 import com.sprint.mission.application.user.UserApplicationService;
+import com.sprint.mission.controller.dto.user.UserCreateRequest;
+import com.sprint.mission.controller.dto.user.UserDto;
+import com.sprint.mission.controller.dto.user.UserResponseDto;
+import com.sprint.mission.controller.dto.user.UserUpdateRequest;
+import com.sprint.mission.controller.dto.userstatus.UserStatusResponseDto;
+import com.sprint.mission.controller.dto.userstatus.UserStatusUpdateRequestDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +34,10 @@ public class UserApiController {
 
     private final UserApplicationService userApplicationService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponseDto> create(
-            @RequestPart(value = "user")                         UserUpsertRequestDto userCreateRequest,
-            @RequestPart(value = "profile", required = false)    MultipartFile profileImage
+            @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+            @RequestPart(value = "profile", required = false) MultipartFile profileImage
     ) {
         UserResponseDto createdUser = userApplicationService.create(userCreateRequest, profileImage);
         return ResponseEntity
@@ -40,18 +45,17 @@ public class UserApiController {
                 .body(createdUser);
     }
 
-    @PutMapping("/{userId}")
+    @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponseDto> update(
-            @NotNull @PathVariable                                      UUID userId,
-            @RequestPart("user")                                 UserUpsertRequestDto userUpdateRequest,
-            @RequestPart(value = "profile", required = false)    MultipartFile profileImage
+            @NotNull @PathVariable UUID userId,
+            @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @RequestPart(value = "profile", required = false) MultipartFile profileImage
     ) {
-        UserResponseDto updatedUser =
-                userApplicationService.update(
-                        userId,
-                        userUpdateRequest,
-                        profileImage
-                );
+        UserResponseDto updatedUser = userApplicationService.update(
+                userId,
+                userUpdateRequest,
+                profileImage
+        );
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(updatedUser);
@@ -68,20 +72,22 @@ public class UserApiController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> retrieveAll() {
-        List<UserResponseDto> usersList = userApplicationService.findAll();
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> usersList = userApplicationService.findAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(usersList);
     }
 
-    @PatchMapping("/{userId}/activate")
-    public ResponseEntity<UserResponseDto> activateUser(
-            @NotNull @PathVariable UUID userId
+    @PatchMapping("/{userId}/userStatus")
+    public ResponseEntity<UserStatusResponseDto> updateUserStatusByUserId(
+            @NotNull @PathVariable UUID userId,
+            @Valid @RequestBody UserStatusUpdateRequestDto request
     ) {
-        UserResponseDto activatedUser = userApplicationService.activateUser(userId);
+        UserStatusResponseDto updatedUserStatus =
+                userApplicationService.updateUserStatusByUserId(userId, request);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(activatedUser);
+                .body(updatedUserStatus);
     }
 }

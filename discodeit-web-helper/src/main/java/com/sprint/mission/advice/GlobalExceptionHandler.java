@@ -2,12 +2,15 @@ package com.sprint.mission.advice;
 
 import com.sprint.mission.DiscodeitException;
 import com.sprint.mission.ExceptionType;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @Slf4j
 @RestControllerAdvice
@@ -22,6 +25,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(discodeitExceptionType.getStatus())
                 .body(discodeitExceptionType.getResponse());
+    }
+
+    @ExceptionHandler({
+            MethodArgumentNotValidException.class,  // DTO 내 필드 문제
+            HandlerMethodValidationException.class, // Controller 메서드 파라미터 자체 문제
+            ConstraintViolationException.class      // Controller 제외 다른 bean의 메서드 파라미터 문제
+    })
+    public ResponseEntity<String> handleBadRequest(Exception exception) {
+        log.warn("잘못된 API 요청", exception);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("잘못된 요청입니다.");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

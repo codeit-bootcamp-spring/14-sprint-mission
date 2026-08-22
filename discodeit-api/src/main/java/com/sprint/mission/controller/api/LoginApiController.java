@@ -1,8 +1,8 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.controller.dto.auth.LoginRequestDto;
-import com.sprint.mission.controller.dto.auth.LoginResponseDto;
 import com.sprint.mission.application.auth.AuthApplicationService;
+import com.sprint.mission.controller.dto.auth.LoginRequestDto;
+import com.sprint.mission.controller.dto.user.UserResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/login")
+@RequestMapping("/api/auth")
 public class LoginApiController {
 
     private final AuthApplicationService authApplicationService;
 
-    @PostMapping
-    public ResponseEntity<LoginResponseDto> login(
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDto> login(
             @Valid @RequestBody LoginRequestDto loginRequest
     ) {
-        LoginResponseDto loginResponse = authApplicationService.login(loginRequest);
+        UserResponseDto loggedInUser = authApplicationService.login(loginRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(loginResponse);
+                .body(loggedInUser);
     }
 }

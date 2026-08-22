@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserPageController {
-
-    @GetMapping()
-    public String retrieveAll() {
-        return "forward:user-list.html";
-    }
+//
+//    @GetMapping()
+//    public String retrieveAll() {
+//        return "forward:user-list.html";
+//    }
 }

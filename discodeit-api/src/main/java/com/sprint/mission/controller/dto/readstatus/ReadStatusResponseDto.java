@@ -14,6 +14,8 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ReadStatusResponseDto {
     UUID id;
+    Instant createdAt;
+    Instant updatedAt;
     UUID userId;
     UUID channelId;
     Instant lastReadAt;
@@ -21,6 +23,8 @@ public class ReadStatusResponseDto {
     public static ReadStatusResponseDto from(ReadStatus readStatus) {
         return new ReadStatusResponseDto(
                 readStatus.getId(),
+                readStatus.getCreatedAt(),
+                readStatus.getUpdatedAt(),
                 readStatus.getUserId(),
                 readStatus.getChannelId(),
                 readStatus.getLastReadAt()

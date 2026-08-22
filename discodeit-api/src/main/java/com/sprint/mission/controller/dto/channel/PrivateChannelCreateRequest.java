@@ -1,20 +1,22 @@
 package com.sprint.mission.controller.dto.channel;
 
-import jakarta.validation.constraints.NotBlank;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+import java.util.UUID;
+
 @Getter
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class ChannelUpdateRequestDto {
+public class PrivateChannelCreateRequest {
 
-    @NotBlank
-    String name;
-
-    @NotBlank
-    String description;
+    @NotEmpty
+    List<@NotNull UUID> participantIds;
 
 }

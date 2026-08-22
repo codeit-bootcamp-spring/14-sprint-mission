@@ -1,10 +1,11 @@
 package com.sprint.mission.controller.api;
 
-import com.sprint.mission.controller.dto.channel.ChannelResponseDto;
-import com.sprint.mission.controller.dto.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.controller.dto.channel.PrivateChannelCreateRequestDto;
-import com.sprint.mission.controller.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.application.channel.ChannelApplicationService;
+import com.sprint.mission.controller.dto.channel.ChannelDto;
+import com.sprint.mission.controller.dto.channel.ChannelResponseDto;
+import com.sprint.mission.controller.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.controller.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.controller.dto.channel.PublicChannelUpdateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -29,31 +30,30 @@ public class ChannelApiController {
 
     private final ChannelApplicationService channelApplicationService;
 
-    @PostMapping
+    @PostMapping("/public")
     public ResponseEntity<ChannelResponseDto> create(
-            @Valid @RequestBody PublicChannelCreateRequestDto request
+            @Valid @RequestBody PublicChannelCreateRequest request
     ) {
-        ChannelResponseDto createdPublicChannel = channelApplicationService.createPublic(request);
+        ChannelResponseDto createdChannel = channelApplicationService.createPublic(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(createdPublicChannel);
+                .body(createdChannel);
     }
 
     @PostMapping("/private")
     public ResponseEntity<ChannelResponseDto> create(
-            @Valid @RequestBody PrivateChannelCreateRequestDto request
+            @Valid @RequestBody PrivateChannelCreateRequest request
     ) {
-        ChannelResponseDto createdPrivateChannel = channelApplicationService.createPrivate(request);
+        ChannelResponseDto createdChannel = channelApplicationService.createPrivate(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(createdPrivateChannel);
+                .body(createdChannel);
     }
 
-    // patch로? <- 어떻게 달라질지
-    @PutMapping("/{channelId}")
+    @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelResponseDto> update(
             @NotNull @PathVariable UUID channelId,
-            @Valid @RequestBody ChannelUpdateRequestDto request
+            @Valid @RequestBody PublicChannelUpdateRequest request
     ) {
         ChannelResponseDto updatedChannel = channelApplicationService.update(channelId, request);
         return ResponseEntity
@@ -71,13 +71,13 @@ public class ChannelApiController {
                 .build();
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<ChannelResponseDto>> retrieveAccessible(
-            @NotNull @PathVariable UUID userId
+    @GetMapping
+    public ResponseEntity<List<ChannelDto>> findAll(
+            @NotNull @RequestParam UUID userId
     ) {
-        List<ChannelResponseDto> accssibleChannelList = channelApplicationService.findAllByUserId(userId);
+        List<ChannelDto> channels = channelApplicationService.findAllByUserId(userId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(accssibleChannelList);
+                .body(channels);
     }
 }

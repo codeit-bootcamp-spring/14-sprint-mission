@@ -46,11 +46,18 @@ public enum DiscodeitExceptionType implements ExceptionType {
             "로그인할 password를 입력해주세요."
     ),
 
-    LOGIN_FAILED(
-            Level.ERROR,
-            HttpURLConnection.HTTP_UNAUTHORIZED,
-            "[AUTH] username 또는 password가 일치하는 User가 없음",
-            "username 또는 password가 일치하지 않습니다."
+    LOGIN_USER_NOT_FOUND(
+            Level.WARN,
+            HttpURLConnection.HTTP_NOT_FOUND,
+            "[AUTH] 로그인할 User를 찾을 수 없음. username=%s",
+            "요청한 User를 찾을 수 없습니다."
+    ),
+
+    LOGIN_WRONG_PASSWORD(
+            Level.WARN,
+            HttpURLConnection.HTTP_BAD_REQUEST,
+            "[AUTH] 비밀번호가 일치하지 않음",
+            "비밀번호가 일치하지 않습니다."
     ),
 
     // User
@@ -92,14 +99,14 @@ public enum DiscodeitExceptionType implements ExceptionType {
 
     USER_USERNAME_EXISTS(
             Level.ERROR,
-            HttpURLConnection.HTTP_CONFLICT,
+            HttpURLConnection.HTTP_BAD_REQUEST,
             "[USER] 동일한 username을 사용하는 User가 이미 존재함",
             "이미 사용 중인 username입니다."
     ),
 
     USER_EMAIL_EXISTS(
             Level.ERROR,
-            HttpURLConnection.HTTP_CONFLICT,
+            HttpURLConnection.HTTP_BAD_REQUEST,
             "[USER] 동일한 email을 사용하는 User가 이미 존재함",
             "이미 사용 중인 email입니다."
     ),
@@ -150,7 +157,7 @@ public enum DiscodeitExceptionType implements ExceptionType {
 
     PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED(
             Level.ERROR,
-            HttpURLConnection.HTTP_FORBIDDEN,
+            HttpURLConnection.HTTP_BAD_REQUEST,
             "[CHANNEL] PRIVATE Channel 수정 시도. channelId=%s",
             "PRIVATE Channel은 수정할 수 없습니다."
     ),
@@ -217,7 +224,7 @@ public enum DiscodeitExceptionType implements ExceptionType {
 
     READ_STATUS_ALREADY_EXISTS(
             Level.WARN,
-            HttpURLConnection.HTTP_CONFLICT,
+            HttpURLConnection.HTTP_BAD_REQUEST,
             "[READ_STATUS] ReadStatus가 이미 존재함. userId=%s, channelId=%s",
             "해당 User와 Channel의 ReadStatus가 이미 존재합니다."
     ),
@@ -287,15 +294,15 @@ public enum DiscodeitExceptionType implements ExceptionType {
     FILE_LOAD_FAILED(
             Level.ERROR,
             HttpURLConnection.HTTP_INTERNAL_ERROR,
-        "[REPOSITORY] 파일 로드 실패. file=%s",
-                "저장된 데이터를 불러오지 못했습니다."
+            "[REPOSITORY] 파일 로드 실패. file=%s",
+            "저장된 데이터를 불러오지 못했습니다."
     ),
 
     FILE_SAVE_FAILED(
             Level.ERROR,
             HttpURLConnection.HTTP_INTERNAL_ERROR,
-        "[REPOSITORY] 파일 저장 실패. file=%s",
-                "데이터를 저장하지 못했습니다."
+            "[REPOSITORY] 파일 저장 실패. file=%s",
+            "데이터를 저장하지 못했습니다."
     ),
 
     FILE_IS_EMPTY(

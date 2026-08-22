@@ -16,14 +16,20 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserStatusResponseDto {
     UUID id;
+    Instant createdAt;
+    Instant updatedAt;
     UUID userId;
     Instant lastActiveAt;
+    boolean online;
 
     public static UserStatusResponseDto from(UserStatus userStatus) {
         return new UserStatusResponseDto(
                 userStatus.getId(),
+                userStatus.getCreatedAt(),
+                userStatus.getUpdatedAt(),
                 userStatus.getUserId(),
-                userStatus.getLastActiveAt()
+                userStatus.getLastActiveAt(),
+                userStatus.isOnline()
         );
     }
 }

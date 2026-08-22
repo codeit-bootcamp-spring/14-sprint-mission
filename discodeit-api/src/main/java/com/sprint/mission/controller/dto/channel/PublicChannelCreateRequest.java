@@ -1,19 +1,20 @@
-package com.sprint.mission.controller.dto.userstatus;
+package com.sprint.mission.controller.dto.channel;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-import java.util.UUID;
-
 @Getter
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class UserStatusCreateRequestDto {
+public class PublicChannelCreateRequest {
 
-    @NotNull
-    UUID userId;
+    @NotBlank
+    String name;
+
+    @NotBlank
+    String description;
 
 }

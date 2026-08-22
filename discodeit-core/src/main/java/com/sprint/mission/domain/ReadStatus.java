@@ -25,34 +25,28 @@ public class ReadStatus implements Serializable {
 
     private Instant lastReadAt;
 
-    private ReadStatus(UUID userId, UUID channelId) {
+    private ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.userId = userId;
         this.channelId = channelId;
-        this.lastReadAt = null;
+        this.lastReadAt = lastReadAt;
     }
 
     public static ReadStatus create(UUID userId, UUID channelId) {
         return new ReadStatus(
-                userId, channelId
+                userId, channelId, null
         );
     }
 
-    public void markAsRead() {
-        this.lastReadAt = Instant.now();
-        this.updatedAt = lastReadAt;
+    public static ReadStatus create(UUID userId, UUID channelId, Instant lastReadAt) {
+        return new ReadStatus(userId, channelId, lastReadAt);
     }
 
-    public ReadStatus copy() {
-        return new ReadStatus(
-                this.id,
-                this.createdAt,
-                this.updatedAt,
-                this.userId,
-                this.channelId,
-                this.lastReadAt
-        );
+
+    public void updateLastReadAt(Instant newLastReadAt) {
+        this.lastReadAt = newLastReadAt;
+        this.updatedAt = Instant.now();
     }
 }

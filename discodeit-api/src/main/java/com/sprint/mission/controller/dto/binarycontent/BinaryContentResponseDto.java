@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -15,14 +16,18 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BinaryContentResponseDto {
     UUID id;
+    Instant createdAt;
     String fileName;
+    long size;
     String contentType;
     byte[] bytes;
 
     public static BinaryContentResponseDto from(BinaryContent binaryContent) {
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
+                binaryContent.getCreatedAt(),
                 binaryContent.getFileName(),
+                binaryContent.getBytes().length,
                 binaryContent.getContentType(),
                 binaryContent.getBytes()
         );
