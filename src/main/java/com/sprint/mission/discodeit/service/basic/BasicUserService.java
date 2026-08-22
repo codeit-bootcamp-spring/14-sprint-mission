@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -42,10 +44,12 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto create(UserCreateRequest request, Optional<BinaryContentCreateRequest> profileRequest) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new IllegalArgumentException("이미 사용 중인 username입니다: " + request.username());
+            throw new DiscodeitException(ExceptionType.DUPLICATE_USERNAME,
+                    "이미 사용 중인 username입니다: " + request.username());
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 사용 중인 email입니다: " + request.email());
+            throw new DiscodeitException(ExceptionType.DUPLICATE_EMAIL,
+                    "이미 사용 중인 email입니다: " + request.email());
         }
 
         UUID profileId = saveProfile(profileRequest).orElse(null);
@@ -79,12 +83,14 @@ public class BasicUserService implements UserService {
         String newUsername = request.newUsername();
         if (newUsername != null && !newUsername.equals(user.getUsername())
                 && userRepository.existsByUsername(newUsername)) {
-            throw new IllegalArgumentException("이미 사용 중인 username입니다: " + newUsername);
+            throw new DiscodeitException(ExceptionType.DUPLICATE_USERNAME,
+                    "이미 사용 중인 username입니다: " + newUsername);
         }
         String newEmail = request.newEmail();
         if (newEmail != null && !newEmail.equals(user.getEmail())
                 && userRepository.existsByEmail(newEmail)) {
-            throw new IllegalArgumentException("이미 사용 중인 email입니다: " + newEmail);
+            throw new DiscodeitException(ExceptionType.DUPLICATE_EMAIL,
+                    "이미 사용 중인 email입니다: " + newEmail);
         }
 
         user.update(newUsername, newEmail, request.newPassword());
@@ -113,7 +119,8 @@ public class BasicUserService implements UserService {
 
     private User findEntity(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다! id: " + userId));
+                .orElseThrow(() -> new DiscodeitException(ExceptionType.USER_NOT_FOUND,
+                        "유저를 찾을 수 없습니다! id: " + userId));
     }
 
     private Optional<UUID> saveProfile(Optional<BinaryContentCreateRequest> profileRequest) {

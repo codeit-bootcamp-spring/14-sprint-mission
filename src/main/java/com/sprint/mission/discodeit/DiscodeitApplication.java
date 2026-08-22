@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -17,6 +19,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,13 +34,15 @@ public class DiscodeitApplication {
         );
     }
 
-    static Channel setupChannel(ChannelService channelService) {
-        return channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+    static ChannelDto setupChannel(ChannelService channelService) {
+        return channelService.createPublic(new PublicChannelCreateRequest("공지", "공지 채널입니다."));
     }
 
-    static void messageCreateTest(MessageService messageService, Channel channel, UserDto author) {
-        Message message = messageService.create("안녕하세요.", channel.getId(), author.id());
-        System.out.println("메시지 생성: " + message.getId());
+    static void messageCreateTest(MessageService messageService, ChannelDto channel, UserDto author) {
+        MessageDto message = messageService.create(
+                new MessageCreateRequest("안녕하세요.", channel.id(), author.id()),
+                List.of());
+        System.out.println("메시지 생성: " + message.id());
     }
 
     public static void main(String[] args) {
@@ -51,7 +56,7 @@ public class DiscodeitApplication {
 
         // 셋업
         UserDto user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
+        ChannelDto channel = setupChannel(channelService);
         // 테스트
         messageCreateTest(messageService, channel, user);
 
@@ -82,7 +87,7 @@ public class DiscodeitApplication {
         try {
             userService.create(new UserCreateRequest("sungjun", "other@codeit.com", "pw"), Optional.empty());
             System.out.println("3. 중복 등록          : 막히지 않음 (요구사항 위반)");
-        } catch (IllegalArgumentException e) {
+        } catch (DiscodeitException e) {
             System.out.println("3. 중복 등록          : 거부됨 - " + e.getMessage());
         }
 

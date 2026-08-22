@@ -1,8 +1,18 @@
 spring:
   application:
     name: discodeit
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
 
 server:
   port: 8002
 
 # properties 대신 yaml을 쓴다. 중첩 키를 다루기 편하다.
+discodeit:
+  repository:
+    # file | jcf. 값을 안 주거나 비우면 file로 동작한다(File*Repository의 matchIfMissing).
+    # 잘못된 값(예: mongo)을 주면 어느 쪽도 조건에 안 걸려 빈이 없어서 부팅이 실패한다 — 의도된 동작.
+    type: file
+    file-directory: data/repository
