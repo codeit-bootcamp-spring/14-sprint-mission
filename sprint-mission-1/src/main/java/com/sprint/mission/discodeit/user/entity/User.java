@@ -1,54 +1,55 @@
 package com.sprint.mission.discodeit.user.entity;
 
-import jakarta.annotation.Nullable;
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
+import com.sprint.mission.discodeit.global.entity.BaseEntity;
 import java.util.UUID;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
-public class User implements Serializable {
+public class User extends BaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID userId = UUID.randomUUID();
-    private final Instant createdAt = Instant.now();
+    private String username;
     private String password;
-    private Instant updatedAt;
-    @NonNull
-    private String userName;
     private String email;
-    @Nullable
-    private UUID binaryId;
+    private UUID profileId;
 
-    public User(String userName, String password, String email, UUID binaryId) {
-        this.userName = userName;
+    private User(String username, String password, String email, UUID profileId) {
+        this.username = username;
         this.password = password;
         this.email = email;
-        this.binaryId = binaryId;
+        this.profileId = profileId;
     }
 
-    public void updateName(String updateName) {
-        this.userName = updateName;
-        this.updatedAt = Instant.now();
-    }
-
-    public void updateEmail(String email) {
-        this.email = email;
-        this.updatedAt = Instant.now();
-    }
-
-    public void updatePassword(String password) {
+    private User(String username, String password, String email) {
+        this.username = username;
         this.password = password;
-        this.updatedAt = Instant.now();
+        this.email = email;
     }
 
-    public void updateBinaryId(UUID binaryId) {
-        this.binaryId = binaryId;
-        this.updatedAt = Instant.now();
+    public static User create(String name, String password, String email, UUID binaryId) {
+        return new User(name, password, email, binaryId);
+    }
+
+    public static User create(String name, String password, String email) {
+        return new User(name, password, email);
+    }
+
+    public void update(String name, String password, String email) {
+        if (name != null) {
+            this.username = name;
+        }
+        if (password != null) {
+            this.password = password;
+        }
+        if (email != null) {
+            this.email = email;
+        }
+        super.markUpdated();
+    }
+
+    public void updateProfile(UUID binaryId) {
+        if (binaryId != null) {
+            this.profileId = binaryId;
+            markUpdated();
+        }
     }
 }

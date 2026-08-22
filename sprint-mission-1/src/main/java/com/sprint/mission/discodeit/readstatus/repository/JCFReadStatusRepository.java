@@ -16,7 +16,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus statusAdd(ReadStatus readStatus) {
-        readStatusMap.put(readStatus.getReadStatusId(), readStatus);
+        readStatusMap.put(readStatus.getId(), readStatus);
         return readStatus;
     }
 
@@ -52,7 +52,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     public void deleteByChannelId(UUID channelId) {
         List<UUID> readStatusId = readStatusMap.values().stream()
             .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-            .map(ReadStatus::getReadStatusId)
+            .map(ReadStatus::getId)
             .toList();
 
         readStatusId.forEach(readStatusMap::remove);
@@ -65,6 +65,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void update(ReadStatus readStatus) {
-        readStatusMap.replace(readStatus.getReadStatusId(), readStatus);
+        readStatusMap.replace(readStatus.getId(), readStatus);
     }
 }

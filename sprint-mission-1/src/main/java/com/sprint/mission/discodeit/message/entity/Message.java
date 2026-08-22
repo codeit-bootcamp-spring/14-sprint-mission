@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.message.entity;
 
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
+import com.sprint.mission.discodeit.global.entity.BaseEntity;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
@@ -12,30 +10,25 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class Message implements Serializable {
+public class Message extends BaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID userId;
+    private final UUID authorId;
     private final UUID channelId;
-    private final UUID messageId = UUID.randomUUID();
-    private final Instant createdAt = Instant.now();
     @NonNull
-    private String message;
-    private Instant updatedAt;
-    private List<UUID> binaryContentsId;
+    private String content;
+    private List<UUID> attachmentIds;
 
-    public Message(UUID userId, UUID channelId, String message, List<UUID> binaryContentsId) {
-        this.userId = userId;
+    public Message(UUID authorId, UUID channelId, String content, List<UUID> attachmentIds) {
+        this.authorId = authorId;
         this.channelId = channelId;
-        this.message = message;
-        this.binaryContentsId = binaryContentsId;
+        this.content = content;
+        this.attachmentIds = attachmentIds;
     }
 
     public void updateMessage(String updateMessage) {
-        if (updateMessage != null && !updateMessage.equals(this.message)) {
-            this.message = updateMessage;
-            this.updatedAt = Instant.now();
+        if (updateMessage != null && !updateMessage.equals(this.content)) {
+            this.content = updateMessage;
+            super.markUpdated();
         }
     }
 }

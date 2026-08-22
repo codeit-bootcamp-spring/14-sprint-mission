@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            throw new RuntimeException("디렉토리 생성 실패", e);
+            throw new UncheckedIOException("디렉토리 생성 실패 - path: " + path, e);
         }
         userStatusLoad();
     }
@@ -42,11 +43,15 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     private void userStatusLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             userStatusMap.putAll((Map<UUID, UserStatus>) objectInputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("기존 유저 상태 데이터가 없습니다.");
+            throw new IllegalStateException("기존 유저 상태 데이터가 없습니다. - path: " + filePath(), e);
         }
     }
 
@@ -55,26 +60,26 @@ public class FileUserStatusRepository implements UserStatusRepository {
             new FileOutputStream(filePath()))) {
             objectOutputStream.writeObject(userStatusMap);
         } catch (IOException e) {
-            throw new RuntimeException("유저 상태 저장에 실패했습니다.", e);
+            throw new UncheckedIOException("유저 상태 저장에 실패했습니다. - path: " + filePath(), e);
         }
     }
 
     @Override
     public UserStatus statusAdd(UserStatus userStatus) {
-        userStatusMap.put(userStatus.getUserStatusId(), userStatus);
+        userStatusMap.put(userStatus.getId(), userStatus);
         userStatusFlush();
-        return userStatusMap.get(userStatus.getUserStatusId());
+        return userStatusMap.get(userStatus.getId());
     }
 
     @Override
     public void delete(UserStatus userStatus) {
-        userStatusMap.remove(userStatus.getUserStatusId());
+        userStatusMap.remove(userStatus.getId());
         userStatusFlush();
     }
 
     @Override
     public void update(UserStatus userStatus) {
-        userStatusMap.replace(userStatus.getUserStatusId(), userStatus);
+        userStatusMap.replace(userStatus.getId(), userStatus);
         userStatusFlush();
     }
 

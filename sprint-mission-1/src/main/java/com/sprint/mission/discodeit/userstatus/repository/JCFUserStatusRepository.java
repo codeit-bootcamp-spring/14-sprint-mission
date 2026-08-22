@@ -17,18 +17,18 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus statusAdd(UserStatus userStatus) {
-        userStatusMap.put(userStatus.getUserStatusId(), userStatus);
-        return userStatusMap.get(userStatus.getUserStatusId());
+        userStatusMap.put(userStatus.getId(), userStatus);
+        return userStatusMap.get(userStatus.getId());
     }
 
     @Override
     public void delete(UserStatus userStatus) {
-        userStatusMap.remove(userStatus.getUserStatusId());
+        userStatusMap.remove(userStatus.getId());
     }
 
     @Override
     public void update(UserStatus userStatus) {
-        userStatusMap.replace(userStatus.getUserStatusId(), userStatus);
+        userStatusMap.replace(userStatus.getId(), userStatus);
     }
 
     @Override

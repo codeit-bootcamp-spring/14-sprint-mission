@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +34,7 @@ public class FileUserRepository implements UserRepository {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            throw new RuntimeException("디렉토리 생성 실패", e);
+            throw new UncheckedIOException("디렉토리 생성 실패 - path: " + path, e);
         }
         userLoad();
     }
@@ -43,11 +44,15 @@ public class FileUserRepository implements UserRepository {
     }
 
     private void userLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             users.putAll((Map<UUID, User>) objectInputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("기존 유저 데이터가 없습니다.");
+            throw new IllegalStateException("기존 유저 데이터가 없습니다. - path: " + filePath(), e);
         }
     }
 
@@ -56,13 +61,13 @@ public class FileUserRepository implements UserRepository {
             new FileOutputStream(filePath()))) {
             objectOutputStream.writeObject(this.users);
         } catch (IOException e) {
-            throw new RuntimeException("유저 저장에 실패했습니다.", e);
+            throw new UncheckedIOException("유저 저장에 실패했습니다. - path: " + filePath(), e);
         }
     }
 
     @Override
     public User userAdd(User user) {
-        this.users.put(user.getUserId(), user);
+        this.users.put(user.getId(), user);
         userFlush();
         return user;
     }
@@ -75,7 +80,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public Optional<User> findByUserName(String name) {
         return users.values().stream()
-            .filter(user -> name.equals(user.getUserName()))
+            .filter(user -> name.equals(user.getUsername()))
             .findFirst();
     }
 
@@ -88,13 +93,13 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void delete(User user) {
-        users.remove(user.getUserId());
+        users.remove(user.getId());
         userFlush();
     }
 
     @Override
     public void update(User user) {
-        users.replace(user.getUserId(), user);
+        users.replace(user.getId(), user);
         userFlush();
     }
 

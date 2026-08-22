@@ -12,7 +12,7 @@ public interface BinaryContentService {
 
     void binaryContentDelete(UUID binaryContentId);
 
-    List<BinaryContentResponseDto> findAllByIdIn(UUID userId);
+    List<BinaryContentResponseDto> findAllByIdIn(List<UUID> binaryContentIds);
 
     BinaryContentResponseDto findBinaryContent(UUID binaryContentId);
 }

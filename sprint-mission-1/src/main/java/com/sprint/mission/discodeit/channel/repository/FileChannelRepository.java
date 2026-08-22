@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,7 +35,7 @@ public class FileChannelRepository implements ChannelRepository {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            throw new RuntimeException("디렉토리 생성 실패", e);
+            throw new UncheckedIOException("디렉토리 생성 실패 - path: " + path, e);
         }
         channelLoad();
     }
@@ -44,11 +45,15 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     private void channelLoad() {
+        Path file = Paths.get(filePath());
+        if (!Files.exists(file)) {
+            return;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(
             new FileInputStream(filePath()))) {
             channels.putAll((Map<UUID, Channel>) objectInputStream.readObject());
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("기존 채널 데이터가 없습니다.");
+            throw new IllegalStateException("기존 채널 데이터가 없습니다. - path: " + filePath(), e);
         }
     }
 
@@ -57,13 +62,13 @@ public class FileChannelRepository implements ChannelRepository {
             new FileOutputStream(filePath()))) {
             objectOutputStream.writeObject(this.channels);
         } catch (IOException e) {
-            throw new RuntimeException("채널 저장에 실패했습니다.", e);
+            throw new UncheckedIOException("채널 저장에 실패했습니다. - path: " + filePath(), e);
         }
     }
 
     @Override
     public Channel channelAdd(Channel channel) {
-        this.channels.put(channel.getChannelId(), channel);
+        this.channels.put(channel.getId(), channel);
         channelFlush();
         return channel;
     }
@@ -75,13 +80,13 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(Channel channel) {
-        channels.remove(channel.getChannelId());
+        channels.remove(channel.getId());
         channelFlush();
     }
 
     @Override
     public void update(Channel channel) {
-        channels.replace(channel.getChannelId(), channel);
+        channels.replace(channel.getId(), channel);
         channelFlush();
     }
 
@@ -93,7 +98,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllByType(ChannelType channelType) {
         return channels.values().stream()
-            .filter(channel -> channel.getChannelType().equals(channelType))
+            .filter(channel -> channel.getType().equals(channelType))
             .toList();
     }
 }

@@ -20,7 +20,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel channelAdd(Channel channel) {
-        channels.put(channel.getChannelId(), channel);
+        channels.put(channel.getId(), channel);
         return channel;
     }
 
@@ -31,12 +31,12 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(Channel channel) {
-        channels.remove(channel.getChannelId());
+        channels.remove(channel.getId());
     }
 
     @Override
     public void update(Channel channel) {
-        channels.replace(channel.getChannelId(), channel);
+        channels.replace(channel.getId(), channel);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllByType(ChannelType channelType) {
         return channels.values().stream()
-            .filter(channel -> channel.getChannelType().equals(channelType))
+            .filter(channel -> channel.getType().equals(channelType))
             .toList();
     }
 }

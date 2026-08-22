@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.binarycontent.repository;
 
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -18,7 +20,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent binaryAdd(BinaryContent binaryContent) {
-        binaryContentMap.put(binaryContent.getBinaryContentId(), binaryContent);
+        binaryContentMap.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
 
@@ -33,8 +35,11 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn() {
-        return binaryContentMap.values().stream()
+    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+        return binaryContentIds
+            .stream()
+            .map(binaryContentMap::get)
+            .filter(Objects::nonNull)
             .toList();
     }
 
@@ -48,7 +53,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
             );
             return binaryAdd(binaryContent);
         } catch (IOException e) {
-            throw new RuntimeException("파일을 읽는데 실패했습니다: " + file.getOriginalFilename(), e);
+            throw new UncheckedIOException("파일을 읽는데 실패했습니다: " + file.getOriginalFilename(), e);
         }
     }
 }

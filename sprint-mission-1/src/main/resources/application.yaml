@@ -1,6 +1,7 @@
 discodeit:
+  seed: true
   repository:
-    type: jcf   # jcf | file
+    type: file   # jcf | file
     file-directory: .discodeit
 
 spring:
@@ -10,6 +11,11 @@ spring:
     encoding:
       charset: UTF-8
       force: true
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha          # Controller 알파벳 정렬
+    operations-sorter: alpha    # URL 알파벳 정렬
 
 server:
   port: 8080

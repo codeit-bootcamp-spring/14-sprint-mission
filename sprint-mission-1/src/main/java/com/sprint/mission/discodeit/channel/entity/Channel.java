@@ -1,44 +1,32 @@
 package com.sprint.mission.discodeit.channel.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import com.sprint.mission.discodeit.global.entity.BaseEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class Channel implements Serializable {
+public class Channel extends BaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID channelId = UUID.randomUUID();
-    private final Instant createdAt = Instant.now();
-    private Instant updatedAt;
-    private String channelName;
-    private ChannelType channelType = ChannelType.PUBLIC;
+    private String name;
+    private ChannelType type = ChannelType.PUBLIC;
     private String description;
 
-    public Channel(ChannelType channelType) {
-        this.channelType = channelType;
+    public Channel(ChannelType type) {
+        this.type = type;
     }
 
-    public Channel(String channelName, ChannelType channelType) {
-        this.channelName = channelName;
-        this.channelType = channelType;
-    }
-
-    public Channel(String channelName, ChannelType channelType, String description) {
-        this.channelName = channelName;
-        this.channelType = channelType;
+    public Channel(String name, ChannelType type, String description) {
+        this.name = name;
+        this.type = type;
         this.description = description;
     }
 
+
     public void update(String channelName, String description) {
         boolean changed = false;
-        if (channelName != null && !channelName.equals(this.channelName)) {
-            this.channelName = channelName;
+        if (channelName != null && !channelName.equals(this.name)) {
+            this.name = channelName;
             changed = true;
         }
         if (description != null && !description.equals(this.description)) {
@@ -46,7 +34,7 @@ public class Channel implements Serializable {
             changed = true;
         }
         if (changed) {
-            this.updatedAt = Instant.now();
+            super.markUpdated();
         }
     }
 }

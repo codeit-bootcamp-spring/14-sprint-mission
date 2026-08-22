@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.channel.service;
 
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPrivateCreateRequestDto;
 import com.sprint.mission.discodeit.channel.dto.ChannelPublicCreateRequestDto;
-import com.sprint.mission.discodeit.channel.dto.ChannelResponseDto;
+import com.sprint.mission.discodeit.channel.dto.ChannelResponse;
 import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.global.exception.DiscodeitException;
+import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
@@ -16,6 +19,7 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -33,16 +37,16 @@ public class ChannelServiceImpl implements ChannelService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public ChannelResponseDto channelCreate(
+    public ChannelResponse channelCreate(
         ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
-        Channel channel = new Channel(channelPublicCreateRequestDto.channelName(),
+        Channel channel = new Channel(channelPublicCreateRequestDto.name(),
             ChannelType.PUBLIC, channelPublicCreateRequestDto.description());
         channelRepository.channelAdd(channel);
-        return toResponseDto(channel);
+        return ChannelResponse.from(channel);
     }
 
     @Override
-    public ChannelResponseDto privateChannelCreate(
+    public ChannelResponse privateChannelCreate(
         ChannelPrivateCreateRequestDto channelPrivateCreateRequestDto) {
         Channel channel = new Channel(ChannelType.PRIVATE);
 
@@ -50,45 +54,59 @@ public class ChannelServiceImpl implements ChannelService {
 
         for (UUID userId : channelPrivateCreateRequestDto.participantIds()) {
             User user = userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저: " + userId));
+                .orElseThrow(() -> new DiscodeitException(
+                    ExceptionType.USER_NOT_FOUND,
+                    Map.of("authorId", userId)
+                ));
 
-            ReadStatus readStatus = new ReadStatus(channel.getChannelId(), user.getUserId(),
-                Instant.now());
+            ReadStatus readStatus = new ReadStatus(channel.getId(), user.getId());
             readStatusRepository.statusAdd(readStatus);
         }
 
-        return toResponseDto(channel);
+        return ChannelResponse.from(channel);
     }
 
     @Override
-    public void channelUpdate(UUID channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
+    public ChannelResponse channelUpdate(UUID channelId,
+        ChannelUpdateRequestDto channelUpdateRequestDto) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> new IllegalArgumentException("수정할 채널이 없습니다: " + channelId));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId)
+            ));
 
-        if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
-            throw new IllegalArgumentException("비공개 채널은 수정할 수 없습니다: " + channelId);
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
+            throw new DiscodeitException(
+                ExceptionType.PRIVATE_CHANNEL_UPDATE_DENIED,
+                Map.of("channelId", channelId)
+            );
         }
 
-        channel.update(channelUpdateRequestDto.channelName(),
-            channelUpdateRequestDto.description());
+        channel.update(channelUpdateRequestDto.newName(),
+            channelUpdateRequestDto.newDescription());
         channelRepository.update(channel);
+
+        return ChannelResponse.from(channel);
     }
 
     @Override
-    public ChannelResponseDto findById(UUID channelId) {
+    public ChannelDto findById(UUID channelId) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> new IllegalArgumentException("보고자 하는 채널이 없습니다: " + channelId));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId)
+            ));
         return toResponseDto(channel);
     }
 
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
         List<Channel> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC);
 
         List<UUID> myChannelIds = readStatusRepository.findByUserId(userId);
         List<Channel> myPrivateChannels = channelRepository.findAllByType(ChannelType.PRIVATE)
             .stream()
-            .filter(channel -> myChannelIds.contains(channel.getChannelId()))
+            .filter(channel -> myChannelIds.contains(channel.getId()))
             .toList();
 
         return Stream.concat(publicChannels.stream(), myPrivateChannels.stream())
@@ -98,30 +116,33 @@ public class ChannelServiceImpl implements ChannelService {
 
     // 채널 -> DTO로 변환
     // find랑 findAll이랑 겹쳐서 통합 사용을 위해 생성
-    private ChannelResponseDto toResponseDto(Channel channel) {
-        List<Message> messages = messageRepository.findAllMessage(channel.getChannelId());
+    private ChannelDto toResponseDto(Channel channel) {
+        List<Message> messages = messageRepository.findAllMessage(channel.getId());
 
         Instant lastMessageAt = messages.stream()
             .map(Message::getCreatedAt)
             .max(Instant::compareTo)
             .orElse(null);
 
-        if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
             List<UUID> participantIds = readStatusRepository.findByChannelId(
-                channel.getChannelId());
-            return ChannelResponseDto.from(channel, lastMessageAt, participantIds);
+                channel.getId());
+            return ChannelDto.from(channel, lastMessageAt, participantIds);
         }
 
-        return ChannelResponseDto.from(channel, lastMessageAt);
+        return ChannelDto.from(channel, lastMessageAt);
     }
 
     @Override
     public void channelDelete(UUID channelId) {
         Channel channel = channelRepository.findByChannel(channelId)
-            .orElseThrow(() -> new IllegalArgumentException("삭제할 채널이 없습니다: " + channelId));
+            .orElseThrow(() -> new DiscodeitException(
+                ExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId)
+            ));
 
         List<UUID> attachmentIds = messageRepository.findAllMessage(channelId).stream()
-            .map(Message::getBinaryContentsId)
+            .map(Message::getAttachmentIds)
             .filter(Objects::nonNull)
             .flatMap(List::stream)
             .toList();

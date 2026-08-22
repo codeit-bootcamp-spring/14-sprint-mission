@@ -17,7 +17,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message messageAdd(Message message) {
-        messages.put(message.getMessageId(), message);
+        messages.put(message.getId(), message);
         return message;
     }
 
@@ -28,12 +28,12 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void delete(Message message) {
-        messages.remove(message.getMessageId());
+        messages.remove(message.getId());
     }
 
     @Override
     public void update(Message message) {
-        messages.replace(message.getMessageId(), message);
+        messages.replace(message.getId(), message);
     }
 
     @Override

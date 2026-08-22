@@ -5,18 +5,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record MessageResponseDto(UUID userId, UUID channelId, UUID messageId, String message,
-                                 Instant createdAt,
-                                 List<UUID> binaryContentsId) {
+public record MessageResponseDto(UUID id, Instant createdAt, Instant updatedAt, String content,
+                                 UUID channelId, UUID authorId, List<UUID> attachmentIds) {
 
     public static MessageResponseDto from(Message message) {
         return new MessageResponseDto(
-            message.getUserId(),
-            message.getChannelId(),
-            message.getMessageId(),
-            message.getMessage(),
+            message.getAuthorId(),
             message.getCreatedAt(),
-            message.getBinaryContentsId()
+            message.getUpdatedAt(),
+            message.getContent(),
+            message.getChannelId(),
+            message.getAuthorId(),
+            message.getAttachmentIds()
         );
     }
 }

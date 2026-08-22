@@ -18,7 +18,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User userAdd(User user) {
-        users.put(user.getUserId(), user);
+        users.put(user.getId(), user);
         return user;
     }
 
@@ -30,7 +30,7 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public Optional<User> findByUserName(String name) {
         return users.values().stream()
-            .filter(user -> name.equals(user.getUserName()))
+            .filter(user -> name.equals(user.getUsername()))
             .findFirst();
     }
 
@@ -43,12 +43,12 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void delete(User user) {
-        users.remove(user.getUserId());
+        users.remove(user.getId());
     }
 
     @Override
     public void update(User user) {
-        users.replace(user.getUserId(), user);
+        users.replace(user.getId(), user);
     }
 
     @Override

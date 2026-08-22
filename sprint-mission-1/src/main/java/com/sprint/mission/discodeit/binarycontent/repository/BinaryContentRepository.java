@@ -11,9 +11,9 @@ public interface BinaryContentRepository {
 
     void delete(UUID binaryId);
 
-    public BinaryContent findById(UUID binaryId);
+    BinaryContent findById(UUID binaryId);
 
-    public List<BinaryContent> findAllByIdIn();
+    List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds);
 
     BinaryContent toBinaryContent(MultipartFile file);
 }
