@@ -30,23 +30,8 @@ public class UserService {
     }
 
     public User deleteById(UUID id) {
+        validateExistsById(id);
         return userRepository.deleteById(id);
-    }
-
-    public boolean existsById(UUID id) {
-        return userRepository.existsById(id);
-    }
-
-    public boolean existsByName(String name) {
-        return userRepository.existsByName(name);
-    }
-
-    public boolean existsAllByIds(List<UUID> ids) {
-        return userRepository.existsAllByIds(ids);
-    }
-
-    public boolean existsByNameOrEmail(String name, String email) {
-        return userRepository.existsByNameOrEmail(name, email);
     }
 
     public User findByNameAndPassword(String name, String password) {
@@ -57,6 +42,12 @@ public class UserService {
     public User update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
         validateNameAndEmailAvailable(name, email);
         return validateExistsAndThenFindById(id).update(name, email, password, profileId);
+    }
+
+    public void validateExistsById(UUID id) {
+        if (!userRepository.existsById(id)) {
+            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
+        }
     }
 
     public void validateExistsByName(String name) {
