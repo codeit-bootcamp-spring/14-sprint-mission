@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.application;
 
+import com.sprint.mission.discodeit.common.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
@@ -9,7 +10,6 @@ import com.sprint.mission.discodeit.service.*;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -25,11 +25,9 @@ public class UserApplication {
     public UserDto createAccount(String name,
                                  String email,
                                  String password,
-                                 @Nullable MultipartFile profile) {
-        UUID profileId = null;
-        if (Objects.nonNull(profile)) {
-            profileId = binaryContentService.create(new BinaryContent(profile)).getId();
-        }
+                                 CreateBinaryContentCommand createProfileCommand
+    ) {
+        UUID profileId = createProfileAndThenGetId(createProfileCommand);
         User created = userService.create(name, email, password, profileId);
         UserStatus userStatus = userStatusService.create(new UserStatus(created.getId()));
         return UserDto.of(created, userStatus);
@@ -56,11 +54,10 @@ public class UserApplication {
 
     public UserDto updateUser(UUID id,
                               @Nullable String name, @Nullable String email, @Nullable String password,
-                              @Nullable MultipartFile profile) {
+                              CreateBinaryContentCommand createProfileCommand) {
         // 1. 선택적으로 프로필 이미지를 대체할 수 있어야 한다.
         // 2. DTO를 활용해 파라미터를 그룹화한다.
-        UUID profileId = (Objects.nonNull(profile)) ?
-                binaryContentService.create(new BinaryContent(profile)).getId() : null;
+        UUID profileId = createProfileAndThenGetId(createProfileCommand);
 
         UserStatus userStatus = userStatusService.findByUserId(id);
         User updated = userService.update(id, name, email, password, profileId);
@@ -88,4 +85,15 @@ public class UserApplication {
         User deletedUser = userService.deleteById(id);
         return UserDto.of(deletedUser, deletedUserStatus);
     }
+
+    private @Nullable UUID createProfileAndThenGetId(CreateBinaryContentCommand profileCreateCommand) {
+        return Objects.nonNull(profileCreateCommand) ?
+                binaryContentService.create(BinaryContent.of(
+                        profileCreateCommand.fileName(),
+                        profileCreateCommand.contentType(),
+                        profileCreateCommand.content()
+                )).getId()
+                : null;
+    }
+
 }
