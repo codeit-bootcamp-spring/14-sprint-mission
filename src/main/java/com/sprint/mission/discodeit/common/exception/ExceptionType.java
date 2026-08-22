@@ -19,6 +19,7 @@ public enum ExceptionType {
     CHANNEL_NOT_FOUND_IN_DATABASE(HttpStatus.NOT_FOUND, "Channel 미존재", "Database에서 해당 Channel 찾을 수 없음", "등록되지 않은 Channel입니다."),
     MESSAGE_NOT_FOUND_IN_DATABASE(HttpStatus.NOT_FOUND, "Message 미존재", "Database에서 해당 Message 찾을 수 없음", "등록되지 않은 Message입니다."),
     READSTATUS_NOT_FOUND_IN_DATABASE(HttpStatus.NOT_FOUND, "ReadStatus 미존재", "Database에서 해당 ReadStatus 찾을 수 없음", "등록되지 않은 ReadStatus입니다."),
+    BINARYCONTENT_NOT_FOUND_IN_DATABASE(HttpStatus.NOT_FOUND, "BinaryContent 미존재", "Database에서 해당 BinaryContent 찾을 수 없음", "등록되지 않은 BinaryContent입니다."),
 
     FILE_NOT_FOUND(HttpStatus.UNPROCESSABLE_CONTENT, "비어있거나 존재하지 않는 파일", "처리해야 하는 MultipartFile이 없거나 비어 있음", "잘못된 형식의 파일입니다."),
     FILE_IO_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 실패", "파일 업로드 실패", "파일 업로드를 실패했습니다, 잠시 후에 다시 시도하세요."),

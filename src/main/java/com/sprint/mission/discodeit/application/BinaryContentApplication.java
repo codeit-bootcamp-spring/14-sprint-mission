@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,23 +12,23 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BinaryContentApplication {
-    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentService binaryContentService;
 
     public BinaryContent create(BinaryContent binaryContent) {
-        return binaryContentRepository.create(binaryContent);
+        return binaryContentService.create(binaryContent);
     }
 
     public BinaryContent getBinaryContent(UUID id) {
-        return binaryContentRepository.findById(id).orElseThrow();
+        return binaryContentService.findById(id);
     }
 
     public List<BinaryContentResponseDto> getAllBinaryContents(List<UUID> ids) {
-        return binaryContentRepository.findAllById(ids).stream()
+        return binaryContentService.findAllById(ids).stream()
                 .map(BinaryContentResponseDto::of)
                 .toList();
     }
 
     public void delete(UUID id) {
-        binaryContentRepository.deleteById(id);
+        binaryContentService.deleteById(id);
     }
 }
