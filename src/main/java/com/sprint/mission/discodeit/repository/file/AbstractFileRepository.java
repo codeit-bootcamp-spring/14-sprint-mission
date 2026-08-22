@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.common.BasicEntity;
 import com.sprint.mission.discodeit.repository.CrudRepository;
 
@@ -61,7 +63,7 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
             Map<UUID, T> retrieved = (Map<UUID, T>) inputStream.readObject();
             return new HashMap<>(retrieved);
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ExceptionType.FILE_IO_FAILED);
         }
     }
 
@@ -78,7 +80,7 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
             outputStream.writeObject(toBeSaved);
             return toBeSaved;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ExceptionType.FILE_IO_FAILED);
         }
     }
 }
