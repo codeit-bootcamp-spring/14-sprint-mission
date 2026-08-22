@@ -35,4 +35,10 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
                 .filter(binaryContent -> ids.contains(binaryContent.getId()))
                 .toList();
     }
+
+    @Override
+    public boolean existsById(List<UUID> ids) {
+        return ids.stream()
+                .allMatch(super::existsById);
+    }
 }

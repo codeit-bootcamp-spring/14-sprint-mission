@@ -8,9 +8,7 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.*;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.*;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,8 +22,8 @@ public class MessageApplication {
     private final UserService userService;
     private final MessageService messageService;
     private final ChannelService channelService;
-    private final BinaryContentRepository binaryContentRepository;
-    private final ReadStatusRepository readStatusRepository;
+    private final BinaryContentService binaryContentService;
+    private final ReadStatusService readStatusService;
 
     public MessageResponseDto createMessage(String content, UUID channelId, UUID userId,
                                             @Nullable List<MultipartFile> attachments) {
@@ -33,7 +31,7 @@ public class MessageApplication {
         Channel channel = channelService.findById(channelId);
 
         // PRIVATE 채널의 경우 소속된 User만 Message 생성 가능
-        if (channel.getChannelType().equals(ChannelType.PRIVATE) && !readStatusRepository.existsByUserAndChannel(userId, channelId)) {
+        if (channel.getChannelType().equals(ChannelType.PRIVATE) && !readStatusService.existsByUserAndChannel(userId, channelId)) {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
@@ -42,7 +40,7 @@ public class MessageApplication {
             createdAttachmentIds = attachments.stream()
                     .map(eachAttachment -> {
                         BinaryContent createdAttachment = new BinaryContent(eachAttachment);
-                        return binaryContentRepository.create(createdAttachment).getId();
+                        return binaryContentService.create(createdAttachment).getId();
                     })
                     .toList();
         }
@@ -61,6 +59,7 @@ public class MessageApplication {
     }
 
     public List<MessageResponseDto> getAllByChannelId(UUID channelId) {
+        channelService.validateExists(channelId);
         return messageService.findAllByChannelId(channelId).stream()
                 .map(MessageResponseDto::of)
                 .toList();
@@ -72,9 +71,8 @@ public class MessageApplication {
     }
 
     public MessageResponseDto deleteMessage(UUID id) {
-        // binaryContent 필드에 다른 필드의 id가 없어서, 다른 엔티티에서 조회해야하는 번거로움
         Message toBeDeleted = messageService.findById(id);
-        binaryContentRepository.delete(toBeDeleted.getAttachmentIds());
+        binaryContentService.deleteById(toBeDeleted.getAttachmentIds());
         Message deleted = messageService.deleteById(id);
         return MessageResponseDto.of(deleted);
     }
