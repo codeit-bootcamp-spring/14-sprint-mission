@@ -31,6 +31,7 @@ public class MessageApplication {
         Channel channel = channelService.findById(channelId);
 
         // PRIVATE 채널의 경우 소속된 User만 Message 생성 가능
+        // TODO 비즈니스 규칙
         if (channel.getChannelType().equals(ChannelType.PRIVATE) && !readStatusService.existsByUserAndChannel(userId, channelId)) {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
