@@ -25,6 +25,11 @@ public class UserStatusService {
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
     }
 
+    public UserStatus findByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ExceptionType.USERSTATUS_NOT_FOUND_IN_DATABASE));
+    }
+
     public List<UserStatus> findAll() {
         return userStatusRepository.findAll();
     }
