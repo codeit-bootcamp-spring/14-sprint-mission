@@ -20,10 +20,4 @@ public class JCFChannelRepository extends AbstractJCFRepository<Channel>
     public Channel updateNameAndDescription(UUID id, String name, String description) {
         return super.STORE.get(id).updateNameAndDescription(name, description);
     }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return super.STORE.values().stream()
-                .anyMatch(channel -> channel.getId().equals(id));
-    }
 }

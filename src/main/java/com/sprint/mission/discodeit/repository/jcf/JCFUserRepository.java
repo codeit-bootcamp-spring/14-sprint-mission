@@ -18,11 +18,6 @@ public class JCFUserRepository extends AbstractJCFRepository<User>
         implements UserRepository {
 
     @Override
-    public boolean existsById(UUID id) {
-        return findById(id).isPresent();
-    }
-
-    @Override
     public boolean existsByName(String name) {
         return super.STORE.values().stream()
                 .anyMatch(user -> user.getName().equals(name));

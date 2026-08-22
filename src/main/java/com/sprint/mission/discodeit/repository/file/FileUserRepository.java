@@ -22,11 +22,6 @@ public class FileUserRepository extends AbstractFileRepository<User>
     }
 
     @Override
-    public boolean existsById(UUID id) {
-        return findById(id).isPresent();
-    }
-
-    @Override
     public boolean existsByName(String name) {
         return super.buffer.values().stream()
                 .anyMatch(user -> user.getName().equals(name));

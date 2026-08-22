@@ -54,9 +54,4 @@ public class JCFMessageRepository extends AbstractJCFRepository<Message>
                 .max(Comparator.naturalOrder());
     }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return super.STORE.values().stream()
-                .anyMatch(message -> message.getId().equals(id));
-    }
 }

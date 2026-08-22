@@ -17,6 +17,4 @@ public interface MessageRepository extends CrudRepository<Message>{
     void deleteAllByChannelId(UUID channelId);
 
     Optional<Instant> findLatestMessageByChannelId(UUID channelId);
-
-    boolean existsById(UUID id);
 }

@@ -8,8 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends CrudRepository<User> {
-    boolean existsById(UUID id);
-
     boolean existsByName(String name);
 
     boolean existsAllByIds(List<UUID> ids);

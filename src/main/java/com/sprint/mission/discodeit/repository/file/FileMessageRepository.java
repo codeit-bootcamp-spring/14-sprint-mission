@@ -61,10 +61,4 @@ public class FileMessageRepository extends AbstractFileRepository<Message>
                 .map(message -> message.getCreatedAt())
                 .max(Comparator.naturalOrder());
     }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return super.buffer.values().stream()
-                .anyMatch(message -> message.getId().equals(id));
-    }
 }

@@ -24,6 +24,4 @@ public interface ReadStatusRepository extends CrudRepository<ReadStatus> {
     List<UUID> findAllUserIdsByChannelId(UUID channelId);
 
     ReadStatus update(UUID publicReadStatusId, Instant newLastReadAt);
-
-    boolean existsById(UUID id);
 }

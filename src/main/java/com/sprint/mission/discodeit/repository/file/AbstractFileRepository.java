@@ -50,6 +50,12 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
         return toBeRemoved;
     }
 
+    @Override
+    public boolean existsById(UUID id) {
+        return buffer.values().stream()
+                .anyMatch(t -> t.getId().equals(id));
+    }
+
     private Map<UUID, T> readFile() {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
             Map<UUID, T> retrieved = (Map<UUID, T>) inputStream.readObject();

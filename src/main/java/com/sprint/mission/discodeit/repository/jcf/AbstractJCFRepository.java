@@ -35,4 +35,10 @@ public abstract class AbstractJCFRepository<T extends BasicEntity> implements Cr
         STORE.remove(id);
         return deleted;
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return STORE.values().stream()
+                .anyMatch(t -> t.getId().equals(id));
+    }
 }

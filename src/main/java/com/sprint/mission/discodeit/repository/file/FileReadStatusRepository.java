@@ -94,9 +94,4 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
                 .update(newLastReadAt);
     }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return super.buffer.values().stream()
-                .anyMatch(readStatus -> readStatus.getId().equals(id));
-    }
 }
