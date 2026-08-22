@@ -18,8 +18,8 @@ public class BinaryContentApplication {
         return binaryContentService.create(binaryContent);
     }
 
-    public BinaryContent getBinaryContent(UUID id) {
-        return binaryContentService.findById(id);
+    public BinaryContentResponseDto getBinaryContent(UUID id) {
+        return BinaryContentResponseDto.of(binaryContentService.findById(id));
     }
 
     public List<BinaryContentResponseDto> getAllBinaryContents(List<UUID> ids) {
