@@ -26,4 +26,10 @@ public class FileChannelRepository extends AbstractFileRepository<Channel>
         super.writeFromBufferToFile();
         return updated;
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return super.buffer.values().stream()
+                .anyMatch(channel -> channel.getId().equals(id));
+    }
 }

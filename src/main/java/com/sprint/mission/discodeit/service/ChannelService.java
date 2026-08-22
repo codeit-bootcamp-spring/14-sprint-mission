@@ -29,10 +29,18 @@ public class ChannelService {
     }
 
     public Channel deleteById(UUID id) {
+        validateExists(id);
         return channelRepository.deleteById(id);
     }
 
     public Channel updateNameAndDescription(UUID id, String name, String description) {
+        validateExists(id);
         return channelRepository.updateNameAndDescription(id, name, description);
+    }
+
+    public void validateExists(UUID id) {
+        if (!channelRepository.existsById(id)) {
+            throw new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE);
+        }
     }
 }
