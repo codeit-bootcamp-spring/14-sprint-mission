@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.ChannelType;
 import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,9 +17,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ChannelApplication {
     private final ChannelService channelService;
-    private final MessageRepository messageRepository;
+    private final MessageService messageService;
     private final UserService userService;
-    private final ReadStatusRepository readStatusRepository;
+    private final ReadStatusService readStatusService;
 
     public ChannelResponseDto createPublicChannel(String name, String description) {
         Channel channel = Channel.createPublicChannel(name, description);
@@ -37,7 +37,7 @@ public class ChannelApplication {
         List<ReadStatus> readStatuses = userIds.stream()
                 .map(userId -> new ReadStatus(userId, channelId, null))
                 .toList();
-        readStatusRepository.createAll(readStatuses);
+        readStatusService.createAll(readStatuses);
 
         Channel created = channelService.create(channel);
         return ChannelResponseDto.of(created);
@@ -53,9 +53,10 @@ public class ChannelApplication {
     // 3. 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다.
     // 4. PUBLIC인 전체조회, PRIVATE은 User가 참여한 채널만 조회하도록
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
+        userService.validateExistsById(userId);
         return channelService.findAll().stream()
                 .filter(channel -> isChannelPublic(channel)
-                        || readStatusRepository.existsByUserAndChannel(userId, channel.getId()))
+                        || readStatusService.existsByUserAndChannel(userId, channel.getId()))
                 .map(ChannelResponseDto::of)
                 .toList();
     }
@@ -72,8 +73,8 @@ public class ChannelApplication {
 
     public ChannelResponseDto deleteChannel(UUID id) {
         // 채널 내부 message 삭제
-        messageRepository.deleteAllByChannelId(id);
-        readStatusRepository.deleteByChannelId(id);
+        messageService.deleteAllByChannelId(id);
+        readStatusService.deleteByChannelId(id);
         Channel deleted = channelService.deleteById(id);
         return ChannelResponseDto.of(deleted);
     }

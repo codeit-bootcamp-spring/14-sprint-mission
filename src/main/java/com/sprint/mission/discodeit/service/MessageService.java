@@ -43,6 +43,10 @@ public class MessageService {
         return messageRepository.deleteById(id);
     }
 
+    public void deleteAllByChannelId(UUID channelId) {
+        messageRepository.deleteAllByChannelId(channelId);
+    }
+
     public void validateExists(UUID id) {
         if (!messageRepository.existsById(id)) {
             throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE);

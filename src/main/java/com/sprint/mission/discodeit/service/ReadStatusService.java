@@ -20,9 +20,17 @@ public class ReadStatusService {
         return readStatusRepository.create(readStatus);
     }
 
+    public List<ReadStatus> createAll(List<ReadStatus> readStatuses) {
+        return readStatusRepository.createAll(readStatuses);
+    }
+
     public ReadStatus findById(UUID id) {
         return readStatusRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ExceptionType.READSTATUS_NOT_FOUND_IN_DATABASE));
+    }
+
+    public boolean existsByUserAndChannel(UUID userId, UUID channelId) {
+        return readStatusRepository.existsByUserAndChannel(userId, channelId);
     }
 
     public List<ReadStatus> findAllByUserId(UUID userId) {
@@ -36,6 +44,10 @@ public class ReadStatusService {
 
     public ReadStatus deleteById(UUID id) {
         return readStatusRepository.deleteById(id);
+    }
+
+    public void deleteByChannelId(UUID channelId) {
+        readStatusRepository.deleteByChannelId(channelId);
     }
 
     public void validateExists(UUID id) {
