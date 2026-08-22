@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.message.Message;
+import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,10 @@ public class MessageService {
     public Message deleteById(UUID id) {
         validateExists(id);
         return messageRepository.deleteById(id);
+    }
+
+    public void deleteAllByUserId(UUID userId) {
+        messageRepository.deleteAllByUserId(userId);
     }
 
     public void deleteAllByChannelId(UUID channelId) {

@@ -46,6 +46,10 @@ public class ReadStatusService {
         return readStatusRepository.deleteById(id);
     }
 
+    public void deleteByUserId(UUID userId) {
+        readStatusRepository.deleteByUserId(userId);
+    }
+
     public void deleteByChannelId(UUID channelId) {
         readStatusRepository.deleteByChannelId(channelId);
     }

@@ -44,6 +44,10 @@ public class UserStatusService {
         return userStatusRepository.deleteById(id);
     }
 
+    public UserStatus deleteByUserId(UUID userId) {
+        return userStatusRepository.deleteByUserId(userId);
+    }
+
     public void validateExists(UUID id) {
         if (!userStatusRepository.existsById(id)) {
             throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE);
