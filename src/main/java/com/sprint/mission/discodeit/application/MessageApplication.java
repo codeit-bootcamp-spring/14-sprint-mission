@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.application;
 
+import com.sprint.mission.discodeit.common.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.ChannelType;
@@ -12,7 +13,6 @@ import com.sprint.mission.discodeit.service.*;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -26,7 +26,7 @@ public class MessageApplication {
     private final ReadStatusService readStatusService;
 
     public MessageResponseDto createMessage(String content, UUID channelId, UUID userId,
-                                            @Nullable List<MultipartFile> attachments) {
+                                            List<CreateBinaryContentCommand> createFileCommands) {
         userService.validateExistsById(userId);
         Channel channel = channelService.findById(channelId);
 
@@ -36,19 +36,25 @@ public class MessageApplication {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
-        List<UUID> createdAttachmentIds = null;
-        if (Objects.nonNull(attachments)) {
-            createdAttachmentIds = attachments.stream()
-                    .map(eachAttachment -> {
-                        BinaryContent createdAttachment = new BinaryContent(eachAttachment);
-                        return binaryContentService.create(createdAttachment).getId();
-                    })
-                    .toList();
-        }
+        List<UUID> createdAttachmentIds = createFilesAndThenGetIdIfNotNullOrElseGetNull(createFileCommands);
 
         Message message = new Message(content, userId, channelId, createdAttachmentIds);
         Message created = messageService.create(message);
         return MessageResponseDto.of(created);
+    }
+
+    private @Nullable List<UUID> createFilesAndThenGetIdIfNotNullOrElseGetNull(List<CreateBinaryContentCommand> createFileCommands) {
+        return Objects.nonNull(createFileCommands) ?
+                createFileCommands.stream()
+                        .map(command -> {
+                            return binaryContentService.create(BinaryContent.of(
+                                    command.fileName(),
+                                    command.contentType(),
+                                    command.content()
+                            )).getId();
+                        }).toList()
+                : null;
+
     }
 
     public Message getMessage(UUID id) {
