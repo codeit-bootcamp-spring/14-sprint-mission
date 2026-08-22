@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,38 +18,31 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserStatusApplication {
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
+    private final UserStatusService userStatusService;
+    private final UserService userService;
 
     public UserStatus create(UUID userId) {
-        if(!userRepository.existsById(userId)) {
-            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
-        }
-        if(userStatusRepository.existsByUserId(userId)) {
-            throw new CustomException(ExceptionType.USERSTATUS_ALREADY_EXISTS);
-        }
-
+        userService.validateExistsById(userId);
+        userStatusService.validateUserIdAvailable(userId);
         UserStatus userStatus = new UserStatus(userId);
-        return userStatusRepository.create(userStatus);
+        return userStatusService.create(userStatus);
     }
 
     public UserStatus getUserStatus(UUID id) {
-        return userStatusRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ExceptionType.USERSTATUS_NOT_FOUND_IN_DATABASE));
+        return userStatusService.findById(id);
     }
 
     public List<UserStatus> getAllUserStatus() {
-        return userStatusRepository.findAll();
+        return userStatusService.findAll();
     }
 
-
     public UserStatusDto updateByUserId(UUID userId, Instant newLastActiveAt) {
-        UserStatus updatedUserStatus = userStatusRepository.updateLastActiveAtByUserId(userId, newLastActiveAt);
+        UserStatus updatedUserStatus = userStatusService.updateLastActiveAtByUserId(userId, newLastActiveAt);
         return UserStatusDto.of(updatedUserStatus);
     }
 
     public void delete(UUID id) {
-        userStatusRepository.deleteById(id);
+        userStatusService.deleteById(id);
     }
 
 }

@@ -14,4 +14,6 @@ public interface CrudRepository<T extends BasicEntity> {
     List<T> findAll();
 
     T deleteById(UUID id);
+
+    boolean existsById(UUID id);
 }
