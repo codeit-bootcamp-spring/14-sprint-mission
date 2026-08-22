@@ -13,10 +13,18 @@ public class BinaryContent extends BasicEntity {
     /*
     User, Message 도메인 모델과의 의존 관계 방향성을 잘 고려하여 id 참조 필드를 추가하세요.
      */
-    private final MultipartFile content;
+    private final String fileName;
+    private final String contentType;
+    private final byte[] content;
 
-    public BinaryContent(MultipartFile content) {
+    private BinaryContent(String fileName, String contentType, byte[] content) {
         super();
+        this.fileName = fileName;
+        this.contentType = contentType;
         this.content = content;
+    }
+
+    public static BinaryContent of(String fileName, String contentType, byte[] content) {
+        return new BinaryContent(fileName, contentType, content);
     }
 }
