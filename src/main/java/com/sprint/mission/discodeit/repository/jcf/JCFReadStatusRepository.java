@@ -82,4 +82,10 @@ public class JCFReadStatusRepository extends AbstractJCFRepository<ReadStatus>
     public ReadStatus update(UUID publicReadStatusId, Instant newLastReadAt) {
         return super.STORE.get(publicReadStatusId).update(newLastReadAt);
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return super.STORE.values().stream()
+                .anyMatch(readStatus -> readStatus.getId().equals(id));
+    }
 }
