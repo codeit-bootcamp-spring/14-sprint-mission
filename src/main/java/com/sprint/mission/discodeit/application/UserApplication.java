@@ -26,7 +26,10 @@ public class UserApplication {
                                  String email,
                                  String password,
                                  @Nullable MultipartFile profile) {
-        UUID profileId = binaryContentService.create(new BinaryContent(profile)).getId();
+        UUID profileId = null;
+        if (Objects.nonNull(profile)) {
+            profileId = binaryContentService.create(new BinaryContent(profile)).getId();
+        }
         User created = userService.create(name, email, password, profileId);
         UserStatus userStatus = userStatusService.create(new UserStatus(created.getId()));
         return UserDto.of(created, userStatus);
