@@ -18,43 +18,15 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class MessageApplication {
-    private final UserService userService;
     private final MessageService messageService;
     private final ChannelService channelService;
     private final BinaryContentService binaryContentService;
-    private final ReadStatusService readStatusService;
+    private final MessageCreateService messageCreateService;
 
     public MessageResponseDto createMessage(String content, UUID channelId, UUID userId,
                                             List<CreateBinaryContentCommand> createFileCommands) {
-        userService.validateExistsById(userId);
-        Channel channel = channelService.findById(channelId);
-
-        // PRIVATE 채널의 경우 소속된 User만 Message 생성 가능
-        // TODO 비즈니스 규칙
-        if (channel.isPrivate() && !readStatusService.existsByUserAndChannel(userId, channelId)) {
-            throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
-        }
-
-        List<UUID> createdAttachmentIds = createFilesAndThenGetIdIfNotNullOrElseGetNull(createFileCommands);
-
-        Message message = new Message(content, userId, channelId, createdAttachmentIds);
-        Message created = messageService.create(message);
-        channelService.update(channel.getId(), created.getCreatedAt());
+        Message created = messageCreateService.create(content, channelId, userId, createFileCommands);
         return MessageResponseDto.of(created);
-    }
-
-    private @Nullable List<UUID> createFilesAndThenGetIdIfNotNullOrElseGetNull(List<CreateBinaryContentCommand> createFileCommands) {
-        return Objects.nonNull(createFileCommands) ?
-                createFileCommands.stream()
-                        .map(command -> {
-                            return binaryContentService.create(BinaryContent.of(
-                                    command.fileName(),
-                                    command.contentType(),
-                                    command.content()
-                            )).getId();
-                        }).toList()
-                : null;
-
     }
 
     public Message getMessage(UUID id) {
