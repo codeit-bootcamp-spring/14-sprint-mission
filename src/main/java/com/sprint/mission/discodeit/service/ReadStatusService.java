@@ -39,7 +39,7 @@ public class ReadStatusService {
 
     public ReadStatus update(UUID id, Instant newLastReadAt) {
         validateExists(id);
-        return readStatusRepository.deleteById(id);
+        return readStatusRepository.update(id, newLastReadAt);
     }
 
     public ReadStatus deleteById(UUID id) {
