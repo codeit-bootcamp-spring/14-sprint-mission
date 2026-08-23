@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.user.dto.UserRequestDto;
 import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusUpdateRequestDto;
@@ -39,7 +38,7 @@ class BasicUserStatusServiceTest {
         userStatusService = new BasicUserStatusService(userRepository, userStatusRepository);
 
         byte[] image = {1, 2, 3, 4};
-        User user = new User(new UserRequestDto("김양현", "yyy2724@naver.com", "2724", image));
+        User user = User.create("김양현", "yyy2724@naver.com", "2724");
         userRepository.save(user);
         userId = user.getId();
     }
@@ -86,7 +85,7 @@ class BasicUserStatusServiceTest {
     @Test
     void 모든_유저상태를_조회한다() {
         byte[] image = {1, 2, 3, 4};
-        User user2 = new User(new UserRequestDto("홍길동", "hong@naver.com", "1234", image));
+        User user2 = User.create("홍길동", "hong@naver.com", "1234");
         userRepository.save(user2);
 
         userStatusService.create(new UserStatusCreateRequestDto(userId, Instant.now()));
@@ -103,7 +102,7 @@ class BasicUserStatusServiceTest {
         UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow();
         Instant before = userStatus.getLastAccessAt();
 
-        UserStatusResponseDto updated = userStatusService.update(new UserStatusUpdateRequestDto(userStatus.getId()));
+        UserStatusResponseDto updated = userStatusService.update(userStatus.getId());
 
         assertEquals(userId, updated.userId());
         assertFalse(updated.lastAccessAt().isBefore(before));
@@ -113,14 +112,14 @@ class BasicUserStatusServiceTest {
     @Test
     void 없는_유저상태를_수정하면_예외가_발생한다() {
         assertThrows(NoSuchElementException.class,
-                () -> userStatusService.update(new UserStatusUpdateRequestDto(UUID.randomUUID())));
+                () -> userStatusService.update(UUID.randomUUID()));
     }
 
     @Test
     void 유저ID로_유저상태를_수정할_수_있다() {
         userStatusService.create(new UserStatusCreateRequestDto(userId, Instant.now()));
 
-        UserStatusResponseDto updated = userStatusService.updateByUserId(userId);
+        UserStatusResponseDto updated = userStatusService.updateByUserId(userId, Instant.now());
 
         assertEquals(userId, updated.userId());
         assertNotNull(updated.lastAccessAt());
@@ -128,7 +127,7 @@ class BasicUserStatusServiceTest {
 
     @Test
     void 없는_유저ID로_수정하면_예외가_발생한다() {
-        assertThrows(NoSuchElementException.class, () -> userStatusService.updateByUserId(UUID.randomUUID()));
+        assertThrows(NoSuchElementException.class, () -> userStatusService.updateByUserId(UUID.randomUUID(), Instant.now()));
     }
 
     @Test
@@ -136,7 +135,7 @@ class BasicUserStatusServiceTest {
         userStatusService.create(new UserStatusCreateRequestDto(userId, Instant.now()));
         UUID id = userStatusRepository.findByUserId(userId).orElseThrow().getId();
 
-        userStatusService.delete(new UserStatusUpdateRequestDto(id));
+        userStatusService.delete(new UserStatusUpdateRequestDto(id,Instant.now()));
 
         assertTrue(userStatusRepository.findById(id).isEmpty());
     }
@@ -144,6 +143,6 @@ class BasicUserStatusServiceTest {
     @Test
     void 없는_유저상태를_삭제하면_예외가_발생한다() {
         assertThrows(NoSuchElementException.class,
-                () -> userStatusService.delete(new UserStatusUpdateRequestDto(UUID.randomUUID())));
+                () -> userStatusService.delete(new UserStatusUpdateRequestDto(UUID.randomUUID(),Instant.now())));
     }
 }

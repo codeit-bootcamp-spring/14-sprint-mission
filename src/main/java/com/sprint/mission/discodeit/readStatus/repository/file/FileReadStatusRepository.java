@@ -39,7 +39,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(readStatus);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
@@ -50,12 +50,16 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         List<ReadStatus> lists = new ArrayList<>();
         File[] files = directory.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
 
+        if(files == null){
+            return new ArrayList<>();
+        }
+
         for (File file : files) {
             try (FileInputStream fis = new FileInputStream(file);
                  ObjectInputStream input = new ObjectInputStream(fis)) {
                 lists.add((ReadStatus) input.readObject());
             }catch (IOException | ClassNotFoundException e){
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
 
@@ -90,7 +94,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         try {
             Files.deleteIfExists(directory.resolve(id + ".ser"));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -128,7 +132,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
              ObjectOutputStream output = new ObjectOutputStream(fos)) {
             output.writeObject(readStatus);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }

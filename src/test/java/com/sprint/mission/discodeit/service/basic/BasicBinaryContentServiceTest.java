@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.binaryContent.repository.jcf.JCFBinaryConten
 import com.sprint.mission.discodeit.binaryContent.application.BinaryContentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +29,37 @@ class BasicBinaryContentServiceTest {
 
     @Test
     void 생성하면_조회_할_수_있다(){
-        BinaryContentResponseDto created = binaryContentService.create(new BinaryContentCreateRequestDto(new byte[]{1, 2, 3}));
+        BinaryContentResponseDto created = binaryContentService.create(new BinaryContentCreateRequestDto(new MockMultipartFile(
+                "profile",
+                "profile",
+                ".jpg",
+                new byte[]{1,2,3,4}
+        )));
         BinaryContentResponseDto found = binaryContentService.find(created.id());
-        assertEquals(created.data(), found.data());
+        assertEquals(created.bytes(), found.bytes());
     }
 
     @Test
     void 같은_아이디로_여러개_생성하면_리스트를_조회_할_수_있다(){
         List<BinaryContentResponseDto> created = new ArrayList<>();
-        created.add(binaryContentService.create(new BinaryContentCreateRequestDto(new byte[]{1, 2, 3})));
-        created.add(binaryContentService.create(new BinaryContentCreateRequestDto(new byte[]{4, 5, 6})));
-        created.add(binaryContentService.create(new BinaryContentCreateRequestDto(new byte[]{7, 8, 9})));
+        created.add(binaryContentService.create(new BinaryContentCreateRequestDto(new MockMultipartFile(
+                "profile",
+                "profile",
+                ".jpg",
+                new byte[]{1,2,3,4}
+        ))));
+        created.add(binaryContentService.create(new BinaryContentCreateRequestDto(new MockMultipartFile(
+                "profile2",
+                "profile2",
+                ".jpg",
+                new byte[]{4,5,6,7}
+        ))));
+        created.add(binaryContentService.create(new BinaryContentCreateRequestDto(new MockMultipartFile(
+                "profile3",
+                "profile3",
+                ".jpg",
+                new byte[]{7,8,9}
+        ))));
 
         List<UUID> ids = created.stream()
                 .map(BinaryContentResponseDto::id)
@@ -60,7 +81,12 @@ class BasicBinaryContentServiceTest {
 
     @Test
     void 생성하면_삭제_할_수_있다(){
-        BinaryContentResponseDto created = binaryContentService.create(new BinaryContentCreateRequestDto(new byte[]{1, 2, 3}));
+        BinaryContentResponseDto created = binaryContentService.create(new BinaryContentCreateRequestDto(new MockMultipartFile(
+                "profile",
+                "profile",
+                ".jpg",
+                new byte[]{1,2,3,4}
+        )));
         binaryContentService.delete(created.id());
         assertThrows(NoSuchElementException.class, () -> binaryContentService.find(created.id()));
     }

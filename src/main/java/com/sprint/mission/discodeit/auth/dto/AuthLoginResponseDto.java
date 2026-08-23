@@ -1,11 +1,20 @@
 package com.sprint.mission.discodeit.auth.dto;
 
-public record AuthLoginResponseDto(
-        String username,
-        String email
-) {
-    public static AuthLoginResponseDto from(String username,  String email){
+import java.time.Instant;
+import java.util.UUID;
 
-        return new AuthLoginResponseDto(username, email);
+public record AuthLoginResponseDto(
+        UUID id,
+        Instant createdAt,
+        Instant updatedAt,
+        String username,
+        String email,
+        String password,
+        UUID profileId
+) {
+    public static AuthLoginResponseDto from(UUID id, Instant createdAt, Instant updatedAt, String username, String email,
+                                            String password, UUID profileId){
+
+        return new AuthLoginResponseDto(id, createdAt, updatedAt, username, email, password, profileId);
     }
 }
