@@ -90,8 +90,10 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
     @Override
     public ReadStatus update(UUID publicReadStatusId, Instant newLastReadAt) {
-        return super.buffer.get(publicReadStatusId)
+        ReadStatus updated = super.buffer.get(publicReadStatusId)
                 .update(newLastReadAt);
+        super.writeFromBufferToFile();
+        return updated;
     }
 
 }
