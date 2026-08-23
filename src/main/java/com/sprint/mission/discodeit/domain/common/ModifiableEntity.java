@@ -15,7 +15,7 @@ public abstract class ModifiableEntity extends BasicEntity
     }
 
     @Override
-    public void markedAsUpdate() {
-        updatedAt = super.now();
+    public void markedAsUpdate(Instant newUpdatedAt) {
+        this.updatedAt = newUpdatedAt;
     }
 }

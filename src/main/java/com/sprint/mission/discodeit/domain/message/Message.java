@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serial;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +44,7 @@ public final class Message extends ModifiableEntity {
 
     public Message updateContent(String content) {
         this.content = content;
-        super.markedAsUpdate();
+        super.markedAsUpdate(Instant.now());
         return this;
     }
 }

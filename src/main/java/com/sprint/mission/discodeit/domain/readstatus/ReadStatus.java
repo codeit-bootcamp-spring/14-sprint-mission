@@ -28,7 +28,7 @@ public class ReadStatus extends ModifiableEntity {
 
     public ReadStatus update(Instant newLastReadAt) {
         this.lastReadAt = newLastReadAt;
-        markedAsUpdate();
+        markedAsUpdate(Instant.now());
         return this;
     }
 }

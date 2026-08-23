@@ -23,8 +23,8 @@ public class UserStatus extends ModifiableEntity {
     }
 
     public void updateLastSeenAt() {
-        this.lastSeenAt = now();
-        super.markedAsUpdate();
+        this.lastSeenAt = Instant.now();
+        super.markedAsUpdate(lastSeenAt);
     }
 
     /***
@@ -33,12 +33,12 @@ public class UserStatus extends ModifiableEntity {
      */
     public boolean isOnline() {
         Instant threshold = lastSeenAt.plusSeconds(300);
-        return super.now().isBefore(threshold);
+        return Instant.now().isBefore(threshold);
     }
 
     public UserStatus updateLastActiveAt(Instant newLastActiveAt) {
         this.lastSeenAt = newLastActiveAt;
-        markedAsUpdate();
+        markedAsUpdate(newLastActiveAt);
         return this;
     }
 }

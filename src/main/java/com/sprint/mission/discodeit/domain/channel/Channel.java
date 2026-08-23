@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serial;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,7 +54,7 @@ public final class Channel extends ModifiableEntity {
         }
         this.name = name;
         this.description = description;
-        super.markedAsUpdate();
+        super.markedAsUpdate(Instant.now());
         return this;
     }
 

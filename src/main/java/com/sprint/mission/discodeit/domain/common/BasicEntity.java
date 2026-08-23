@@ -12,12 +12,6 @@ public abstract class BasicEntity implements Identifiable {
 
     protected BasicEntity() {
         this.id = UUID.randomUUID();
-        this.createdAt = now();
+        this.createdAt = Instant.now();
     }
-
-
-    protected Instant now() {
-        return Instant.now();
-    }
-
 }
