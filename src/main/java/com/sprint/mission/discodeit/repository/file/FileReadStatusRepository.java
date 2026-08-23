@@ -55,9 +55,12 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-        super.buffer.values().stream()
+        List<UUID> toBeDeleted = super.buffer.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .forEach(readStatus -> super.deleteById(readStatus.getId()));
+                .map(ReadStatus::getId)
+                .toList();
+
+        toBeDeleted.forEach(super.buffer::remove);
         super.writeFromBufferToFile();
     }
 
@@ -75,9 +78,12 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
     @Override
     public void deleteByUserId(UUID userId) {
-        findAll().stream()
+        List<UUID> toBeDeleted = super.buffer.values().stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userId))
-                .forEach(readStatus -> deleteById(readStatus.getId()));
+                .map(ReadStatus::getId)
+                .toList();
+
+        toBeDeleted.forEach(super.buffer::remove);
         super.writeFromBufferToFile();
     }
 
