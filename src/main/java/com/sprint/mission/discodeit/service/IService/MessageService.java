@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface MessageService {
 
     MessageResponseDto create(MessageCreateRequestDto request, List<BinaryContentCreateRequestDto> attachmentRequests);
-    List<MessageResponseDto> findAllByChaanelId(UUID channelId);
+    List<MessageResponseDto> findAllByChannelId(UUID channelId);
     MessageResponseDto update(UUID id, MessageUpdateRequestDto request);
     void delete(UUID id);
 

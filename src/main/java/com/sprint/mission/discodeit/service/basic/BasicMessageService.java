@@ -43,7 +43,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageResponseDto> findAllByChaanelId(UUID channelId) {
+    public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
         List<Message> messages = messageRepository.findAllByChannelId(channelId);
         return messages.stream()
             .map(MessageResponseDto ::from)

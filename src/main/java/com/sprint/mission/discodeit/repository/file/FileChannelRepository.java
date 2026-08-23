@@ -15,12 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Primary
 public class FileChannelRepository implements ChannelRepository {
 
-    protected Path filePath = Path.of("user.ser");
+    protected Path filePath = Path.of("channel.ser");
 
     @Override
     public void save(Channel channel) {
