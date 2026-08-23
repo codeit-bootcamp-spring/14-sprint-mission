@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.user.dto.UserResponse;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -49,6 +50,7 @@ public class UserController {
         value = "/api/users/{userId}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> update(
+        @Parameter(description = "사용자 ID")
         @PathVariable UUID userId,
         @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequestDto userUpdateRequestDto,
         @RequestPart(value = "profile", required = false) MultipartFile profile) {
@@ -61,6 +63,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/api/users/{userId}")
     public ResponseEntity<Void> delete(
+        @Parameter(description = "사용자 ID")
         @PathVariable UUID userId) {
         userService.userDelete(userId);
 
