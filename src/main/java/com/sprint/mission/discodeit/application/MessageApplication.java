@@ -39,6 +39,7 @@ public class MessageApplication {
 
         Message message = new Message(content, userId, channelId, createdAttachmentIds);
         Message created = messageService.create(message);
+        channelService.update(channel.getId(), created.getCreatedAt());
         return MessageResponseDto.of(created);
     }
 

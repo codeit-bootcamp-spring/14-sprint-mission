@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -25,5 +26,11 @@ public class FileChannelRepository extends AbstractFileRepository<Channel>
         Channel updated = super.buffer.get(id).updateNameAndDescription(name, description);
         super.writeFromBufferToFile();
         return updated;
+    }
+
+    @Override
+    public void update(UUID id, Instant newUpdatedAt) {
+        super.buffer.get(id).markedAsUpdate(newUpdatedAt);
+        super.writeFromBufferToFile();
     }
 }

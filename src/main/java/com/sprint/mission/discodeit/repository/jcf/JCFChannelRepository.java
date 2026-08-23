@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -19,5 +20,10 @@ public class JCFChannelRepository extends AbstractJCFRepository<Channel>
     @Override
     public Channel updateNameAndDescription(UUID id, String name, String description) {
         return super.STORE.get(id).updateNameAndDescription(name, description);
+    }
+
+    @Override
+    public void update(UUID id, Instant newUpdatedAt) {
+        super.STORE.get(id).markedAsUpdate(newUpdatedAt);
     }
 }

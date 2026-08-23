@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,5 +43,10 @@ public class ChannelService {
         if (!channelRepository.existsById(id)) {
             throw new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE);
         }
+    }
+
+    public void update(UUID id, Instant newUpdatedAt) {
+        validateExists(id);
+        channelRepository.update(id, newUpdatedAt);
     }
 }
