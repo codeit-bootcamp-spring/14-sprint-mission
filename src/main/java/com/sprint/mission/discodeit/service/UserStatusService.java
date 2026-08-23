@@ -35,6 +35,10 @@ public class UserStatusService {
     }
 
     public UserStatus updateLastActiveAtByUserId(UUID userId, Instant newLastActiveAt) {
+        /*
+        특정 user의 userStatus가 오류로 생성이 되지 않았다면, 여기에서라도 생성하는 로직을 추가하는게 맞을까?
+        아니면 예외를 던지는 것이 일관성 있는 설계일까?
+         */
         validateExistsByUserId(userId);
         return userStatusRepository.updateLastActiveAtByUserId(userId, newLastActiveAt);
     }
@@ -50,13 +54,13 @@ public class UserStatusService {
 
     public void validateExists(UUID id) {
         if (!userStatusRepository.existsById(id)) {
-            throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE);
+            throw new CustomException(ExceptionType.USERSTATUS_NOT_FOUND_IN_DATABASE);
         }
     }
 
     public void validateExistsByUserId(UUID userId) {
         if (!userStatusRepository.existsByUserId(userId)) {
-            throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE);
+            throw new CustomException(ExceptionType.USERSTATUS_NOT_FOUND_IN_DATABASE);
         }
     }
 
