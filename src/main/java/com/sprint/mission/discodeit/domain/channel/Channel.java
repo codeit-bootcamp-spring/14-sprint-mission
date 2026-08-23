@@ -32,6 +32,10 @@ public final class Channel extends ModifiableEntity {
         this.description = description;
     }
 
+    private Channel(ChannelType channelType, String name) {
+        this(channelType, name, null);
+    }
+
     public static Channel createPublicChannel(String name, String description) {
         return new Channel(ChannelType.PUBLIC, name, description);
     }
@@ -40,8 +44,7 @@ public final class Channel extends ModifiableEntity {
         String name = usersId.stream()
                 .map(UUID::toString)
                 .collect(Collectors.joining(", "));
-        String description = null;
-        return new Channel(ChannelType.PRIVATE, name, description);
+        return new Channel(ChannelType.PRIVATE, name);
     }
 
     public Channel updateNameAndDescription(String name, String description) {
@@ -52,5 +55,13 @@ public final class Channel extends ModifiableEntity {
         this.description = description;
         super.markedAsUpdate();
         return this;
+    }
+
+    public boolean isPrivate() {
+        return channelType.equals(ChannelType.PRIVATE);
+    }
+
+    public boolean isPublic() {
+        return channelType.equals(ChannelType.PUBLIC);
     }
 }

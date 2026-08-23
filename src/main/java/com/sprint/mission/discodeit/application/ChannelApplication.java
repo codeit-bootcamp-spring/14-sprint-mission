@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.application;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelUpsertResponse;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.domain.channel.Channel;
-import com.sprint.mission.discodeit.domain.channel.ChannelType;
 import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -21,13 +21,13 @@ public class ChannelApplication {
     private final UserService userService;
     private final ReadStatusService readStatusService;
 
-    public ChannelResponseDto createPublicChannel(String name, String description) {
+    public ChannelUpsertResponse createPublicChannel(String name, String description) {
         Channel channel = Channel.createPublicChannel(name, description);
         Channel created = channelService.create(channel);
-        return ChannelResponseDto.of(created);
+        return ChannelUpsertResponse.of(created);
     }
 
-    public ChannelResponseDto createPrivateChannel(List<UUID> userIds) {
+    public ChannelUpsertResponse createPrivateChannel(List<UUID> userIds) {
         userService.validateAllExists(userIds);
 
         Channel channel = Channel.createPrivateChannel(userIds);
@@ -40,12 +40,13 @@ public class ChannelApplication {
         readStatusService.createAll(readStatuses);
 
         Channel created = channelService.create(channel);
-        return ChannelResponseDto.of(created);
+        return ChannelUpsertResponse.of(created);
     }
 
     public ChannelResponseDto getChannel(UUID id) {
         Channel channel = channelService.findById(id);
-        return ChannelResponseDto.of(channel);
+        List<UUID> participantIds = readStatusService.findAllUserIdsByChannelId(channel.getId());
+        return ChannelResponseDto.of(channel, participantIds);
     }
 
     // 1. DTO를 활용해 가장 최근 메시지의 시간 정보 포함
@@ -55,27 +56,24 @@ public class ChannelApplication {
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
         userService.validateExistsById(userId);
         return channelService.findAll().stream()
-                .filter(channel -> isChannelPublic(channel)
+                .filter(channel -> channel.isPublic()
                         || readStatusService.existsByUserAndChannel(userId, channel.getId()))
-                .map(ChannelResponseDto::of)
-                .toList();
+                .map(channel -> {
+                    List<UUID> participantIds = readStatusService.findAllUserIdsByChannelId(channel.getId());
+                    return ChannelResponseDto.of(channel, participantIds);
+                }).toList();
     }
 
-    private boolean isChannelPublic(Channel channel) {
-        return channel.getChannelType().equals(ChannelType.PUBLIC);
-    }
-
-    public ChannelResponseDto updateChannelName(UUID id,
+    public ChannelUpsertResponse updateChannelName(UUID id,
                                                 String name, String description) {
         Channel updated = channelService.updateNameAndDescription(id, name, description);
-        return ChannelResponseDto.of(updated);
+        return ChannelUpsertResponse.of(updated);
     }
 
-    public ChannelResponseDto deleteChannel(UUID id) {
+    public void deleteChannel(UUID id) {
         // 채널 내부 message 삭제
         messageService.deleteAllByChannelId(id);
         readStatusService.deleteByChannelId(id);
         Channel deleted = channelService.deleteById(id);
-        return ChannelResponseDto.of(deleted);
     }
 }

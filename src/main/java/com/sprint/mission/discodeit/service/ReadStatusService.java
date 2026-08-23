@@ -29,6 +29,11 @@ public class ReadStatusService {
                 .orElseThrow(() -> new CustomException(ExceptionType.READSTATUS_NOT_FOUND_IN_DATABASE));
     }
 
+
+    public List<UUID> findAllUserIdsByChannelId(UUID channelId) {
+        return readStatusRepository.findAllUserIdsByChannelId(channelId);
+    }
+
     public boolean existsByUserAndChannel(UUID userId, UUID channelId) {
         return readStatusRepository.existsByUserAndChannel(userId, channelId);
     }

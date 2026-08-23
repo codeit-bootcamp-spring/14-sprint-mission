@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.application;
 import com.sprint.mission.discodeit.common.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.channel.Channel;
-import com.sprint.mission.discodeit.domain.channel.ChannelType;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.common.exception.CustomException;
@@ -32,7 +31,7 @@ public class MessageApplication {
 
         // PRIVATE 채널의 경우 소속된 User만 Message 생성 가능
         // TODO 비즈니스 규칙
-        if (channel.getChannelType().equals(ChannelType.PRIVATE) && !readStatusService.existsByUserAndChannel(userId, channelId)) {
+        if (channel.isPrivate() && !readStatusService.existsByUserAndChannel(userId, channelId)) {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
