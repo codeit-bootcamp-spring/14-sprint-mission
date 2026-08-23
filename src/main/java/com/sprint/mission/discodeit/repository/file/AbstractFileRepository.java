@@ -34,12 +34,14 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
 
     @Override
     public T create(T t) {
-        UUID id = t.getId();
-        return findById(id).orElseGet(() -> {
-                buffer.put(id, t);
-                writeFromBufferToFile();
-                return t;
-        });
+        return !buffer.containsKey(t.getId()) ?
+                createAndThenGet(t) : null;
+    }
+
+    private T createAndThenGet(T t) {
+        buffer.put(t.getId(), t);
+        writeFromBufferToFile();
+        return t;
     }
 
     @Override
@@ -54,10 +56,15 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
 
     @Override
     public T deleteById(UUID id) {
-        T toBeRemoved = buffer.get(id);
+        return buffer.containsKey(id) ?
+                deleteAndThenGet(id) : null;
+    }
+
+    private T deleteAndThenGet(UUID id) {
+        T toBeDeleted = buffer.get(id);
         buffer.remove(id);
         writeFromBufferToFile();
-        return toBeRemoved;
+        return toBeDeleted;
     }
 
     @Override
