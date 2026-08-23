@@ -41,7 +41,8 @@ public class UserService {
 
     public User update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
         validateNameAndEmailAvailable(name, email);
-        return validateExistsAndThenFindById(id).update(name, email, password, profileId);
+        User updating = validateExistsAndThenFindById(id);
+        return userRepository.update(updating.getId(), name, email, password, profileId);
     }
 
     public void validateExistsById(UUID id) {
