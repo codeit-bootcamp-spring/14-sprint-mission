@@ -1,7 +1,7 @@
 package com.sprint.mission.service.message;
 
 import com.sprint.mission.domain.Message;
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Qualifier;

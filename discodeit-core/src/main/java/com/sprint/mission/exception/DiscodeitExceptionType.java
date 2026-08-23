@@ -1,6 +1,5 @@
 package com.sprint.mission.exception;
 
-import com.sprint.mission.ExceptionType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

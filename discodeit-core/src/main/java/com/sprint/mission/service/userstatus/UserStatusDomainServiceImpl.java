@@ -1,7 +1,7 @@
 package com.sprint.mission.service.userstatus;
 
 import com.sprint.mission.domain.UserStatus;
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Qualifier;

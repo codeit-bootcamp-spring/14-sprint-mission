@@ -3,7 +3,7 @@ package com.sprint.mission.application.auth;
 import com.sprint.mission.domain.User;
 import com.sprint.mission.controller.dto.auth.LoginRequestDto;
 import com.sprint.mission.controller.dto.user.UserResponseDto;
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.UserRepository;
 import jakarta.validation.Valid;

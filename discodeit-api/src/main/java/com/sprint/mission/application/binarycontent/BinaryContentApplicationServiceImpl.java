@@ -1,9 +1,7 @@
 package com.sprint.mission.application.binarycontent;
 
-import com.sprint.mission.DiscodeitException;
 import com.sprint.mission.domain.BinaryContent;
 import com.sprint.mission.controller.dto.binarycontent.BinaryContentResponseDto;
-import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.multipart.MultipartFileConverter;
 import com.sprint.mission.multipart.MultipartFileDto;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 

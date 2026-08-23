@@ -1,6 +1,6 @@
 package com.sprint.mission.repository.file;
 
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import lombok.extern.slf4j.Slf4j;
 

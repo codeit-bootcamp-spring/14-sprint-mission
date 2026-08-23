@@ -1,7 +1,7 @@
 package com.sprint.mission.service.binarycontent;
 
 import com.sprint.mission.domain.BinaryContent;
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.BinaryContentRepository;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -1,9 +1,7 @@
 package com.sprint.mission.domain;
 
-import jdk.jfr.ContentType;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serial;
 import java.io.Serializable;

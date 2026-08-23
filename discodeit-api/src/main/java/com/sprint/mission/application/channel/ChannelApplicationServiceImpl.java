@@ -6,7 +6,7 @@ import com.sprint.mission.controller.dto.channel.ChannelResponseDto;
 import com.sprint.mission.controller.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.controller.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.controller.dto.channel.PublicChannelCreateRequest;
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
 import com.sprint.mission.service.channel.ChannelDomainService;
@@ -105,12 +105,19 @@ public class ChannelApplicationServiceImpl implements ChannelApplicationService 
     public List<ChannelDto> findAllByUserId(UUID userId) {
         userDomainService.findById(userId);
 
-        Set<UUID> accessiblePrivateChannelIds = readStatusDomainService.findAllByUserId(userId).stream()
+        List<Channel> channels = channelDomainService.findAll();
+
+        Set<UUID> accessibleChannelIds = readStatusDomainService.findAllByUserId(userId).stream()
                 .map(ReadStatus::getChannelId)
                 .collect(Collectors.toSet());
 
+        channels.stream()
+                .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC)
+                .map(Channel::getId)
+                .forEach(accessibleChannelIds::add);
+
         List<ChannelDto> channelResponses = channelDomainService.findAll().stream()
-                .filter(channel -> isAccessible(channel, accessiblePrivateChannelIds))
+                .filter(channel -> accessibleChannelIds.contains(channel.getId()))
                 .map(channel -> this.findById(channel.getId()))
                 .toList();
 
@@ -190,11 +197,4 @@ public class ChannelApplicationServiceImpl implements ChannelApplicationService 
         log.info("Channel 및 연관 데이터 삭제 완료: channelId={}", channelId);
     }
 
-    private boolean isAccessible(
-            Channel channel,
-            Set<UUID> accessiblePrivateChannelIds
-    ) {
-        return channel.getChannelType() == ChannelType.PUBLIC
-                || accessiblePrivateChannelIds.contains(channel.getId());
-    }
 }

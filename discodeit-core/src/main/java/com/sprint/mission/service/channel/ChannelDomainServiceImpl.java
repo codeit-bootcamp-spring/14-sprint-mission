@@ -2,7 +2,7 @@ package com.sprint.mission.service.channel;
 
 import com.sprint.mission.domain.Channel;
 import com.sprint.mission.domain.ChannelType;
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Qualifier;

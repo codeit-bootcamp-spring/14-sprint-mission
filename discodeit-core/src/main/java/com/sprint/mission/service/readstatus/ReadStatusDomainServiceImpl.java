@@ -1,7 +1,7 @@
 package com.sprint.mission.service.readstatus;
 
 import com.sprint.mission.domain.ReadStatus;
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.ReadStatusRepository;
 import org.springframework.beans.factory.annotation.Qualifier;

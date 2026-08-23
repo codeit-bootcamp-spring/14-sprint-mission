@@ -1,7 +1,7 @@
 package com.sprint.mission.service.user;
 
 import com.sprint.mission.domain.User;
-import com.sprint.mission.DiscodeitException;
+import com.sprint.mission.exception.DiscodeitException;
 import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
