@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -25,8 +25,10 @@ public class JCFMessageRepository extends AbstractJCFRepository<Message>
     }
 
     @Override
-    public void updateContent(UUID id, String content) {
-        findById(id).ifPresent(retrieved -> retrieved.updateContent(content));
+    public Message updateContent(UUID id, String content) {
+        Message updating = super.STORE.get(id);
+        Message updated = updating.updateContent(content);
+        return updated;
     }
 
     @Override
@@ -51,4 +53,5 @@ public class JCFMessageRepository extends AbstractJCFRepository<Message>
                 .map(message -> message.getCreatedAt())
                 .max(Comparator.naturalOrder());
     }
+
 }

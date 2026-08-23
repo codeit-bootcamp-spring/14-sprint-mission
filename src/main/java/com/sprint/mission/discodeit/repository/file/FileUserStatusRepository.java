@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,12 +30,11 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     }
 
     @Override
-    public void deleteByUserId(UUID userId) {
-        super.buffer.values().stream()
-                .filter(userStatus -> userStatus.getUserId().equals(userId))
-                .map(userStatus -> userStatus.getId())
-                .forEach(id -> deleteById(id));
+    public UserStatus deleteByUserId(UUID userId) {
+        UserStatus deleting = findByUserId(userId).orElse(null);
+        UserStatus deleted = deleteById(deleting.getId());
         super.writeFromBufferToFile();
+        return deleted;
     }
 
     @Override
@@ -44,14 +44,10 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     }
 
     @Override
-    public void update(UUID id) {
-        findById(id).ifPresent(userStatus -> userStatus.update());
+    public UserStatus updateLastActiveAtByUserId(UUID userId, Instant newLastActiveAt) {
+        UserStatus updating = findByUserId(userId).orElseThrow();
+        UserStatus updated = updating.updateLastActiveAt(newLastActiveAt);
         super.writeFromBufferToFile();
-    }
-
-    @Override
-    public void updateByUserId(UUID userId) {
-        findByUserId(userId).ifPresent(userStatus -> userStatus.update());
-        super.writeFromBufferToFile();
+        return updated;
     }
 }

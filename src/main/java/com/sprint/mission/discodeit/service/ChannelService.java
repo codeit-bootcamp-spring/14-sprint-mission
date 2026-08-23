@@ -1,23 +1,52 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.dto.channel.ChannelCreationDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateNameDto;
+import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public interface ChannelService {
-    Channel createChannel(ChannelCreationDto dto);
+@Service
+@RequiredArgsConstructor
+public class ChannelService {
+    private final ChannelRepository channelRepository;
 
-    ChannelResponseDto getChannel(UUID uuid);
+    public Channel create(Channel channel) {
+        return channelRepository.create(channel);
+    }
 
-    List<Channel> getAllChannels();
+    public Channel findById(UUID id) {
+        return channelRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
+    }
 
-    List<ChannelResponseDto> getAllChannelsByUserId(UUID userId);
+    public List<Channel> findAll() {
+        return channelRepository.findAll();
+    }
 
-    void updateChannelName(UUID id, ChannelUpdateNameDto dto);
+    public Channel deleteById(UUID id) {
+        validateExists(id);
+        return channelRepository.deleteById(id);
+    }
 
-    void deleteChannel(UUID uuid);
+    public Channel updateNameAndDescription(UUID id, String name, String description) {
+        validateExists(id);
+        return channelRepository.updateNameAndDescription(id, name, description);
+    }
+
+    public void validateExists(UUID id) {
+        if (!channelRepository.existsById(id)) {
+            throw new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE);
+        }
+    }
+
+    public void update(UUID id, Instant newUpdatedAt) {
+        validateExists(id);
+        channelRepository.update(id, newUpdatedAt);
+    }
 }

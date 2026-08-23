@@ -1,19 +1,12 @@
 package com.sprint.mission.discodeit.dto.readStatus;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Value;
+import jakarta.validation.constraints.NotNull;
 
+import java.time.Instant;
 import java.util.UUID;
 
-@Value
-public class ReadStatusCreateDto {
-    @NotBlank
-    UUID userId;
-    @NotBlank
-    UUID channelId;
+public record ReadStatusCreateDto(@NotNull UUID userId,
+                                  @NotNull UUID channelId,
+                                  @NotNull Instant lastReadAt) {
 
-    public ReadStatus toReadStatus() {
-        return new ReadStatus(userId, channelId);
-    }
 }

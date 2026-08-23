@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -34,5 +34,11 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
         return findAll().stream()
                 .filter(binaryContent -> ids.contains(binaryContent.getId()))
                 .toList();
+    }
+
+    @Override
+    public boolean existsById(List<UUID> ids) {
+        return ids.stream()
+                .allMatch(super::existsById);
     }
 }

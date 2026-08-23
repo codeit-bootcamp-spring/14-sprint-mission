@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.common.BasicEntity;
+import com.sprint.mission.discodeit.domain.common.BasicEntity;
 import com.sprint.mission.discodeit.repository.CrudRepository;
 
 import java.util.*;
@@ -30,7 +30,15 @@ public abstract class AbstractJCFRepository<T extends BasicEntity> implements Cr
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public T deleteById(UUID id) {
+        T deleted = STORE.get(id);
         STORE.remove(id);
+        return deleted;
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return STORE.values().stream()
+                .anyMatch(t -> t.getId().equals(id));
     }
 }

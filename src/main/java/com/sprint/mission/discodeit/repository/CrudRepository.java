@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.common.BasicEntity;
+import com.sprint.mission.discodeit.domain.common.BasicEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,5 +13,7 @@ public interface CrudRepository<T extends BasicEntity> {
 
     List<T> findAll();
 
-    void deleteById(UUID id);
+    T deleteById(UUID id);
+
+    boolean existsById(UUID id);
 }

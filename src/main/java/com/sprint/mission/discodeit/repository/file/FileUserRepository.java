@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,8 +22,9 @@ public class FileUserRepository extends AbstractFileRepository<User>
     }
 
     @Override
-    public boolean existsById(UUID id) {
-        return findById(id).isPresent();
+    public boolean existsByName(String name) {
+        return super.buffer.values().stream()
+                .anyMatch(user -> user.getName().equals(name));
     }
 
     @Override
@@ -50,9 +51,11 @@ public class FileUserRepository extends AbstractFileRepository<User>
     }
 
     @Override
-    public void update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
-        findById(id).ifPresent(user -> user.update(name, email, password, profileId));
+    public User update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
+        User toBeUpdated = super.buffer.get(id);
+        User updated = toBeUpdated.update(name, email, password, profileId);
         super.writeFromBufferToFile();
+        return updated;
     }
 
 

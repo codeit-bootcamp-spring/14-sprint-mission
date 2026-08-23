@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.common.BasicEntity;
+import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.common.BasicEntity;
 import com.sprint.mission.discodeit.repository.CrudRepository;
 
 import java.io.*;
@@ -14,22 +16,32 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
     protected Map<UUID, T> buffer;
 
     protected AbstractFileRepository(File file) {
+        createParentDirectoryIfAbsent(file);
         this.file = file;
-//        this.buffer = Optional.of(file)
-//                .filter(f -> file.exists() && file.length() != 0)
-//                .map(f -> readFile())
-//                .orElseGet(() -> writeFile(EMPTY_BUFFER));
-        this.buffer = writeFile(EMPTY_BUFFER); // test를 위해 실행시마다 빈 파일로 초기화
+        this.buffer = Optional.of(file)
+                .filter(f -> file.exists() && file.length() != 0)
+                .map(f -> readFile())
+                .orElseGet(() -> writeFile(EMPTY_BUFFER));
+//        this.buffer = writeFile(EMPTY_BUFFER); // test를 위해 실행시마다 빈 파일로 초기화
+    }
+
+    private void createParentDirectoryIfAbsent(File file) {
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw new CustomException(ExceptionType.FILE_IO_FAILED);
+        }
     }
 
     @Override
     public T create(T t) {
-        UUID id = t.getId();
-        return findById(id).orElseGet(() -> {
-                buffer.put(id, t);
-                writeFromBufferToFile();
-                return t;
-        });
+        return !buffer.containsKey(t.getId()) ?
+                createAndThenGet(t) : null;
+    }
+
+    private T createAndThenGet(T t) {
+        buffer.put(t.getId(), t);
+        writeFromBufferToFile();
+        return t;
     }
 
     @Override
@@ -43,11 +55,22 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
     }
 
     @Override
-    public void deleteById(UUID id) {
-        findById(id).ifPresent(retrieved -> {
-            buffer.remove(id);
-            writeFromBufferToFile();
-        });
+    public T deleteById(UUID id) {
+        return buffer.containsKey(id) ?
+                deleteAndThenGet(id) : null;
+    }
+
+    private T deleteAndThenGet(UUID id) {
+        T toBeDeleted = buffer.get(id);
+        buffer.remove(id);
+        writeFromBufferToFile();
+        return toBeDeleted;
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return buffer.values().stream()
+                .anyMatch(t -> t.getId().equals(id));
     }
 
     private Map<UUID, T> readFile() {
@@ -55,7 +78,7 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
             Map<UUID, T> retrieved = (Map<UUID, T>) inputStream.readObject();
             return new HashMap<>(retrieved);
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ExceptionType.FILE_IO_FAILED);
         }
     }
 
@@ -72,7 +95,7 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
             outputStream.writeObject(toBeSaved);
             return toBeSaved;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ExceptionType.FILE_IO_FAILED);
         }
     }
 }

@@ -1,18 +1,57 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import jakarta.validation.Valid;
+import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface BinaryContentService {
-    BinaryContent create(@Valid BinaryContentCreateDto dto);
+@Service
+@RequiredArgsConstructor
+public class BinaryContentService {
+    private final BinaryContentRepository binaryContentRepository;
 
-    BinaryContent getBinaryContent(UUID id);
+    public BinaryContent create(BinaryContent binaryContent) {
+        return binaryContentRepository.create(binaryContent);
+    }
 
-    List<BinaryContent> getAllBinaryContents(List<UUID> ids);
+    public BinaryContent findById(UUID id) {
+        return binaryContentRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionType.BINARYCONTENT_NOT_FOUND_IN_DATABASE));
+    }
 
-    void delete(UUID id);
+    public List<BinaryContent> findAll() {
+        return binaryContentRepository.findAll();
+    }
+
+    public List<BinaryContent> findAllById(List<UUID> ids) {
+        return binaryContentRepository.findAllById(ids);
+    }
+
+    public void deleteById(UUID id) {
+        validateExists(id);
+        binaryContentRepository.deleteById(id);
+    }
+
+    public void deleteById(List<UUID> ids) {
+        validateExists(ids);
+        binaryContentRepository.delete(ids);
+    }
+
+    public void validateExists(UUID id) {
+        if (!binaryContentRepository.existsById(id)) {
+            throw new CustomException(ExceptionType.BINARYCONTENT_NOT_FOUND_IN_DATABASE);
+        }
+    }
+
+    public void validateExists(List<UUID> ids) {
+        if (!binaryContentRepository.existsById(ids)) {
+            throw new CustomException(ExceptionType.BINARYCONTENT_NOT_FOUND_IN_DATABASE);
+        }
+    }
+
 }

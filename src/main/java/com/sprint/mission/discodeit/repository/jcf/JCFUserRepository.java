@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,8 +18,9 @@ public class JCFUserRepository extends AbstractJCFRepository<User>
         implements UserRepository {
 
     @Override
-    public boolean existsById(UUID id) {
-        return findById(id).isPresent();
+    public boolean existsByName(String name) {
+        return super.STORE.values().stream()
+                .anyMatch(user -> user.getName().equals(name));
     }
 
     @Override
@@ -44,8 +45,9 @@ public class JCFUserRepository extends AbstractJCFRepository<User>
     }
 
     @Override
-    public void update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
-        findById(id).ifPresent(user -> user.update(name, email, password, profileId));
+    public User update(UUID id, String name, String email, String password, @Nullable UUID profileId) {
+        User updating = findById(id).orElseThrow();
+        return updating.update(name, email, password, profileId);
     }
 
 }

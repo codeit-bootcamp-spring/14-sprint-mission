@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,9 +17,11 @@ public interface ReadStatusRepository extends CrudRepository<ReadStatus> {
 
     void deleteByChannelId(UUID channelId);
 
-    void update(UUID id);
+    List<ReadStatus> updateByChannelId(UUID id, Instant newLastReadAt);
 
     void deleteByUserId(UUID userId);
 
     List<UUID> findAllUserIdsByChannelId(UUID channelId);
+
+    ReadStatus update(UUID publicReadStatusId, Instant newLastReadAt);
 }

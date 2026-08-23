@@ -47,3 +47,6 @@ bin/
 
 ### FileRepository data files ###
 *.ser
+
+## api test ##
+postman/

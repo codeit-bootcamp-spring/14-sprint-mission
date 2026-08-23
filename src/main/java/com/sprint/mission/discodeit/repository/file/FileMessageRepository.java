@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -29,28 +29,32 @@ public class FileMessageRepository extends AbstractFileRepository<Message>
     }
 
     @Override
-    public void updateContent(UUID id, String content) {
-        findById(id).ifPresent(retrieved -> {
-            retrieved.updateContent(content);
-            super.writeFromBufferToFile();
-        });
+    public Message updateContent(UUID id, String content) {
+        Message updating = super.buffer.get(id);
+        Message updated = updating.updateContent(content);
+        super.writeFromBufferToFile();
+        return updated;
     }
 
     @Override
     public void deleteAllByUserId(UUID userId) {
-        buffer.values().stream()
+        List<UUID> toBeDeleted = buffer.values().stream()
                 .filter(message -> message.getUserId().equals(userId))
                 .map(message -> message.getId())
-                .forEach(toBeDeleted -> deleteById(toBeDeleted));
+                .toList();
+
+        toBeDeleted.forEach(buffer::remove);
         super.writeFromBufferToFile();
     }
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-        buffer.values().stream()
+        List<UUID> idsToDelete = buffer.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .map(message -> message.getId())
-                .forEach(toBeDeleted -> deleteById(toBeDeleted));
+                .toList();
+
+        idsToDelete.forEach(buffer::remove);
         super.writeFromBufferToFile();
     }
 

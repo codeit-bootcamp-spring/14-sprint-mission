@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -54,23 +55,35 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-        super.buffer.values().stream()
+        List<UUID> toBeDeleted = super.buffer.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .forEach(readStatus -> super.deleteById(readStatus.getId()));
+                .map(ReadStatus::getId)
+                .toList();
+
+        toBeDeleted.forEach(super.buffer::remove);
         super.writeFromBufferToFile();
     }
 
     @Override
-    public void update(UUID id) {
-        findById(id).ifPresent(readStatus -> readStatus.update());
+    public List<ReadStatus> updateByChannelId(UUID channelId, Instant newLastReadAt) {
+        List<ReadStatus> channelReadStatus = super.buffer.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
+        for (ReadStatus eachReadStatus : channelReadStatus) {
+            eachReadStatus.update(newLastReadAt);
+        }
         super.writeFromBufferToFile();
+        return channelReadStatus;
     }
 
     @Override
     public void deleteByUserId(UUID userId) {
-        findAll().stream()
+        List<UUID> toBeDeleted = super.buffer.values().stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userId))
-                .forEach(readStatus -> deleteById(readStatus.getId()));
+                .map(ReadStatus::getId)
+                .toList();
+
+        toBeDeleted.forEach(super.buffer::remove);
         super.writeFromBufferToFile();
     }
 
@@ -80,4 +93,13 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
                 .map(readStatus -> readStatus.getUserId())
                 .toList();
     }
+
+    @Override
+    public ReadStatus update(UUID publicReadStatusId, Instant newLastReadAt) {
+        ReadStatus updated = super.buffer.get(publicReadStatusId)
+                .update(newLastReadAt);
+        super.writeFromBufferToFile();
+        return updated;
+    }
+
 }

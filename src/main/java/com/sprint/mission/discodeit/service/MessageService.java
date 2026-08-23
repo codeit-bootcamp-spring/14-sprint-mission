@@ -1,23 +1,60 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.message.Message;
+import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-public interface MessageService {
-    Message createMessage(MessageCreationDto dto);
+@Service
+@RequiredArgsConstructor
+public class MessageService {
+    private final MessageRepository messageRepository;
 
-    Optional<Message> getMessage(UUID id);
+    public Message create(Message message) {
+        return messageRepository.create(message);
+    }
 
-    List<Message> getAllMessages();
+    public Message findById(UUID id) {
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE));
+    }
 
-    List<Message> getAllByChannelId(UUID channelId);
+    public List<Message> findAll() {
+        return messageRepository.findAll();
+    }
 
-    void updateMessage(UUID id, MessageUpdateDto dto);
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId);
+    }
 
-    void deleteMessage(UUID id);
+
+    public Message updateContent(UUID id, String content) {
+        validateExists(id);
+        return messageRepository.updateContent(id, content);
+    }
+
+    public Message deleteById(UUID id) {
+        validateExists(id);
+        return messageRepository.deleteById(id);
+    }
+
+    public void deleteAllByUserId(UUID userId) {
+        messageRepository.deleteAllByUserId(userId);
+    }
+
+    public void deleteAllByChannelId(UUID channelId) {
+        messageRepository.deleteAllByChannelId(channelId);
+    }
+
+    public void validateExists(UUID id) {
+        if (!messageRepository.existsById(id)) {
+            throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE);
+        }
+    }
 }
