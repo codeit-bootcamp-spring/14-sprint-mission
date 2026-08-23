@@ -32,7 +32,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(id);
         if (Objects.isNull(binaryContent)) {
             // throw new RuntimeException("해당 BinaryContent가 존재하지 않습니다:");
-            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
+            throw new CustomRuntimeException(ExceptionType.BINARY_CONTENT_NOT_FOUND, id);
         }
         return BinaryContentResponseDto.from(binaryContent);
     }

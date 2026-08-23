@@ -39,11 +39,11 @@ public class BasicUserService implements UserService {
         User user = userCreateRequestDto.toEntity();
         if (userRepository.findByEmail(user.getEmail()) != null) {
             // throw new IllegalArgumentException("이미 가입한 회원 이메일 입니다.");
-            throw new CustomRuntimeException(ExceptionType.DATABASE_CONNECTION_FAILED);
+            throw new CustomRuntimeException(ExceptionType.USER_EMAIL_ALREADY_EXISTS, user.getEmail());
         }
         if (userRepository.findByName(user.getName()) != null) {
             // throw new IllegalArgumentException("이미 가입한 회원 이름 입니다.");
-            throw new CustomRuntimeException(ExceptionType.DATABASE_CONNECTION_FAILED);
+            throw new CustomRuntimeException(ExceptionType.USER_USERNAME_ALREADY_EXISTS, user.getName());
         }
         userRepository.save(user);
 
@@ -64,7 +64,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(id);
         if (user == null) {
             // throw new IllegalArgumentException("존재하지 않는 유저입니다: " + id);
-            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
+            throw new CustomRuntimeException(ExceptionType.USER_NOT_FOUND, id);
         }
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
         return UserResponseDto.from(user, userStatus);
@@ -87,7 +87,7 @@ public class BasicUserService implements UserService {
         User target = userRepository.findById(id);
         if (Objects.isNull(target)) {
             // throw new RuntimeException("해당 유저가 존재하지 않습니다: " + id);
-            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
+            throw new CustomRuntimeException(ExceptionType.USER_NOT_FOUND, id);
         }
         //이름 받으면 업데이트
         if(requestDto.getName() != null) {

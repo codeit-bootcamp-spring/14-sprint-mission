@@ -25,13 +25,13 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusResponseDto createUserStatus(UserStatusCreateRequestDto requestDto) {
         if (Objects.isNull(userRepository.findById(requestDto.getUserId()))) {
-//            throw new RuntimeException("관련된 User가 존재하지 않습니다: " );
-            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
+            // throw new RuntimeException("관련된 User가 존재하지 않습니다: " );
+            throw new CustomRuntimeException(ExceptionType.USER_NOT_FOUND, requestDto.getUserId());
         }
 
         if (Objects.nonNull(userStatusRepository.findByUserId(requestDto.getUserId()))) {
-//            throw new RuntimeException("해당 User에 대한 UserStatus가 이미 존재합니다.");
-            throw new CustomRuntimeException(ExceptionType.DATABASE_CONNECTION_FAILED);
+            // throw new RuntimeException("해당 User에 대한 UserStatus가 이미 존재합니다.");
+            throw new CustomRuntimeException(ExceptionType.BAD_REQUEST);
         }
 
         UserStatus userStatus = requestDto.toEntity();
@@ -43,8 +43,8 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusResponseDto readUserStatus(UUID id) {
         UserStatus userStatus = userStatusRepository.findById(id);
         if (Objects.isNull(userStatus)) {
-//            throw new RuntimeException("해당 UserStatus가 존재하지 않습니다: ");
-            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
+            // throw new RuntimeException("해당 UserStatus가 존재하지 않습니다: ");
+            throw new CustomRuntimeException(ExceptionType.USER_STATUS_NOT_FOUND, id);
         }
         return UserStatusResponseDto.from(userStatus);
     }
@@ -60,8 +60,8 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusResponseDto updateUserStatus(UUID id, UserStatusUpdateRequestDto requestDto) {
         UserStatus target = userStatusRepository.findById(id);
         if (Objects.isNull(target)) {
-//            throw new RuntimeException("해당 UserStatus가 존재하지 않습니다: " );
-            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
+            // throw new RuntimeException("해당 UserStatus가 존재하지 않습니다: " );
+            throw new CustomRuntimeException(ExceptionType.USER_STATUS_NOT_FOUND, id);
         }
         if (requestDto.getLastActiveAt() != null) {
             target.setLastActiveAt(requestDto.getLastActiveAt());
@@ -77,8 +77,8 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusResponseDto updateUserStatusByUserId(UUID userId, UserStatusUpdateRequestDto requestDto) {
         UserStatus target = userStatusRepository.findByUserId(userId);
         if (Objects.isNull(target)) {
-//            throw new RuntimeException("해당 User의 UserStatus가 존재하지 않습니다: " );
-            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
+            // throw new RuntimeException("해당 User의 UserStatus가 존재하지 않습니다: " );
+            throw new CustomRuntimeException(ExceptionType.USER_STATUS_NOT_FOUND, userId);
         }
         if (requestDto.getLastActiveAt() != null) {
             target.setLastActiveAt(requestDto.getLastActiveAt());
