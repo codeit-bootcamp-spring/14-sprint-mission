@@ -38,19 +38,23 @@ public class FileMessageRepository extends AbstractFileRepository<Message>
 
     @Override
     public void deleteAllByUserId(UUID userId) {
-        buffer.values().stream()
+        List<UUID> toBeDeleted = buffer.values().stream()
                 .filter(message -> message.getUserId().equals(userId))
                 .map(message -> message.getId())
-                .forEach(toBeDeleted -> deleteById(toBeDeleted));
+                .toList();
+
+        toBeDeleted.forEach(buffer::remove);
         super.writeFromBufferToFile();
     }
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-        buffer.values().stream()
+        List<UUID> idsToDelete = buffer.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .map(message -> message.getId())
-                .forEach(toBeDeleted -> deleteById(toBeDeleted));
+                .toList();
+
+        idsToDelete.forEach(buffer::remove);
         super.writeFromBufferToFile();
     }
 
