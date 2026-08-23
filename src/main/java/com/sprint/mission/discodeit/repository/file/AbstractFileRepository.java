@@ -16,12 +16,20 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
     protected Map<UUID, T> buffer;
 
     protected AbstractFileRepository(File file) {
+        createParentDirectoryIfAbsent(file);
         this.file = file;
         this.buffer = Optional.of(file)
                 .filter(f -> file.exists() && file.length() != 0)
                 .map(f -> readFile())
                 .orElseGet(() -> writeFile(EMPTY_BUFFER));
 //        this.buffer = writeFile(EMPTY_BUFFER); // test를 위해 실행시마다 빈 파일로 초기화
+    }
+
+    private void createParentDirectoryIfAbsent(File file) {
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw new CustomException(ExceptionType.FILE_IO_FAILED);
+        }
     }
 
     @Override
