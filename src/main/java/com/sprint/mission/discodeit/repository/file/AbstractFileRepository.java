@@ -17,11 +17,11 @@ public abstract class AbstractFileRepository<T extends BasicEntity> implements C
 
     protected AbstractFileRepository(File file) {
         this.file = file;
-//        this.buffer = Optional.of(file)
-//                .filter(f -> file.exists() && file.length() != 0)
-//                .map(f -> readFile())
-//                .orElseGet(() -> writeFile(EMPTY_BUFFER));
-        this.buffer = writeFile(EMPTY_BUFFER); // test를 위해 실행시마다 빈 파일로 초기화
+        this.buffer = Optional.of(file)
+                .filter(f -> file.exists() && file.length() != 0)
+                .map(f -> readFile())
+                .orElseGet(() -> writeFile(EMPTY_BUFFER));
+//        this.buffer = writeFile(EMPTY_BUFFER); // test를 위해 실행시마다 빈 파일로 초기화
     }
 
     @Override
