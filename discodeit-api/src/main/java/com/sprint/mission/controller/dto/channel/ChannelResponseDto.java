@@ -2,6 +2,7 @@ package com.sprint.mission.controller.dto.channel;
 
 import com.sprint.mission.domain.Channel;
 import com.sprint.mission.domain.ChannelType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Schema(name = "Channel")
 public class ChannelResponseDto {
     UUID id;
     Instant createdAt;

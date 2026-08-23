@@ -1,6 +1,7 @@
 package com.sprint.mission.controller.dto.userstatus;
 
 import com.sprint.mission.domain.UserStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Schema(name = "UserStatus")
 public class UserStatusResponseDto {
     UUID id;
     Instant createdAt;

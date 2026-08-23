@@ -144,7 +144,7 @@ public class ChannelApplicationServiceImpl implements ChannelApplicationService 
             throw new DiscodeitException(DiscodeitExceptionType.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED, channelId);
         }
 
-        updatingChannel.updateNameAndDescription(request.getName(), request.getDescription());
+        updatingChannel.updateNameAndDescription(request.getNewName(), request.getNewDescription());
         Channel updatedChannel = channelDomainService.update(updatingChannel);
 
         log.info("Channel 수정 완료: channelId={}", updatedChannel.getId());

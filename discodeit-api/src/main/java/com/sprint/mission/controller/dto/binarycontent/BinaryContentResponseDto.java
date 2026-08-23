@@ -1,6 +1,7 @@
 package com.sprint.mission.controller.dto.binarycontent;
 
 import com.sprint.mission.domain.BinaryContent;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Schema(name = "BinaryContent")
 public class BinaryContentResponseDto {
     UUID id;
     Instant createdAt;
