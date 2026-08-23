@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.domain.channel.ChannelType;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record ChannelResponseDto(@NotNull UUID id,
@@ -12,17 +13,25 @@ public record ChannelResponseDto(@NotNull UUID id,
                                  @NotNull Instant updatedAt,
                                  @NotNull ChannelType type,
                                  @NotNull String name,
-                                 @NotNull String description) {
+                                 @NotNull String description,
+                                 @NotNull List<UUID> participantIds,
+                                 @NotNull Instant lastMessageAt) {
 
 
     public static ChannelResponseDto of(Channel channel) {
+        return of(channel, List.of(), channel.getCreatedAt());
+    }
+
+    public static ChannelResponseDto of(Channel channel, List<UUID> participantIds, Instant lastMessageAt) {
         return new ChannelResponseDto(
                 channel.getId(),
                 channel.getCreatedAt(),
                 channel.getUpdatedAt(),
                 channel.getChannelType(),
                 channel.getName(),
-                channel.getDescription()
+                channel.getDescription() == null ? "" : channel.getDescription(),
+                participantIds,
+                lastMessageAt
         );
     }
 }
