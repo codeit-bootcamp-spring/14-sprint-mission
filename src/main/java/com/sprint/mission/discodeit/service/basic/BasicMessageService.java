@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.messagedto.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.messagedto.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.CustomRuntimeException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
@@ -52,7 +53,7 @@ public class BasicMessageService implements MessageService {
         }
 
         Channel channel = channelRepository.findById(requestDto.getChannelId());
-        if (channel.getMemberIds() != null && channel.getMemberIds().contains(requestDto.getSenderId())) {
+        if (channel.getChannelType() == ChannelType.PUBLIC || (channel.getMemberIds() != null && channel.getMemberIds().contains(requestDto.getSenderId()))) {
             Message message = new Message(requestDto.getValues(), requestDto.getChannelId(), requestDto.getSenderId());
             messageRepository.save(message);
 
