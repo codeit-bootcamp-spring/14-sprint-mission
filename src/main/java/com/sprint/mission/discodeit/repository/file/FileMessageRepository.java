@@ -11,6 +11,12 @@ import java.util.*;
 public class FileMessageRepository implements MessageRepository {
     private static final String FILE_NAME = "messages.dat";
 
+    private final Map<UUID, Message> cache;
+
+    public FileMessageRepository() {
+        this.cache = loadData();
+    }
+
     private Map<UUID, Message> loadData() {
         File file = new File(FILE_NAME);
 
@@ -26,29 +32,28 @@ public class FileMessageRepository implements MessageRepository {
 
             return data;
         } catch (IOException | ClassNotFoundException e) {
-            log.error("메시지 데이터 파일 읽기 실패", e);
+            log.error("메시지 데이터 파일 읽기 실패 : " + FILE_NAME);
 
-            throw new RuntimeException(e);
+            throw new RuntimeException("메시지 데이터 파일 읽기 실패 : " + FILE_NAME);
         }
     }
 
-    private void saveData(Map<UUID, Message> data) {
+    private void saveData() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
-            oos.writeObject(data);
+            oos.writeObject(cache);
             log.debug("메시지 데이터 파일 저장 완료 : file={}", FILE_NAME);
         } catch (IOException e) {
-            log.error("메시지 데이터 파일 저장 실패", e);
+            log.error("메시지 데이터 파일 저장 실패 : " + FILE_NAME);
 
-            throw new RuntimeException(e);
+            throw new RuntimeException("메시지 데이터 파일 저장 실패 : " + FILE_NAME);
         }
     }
 
     @Override
     public Message save(Message message) {
-        Map<UUID, Message> data = loadData();
-        data.put(message.getId(), message);
+        cache.put(message.getId(), message);
 
-        saveData(data);
+        saveData();
         log.debug("File 메시지 저장 완료 : id={}", message.getId());
 
         return message;
@@ -56,8 +61,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID id) {
-        Message message = Optional.ofNullable(loadData().get(id))
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메시지입니다."));
+        Message message = cache.get(id);
         log.debug("File 메시지 데이터 조회 : id={}", id);
 
         return message;
@@ -65,7 +69,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findAll() {
-        List<Message> messages = loadData().values()
+        List<Message> messages = cache.values()
                 .stream()
                 .toList();
         log.debug("File 메시지 전체 조회 : count={}", messages.size());
@@ -75,14 +79,11 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void delete(UUID id) {
-        Map<UUID, Message> data = loadData();
+        Message targetMessage = findById(id);
 
-        Message targetMessage = Optional.ofNullable(data.get(id))
-                        .orElseThrow(() -> new IllegalArgumentException("삭제할 메시지가 없습니다."));
+        cache.remove(targetMessage.getId());
 
-        data.remove(targetMessage.getId());
-
-        saveData(data);
+        saveData();
         log.debug("File 메시지 삭제 완료 : id={}", id);
     }
 }

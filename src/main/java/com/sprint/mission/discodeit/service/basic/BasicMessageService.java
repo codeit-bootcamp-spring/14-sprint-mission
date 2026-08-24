@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -27,7 +28,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message findById(UUID id) {
-        Message message = messageRepository.findById(id);
+        Message message = Optional.ofNullable(messageRepository.findById(id))
+                        .orElseThrow(() -> new IllegalArgumentException("존재하진 않는 메시지입니다."));
         log.info("메시지 조회 : id={}", message.getId());
 
         return message;
@@ -55,6 +57,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID id) {
+        Optional.ofNullable(messageRepository.findById(id))
+                        .orElseThrow(() -> new IllegalArgumentException("삭제할 메시지가 없습니다."));
         messageRepository.delete(id);
         log.info("메시지 삭제 완료 : id={}", id);
     }
