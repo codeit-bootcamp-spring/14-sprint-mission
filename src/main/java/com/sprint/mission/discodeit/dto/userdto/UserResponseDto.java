@@ -31,4 +31,17 @@ public class UserResponseDto {
                 userStatus.isOnline()
         );
     }
+    // 게터로 프론트에 필드 쏴주기
+    public String getUsername() {
+        return name;
+    }
+
+    public boolean getOnline() {
+        return isOnline;
+    }
+
+    public UUID getProfileId() {
+        return null;
+    }
+
 }
