@@ -1,38 +1,25 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.time.Instant;
 import java.util.UUID;
 
-/** 사용자가 채널별로 마지막으로 메시지를 읽은 시간. 안 읽은 메시지를 계산하는 데 쓴다. */
-public class ReadStatus extends Common {
-    private static final long serialVersionUID = 1L;
-
-    private final UUID userId;
-    private final UUID channelId;
+@Getter
+public class ReadStatus extends Basic{
+    private UUID userId;
+    private UUID channelId; //각 채널별 읽지않은 메시지를 참조
     private Instant lastReadAt;
 
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        super();
+    public ReadStatus(UUID id, UUID userId, UUID channelId) {
+        super(id);
         this.userId = userId;
         this.channelId = channelId;
-        this.lastReadAt = lastReadAt;
+        this.lastReadAt = Instant.now();
     }
 
-    public UUID getUserId() {
-        return userId;
+    public void readChannel() {
+        this.lastReadAt = Instant.now();
+        super.updatedAt = Instant.now();
     }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public Instant getLastReadAt() {
-        return lastReadAt;
-    }
-
-    public void updateLastReadAt(Instant newLastReadAt) {
-        this.lastReadAt = newLastReadAt;
-        update();
-    }
-
 }

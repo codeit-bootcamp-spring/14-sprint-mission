@@ -1,52 +1,34 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends Common {
-    private static final long serialVersionUID = 1L;
+import lombok.Getter;
 
-    private ChannelType type;
-    private String channelName;
-    private String description;
+import java.time.Instant;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-    public Channel(ChannelType type, String channelName, String description) {
-        super();
-        this.type = type;
+@Getter
+public class Channel extends Basic {
+
+    private String channelName; //채널명
+    private String description; //채널설명
+    private ChannelType type; //공개, 비공개 채널
+
+
+    private Channel(UUID id, String channelName, String description, ChannelType type) {
+        super(id);
         this.channelName = channelName;
         this.description = description;
+        this.type = type;
     }
 
-    public ChannelType getType() {
-        return type;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * type은 뺐다. PUBLIC/PRIVATE 전환은 참여자 유무 자체가 바뀌는 셈이라 의미가 깨진다.
-     * null인 항목은 바꾸지 않는다 — User.update()와 같은 규칙.
-     */
-    public void update(String newChannelName, String newDescription) {
-        boolean anyValueUpdated = false;
-        if (newChannelName != null && !newChannelName.equals(this.channelName)) {
-            this.channelName = newChannelName;
-            anyValueUpdated = true;
+    public void update(String title) {
+        if (title != null) {
+            this.channelName = title;
         }
-        if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            update();
-        }
+        super.updatedAt = Instant.now();
     }
 
-    public String toString() {
-        return String.format("채널종류: %s, 채널이름: %s, 설명: %s", type, channelName, description);
+    public static Channel create(UUID id, String channelName, String description, ChannelType type) {
+        return new Channel(id, channelName, description, type);
     }
-
 }
