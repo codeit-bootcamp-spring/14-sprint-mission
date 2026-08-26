@@ -1,67 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.time.Instant;
 import java.util.UUID;
 
-public class User extends Common {
-    private static final long serialVersionUID = 2L;
-
-    private String username;
-    private String email;
+@Getter
+public class User extends Basic {
+    private String name;
     private String password;
-    /** 프로필 이미지(BinaryContent)의 id. 없을 수 있다. */
-    private UUID profileId;
+    private String email;
+    private UUID profileId; //프로필사진 없어도 됨.
 
-    public User(String username, String email, String password, UUID profileId) {
-        super();
-        this.username = username;
-        this.email = email;
+    public User(UUID id, String name, String password, String email) {
+        super(id);
+        this.name = name;
         this.password = password;
-        this.profileId = profileId;
+        this.email = email;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public UUID getProfileId() {
-        return profileId;
-    }
-
-    /** null인 항목은 바꾸지 않는다. 바뀐 값이 하나도 없으면 updatedAt도 건드리지 않는다. */
-    public void update(String newUsername, String newEmail, String newPassword) {
-        boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
-            anyValueUpdated = true;
+    public void update(String name, String password, String email) {
+        if(name != null) {
+            this.name = name;
         }
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
-            anyValueUpdated = true;
+        if (password != null) {
+            this.password = password;
         }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
-            anyValueUpdated = true;
+        if (email != null) {
+            this.email = email;
         }
-        if (anyValueUpdated) {
-            update();
-        }
+        super.updatedAt = Instant.now();
     }
 
-    public void updateProfileId(UUID newProfileId) {
-        this.profileId = newProfileId;
-        update();
+    public void changeProfile(UUID profileId) {
+        this.profileId = profileId; // null이면 프로필 제거
+        this.updatedAt = Instant.now();
     }
 
     public String toString() {
-        return String.format("유저이름: %s, 이메일: %s", username, email);
+        return String.format("아이디: %s, 생성일: %s, 수정일: %s, 이름: %s, 비밀번호: %s, 이메일: %s", super.id, super.createdAt, this.updatedAt, this.name, this.password, this.email);
     }
-
 }
