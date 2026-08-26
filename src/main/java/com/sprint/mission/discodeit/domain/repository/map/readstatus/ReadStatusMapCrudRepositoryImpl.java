@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.repository.map.AbstractMapCrudRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
@@ -37,5 +38,17 @@ public class ReadStatusMapCrudRepositoryImpl extends AbstractMapCrudRepository<R
         for (ReadStatus filteredReadStatus : filteredReadStatuses) {
             super.deleteEntity(filteredReadStatus.getId());
         }
+    }
+
+    @Override
+    public Optional<ReadStatus> findReadStatusByUserIdAndChannelId(UUID userId, UUID channelId) {
+        List<ReadStatus> readStatuses = super.findAllEntity();
+        return readStatuses.stream()
+            .filter(readStatus -> isExistReadStatus(userId,channelId,readStatus))
+            .findFirst();
+    }
+
+    private boolean isExistReadStatus(UUID userId, UUID channelId, ReadStatus readStatus){
+        return readStatus.getUserId().equals(userId) && readStatus.getChannelId().equals(channelId);
     }
 }

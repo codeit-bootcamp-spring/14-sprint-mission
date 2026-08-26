@@ -11,11 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreateRequestDTO {
     String email;
-    String userPassword;
-    String checkPassword;
-    String name;
-    Integer age;
-
-    //파일 이미지
-    MultipartFile profileImage;
+    String password;
+    //String checkPassword;2af6e1d3-2df8-4cb7-860f-7055558e5022 // 04654c65-c179-4db8-bf99-8458daa42f72
+    String username;
 }

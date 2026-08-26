@@ -5,12 +5,14 @@ import com.sprint.mission.discodeit.domain.entity.Message;
 import com.sprint.mission.discodeit.domain.service.binarycontent.BinaryContentService;
 import com.sprint.mission.discodeit.domain.service.message.MessageService;
 import com.sprint.mission.discodeit.domain.service.user.UserService;
-import com.sprint.mission.discodeit.web.controller.dto.req.CreateMessageRequestDTO;
+import com.sprint.mission.discodeit.web.controller.dto.req.MessageCreateRequestDTO;
+import com.sprint.mission.discodeit.web.controller.dto.res.MessageResponseDTO;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -20,9 +22,9 @@ public class MessageServiceApp {
     private final UserService userService;
 
 
-    public Message createMessage(UUID channelId, CreateMessageRequestDTO createMessageRequestDTO){
-        userService.findById(createMessageRequestDTO.getUserId());
-        Message message = Message.init(createMessageRequestDTO.getUserId(),channelId, createMessageRequestDTO.getContent());
+    public MessageResponseDTO createMessage(MessageCreateRequestDTO messageCreateRequestDTO, List<MultipartFile> files){
+        userService.findUserById(messageCreateRequestDTO.getAuthorId());
+        Message message = Message.init(messageCreateRequestDTO.getAuthorId(), messageCreateRequestDTO.getChannelId(), messageCreateRequestDTO.getContent());
 
         /*
             1. dto 에 파일이 들어있는지 확인
@@ -32,15 +34,24 @@ public class MessageServiceApp {
 
         List<BinaryContent> storedBinaryContents;
         List<UUID> filteredBinaryContents = null;
-        if(Objects.nonNull(createMessageRequestDTO.getImageList())){
-            storedBinaryContents = binaryContentService.storeFiles(createMessageRequestDTO.getImageList());
-            //서비스 필요형태로 변환
+        if(Objects.nonNull(files) && !files.isEmpty()){
+            storedBinaryContents = binaryContentService.storeFiles(files);
+
             filteredBinaryContents = storedBinaryContents.stream()
                 .map(BinaryContent::getId)
                 .toList();
         }
 
-        return messageService.createMessage(message, filteredBinaryContents);
+//        if(Objects.nonNull(messageCreateRequestDTO.getImageList())){
+//            storedBinaryContents = binaryContentService.storeFiles(messageCreateRequestDTO.getImageList());
+//            //서비스 필요형태로 변환
+//            filteredBinaryContents = storedBinaryContents.stream()
+//                .map(BinaryContent::getId)
+//                .toList();
+//        }
+
+        Message createdMessage = messageService.createMessage(message, filteredBinaryContents);
+        return MessageResponseDTO.from(createdMessage);
     }
 
 

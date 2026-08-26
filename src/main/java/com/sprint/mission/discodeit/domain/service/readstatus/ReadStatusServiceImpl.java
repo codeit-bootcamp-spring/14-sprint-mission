@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.global.exception.CustomErrorCode;
 import com.sprint.mission.discodeit.global.exception.CustomException;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,12 @@ public class ReadStatusServiceImpl implements ReadStatusService{
 
     @Override
     public ReadStatus createReadStatus(ReadStatus readStatus) {
+        // 동일 필드 방지 검증
+        if(validCreatable(readStatus.getUserId(), readStatus.getChannelId())){
+            return readStatusRepository.saveEntity(readStatus);
+        }
 
-        return readStatusRepository.saveEntity(readStatus);
+        throw new CustomException(CustomErrorCode.READ_STATUS_DUPLICATE);
     }
 
     @Override
@@ -55,11 +60,16 @@ public class ReadStatusServiceImpl implements ReadStatusService{
     }
 
     @Override
-    public ReadStatus updateReadStatusReadTime(UUID readStatusId) {
+    public ReadStatus updateReadStatusReadTime(UUID readStatusId, Instant updateTime) {
 
         ReadStatus readStatus = this.findReadStatusById(readStatusId);
-        readStatus.updateReadTime();
+        readStatus.updateReadTime(updateTime);
 
         return readStatusRepository.saveEntity(readStatus);
+    }
+
+    private boolean validCreatable(UUID userId, UUID channelId){
+        return readStatusRepository.findReadStatusByUserIdAndChannelId(userId, channelId)
+            .isEmpty();
     }
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.web.controller.auth;
 import com.sprint.mission.discodeit.domain.entity.User;
 import com.sprint.mission.discodeit.domain.service.application.UserServiceApp;
 import com.sprint.mission.discodeit.web.controller.dto.req.UserLoginRequestDTO;
+import com.sprint.mission.discodeit.web.controller.dto.res.UserResponseDTO;
 import com.sprint.mission.discodeit.web.controller.session.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -15,18 +16,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RestController
 public class AuthController {
     private final UserServiceApp userServiceApp;
 
-    @PostMapping
-    public ResponseEntity<Void> login(@RequestBody UserLoginRequestDTO userLoginRequestDTO, HttpServletRequest request){
-        User user = userServiceApp.login(userLoginRequestDTO);
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginRequestDTO userLoginRequestDTO, HttpServletRequest request){
+        UserResponseDTO response = userServiceApp.login(userLoginRequestDTO);
 
-        HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.LOGIN_USER, user.getId());
+//        HttpSession session = request.getSession();
+//        session.setAttribute(SessionConst.LOGIN_USER, user.getId());
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(response);
     }
 }

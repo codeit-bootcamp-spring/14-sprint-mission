@@ -32,7 +32,6 @@ public class User implements Serializable, IdMapper {
     String email;
     String userPassword;
     String name;
-    Integer age;
 
     @Builder.Default
     UUID profileId = null;      //todo : 추후 수정
@@ -42,13 +41,20 @@ public class User implements Serializable, IdMapper {
     Instant updatedAt = Instant.now();
 
 
-    public static User init(String email, String userPassword, String name, Integer age){
+    public static User init(String email, String userPassword, String name){
         return User.builder().
-            email(email).userPassword(userPassword).name(name).age(age).build();
+            email(email).userPassword(userPassword).name(name).build();
     }
 
     public void updateName(String name){
         this.name = name;
+        updatedAt = Instant.now();
+    }
+
+    public void updateAllField(String name, String email, String password){
+        this.name = name;
+        this.email = email;
+        this.userPassword = password;
         updatedAt = Instant.now();
     }
 

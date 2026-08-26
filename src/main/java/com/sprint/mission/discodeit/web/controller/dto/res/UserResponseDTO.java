@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.web.controller.dto.res;
 
 import com.sprint.mission.discodeit.domain.entity.User;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record UserResponseDTO(

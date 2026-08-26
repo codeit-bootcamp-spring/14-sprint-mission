@@ -29,13 +29,10 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
     @Override
-    public Channel updateChannelName(UUID channelId, String updateName) {
-
-        //채널 조회 검증
+    public Channel updateChannel(UUID channelId, String updateName, String description) {
         Channel channel = this.findChannelById(channelId);
 
-        channel.validUpdatable();
-        channel.updateChannelName(updateName);
+        channel.updateChannelNameDescription(updateName, description);
 
         return channelRepository.saveEntity(channel);
     }

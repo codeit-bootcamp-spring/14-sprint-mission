@@ -12,7 +12,7 @@ public record UserUpdateResponseDTO(
         String email,
         UUID profileId
     ) {
-    public static UserUpdateResponseDTO of(User user) {
+    public static UserUpdateResponseDTO from(User user) {
         return new UserUpdateResponseDTO(
             user.getId(),
             user.getCreatedAt(),

@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageUpdateRequestDTO {
-    String content;
+    String newContent;
 }

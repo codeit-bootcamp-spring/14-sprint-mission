@@ -9,11 +9,12 @@ import com.sprint.mission.discodeit.domain.service.channel.ChannelService;
 import com.sprint.mission.discodeit.domain.service.message.MessageService;
 import com.sprint.mission.discodeit.domain.service.readstatus.ReadStatusService;
 import com.sprint.mission.discodeit.domain.service.user.UserService;
-import com.sprint.mission.discodeit.web.controller.dto.req.ChannelCreateRequestDTO;
-import com.sprint.mission.discodeit.web.controller.dto.req.PrivateChannelCreateRequestDTO;
+import com.sprint.mission.discodeit.web.controller.dto.req.ChannelPublicCreateRequestDTO;
+import com.sprint.mission.discodeit.web.controller.dto.req.ChannelPrivateCreateRequestDTO;
 import com.sprint.mission.discodeit.web.controller.dto.res.ChannelFindResponseDTO;
 import com.sprint.mission.discodeit.global.exception.CustomErrorCode;
 import com.sprint.mission.discodeit.global.exception.CustomException;
+import com.sprint.mission.discodeit.web.controller.dto.res.ChannelResponseDTO;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+/*
 
+ */
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,16 +39,18 @@ public class ChannelServiceApp {
     private final UserService userService;
 
     //퍼블릭 채널 저장
-    public Channel makePublicChannel(ChannelCreateRequestDTO channelCreateRequestDTO) {
-        Channel channel = Channel.init(channelCreateRequestDTO.getChannelName(), ChannelType.PUBLIC_CHANNEL);
+    public ChannelResponseDTO makePublicChannel(ChannelPublicCreateRequestDTO channelPublicCreateRequestDTO) {
+        Channel channel = Channel.init(channelPublicCreateRequestDTO.name(), ChannelType.PUBLIC_CHANNEL, channelPublicCreateRequestDTO.description());
+        channelService.makeChannel(channel);
 
-        return channelService.makeChannel(channel);
+        return ChannelResponseDTO.from(channel);
     }
 
     //프라이빗 채널 저장
-    public Channel makePrivateChannel(
-        PrivateChannelCreateRequestDTO privateChannelCreateRequestDTO) {
-        Channel channel = Channel.init(privateChannelCreateRequestDTO.getChannelName(), ChannelType.PRIVATE_CHANNEL);
+    public ChannelResponseDTO makePrivateChannel(
+        ChannelPrivateCreateRequestDTO channelPrivateCreateRequestDTO) {
+        // todo : api 규격에 맞추다보니 이상해짐... 오버로딩으로 빼야할듯
+        Channel channel = Channel.init(null, ChannelType.PRIVATE_CHANNEL, null);
 
         /*
             1. 채널저장
@@ -55,7 +60,7 @@ public class ChannelServiceApp {
         Channel madeChannel = channelService.makeChannel(channel);
 
 
-        List<UUID> userIdList = privateChannelCreateRequestDTO.getUserList();
+        List<UUID> userIdList = channelPrivateCreateRequestDTO.participantIds();
         /*
             이 검증을 유저 도메인 서비스 안에 두면 도메인 서비스가 요구사항에 종속되는 것이라 느껴져 앱서비스에서 예외처리를 하도록함
          */
@@ -63,8 +68,9 @@ public class ChannelServiceApp {
         if(!userService.existAllByIdList(userIdList)){
             throw new CustomException(CustomErrorCode.USER_NOT_FOUND);
         }
+        // todo : 뭐지? fix 해야함  --------- ReadStatus 여기서 생성하는게 맞나? 지금 일단 여기서 now 로 생성하게 임시조치
         List<ReadStatus> readStatuses = userIdList.stream()
-            .map(userId -> ReadStatus.init(userId, madeChannel.getId())
+            .map(userId -> ReadStatus.init(userId, madeChannel.getId(), Instant.now())
             )
             .toList();
 
@@ -72,7 +78,7 @@ public class ChannelServiceApp {
             readStatusService.createReadStatus(readStatus);
         }
 
-        return madeChannel;
+        return ChannelResponseDTO.from(madeChannel);
     }
 
     //특정 채널을 조회하고 싶을 때
@@ -113,8 +119,8 @@ public class ChannelServiceApp {
         channelService.deleteChannel(channelId);
     }
 
-    public List<Channel> findAllChannelByUserId(UUID userId){
-        userService.findById(userId);
+    public List<ChannelResponseDTO> findAllChannelByUserId(UUID userId){
+        userService.findUserById(userId);
         List<ReadStatus> readStatusList = readStatusService.findReadStatusByUserId(userId);
 
         List<UUID> joinedChannelIds = readStatusList.stream()
@@ -124,8 +130,12 @@ public class ChannelServiceApp {
         List<Channel> allPublicChannel = channelService.findAllPublicChannel();
         List<Channel> allJoinedPrivateChannel = channelService.findAllChannelByIds(joinedChannelIds);
 
-        return Stream.of(allPublicChannel, allJoinedPrivateChannel)
+        List<Channel> accessibleChannels = Stream.of(allPublicChannel, allJoinedPrivateChannel)
             .flatMap(List::stream)
             .collect(Collectors.toList());
+
+        return accessibleChannels.stream()
+            .map(ChannelResponseDTO::from)
+            .toList();
     }
 }

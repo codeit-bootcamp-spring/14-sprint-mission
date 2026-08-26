@@ -41,6 +41,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
         }
 
         UUID userId = (UUID)session.getAttribute(SessionConst.LOGIN_USER);
-        return userService.findById(userId);
+        return userService.findUserById(userId);
     }
 }
