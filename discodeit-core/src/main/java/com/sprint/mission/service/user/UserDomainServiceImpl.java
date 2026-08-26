@@ -2,7 +2,7 @@ package com.sprint.mission.service.user;
 
 import com.sprint.mission.domain.User;
 import com.sprint.mission.exception.DiscodeitException;
-import com.sprint.mission.exception.ExceptionType;
+import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,10 +26,10 @@ public class UserDomainServiceImpl implements UserDomainService {
     @Override
     public void validateUnique(String username, String email) {
         if (userRepository.existsByUsername(username)) {
-            throw new DiscodeitException(ExceptionType.USER_USERNAME_EXISTS);
+            throw new DiscodeitException(DiscodeitExceptionType.USER_USERNAME_EXISTS);
         }
         if (userRepository.existsByEmail(email)) {
-            throw new DiscodeitException(ExceptionType.USER_EMAIL_EXISTS);
+            throw new DiscodeitException(DiscodeitExceptionType.USER_EMAIL_EXISTS);
         }
     }
 
@@ -43,11 +43,11 @@ public class UserDomainServiceImpl implements UserDomainService {
     @Override
     public User findById(UUID userId) {
         if (Objects.isNull(userId)) {
-            throw new DiscodeitException(ExceptionType.USER_ID_IS_NULL);
+            throw new DiscodeitException(DiscodeitExceptionType.USER_ID_IS_NULL);
         }
 
         return userRepository.findById(userId)
-                .orElseThrow(() -> new DiscodeitException(ExceptionType.USER_NOT_FOUND, userId));
+                .orElseThrow(() -> new DiscodeitException(DiscodeitExceptionType.USER_NOT_FOUND, userId));
     }
 
     @Override
@@ -81,10 +81,10 @@ public class UserDomainServiceImpl implements UserDomainService {
         );
 
         if (usernameChanged && userRepository.existsByUsername(username)) {
-            throw new DiscodeitException(ExceptionType.USER_USERNAME_EXISTS);
+            throw new DiscodeitException(DiscodeitExceptionType.USER_USERNAME_EXISTS);
         }
         if (emailChanged && userRepository.existsByEmail(email)) {
-            throw new DiscodeitException(ExceptionType.USER_EMAIL_EXISTS);
+            throw new DiscodeitException(DiscodeitExceptionType.USER_EMAIL_EXISTS);
         }
     }
 

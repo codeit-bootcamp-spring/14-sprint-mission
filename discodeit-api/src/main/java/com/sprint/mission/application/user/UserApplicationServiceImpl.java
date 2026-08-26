@@ -1,45 +1,47 @@
 package com.sprint.mission.application.user;
 
+import com.sprint.mission.controller.dto.user.UserCreateRequest;
+import com.sprint.mission.controller.dto.user.UserDto;
+import com.sprint.mission.controller.dto.user.UserResponseDto;
+import com.sprint.mission.controller.dto.user.UserUpdateRequest;
+import com.sprint.mission.controller.dto.userstatus.UserStatusResponseDto;
+import com.sprint.mission.controller.dto.userstatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.domain.*;
-import com.sprint.mission.dto.user.UserUpsertRequestDto;
-import com.sprint.mission.dto.user.UserResponseDto;
+import com.sprint.mission.multipart.MultipartFileConverter;
+import com.sprint.mission.multipart.MultipartFileDto;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
-import com.sprint.mission.service.channel.ChannelDomainService;
-import com.sprint.mission.service.readstatus.ReadStatusDomainService;
 import com.sprint.mission.service.user.UserDomainService;
 import com.sprint.mission.service.userstatus.UserStatusDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class UserApplicationServiceImpl implements UserApplicationService {
 
     private final UserDomainService userDomainService;
     private final BinaryContentDomainService binaryContentDomainService;
     private final UserStatusDomainService userStatusDomainService;
-    private final ChannelDomainService channelDomainService;
-    private final ReadStatusDomainService readStatusDomainService;
+    private final MultipartFileConverter multipartFileConverter;
 
 
     @Override
     public UserResponseDto create(
-            UserUpsertRequestDto userCreateRequest,
+            UserCreateRequest userCreateRequest,
             MultipartFile profileImageRequest
     ) {
         // generate binary content
-        BinaryContent createdProfileImage = (Objects.nonNull(profileImageRequest))
-                ? binaryContentDomainService.create(
-                    BinaryContent.create(profileImageRequest)
-                  )
-                : null;
+        BinaryContent createdProfileImage = null;
 
-        if (Objects.nonNull(createdProfileImage)) {
+        if (Objects.nonNull(profileImageRequest)) {
+            createdProfileImage = createBinaryContent(profileImageRequest);
             log.info(
                     "새 프로필 저장 완료: newProfileId={}",
                     createdProfileImage.getId()
@@ -53,7 +55,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 Objects.isNull(createdProfileImage) ? "No Pfp" : createdProfileImage.getId()
         );
 
-        // create user
+        // user 생성
         User createdUser = userDomainService.create(User.create(
                 userCreateRequest.getUsername(),
                 userCreateRequest.getEmail(),
@@ -61,18 +63,8 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 (Objects.nonNull(createdProfileImage)) ? createdProfileImage.getId() : null
         ));
 
-        // create user status to track last read time
-        UserStatus createdUserStatus = userStatusDomainService.create(
-                UserStatus.create(createdUser.getId())
-        );
-
-        // create read status for all public channels
-        List<ReadStatus> readStatuses = channelDomainService.findAll()
-                .stream()
-                .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC)
-                .map(channel -> ReadStatus.create(createdUser.getId(), channel.getId()))
-                .toList();
-        readStatusDomainService.createAll(readStatuses);
+        // user의 user status 생성
+        userStatusDomainService.create(UserStatus.create(createdUser.getId()));
 
         log.info(
                 "User 생성 완료: userId={}, profileId={}",
@@ -80,7 +72,19 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 createdUser.getProfileId()
         );
 
-        return UserResponseDto.from(createdUser, createdUserStatus);
+        return UserResponseDto.from(createdUser);
+    }
+
+    private BinaryContent createBinaryContent(MultipartFile profileImageRequest) {
+        MultipartFileDto converted = multipartFileConverter.convert(profileImageRequest);
+
+        BinaryContent binaryContent = BinaryContent.create(
+                converted.getFileName(),
+                converted.getContentType(),
+                converted.getBytes()
+        );
+
+        return binaryContentDomainService.create(binaryContent);
     }
 
     @Override
@@ -88,16 +92,14 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         log.debug("User 단일 조회: userId={}", userId);
 
         User user = userDomainService.findById(userId);
-        UserStatus userStatus = userStatusDomainService.findByUserId(userId);
-
-        return UserResponseDto.from(user, userStatus);
+        return UserResponseDto.from(user);
     }
 
     @Override
-    public List<UserResponseDto> findAll() {
+    public List<UserDto> findAll() {
         List<User> users = userDomainService.findAll();
         List<UserStatus> userStatuses = userStatusDomainService.findAll();
-        List<UserResponseDto> userResponses = toUserResponseDtoList(users, userStatuses);
+        List<UserDto> userResponses = toUserResponseDtoList(users, userStatuses);
 
         log.debug("User 다건 조회: size={}", userResponses.size());
 
@@ -107,7 +109,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     @Override
     public UserResponseDto update(
             UUID userId,
-            UserUpsertRequestDto userUpdateRequest,
+            UserUpdateRequest userUpdateRequest,
             MultipartFile profileImage
     ) {
         User updatingUser = userDomainService.findById(userId);
@@ -120,15 +122,10 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 Objects.nonNull(profileImage) ? "YES" : "N/A"
         );
 
-        BinaryContent createdProfileImage = (Objects.nonNull(profileImage))
-                ? binaryContentDomainService.create(
-                        BinaryContent.create(
-                                profileImage
-                        )
-                )
-                : null;
-
-        if (Objects.nonNull(createdProfileImage)) {
+        // 프로필 사진 있으면 생성
+        BinaryContent createdProfileImage = null;
+        if (Objects.nonNull(profileImage)) {
+            createdProfileImage = createBinaryContent(profileImage);
             log.info(
                     "새 프로필 저장 완료: userId={}, newProfileId={}",
                     userId,
@@ -137,9 +134,9 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         }
 
         updatingUser.updateAccountDetails(
-                userUpdateRequest.getUsername(),
-                userUpdateRequest.getEmail(),
-                userUpdateRequest.getPassword(),
+                userUpdateRequest.getNewUsername(),
+                userUpdateRequest.getNewEmail(),
+                userUpdateRequest.getNewPassword(),
                 (Objects.isNull(createdProfileImage)
                         ? oldProfileId
                         : createdProfileImage.getId()
@@ -162,27 +159,28 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 updatedUser.getProfileId()
         );
 
-        return UserResponseDto.from(updatedUser, userStatus);
+        return UserResponseDto.from(updatedUser);
     }
 
     @Override
-    public UserResponseDto activateUser(UUID userId) {
-        log.info("User 활성화 시작: userId={}", userId);
+    public UserStatusResponseDto updateUserStatusByUserId(
+            UUID userId,
+            UserStatusUpdateRequestDto request
+    ) {
+        log.info("User 업데이트 시작: userId={}", userId);
 
-        User user = userDomainService.findById(userId);
-        UserStatus activatingUserStatus = userStatusDomainService.findByUserId(userId);
-
-        activatingUserStatus.refreshLastActiveAt();
-
-        UserStatus activatedUserStatus = userStatusDomainService.update(activatingUserStatus);
+        userDomainService.findById(userId);
+        UserStatus updatingUserStatus = userStatusDomainService.findByUserId(userId);
+        updatingUserStatus.updateLastActiveAt(request.getNewLastActiveAt());
+        UserStatus updatedUserStatus = userStatusDomainService.update(updatingUserStatus);
 
         log.info(
-                "User 활성화 완료: userId={}, lastActiveAt={}",
+                "UserStatus 업데이트 완료: userId={}, lastActiveAt={}",
                 userId,
-                activatedUserStatus.getLastActiveAt()
+                updatedUserStatus.getLastActiveAt()
         );
 
-        return UserResponseDto.from(user, activatedUserStatus);
+        return UserStatusResponseDto.from(updatedUserStatus);
     }
 
     @Override
@@ -213,7 +211,8 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     }
 
 
-    private List<UserResponseDto> toUserResponseDtoList(
+    // 사용자와 그 사용자의 status까지 같이 반환
+    private List<UserDto> toUserResponseDtoList(
             List<User> users,
             List<UserStatus> userStatuses
     ) {
@@ -224,7 +223,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
         }
 
         // construct UserResponseDto
-        List<UserResponseDto> userResponses = new ArrayList<>();
+        List<UserDto> userResponses = new ArrayList<>();
         for (User user : users) {
             UserStatus userStatus = userStatusMap.get(user.getId());
             if (Objects.isNull(userStatus)) {
@@ -235,7 +234,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 );
             }
 
-            userResponses.add(UserResponseDto.from(user, userStatus));
+            userResponses.add(UserDto.from(user, userStatus));
         }
         return userResponses;
     }

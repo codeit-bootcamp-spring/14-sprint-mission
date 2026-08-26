@@ -9,7 +9,7 @@ public class DiscodeitException extends RuntimeException {
 
     public DiscodeitException(
             ExceptionType type,
-            Object... errorData     // 가변 인자: 0-n개 처리할 수 있다
+            Object... errorData
     ) {
         super(type.formatLogMessage(errorData));
         this.type = type;
@@ -23,5 +23,4 @@ public class DiscodeitException extends RuntimeException {
         super(type.formatLogMessage(errorData), cause);
         this.type = type;
     }
-
 }

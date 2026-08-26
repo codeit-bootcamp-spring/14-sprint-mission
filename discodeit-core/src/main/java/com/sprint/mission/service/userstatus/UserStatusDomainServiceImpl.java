@@ -2,7 +2,7 @@ package com.sprint.mission.service.userstatus;
 
 import com.sprint.mission.domain.UserStatus;
 import com.sprint.mission.exception.DiscodeitException;
-import com.sprint.mission.exception.ExceptionType;
+import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class UserStatusDomainServiceImpl implements UserStatusDomainService {
         // 이미 해당 id를 가진 user의 userStatus 객체가 존재함
         if (userStatusRepository.findByUserId(userStatus.getUserId()).isPresent()) {
             throw new DiscodeitException(
-                    ExceptionType.USER_STATUS_ALREADY_EXISTS,
+                    DiscodeitExceptionType.USER_STATUS_ALREADY_EXISTS,
                     userStatus.getUserId()
             );
         }
@@ -40,13 +40,13 @@ public class UserStatusDomainServiceImpl implements UserStatusDomainService {
     @Override
     public UserStatus findById(UUID userStatusId) {
         if (Objects.isNull(userStatusId)) {
-            throw new DiscodeitException(ExceptionType.USER_STATUS_ID_IS_NULL);
+            throw new DiscodeitException(DiscodeitExceptionType.USER_STATUS_ID_IS_NULL);
         }
 
         return userStatusRepository.findById(userStatusId)
                 .orElseThrow(() ->
                         new DiscodeitException(
-                                ExceptionType.USER_STATUS_NOT_FOUND,
+                                DiscodeitExceptionType.USER_STATUS_NOT_FOUND,
                                 userStatusId
                         )
                 );
@@ -55,13 +55,13 @@ public class UserStatusDomainServiceImpl implements UserStatusDomainService {
     @Override
     public UserStatus findByUserId(UUID userId) {
         if (Objects.isNull(userId)) {
-            throw new DiscodeitException(ExceptionType.USER_ID_IS_NULL);
+            throw new DiscodeitException(DiscodeitExceptionType.USER_ID_IS_NULL);
         }
 
         return userStatusRepository.findByUserId(userId)
                 .orElseThrow(() ->
                         new DiscodeitException(
-                                ExceptionType.USER_STATUS_NOT_FOUND,
+                                DiscodeitExceptionType.USER_STATUS_NOT_FOUND,
                                 userId
                         )
                 );

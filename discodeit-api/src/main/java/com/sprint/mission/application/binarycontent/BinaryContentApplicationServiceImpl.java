@@ -1,11 +1,14 @@
 package com.sprint.mission.application.binarycontent;
 
 import com.sprint.mission.domain.BinaryContent;
-import com.sprint.mission.dto.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.controller.dto.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.multipart.MultipartFileConverter;
+import com.sprint.mission.multipart.MultipartFileDto;
 import com.sprint.mission.service.binarycontent.BinaryContentDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -13,14 +16,22 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Validated
 @RequiredArgsConstructor
 public class BinaryContentApplicationServiceImpl implements BinaryContentApplicationService {
 
     private final BinaryContentDomainService binaryContentDomainService;
+    private final MultipartFileConverter multipartFileConverter;
 
     @Override
     public BinaryContentResponseDto create(MultipartFile multipartFile) {
-        BinaryContent binaryContent = BinaryContent.create(multipartFile);
+        MultipartFileDto sanitizedMultipartData = multipartFileConverter.convert(multipartFile);
+
+        BinaryContent binaryContent = BinaryContent.create(
+                sanitizedMultipartData.getFileName(),
+                sanitizedMultipartData.getContentType(),
+                sanitizedMultipartData.getBytes()
+        );
 
         BinaryContent createdBinaryContent = binaryContentDomainService.create(binaryContent);
 

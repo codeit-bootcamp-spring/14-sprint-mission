@@ -2,7 +2,7 @@ package com.sprint.mission.service.message;
 
 import com.sprint.mission.domain.Message;
 import com.sprint.mission.exception.DiscodeitException;
-import com.sprint.mission.exception.ExceptionType;
+import com.sprint.mission.exception.DiscodeitExceptionType;
 import com.sprint.mission.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,13 +32,13 @@ public class MessageDomainServiceImpl implements MessageDomainService {
     @Override
     public Message findById(UUID messageId) {
         if (Objects.isNull(messageId)) {
-            throw new DiscodeitException(ExceptionType.MESSAGE_ID_IS_NULL);
+            throw new DiscodeitException(DiscodeitExceptionType.MESSAGE_ID_IS_NULL);
         }
 
         return messageRepository.findById(messageId)
                 .orElseThrow(() ->
                         new DiscodeitException(
-                                ExceptionType.MESSAGE_NOT_FOUND,
+                                DiscodeitExceptionType.MESSAGE_NOT_FOUND,
                                 messageId
                         )
                 );
