@@ -4,12 +4,17 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ReadStatusUpdateResponseDto(
-        UUID channelId,
+        UUID id,
+        Instant createdAt,
+        Instant updatedAt,
         UUID userId,
-        Instant lastReadTime
+        UUID channelId,
+        Instant lastReadAt
 ) {
 
-    public static ReadStatusUpdateResponseDto from(UUID channelId, UUID userId, Instant lastReadTime){
-        return new ReadStatusUpdateResponseDto(channelId, userId, lastReadTime);
+    public static ReadStatusUpdateResponseDto from(UUID id, Instant createdAt, Instant updatedAt,
+                                                   UUID userId, UUID channelId, Instant lastReadAt){
+        return new ReadStatusUpdateResponseDto(id, createdAt, updatedAt, userId, channelId, lastReadAt);
+
     }
 }

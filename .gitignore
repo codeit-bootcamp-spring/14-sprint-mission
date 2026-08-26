@@ -43,6 +43,4 @@ out/
 build/
 out/
 *.ser
-user/
-channel/
-message/
+.discodeit/

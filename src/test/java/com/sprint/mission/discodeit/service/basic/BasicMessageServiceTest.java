@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.user.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.message.application.MessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,15 +47,15 @@ class BasicMessageServiceTest {
         UUID channelB = UUID.randomUUID();
         UUID author = UUID.randomUUID();
 
-        messageService.create(new MessageCreateRequestDto(List.of(), "첫 번째", channelA, author));
-        messageService.create(new MessageCreateRequestDto(List.of(), "두 번째", channelA, author));
-        messageService.create(new MessageCreateRequestDto(List.of(), "다른 채널", channelB, author));
+        messageService.create(new MessageCreateRequestDto(List.of(), "첫 번째", channelA, author), null);
+        messageService.create(new MessageCreateRequestDto(List.of(), "두 번째", channelA, author), null);
+        messageService.create(new MessageCreateRequestDto(List.of(), "다른 채널", channelB, author), null);
 
         List<MessageResponseDto> found = messageService.findAllByChannelId(channelA);
 
         assertEquals(2, found.size());
-        assertTrue(found.stream().anyMatch(m -> m.message().equals("첫 번째")));
-        assertTrue(found.stream().anyMatch(m -> m.message().equals("두 번째")));
+        assertTrue(found.stream().anyMatch(m -> m.content().equals("첫 번째")));
+        assertTrue(found.stream().anyMatch(m -> m.content().equals("두 번째")));
     }
 
     @Test
@@ -62,12 +63,12 @@ class BasicMessageServiceTest {
         UUID channelId = UUID.randomUUID();
         UUID author = UUID.randomUUID();
 
-        messageService.create(new MessageCreateRequestDto(List.of(), "안녕하세요", channelId, author));
+        messageService.create(new MessageCreateRequestDto(List.of(), "안녕하세요", channelId, author), null);
         MessageResponseDto response = messageService.findAllByChannelId(channelId).stream().findFirst().orElseThrow();
 
         MessageResponseDto found = messageService.find(response.id());
 
-        assertEquals("안녕하세요", found.message());
+        assertEquals("안녕하세요", found.content());
         assertEquals(channelId, found.channelId());
         assertEquals(author, found.userId());
     }
@@ -82,15 +83,14 @@ class BasicMessageServiceTest {
         UUID channelId = UUID.randomUUID();
         UUID author = UUID.randomUUID();
 
-        messageService.create(new MessageCreateRequestDto(List.of(), "수정 전", channelId, author));
+        messageService.create(new MessageCreateRequestDto(List.of(), "수정 전", channelId, author), null);
         MessageResponseDto saved = messageService.findAllByChannelId(channelId).stream().findFirst().orElseThrow();
 
-        messageService.update(saved.id(), new MessageUpdateRequestDto(
-               "수정 후", channelId, author, List.of()));
+        messageService.update(saved.id(), new MessageUpdateRequestDto("수정 후"));
 
         // 반환값이 아니라 원래 id로 다시 조회해서 검증한다
         MessageResponseDto found = messageService.find(saved.id());
-        assertEquals("수정 후", found.message());
+        assertEquals("수정 후", found.content());
 
         // 수정은 새 메시지를 만드는 게 아니므로 전체 개수는 그대로여야 한다
         assertEquals(1, messageRepository.findAll().size());
@@ -101,17 +101,22 @@ class BasicMessageServiceTest {
         UUID channelId = UUID.randomUUID();
         UUID author = UUID.randomUUID();
 
-        BinaryContent attachment = new BinaryContent(new byte[]{1, 2, 3});
-        binaryContentRepository.save(attachment);
 
-        messageService.create(new MessageCreateRequestDto(
-                List.of(attachment.getId()), "삭제될 메시지", channelId, author));
+        MessageResponseDto created = messageService.create(new MessageCreateRequestDto(
+                        List.of(), "삭제될 메시지", channelId, author),
+                List.of(new MockMultipartFile(
+                        "attachments",
+                        "profile3.jpg",
+                        "image/jpeg",
+                        new byte[]{7, 8, 9}
+                )));
+
         MessageResponseDto saved = messageService.findAllByChannelId(channelId).stream().findFirst().orElseThrow();
 
         messageService.delete(saved.id());
 
         assertThrows(NoSuchElementException.class, () -> messageService.find(saved.id()));
-        assertTrue(binaryContentRepository.findById(attachment.getId()).isEmpty());
+        assertTrue(binaryContentRepository.findById(created.attachmentIds().get(0)).isEmpty());
     }
 
     @Test
@@ -119,7 +124,7 @@ class BasicMessageServiceTest {
         UUID channelId = UUID.randomUUID();
         UUID author = UUID.randomUUID();
 
-        messageService.create(new MessageCreateRequestDto(null, "첨부 없음", channelId, author));
+        messageService.create(new MessageCreateRequestDto(null, "첨부 없음", channelId, author), null);
         MessageResponseDto saved = messageService.findAllByChannelId(channelId).stream().findFirst().orElseThrow();
 
         assertDoesNotThrow(() -> messageService.delete(saved.id()));

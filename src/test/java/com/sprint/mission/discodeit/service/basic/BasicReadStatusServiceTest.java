@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.channel.domain.ChannelType;
 import com.sprint.mission.discodeit.readStatus.dto.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.readStatus.dto.ReadStatusResponseDto;
-import com.sprint.mission.discodeit.readStatus.dto.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.readStatus.application.basic.BasicReadStatusService;
-import com.sprint.mission.discodeit.user.dto.UserRequestDto;
 import com.sprint.mission.discodeit.channel.domain.Channel;
-import com.sprint.mission.discodeit.channel.domain.ChannelType;
 import com.sprint.mission.discodeit.readStatus.domain.ReadStatus;
 import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.common.exception.DuplicateStatus;
@@ -47,7 +45,7 @@ class BasicReadStatusServiceTest {
         readStatusService = new BasicReadStatusService(readStatusRepository, userRepository, channelRepository);
 
         byte[] image = {1, 2, 3, 4};
-        User user = new User(new UserRequestDto("김양현", "yyy2724@naver.com", "2724", image));
+        User user = User.create("김양현", "yyy2724@naver.com", "2724");
         userRepository.save(user);
         userId = user.getId();
 
@@ -58,7 +56,7 @@ class BasicReadStatusServiceTest {
 
     @Test
     void 읽음상태를_생성하면_저장된다() {
-        ReadStatusResponseDto created = readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId));
+        ReadStatusResponseDto created = readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId, Instant.now()));
 
         assertEquals(channelId, created.channelId());
         assertEquals(userId, created.userId());
@@ -68,26 +66,26 @@ class BasicReadStatusServiceTest {
     @Test
     void 없는_채널로_생성하면_예외가_발생한다() {
         assertThrows(NotFoundChannelException.class,
-                () -> readStatusService.create(new ReadStatusCreateRequestDto(userId, UUID.randomUUID())));
+                () -> readStatusService.create(new ReadStatusCreateRequestDto(userId, UUID.randomUUID(), Instant.now())));
     }
 
     @Test
     void 없는_유저로_생성하면_예외가_발생한다() {
         assertThrows(NotFoundUserException.class,
-                () -> readStatusService.create(new ReadStatusCreateRequestDto(UUID.randomUUID(), channelId)));
+                () -> readStatusService.create(new ReadStatusCreateRequestDto(UUID.randomUUID(), channelId,  Instant.now())));
     }
 
     @Test
     void 같은_채널과_유저로_중복_생성하면_예외가_발생한다() {
-        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId));
+        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId, Instant.now()));
 
         assertThrows(DuplicateStatus.class,
-                () -> readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId)));
+                () -> readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId, Instant.now())));
     }
 
     @Test
     void 읽음상태를_생성하면_조회할_수_있다() {
-        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId));
+        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId, Instant.now()));
         UUID id = readStatusRepository.findAllByUserId(userId).get(0).getId();
 
         ReadStatusResponseDto found = readStatusService.find(id);
@@ -106,8 +104,8 @@ class BasicReadStatusServiceTest {
         Channel channel2 = new Channel(ChannelType.PUBLIC, "제목2", "메모 내용2");
         channelRepository.save(channel2);
 
-        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId));
-        readStatusService.create(new ReadStatusCreateRequestDto(userId, channel2.getId()));
+        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId, Instant.now()));
+        readStatusService.create(new ReadStatusCreateRequestDto(userId, channel2.getId(), Instant.now()));
 
         List<ReadStatusResponseDto> found = readStatusService.findAllByUserId(userId);
 
@@ -117,11 +115,11 @@ class BasicReadStatusServiceTest {
 
     @Test
     void 읽음상태를_수정하면_마지막_읽은_시간이_갱신된다() {
-        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId));
+        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId, Instant.now()));
         ReadStatus readStatus = readStatusRepository.findAllByUserId(userId).get(0);
         assertNull(readStatus.getLastReadTime());
 
-        readStatusService.update(new ReadStatusUpdateRequestDto(readStatus.getId(), Instant.now()));
+        readStatusService.update(readStatus.getId(), );
 
         ReadStatus updated = readStatusRepository.findById(readStatus.getId()).orElseThrow();
         assertNotNull(updated.getLastReadTime());
@@ -130,12 +128,12 @@ class BasicReadStatusServiceTest {
     @Test
     void 없는_읽음상태를_수정하면_예외가_발생한다() {
         assertThrows(NoSuchElementException.class,
-                () -> readStatusService.update(new ReadStatusUpdateRequestDto(UUID.randomUUID(), Instant.now())));
+                () -> readStatusService.update(UUID.randomUUID(), ));
     }
 
     @Test
     void 읽음상태를_삭제하면_조회할_수_없다() {
-        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId));
+        readStatusService.create(new ReadStatusCreateRequestDto(userId, channelId, Instant.now()));
         UUID id = readStatusRepository.findAllByUserId(userId).get(0).getId();
 
         readStatusService.delete(id);

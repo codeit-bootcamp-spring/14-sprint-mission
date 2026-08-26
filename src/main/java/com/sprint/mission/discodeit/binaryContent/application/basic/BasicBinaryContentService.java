@@ -8,7 +8,10 @@ import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentReposi
 import com.sprint.mission.discodeit.binaryContent.application.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,12 +23,18 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContentResponseDto create(BinaryContentCreateRequestDto request){
+        MultipartFile file = request.data();
 
-        BinaryContent binaryContent = request.toEntity();
+        try {
+            BinaryContent binaryContent = new BinaryContent(file.getOriginalFilename(), file.getSize(),
+                    file.getContentType(), file.getBytes());
 
-        binaryContentRepository.save(binaryContent);
+            binaryContentRepository.save(binaryContent);
+            return BinaryContentResponseDto.from(binaryContent);
+        } catch (IOException e) {
+            throw new NoSuchElementException();
+        }
 
-        return BinaryContentResponseDto.from(binaryContent);
 
     }
 
