@@ -26,7 +26,7 @@ public class BasicAuthService implements AuthService {
         User user = userRepository.findByName(authCreateRequestDto.getName());
         if (Objects.isNull(user)) {
             // throw new RuntimeException("올바른 이름을 입력해주세요.");
-            throw new CustomRuntimeException(ExceptionType.NOT_FOUND);
+            throw new CustomRuntimeException(ExceptionType.USER_BY_USERNAME_NOT_FOUND, authCreateRequestDto.getName());
         }
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
         return UserResponseDto.from(user, userStatus);

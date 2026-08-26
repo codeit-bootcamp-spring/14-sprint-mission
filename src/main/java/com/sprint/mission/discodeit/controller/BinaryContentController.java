@@ -14,14 +14,13 @@ import java.util.UUID;
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public BinaryContentResponseDto read(@PathVariable UUID id) {
-        return binaryContentService.readBinaryContent(id);
+    @RequestMapping(method = RequestMethod.GET, value = "/{binaryContentId}")
+    public BinaryContentResponseDto read(@PathVariable UUID binaryContentId) {
+        return binaryContentService.readBinaryContent(binaryContentId);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "")
-    public List<BinaryContentResponseDto> readAll(@RequestParam List<UUID> ids) {
-        return binaryContentService.findAllByIdIn(ids);
+    public List<BinaryContentResponseDto> readAll(@RequestParam List<UUID> binaryContentIds) {
+        return binaryContentService.findAllByIdIn(binaryContentIds);
     }
-
 }
