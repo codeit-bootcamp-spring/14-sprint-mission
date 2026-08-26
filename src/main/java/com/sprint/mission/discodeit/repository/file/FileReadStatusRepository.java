@@ -18,14 +18,14 @@ public class FileReadStatusRepository extends FileRepository<ReadStatus> impleme
         super(fileDirectory, "readStatus");
     }
 
-    @Override // 특정 유저의 읽음 상태 전체 찾기 (유저가 속한 채널마다 하나씩 있음)
+    @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return findAll().stream()
             .filter(readStatus -> readStatus.getUserId().equals(userId))
             .toList();
     }
 
-    @Override // 특정 채널의 읽음 상태 전체 찾기 (채널에 속한 유저마다 하나씩 있음)
+    @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
         return findAll().stream()
             .filter(readStatus -> readStatus.getChannelId().equals(channelId))

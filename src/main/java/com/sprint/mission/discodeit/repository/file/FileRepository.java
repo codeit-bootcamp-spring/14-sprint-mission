@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BaseEntity;
-import com.sprint.mission.discodeit.entity.UpdatableEntity;
 import com.sprint.mission.discodeit.repository.Repository;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,24 +13,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 public class FileRepository<T extends BaseEntity> implements Repository<T> {
 
     private final String fileName;
 
-    //  기존에는 파일 이름(fileName)만 받았는데,
-    // 이제 어느 폴더(fileDirectory)에 저장할지도 같이 받도록 바꿈.
+
     protected FileRepository(String fileDirectory, String fileName) {
 
-        // 1. 폴더가 없으면 새로 만들기
+
         File directory = new File(fileDirectory);
         if(!directory.exists()) {
-            directory.mkdirs(); // 중간 경로까지 다 없어도 한번에 다 생성해줌
+            directory.mkdirs();
         }
 
-        // 2. "폴더 경로 + 파일 이름 + .ser" 형태로 최종 파일 경로 완성
+
         this.fileName = fileDirectory + "/" + fileName + ".ser";
 
         File file = new File(this.fileName);

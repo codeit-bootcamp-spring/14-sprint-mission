@@ -4,57 +4,65 @@ import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/message")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 public class MessageController {
 
     private final MessageService messageService;
 
-    /* 1. 메세지를 보낼수있음 --- List<BinaryContentCreateRequest>때문에 오류발생됨.
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<MessageDto> create(
-        @Valid @RequestBody MessageCreateRequest request,
-        List<BinaryContentCreateRequest> contentRequest
-    ) {
-        log.info("Message create 적상 작동");
-        MessageDto created = messageService.create(request, contentRequest);
-        return ResponseEntity.ok(created);
+    private BinaryContentCreateRequest toBinaryContentCreateRequest(
+        MultipartFile file) {
+        try {
+            return new BinaryContentCreateRequest(
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("첨부파일 변환 중 오류가 발생했습니다.", e);
+        }
     }
-*/
 
-    // [수정] 1. 메세지를 보낼수있음 (오류 발생 안나게 하려고 List<BinaryContentCreateRequest> 없앤 버전)
-    // List<BinaryContentCreateRequest> 자리에 List.of()로 채우기(빈리스트) --- [] 안에 값이 없다지 null값 아님.
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> create(
-        @Valid @RequestBody MessageCreateRequest request
+        @RequestPart("messageCreateRequest") @Valid MessageCreateRequest request,
+        @RequestPart(value = "attachments", required = false)
+        List<MultipartFile> attachments
     ) {
         log.info("Message create 정상 작동");
-        MessageDto created = messageService.create(request, List.of());
-        return ResponseEntity.ok(created);
+        List<BinaryContentCreateRequest> attachmentRequests = (attachments == null)
+            ? List.of() : attachments.stream().map(this::toBinaryContentCreateRequest)
+            .toList();
+        MessageDto created = messageService.create(request, attachmentRequests);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(created);
     }
 
 
-    // 2. 메세지 수정
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{messageId}")
+    @PatchMapping("/{messageId}")
     public ResponseEntity<MessageDto> update(
         @PathVariable UUID messageId,
         @Valid @RequestBody MessageUpdateRequest request) {
@@ -62,19 +70,17 @@ public class MessageController {
         log.info("update 정상 작동. 수정할 메세지id:{}", messageId);
         MessageDto updated = messageService.update(messageId, request);
         return ResponseEntity.ok(updated);
-
     }
 
-    // 3. 메세지 삭제
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{messageId}")
+    @DeleteMapping("/{messageId}")
     public void delete(@PathVariable UUID messageId) {
         log.info("delete 정상 작동. 삭제할 messageId:{}", messageId);
         messageService.delete(messageId);
     }
 
-    // 4. 특정 채널 메세지 목록 조회
-    @RequestMapping(method = RequestMethod.GET, value = "/{channelId}")
-    public ResponseEntity<List<MessageDto>> findAllByChannelId(@PathVariable UUID channelId) {
+    @GetMapping
+    public ResponseEntity<List<MessageDto>> findAllByChannelId(
+        @RequestParam UUID channelId) {
         log.info("findAllByChannelId 정상 작동. 조회할 channelId:{}", channelId);
         List<MessageDto> messages
             = messageService.findAllByChannelId(channelId);

@@ -7,11 +7,11 @@ import java.util.UUID;
 
 public interface Service<T extends UpdatableEntity> {
 
-    /* public abstract */ T save(T entity);
-    /* public abstract */ Optional<T> findById(UUID id);
-    /* public abstract */ List<T> findAll();
-    /* public abstract */ T update(T entity);
-    /* public abstract */ void delete(UUID id);
+    T save(T entity);
+    Optional<T> findById(UUID id);
+    List<T> findAll();
+    T update(T entity);
+     void delete(UUID id);
 
     default String findIdAsString(UUID id) {
         return findById(id)

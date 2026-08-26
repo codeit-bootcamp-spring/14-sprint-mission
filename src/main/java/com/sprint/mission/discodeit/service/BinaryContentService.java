@@ -18,7 +18,3 @@ public interface BinaryContentService {
 
 }
 
-/*
-BinaryContentDto는 따로 안만듬.
-비밀번호같은 민간 정보없고 그냥 파일 던져주는거라서.
- */

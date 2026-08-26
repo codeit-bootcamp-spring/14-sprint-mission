@@ -15,7 +15,7 @@ public class JCFMessageRepository extends JCFRepository<Message> implements Mess
         super();
     }
 
-    @Override  // 채널 하나에 속한 메시지 전체 찾기
+    @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return findAll().stream()
             .filter(message -> message.getChannelId().equals(channelId))

@@ -16,7 +16,7 @@ public class JCFUserStatusRepository extends JCFRepository<UserStatus>
         super();
     }
 
-    @Override // 유저 한 명당 UserStatus는 딱 1개라서 Optional로 반환
+    @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
         return findAll().stream().
             filter(userStatus -> userStatus.getUserId().equals(userId))

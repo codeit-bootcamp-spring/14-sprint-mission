@@ -3,17 +3,16 @@ package com.sprint.mission.discodeit.dto.user;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
-// 유저 생성 요청에 필요한 값들만 묶어놓은 DTO
 public record UserCreateRequest(
 
     @NotBlank(message = "이름을 비워둘 수 없습니다.")
-    /* private final */ String userName,
+    String userName,
     @NotEmpty(message = "이메일을 비워둘 수 없습니다.")
-    /* private final */ String email,
+    String email,
     @NotEmpty(message = "비밀번호를 비워둘 수 없습니다.")
-    /* private final */ String password,
+    String password,
     @NotEmpty(message = "닉네임을 비워둘 수 없습니다.")
-    /* private final */ String nickName
+    String nickName
 ) {
 }
 

@@ -8,43 +8,23 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-/*
-스프링이 @Controller, @Repository, @Service, @Component 달린 클래스를 찾아서
-객체를 만들고 빈 컨테이너에 등록해둔다.
-그 객체가 필요한 다른 곳(생성자 등)에 자동으로 넣어주는 걸 "주입"이라고 한다.
-*/
+
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository extends FileRepository<Message> implements MessageRepository {
 
-     /*
- 원래 싱글톤으로 했을 때 객체 1개만 만들고 외부에서 접근하지말라고 필드,생성자를 private로 막아놨는데
- 스프링으로 변경시 private로 막아두면 객체 못만들어줘서 등록 못함.public으로 열어서 다시 만들기.
-
- FileUserRepository 생성자는 매개변수 없음(빈 생성자).
-대신 부모 클래스 FileRepository의 생성자가 파일 이름(String)을 필요로 하니까,
-super("message")로 "message"라는 고정값을 부모한테 넘겨준다.
-    */
 
     public FileMessageRepository(
         @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
         super(fileDirectory, "message");
     }
 
-    @Override //  채널 하나에 속한 메시지 전체 찾기
+    @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return findAll().stream()
             .filter(message -> message.getChannelId().equals(channelId))
             .toList();
     }
 
-    /*
-    private static final FileMessageRepository instance = new FileMessageRepository();
-    private FileMessageRepository() {
-        super("message");
-    }
-    public static FileMessageRepository getInstance() {
-        return instance;
-    }
-*/
+
 }

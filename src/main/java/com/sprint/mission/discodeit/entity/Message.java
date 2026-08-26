@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.InvalidMessageContentException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-
-// 기본 공통필드가지는 BaseEntity 추상클래스 -> updatedAt 필드가진 UpdatableEntity
-// 또 분리해서 상속 추상클래스 만들기 -> 최종 상속 클래스 Message
-// BaseEntity -> UpdatableEntity -> Message
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -37,7 +34,7 @@ public class Message extends UpdatableEntity {
 
     public String update(String contents) {
         if(contents == null || contents.isBlank()) {
-            throw new InvalidMessageContentException();
+            throw new DiscodeitException(ErrorCode.INVALID_MESSAGE_CONTENT);
         }
         this.contents = contents;
         updateTimeStamp();

@@ -1,14 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.InvalidNicknameException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-
-// 기본 공통필드가지는 BaseEntity 추상클래스 -> updatedAt 필드가진 UpdatableEntity
-// 또 분리해서 상속 추상클래스 만들기 -> 최종 상속 클래스 User
-// BaseEntity -> UpdatableEntity -> User
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -19,7 +16,7 @@ public class User extends UpdatableEntity {
     String email;
     String password;
     String nickName;
-    UUID profileId; // nullable(값이 없어도 됨) -> 0..1로 표시 (프로필 이미지 필수아님)!
+    UUID profileId;
 
     private User (String userName, String email,  String password, String nickName,UUID profileId) {
         super();
@@ -38,7 +35,7 @@ public class User extends UpdatableEntity {
 
     public String update(String nickName) {
         if(nickName == null || nickName.isBlank()) {
-            throw new InvalidNicknameException();
+            throw new DiscodeitException(ErrorCode.INVALID_NICKNAME);
         }
         this.nickName = nickName;
         updateTimeStamp();

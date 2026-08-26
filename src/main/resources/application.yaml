@@ -4,11 +4,5 @@ spring:
 
 discodeit:
   repository:
-    type: jcf              # jcf | file  (안 적으면 jcf로 동작)
-    file-directory: .discodeit   # type: file일 때, .ser 파일들이 저장될 폴더
-
-
-# application.yaml은 이 프로그램을 어떻게 실행할지에 대한 설정값들을 모아두는 파일.
-# 설정값만 적어두는 곳
-# 8080 프로그램이 몇번 포트로 실행될지, 애플리케이션 이름, DB 연결 주소등 코드 밖으로 빼둠
-# [application.yaml]  →  스프링이 이 파일을 읽음  →  @Value, @ConditionalOnProperty가 그 값을 자바 코드에 꽂아줌
+    type: jcf
+    file-directory: .discodeit

@@ -7,10 +7,6 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 
-// 기본 공통필드가지는 BaseEntity 추상클래스 -> updatedAt 필드가진 UpdatableEntity
-// 또 분리해서 상속 추상클래스 만들기 -> 최종 상속 클래스 ReadStatus
-// BaseEntity -> UpdatableEntity -> ReadStatus (읽기상태/마지막 읽은 시간 메소드 포함)
-
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ReadStatus extends UpdatableEntity {
@@ -35,7 +31,6 @@ public class ReadStatus extends UpdatableEntity {
         return new Builder();
     }
 
-    // 마지막으로 읽은 시간 메소드 별도 추가
     public void updateLastReadAt(Instant lastReadAt) {
         this.lastReadAt = lastReadAt;
         updateTimeStamp();

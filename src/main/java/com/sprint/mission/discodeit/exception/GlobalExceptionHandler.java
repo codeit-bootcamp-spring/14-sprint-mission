@@ -1,126 +1,33 @@
 package com.sprint.mission.discodeit.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    @ExceptionHandler(DiscodeitException.class)
+
+    public ResponseEntity<ErrorResponse> discodeitExceptionHandler(
+        DiscodeitException exception
+    ) {
+        log.warn("[{}] {}", exception.getErrorCode(), exception.getErrorCode());
+        ErrorResponse response = ErrorResponse.from(exception);
+        return ResponseEntity.status(
+            exception.getErrorCode().getHttpStatus()).body(response);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> AllExceptionhandler(
+    public ResponseEntity<ErrorResponse> allExceptionExceptionHandler(
         Exception exception
     ) {
-        return ResponseEntity.internalServerError().body("서버 오류");
+        log.error("서버 오류", exception);
+        ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.internalServerError().body(response);
     }
-
-
-    @ExceptionHandler(BinaryContentNotFoundException.class)
-    public ResponseEntity<String> BinaryContentNotFoundhandler(
-        BinaryContentNotFoundException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-
-    @ExceptionHandler(ChannelNotFoundException.class)
-    public ResponseEntity<String> ChannelNotFoundhandler(
-        ChannelNotFoundException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(DuplicateEmailException.class)
-    public ResponseEntity<String> DuplicateEmailhandler(
-        DuplicateEmailException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-
-    @ExceptionHandler(DuplicateReadStatusException.class)
-    public ResponseEntity<String> DuplicateReadStatushandler(
-        DuplicateReadStatusException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(DuplicateUserNameException.class)
-    public ResponseEntity<String> DuplicateUserNamehandler(
-        DuplicateUserNameException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(DuplicateUserStatusException.class)
-    public ResponseEntity<String> DuplicateUserStatushandler(
-        DuplicateUserStatusException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(InvalidChannelNameException.class)
-    public ResponseEntity<String> InvalidChannelNamehandler(
-        InvalidChannelNameException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(InvalidCredentialException.class)
-    public ResponseEntity<String> InvalidCredentialhandler(
-        InvalidCredentialException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(InvalidMessageContentException.class)
-    public ResponseEntity<String> InvalidMessageContenthandler(
-        InvalidMessageContentException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(InvalidNicknameException.class)
-    public ResponseEntity<String> InvalidNicknamehandler(
-        InvalidNicknameException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(MessageNotFoundException.class)
-    public ResponseEntity<String> MessageNotFoundhandler(
-        MessageNotFoundException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(PrivateChannelUpdateException.class)
-    public ResponseEntity<String> PrivateChannelUpdatehandler(
-        PrivateChannelUpdateException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(ReadStatusNotFoundException.class)
-    public ResponseEntity<String> ReadStatusNotFoundhandler(
-        ReadStatusNotFoundException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> UserNotFoundhandler(
-        UserNotFoundException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
-    @ExceptionHandler(UserStatusNotFoundException.class)
-    public ResponseEntity<String> UserStatusNotFoundhandler(
-        UserStatusNotFoundException exception
-    ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
-    }
-
 
 }
