@@ -9,15 +9,15 @@ import lombok.Getter;
 public class Message extends BasicEntity {
 
     private String text;
-    private UUID user_id;
-    private UUID channel_id;
+    private UUID userId;
+    private UUID channelId;
     private List<UUID> attachmentIds;
 
-    public Message(String text, UUID user_id, UUID channel_id, List<UUID> attachmentIds) {
+    public Message(String text, UUID userId, UUID channelId, List<UUID> attachmentIds) {
         super();
         this.text = text;
-        this.user_id = user_id;
-        this.channel_id = channel_id;
+        this.userId = userId;
+        this.channelId = channelId;
         this.attachmentIds = attachmentIds;
     }
 
@@ -36,8 +36,8 @@ public class Message extends BasicEntity {
             ", createdAt='" + createdAt +
             "', updatedAt='" + updatedAt +
             "', text='" + text +
-            "', channel='" + channel_id +
-            "', user='" + user_id +
+            "', channel='" + channelId +
+            "', user='" + userId +
             "'}";
     }
 }

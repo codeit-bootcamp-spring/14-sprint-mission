@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +13,9 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     protected Map<UUID, UserStatus> data;
 
+    public JCFUserStatusRepository(){
+        data = new HashMap<>();
+    }
     @Override
     public void save(UserStatus userStatus) {
         data.put(userStatus.getId(),userStatus);

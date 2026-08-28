@@ -50,7 +50,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public boolean existsByEmail(String email) {
         return  loadData().values().stream()
-            .anyMatch(user -> user.getName().equals(email));
+            .anyMatch(user -> user.getEmail().equals(email));
     }
 
     @Override
