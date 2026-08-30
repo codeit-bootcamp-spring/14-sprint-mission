@@ -42,6 +42,14 @@ public class FileUserRepository extends FileAbstractRepository implements UserRe
     }
 
     @Override
+    public Optional<User> findByUsername(String name) {
+        return this.findAll().stream()
+                .filter(user -> user.getUsername().equals(name))
+                .findFirst();
+    }
+
+
+    @Override
     public List<User> findAll() {
         return this.cache.values().stream().toList();
     }
@@ -60,7 +68,7 @@ public class FileUserRepository extends FileAbstractRepository implements UserRe
 
     @Override
     public boolean existsByName(String name) {
-        return this.cache.values().stream().anyMatch(user -> user.getName().equals(name));
+        return this.cache.values().stream().anyMatch(user -> user.getUsername().equals(name));
     }
 
     @Override
