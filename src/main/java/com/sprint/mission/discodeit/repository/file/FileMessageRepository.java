@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.util.List;
 import java.util.Optional;
@@ -35,10 +34,10 @@ public class FileMessageRepository implements MessageRepository {
         return List.of();
     }
 
-    @Override
-    public Message update(UUID id, String text) {
-        return null;
-    }
+//    @Override
+//    public Message update(UUID id, String text) {
+//        return null;
+//    }
 
     @Override
     public void deleteByChannelId(UUID id) {

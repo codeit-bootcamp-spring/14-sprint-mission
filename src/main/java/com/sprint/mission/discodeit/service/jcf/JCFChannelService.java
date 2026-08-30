@@ -71,9 +71,9 @@ public class JCFChannelService implements ChannelService {
         Channel channel = channelRepository.findChannel(id).orElseThrow(
             () -> new DiscodeitRuntimeException(ExceptionType.CHANNEL_NOT_FOUND)
         );
-        Channel updateChannel = channel.update(channelRequest);
-        channelRepository.save(updateChannel);
-        return ChannelResponse.from(channel);
+        Channel updatedChannel = channel.update(channelRequest);
+        channelRepository.save(updatedChannel);
+        return ChannelResponse.from(updatedChannel);
     }
 
     @Override

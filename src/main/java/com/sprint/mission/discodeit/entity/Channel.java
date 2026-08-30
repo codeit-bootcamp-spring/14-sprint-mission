@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.channelDto.ChannelDto;
 import com.sprint.mission.discodeit.dto.channelDto.ChannelRequest;
 import com.sprint.mission.discodeit.dto.channelDto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.exception.DiscodeitRuntimeException;
 import com.sprint.mission.discodeit.exception.ExceptionType;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
 
@@ -44,6 +46,17 @@ public class Channel implements Serializable {
         this.description = request.newDescription();
         this.updatedAt = Instant.now();
         return this;
+    }
+
+    private ChannelDto toDto(Channel channel, Instant lastMessageAt, List<UUID> participantIds) {
+        return new ChannelDto(
+            channel.getId(),
+            channel.getType(),
+            channel.getChannelName(),
+            channel.getDescription(),
+            participantIds,
+            lastMessageAt
+        );
     }
 
     @Override

@@ -19,7 +19,7 @@ public interface MessageRepository {
 
     List<Message> findAll();
 
-    Message update(UUID id, String text);
+//    Message update(UUID id, String text);
 
     void deleteByChannelId(UUID id);
 

@@ -20,7 +20,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public Message save(Message message) {
         UUID mid = message.getId();
-        messageInbox.put(mid,message);
+        messageInbox.put(mid, message);
         return messageInbox.get(mid);
     }
 
@@ -50,16 +50,17 @@ public class JCFMessageRepository implements MessageRepository {
         return messageInbox.values().stream().toList();
     }
 
-    @Override
-    public Message update(UUID id, String text) {
-        Message message = messageInbox.get(id);
-        Message updatedMessage = message.update(text);
-        return messageInbox.replace(updatedMessage.getId(), updatedMessage);
-    }
+//    @Override
+//    public Message update(UUID id, String text) {
+//        Message message = messageInbox.get(id);
+//        Message updatedMessage = message.update(text);
+//        return messageInbox.replace(updatedMessage.getId(), updatedMessage);
+//    }
 
     @Override
     public void deleteByChannelId(UUID id) {
-        List<UUID> list = messageInbox.values().stream().filter(message -> message.getChannelId().equals(id)).map(Message::getId).toList();
+        List<UUID> list = messageInbox.values().stream()
+            .filter(message -> message.getChannelId().equals(id)).map(Message::getId).toList();
         for (UUID mid : list) {
             messageInbox.remove(mid);
         }
