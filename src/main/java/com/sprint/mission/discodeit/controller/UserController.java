@@ -9,80 +9,99 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> create(
-            @ModelAttribute UserCreateRequest request,
-            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
-        Optional<BinaryContentCreateRequest> profileRequest = convertToBinaryRequest(profileImage);
-        User user = userService.create(request, profileRequest);
-        return ResponseEntity.ok(user);
+            @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+            @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) {
+        Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
+                .flatMap(this::resolveProfileRequest);
+        User createdUser = userService.create(userCreateRequest, profileRequest);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdUser);
     }
 
-    @GetMapping("/findAll")
-    public ResponseEntity<List<UserDto>> findAll(){
-        return ResponseEntity.ok(userService.findAll());
-    }
-
-    @PutMapping("/{userId}")
-    public ResponseEntity<User> update(@PathVariable UUID userId, @ModelAttribute UserUpdateRequest request,
-            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage){
-
-        Optional<BinaryContentCreateRequest> profileRequest = convertToBinaryRequest(profileImage);
-        User user = userService.update(userId, request, profileRequest);
-        return  ResponseEntity.ok(user);
+    @PatchMapping(path = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<User> update(
+            @PathVariable("userId") UUID userId,
+            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) {
+        Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
+                .flatMap(this::resolveProfileRequest);
+        User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedUser);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID userId){
+    public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
         userService.delete(userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
-    @PatchMapping("/{userId}/status")
-    public ResponseEntity<UserStatus> updateStutus(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request){
-        UserStatus userStatus = userStatusService.updateByUserId(userId, request);
-        return ResponseEntity.ok(userStatus);
+    @GetMapping
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> users = userService.findAll();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(users);
     }
 
-    // 공통 파일 변환 메서드 (컨트롤러 내부에 선언)
-    private Optional<BinaryContentCreateRequest> convertToBinaryRequest(MultipartFile file) {
-        try {
-            if (file != null && !file.isEmpty()) {
-                return Optional.of(new BinaryContentCreateRequest(
-                        file.getOriginalFilename(),
-                        file.getContentType(),
-                        file.getBytes()
-                ));
+    @PatchMapping("/{userId}/userStatus")
+    public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
+            @RequestBody UserStatusUpdateRequest request) {
+        UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedUserStatus);
+    }
+
+    private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
+        if (profileFile.isEmpty()) {
+            return Optional.empty();
+        } else {
+            try {
+                BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
+                        profileFile.getOriginalFilename(),
+                        profileFile.getContentType(),
+                        profileFile.getBytes()
+                );
+                return Optional.of(binaryContentCreateRequest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (Exception e) {
-            throw new RuntimeException("이미지 처리 중 오류가 발생했습니다.", e);
         }
-        return Optional.empty();
     }
 }
