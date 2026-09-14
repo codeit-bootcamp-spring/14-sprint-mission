@@ -11,7 +11,7 @@ public record UserStatusResponseDto(
 
     public static UserStatusResponseDto from(UserStatus userStatus) {
         return new UserStatusResponseDto(
-            userStatus.getUserId(),
+            userStatus.getUser().getId(),
             userStatus.getLastActiveAt()
         );
     }

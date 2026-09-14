@@ -14,9 +14,9 @@ public record UserResponseDto(
     public static UserResponseDto from(User user, boolean onlined){
         return new UserResponseDto(
             user.getId(),
-            user.getName(),
+            user.getUsername(),
             user.getEmail(),
-            user.getProfileId(),
+            user.getProfile() != null ? user.getProfile().getId() : null,
             onlined
         );
     }

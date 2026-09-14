@@ -1,16 +1,19 @@
 package com.sprint.mission.discodeit.dto.message;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.UUID;
 
 public record MessageCreateRequestDto(
-    String text,
-    UUID user_id,
-    UUID channel_id
+    String content,
+    UUID authorId,
+    UUID channelId
 ) {
-    public Message toEntity(List<UUID> attachmentIds) {
-        return new Message(this.text, this.user_id, this.channel_id, attachmentIds);
+    public Message toEntity(Channel channel, User author, List<BinaryContent> attachments) {
+        return new Message(this.content, channel, author, attachments);
     }
 
 

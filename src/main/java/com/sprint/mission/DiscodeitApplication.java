@@ -23,7 +23,9 @@ import java.util.List;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+@EnableJpaAuditing
 @SpringBootApplication
 public class DiscodeitApplication {
 	static UserResponseDto setupUser(UserService userService) {
@@ -44,46 +46,45 @@ public class DiscodeitApplication {
 
 
 	public static void main(String[] args) {
-		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-
-		UserService userService = context.getBean(UserService.class);
-		ChannelService channelService = context.getBean(ChannelService.class);
-		MessageService messageService = context.getBean(MessageService.class);
-
-		UserResponseDto user = setupUser(userService);
-		ChannelResponseDto channel = setupChannel(channelService);
-		messageCreateTest(messageService, channel, user);
-
-		// 조회 테스트
-		UserResponseDto foundUser = userService.read(user.id());
-		System.out.println("조회된 유저: " + foundUser);
-
-		List<UserResponseDto> allUsers = userService.readAll();
-		System.out.println("전체 유저 수: " + allUsers.size());
-
-		// 수정 테스트
-		UserUpdateRequestDto updateRequest = new UserUpdateRequestDto("민준2", null);
-		UserResponseDto updatedUser = userService.update(user.id(), updateRequest, null);
-		System.out.println("수정된 유저: " + updatedUser);
-
-		// 채널 메시지 목록 조회 테스트
-		List<MessageResponseDto> messages = messageService.findAllByChannelId(channel.id());
-		System.out.println("채널 메시지 목록: " + messages);
-
-		// 삭제 테스트
-		userService.delete(user.id());
-		System.out.println("유저 삭제 완료");
-
-		// 삭제 후 재조회 -> 예외 발생하는지 확인
-		try {
-			userService.read(user.id());
-		} catch (Exception e) {
-			System.out.println("삭제 확인됨, 예상된 예외: " + e.getMessage());
-		}
+	ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+//
+//		UserService userService = context.getBean(UserService.class);
+//		ChannelService channelService = context.getBean(ChannelService.class);
+//		MessageService messageService = context.getBean(MessageService.class);
+//
+//		UserResponseDto user = setupUser(userService);
+//		ChannelResponseDto channel = setupChannel(channelService);
+//		messageCreateTest(messageService, channel, user);
+//
+//		// 조회 테스트
+//		UserResponseDto foundUser = userService.read(user.id());
+//		System.out.println("조회된 유저: " + foundUser);
+//
+//		List<UserResponseDto> allUsers = userService.readAll();
+//		System.out.println("전체 유저 수: " + allUsers.size());
+//
+//		// 수정 테스트
+//		UserUpdateRequestDto updateRequest = new UserUpdateRequestDto("민준2", null);
+//		UserResponseDto updatedUser = userService.update(user.id(), updateRequest, null);
+//		System.out.println("수정된 유저: " + updatedUser);
+//
+//		// 채널 메시지 목록 조회 테스트
+//		List<MessageResponseDto> messages = messageService.findAllByChannelId(channel.id());
+//		System.out.println("채널 메시지 목록: " + messages);
+//
+//		// 삭제 테스트
+//		userService.delete(user.id());
+//		System.out.println("유저 삭제 완료");
+//
+//		// 삭제 후 재조회 -> 예외 발생하는지 확인
+//		try {
+//			userService.read(user.id());
+//		} catch (Exception e) {
+//			System.out.println("삭제 확인됨, 예상된 예외: " + e.getMessage());
+//		}
+//
+//	}
 
 	}
-
-
-
 
 }

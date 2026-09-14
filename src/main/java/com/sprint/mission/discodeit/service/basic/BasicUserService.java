@@ -13,10 +13,12 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.IService.UserService;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,28 +28,25 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
-
-
     @Override
     public UserResponseDto create(UserCreateRequestDto userRequest, BinaryContentCreateRequestDto profileRequest) {
         if (userRepository.existsByEmail(userRequest.email())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
-        if (userRepository.existsByName(userRequest.name())) {
+        if (userRepository.existsByUsername(userRequest.username())) {
             throw new IllegalArgumentException("이미 존재하는 이름입니다.");
         }
 
-        UUID profileId = null;
-
-        if(profileRequest!= null){
-            BinaryContent binaryContent = profileRequest.toEntity();
-            binaryContentRepository.save(binaryContent);
-            profileId = binaryContent.getId();
+        BinaryContent profile = null;
+        if (profileRequest != null) {
+            profile = profileRequest.toEntity();
+            binaryContentRepository.save(profile);
         }
-        User user = userRequest.toEntity(profileId);
+
+        User user = userRequest.toEntity(profile);
         userRepository.save(user);
 
-        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
+        UserStatus userStatus = new UserStatus(user, Instant.now());
         userStatusRepository.save(userStatus);
 
         boolean online = userStatus.isOnline();
@@ -55,69 +54,56 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponseDto read(UUID id) {
-        User user = userRepository.findById(id);
-        if(Objects.isNull(user)){
-            throw new RuntimeException("존재하지 않는 유저입니다.");
-        }
-        UserStatus userStatus = userStatusRepository.findByUserId(id)
-            .orElseThrow(() -> new RuntimeException("유저 상태 정보가 없습니다."));
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+
+        UserStatus userStatus = userStatusRepository.findByUser_Id(id)
+            .orElseThrow(() -> new NoSuchElementException("유저 상태 정보가 없습니다."));
+
         boolean online = userStatus.isOnline();
         return UserResponseDto.from(user, online);
-
     }
 
     @Override
     public UserResponseDto update(UUID id, UserUpdateRequestDto requestDto, BinaryContentCreateRequestDto profileRequest) {
-        User user = userRepository.findById(id);
-        if(Objects.isNull(user)) {
-            throw new RuntimeException("존재하지 않는 유저 입니다");
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+
+        user.update(requestDto.newUsername(), requestDto.newEmail());
+
+        if (profileRequest != null) {
+            BinaryContent profile = profileRequest.toEntity();
+            binaryContentRepository.save(profile);
+            user.updateProfile(profile);
         }
 
-        user.update(requestDto.name(),requestDto.email());
+        UserStatus userStatus = userStatusRepository.findByUser_Id(id)
+            .orElseThrow(() -> new NoSuchElementException("유저 상태 정보가 없습니다."));
 
-        if (profileRequest != null)  {
-            BinaryContent binaryContent = profileRequest.toEntity();
-            binaryContentRepository.save(binaryContent);
-            user.updateProfileId(binaryContent.getId());
-        }
-
-        userRepository.save(user);
-
-        UserStatus userStatus = userStatusRepository.findByUserId(id)
-            .orElseThrow(() -> new RuntimeException("유저 상태정보가 없습니다"));
         boolean online = userStatus.isOnline();
-
         return UserResponseDto.from(user, online);
-
-
     }
 
     @Override
     public void delete(UUID id) {
-        User user = userRepository.findById(id);
-        if (Objects.isNull(user)) {
-            throw new RuntimeException("존재하지 않는 유저입니다");
-        }
-
-
-        if (user.getProfileId() != null) {
-            binaryContentRepository.deleteById(user.getProfileId());
-        }
-        UserStatus userStatus = userStatusRepository.findByUserId(id)
-            .orElseThrow(() ->new RuntimeException("유저 상태 정보가 없습니다"));
-        userStatusRepository.deleteById(userStatus.getId());
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
 
         userRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponseDto> readAll() {
         return userRepository.findAll().stream()
-            .map(user -> {UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("유저 상태 정보가 없습니다."));
+            .map(user -> {
+                UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                    .orElseThrow(() -> new NoSuchElementException("유저 상태 정보가 없습니다."));
                 boolean online = userStatus.isOnline();
-                return UserResponseDto.from(user, online);})
+                return UserResponseDto.from(user, online);
+            })
             .toList();
     }
 

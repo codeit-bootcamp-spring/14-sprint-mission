@@ -12,13 +12,16 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.IService.IReadStatusService;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReadStatusService implements IReadStatusService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
@@ -26,38 +29,34 @@ public class ReadStatusService implements IReadStatusService {
 
     @Override
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto request) {
-        ReadStatus readStatus = request.toEntity();
+        Channel channel = channelRepository.findById(request.channelId())
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
+        User user = userRepository.findById(request.userId())
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
 
-        Channel channel = channelRepository.findById(readStatus.getChannelId());
-        if (Objects.isNull(channel)) {
-            throw new RuntimeException("존재하지 않는 채널 입니다");
+        if (readStatusRepository.existsByUser_IdAndChannel_Id(user.getId(), channel.getId())) {
+            throw new IllegalArgumentException("이미 존재하는 읽음 상태입니다.");
         }
-        User user = userRepository.findById(readStatus.getUserId());
-        if (Objects.isNull(user)) {
-            throw new RuntimeException("존재하지 않는 유저아이디 입니다");
-        }
-        if (readStatusRepository.existsByUserIdAndChannelId(user.getId(),channel.getId())) {
-            throw new RuntimeException("이미 존재하는 읽음 상태입니다");
-        }
+
+        ReadStatus readStatus = request.toEntity(user, channel);
         readStatusRepository.save(readStatus);
 
-
         return ReadStatusResponseDto.from(readStatus);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReadStatusResponseDto find(UUID id) {
-        ReadStatus readStatus = readStatusRepository.findById(id);
-        if (Objects.isNull(readStatus)) {
-            throw new RuntimeException("없는 읽음 상태입니다");
-        }
+        ReadStatus readStatus = readStatusRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("없는 읽음 상태입니다."));
 
         return ReadStatusResponseDto.from(readStatus);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
-        List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByUser_Id(userId);
         return readStatuses.stream()
             .map(ReadStatusResponseDto::from)
             .toList();
@@ -65,21 +64,20 @@ public class ReadStatusService implements IReadStatusService {
 
     @Override
     public ReadStatusResponseDto update(UUID id, ReadStatusUpdateRequestDto request) {
-        ReadStatus readStatus = readStatusRepository.findById(id);
-        if (Objects.isNull(readStatus)) {
-            throw new RuntimeException("존재하지 않는 읽음 상태입니다");
-        }
-        readStatus.update(request.lastReadAt());
-        readStatusRepository.save(readStatus);
+        ReadStatus readStatus = readStatusRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 읽음 상태입니다."));
+
+        readStatus.update(request.newLastReadAt());
+        // save() 불필요 - 변경 감지로 자동 반영
+
         return ReadStatusResponseDto.from(readStatus);
     }
 
     @Override
     public void delete(UUID id) {
-        ReadStatus readStatus = readStatusRepository.findById(id);
-        if (Objects.isNull(readStatus)) {
-            throw new RuntimeException("존재하지 않는 읽음 상태입니다");
-        }
+        ReadStatus readStatus = readStatusRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 읽음 상태입니다."));
+
         readStatusRepository.deleteById(id);
     }
 }

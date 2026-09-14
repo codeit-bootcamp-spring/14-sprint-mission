@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.dto.readstatus;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -8,13 +10,10 @@ public record ReadStatusCreateRequestDto(
     UUID userId,
     UUID channelId,
     Instant lastReadAt
+
 ) {
 
-    public ReadStatus toEntity() {
-        return new ReadStatus(
-            this.userId,
-            this.channelId,
-            this.lastReadAt
-        );
+    public ReadStatus toEntity(User user, Channel channel) {
+        return new ReadStatus(user, channel, this.lastReadAt);
     }
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.message;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 import java.util.UUID;
@@ -7,8 +8,8 @@ import java.util.UUID;
 public record MessageResponseDto(
 
     UUID id,
-    UUID user_id,
-    UUID channel_id,
+    UUID userId,
+    UUID channelId,
     String text,
     List<UUID> attachmentIds
 ) {
@@ -16,10 +17,12 @@ public record MessageResponseDto(
     public static MessageResponseDto from(Message message) {
         return new MessageResponseDto(
             message.getId(),
-            message.getUser_id(),
-            message.getChannel_id(),
-            message.getText(),
-            message.getAttachmentIds()
+            message.getAuthor() != null ? message.getAuthor().getId() : null,
+            message.getChannel().getId(),
+            message.getContent(),
+            message.getAttachments().stream()
+                .map(BinaryContent::getId)
+                .toList()
 
         );
     }
