@@ -1,42 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class Message extends BasicEntity {
+@Entity
+@Table(name = "messages")
+@NoArgsConstructor
+public class Message extends BaseUpdatableEntity {
 
-    private String text;
-    private UUID user_id;
-    private UUID channel_id;
-    private List<UUID> attachmentIds;
+    @Column
+    private String content;
 
-    public Message(String text, UUID user_id, UUID channel_id) {
-        super();
-        this.text = text;
-        this.user_id = user_id;
-        this.channel_id = channel_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+
+    @ManyToMany
+    @JoinTable(
+        name = "message_attachments",
+        joinColumns = @JoinColumn(name = "message_id"),
+        inverseJoinColumns = @JoinColumn(name = "attachment_id")
+    )
+    private List<BinaryContent> attachments = new ArrayList<>();
+
+    public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
+        this.content = content;
+        this.channel = channel;
+        this.author = author;
+        if (attachments != null) {
+            this.attachments = attachments;
+        }
     }
 
-
-
-
-
-    public void setText(String text) {
-        this.text = text;
-        this.updatedAt = Instant.now();
-    }
-
-    @Override
-    public String toString() {
-        return "Message{id=" + id +
-            ", createdAt='" + createdAt +
-            "', updatedAt='" + updatedAt +
-            "', text='" + text +
-            "', channel='" + channel_id +
-            "', user='" + user_id +
-            "'}";
+    public void setContent(String content) {
+        this.content = content;
     }
 }

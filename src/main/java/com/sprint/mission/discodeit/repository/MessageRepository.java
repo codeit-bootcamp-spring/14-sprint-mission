@@ -3,12 +3,15 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MessageRepository {
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    public void save(Message msg);
-    public Message findById(UUID id);
-    public List<Message> findAll();
-    public void deleteById(UUID id);
+    Slice<Message> findAllByChannelIdOrderByCreatedAtDesc(UUID channelId, Pageable pageable);
+
+    Optional<Message> findTopByChannel_IdOrderByCreatedAtDesc(UUID channelId);
 }
