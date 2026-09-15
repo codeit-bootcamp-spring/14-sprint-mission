@@ -12,7 +12,5 @@ public record MessageCreateRequestDto(
         UUID authorId
 ) {
 
-    public Message toEntity(){
-        return new Message(attachmentIds, content,channelId, authorId );
-    }
+
 }

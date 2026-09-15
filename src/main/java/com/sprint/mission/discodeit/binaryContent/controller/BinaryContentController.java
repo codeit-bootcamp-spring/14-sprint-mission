@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.binaryContent.controller;
 
 import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentDownloadResponse;
-import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.binaryContent.application.BinaryContentService;
+import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.binaryContent.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,6 @@ import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -20,26 +20,22 @@ import java.util.UUID;
 public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
     @GetMapping
-    public List<BinaryContentResponseDto> findAllByIds(@RequestParam List<UUID> binaryContentIds ){
+    public List<BinaryContentDto> findAllByIds(@RequestParam List<UUID> binaryContentIds ){
         return binaryContentService.findAllByIdIn(binaryContentIds );
     }
 
     @GetMapping(value = "/{binaryContentId}")
-    public BinaryContentResponseDto findById(@PathVariable UUID binaryContentId){
+    public BinaryContentDto findById(@PathVariable UUID binaryContentId){
         return binaryContentService.find(binaryContentId);
     }
 
     @GetMapping(value = "/{binaryContentId}/download")
-    public ResponseEntity<byte[]> downloadById(@PathVariable UUID binaryContentId){
-        BinaryContentDownloadResponse download = binaryContentService.download(binaryContentId);
-
-        String encodingName = UriUtils.encode(download.filename(), StandardCharsets.UTF_8);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodingName + "\"")
-                .body(download.bytes());
+    public ResponseEntity<?> downloadById(@PathVariable UUID binaryContentId){
+        BinaryContentDto dto = binaryContentService.find(binaryContentId);
+        return binaryContentStorage.download(dto);
     }
 
 }

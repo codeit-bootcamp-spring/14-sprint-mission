@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.user.application;
 
+import com.sprint.mission.discodeit.readStatus.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusUpdateRequestDto;
 
@@ -9,15 +11,15 @@ import java.util.UUID;
 
 public interface UserStatusService {
 
-    UserStatusResponseDto create(UserStatusCreateRequestDto request);
+    UserStatusDto create(UserStatusCreateRequestDto request);
 
-    UserStatusResponseDto find(UUID id);
+    UserStatusDto find(UUID id);
 
-    List<UserStatusResponseDto> findAll();
+    List<UserStatusDto> findAll();
 
-    UserStatusResponseDto update(UUID id);
+    UserStatusDto update(UUID id);
 
-    UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateRequestDto request);
+    UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequestDto request);
 
     void delete(UUID id);
 }

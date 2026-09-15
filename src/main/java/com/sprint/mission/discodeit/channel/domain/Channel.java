@@ -1,19 +1,27 @@
 package com.sprint.mission.discodeit.channel.domain;
 
-import com.sprint.mission.discodeit.common.entity.BaseEntity;
+import com.sprint.mission.discodeit.common.entity.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.time.Instant;
 
 @Getter
-public class Channel extends BaseEntity {
+@Entity
+@Table(name = "channels")
+@NoArgsConstructor
+public class Channel extends BaseUpdatableEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private ChannelType channelType;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "description")
     private String description;
 
     public Channel(ChannelType channelType, String name, String description) {

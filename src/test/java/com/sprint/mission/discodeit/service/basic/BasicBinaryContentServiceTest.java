@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.binaryContent.application.basic.BasicBinaryContentService;
 import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.binaryContent.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.binaryContent.application.BinaryContentService;

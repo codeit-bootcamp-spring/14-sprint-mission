@@ -1,29 +1,42 @@
 package com.sprint.mission.discodeit.user.domain;
 
-import com.sprint.mission.discodeit.common.entity.BaseEntity;
+import com.sprint.mission.discodeit.binaryContent.domain.BinaryContent;
+import com.sprint.mission.discodeit.common.entity.BaseUpdatableEntity;
 import jakarta.annotation.Nullable;
-import lombok.AccessLevel;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serial;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
+@Entity
+@Table(name = "users")
 @ToString
-public class User extends BaseEntity {
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @Nullable
-    private UUID profileId;
+    @Column(name = "username", unique = true, nullable = false)
     private String userName;
+
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 //    @Getter(AccessLevel.NONE)
+
+    @Column(name = "password", nullable = false)
     private String password;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id", unique = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserStatus userStatus;
 
     private User(String userName, String email, String password) {
@@ -31,6 +44,10 @@ public class User extends BaseEntity {
         this.userName = userName;
         this.email = email;
         this.password = password;
+    }
+
+    public void updateUserStatus(UserStatus userStatus){
+        this.userStatus = userStatus;
     }
 
     public static User create(String userName, String email, String password){
@@ -56,8 +73,8 @@ public class User extends BaseEntity {
         this.updateUpdatedAt(Instant.now());
     }
 
-    public void updateProfileId(UUID profileId){
-        this.profileId = profileId;
+    public void updateProfile(BinaryContent profile){
+        this.profile = profile;
     }
 
     public boolean checkPassword(String password){
