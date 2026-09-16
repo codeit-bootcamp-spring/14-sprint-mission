@@ -1,0 +1,136 @@
+package com.sprint.mission.discodeit.channel.service;
+
+import com.sprint.mission.discodeit.channel.service.dto.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.channel.service.dto.ReadStatusResult;
+import com.sprint.mission.discodeit.channel.service.dto.UpdateReadStatusCommand;
+import com.sprint.mission.discodeit.channel.entity.ReadStatus;
+import com.sprint.mission.discodeit.channel.entity.Channel;
+import com.sprint.mission.discodeit.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.channel.exception.ReadStatusCreationNotAllowedException;
+import com.sprint.mission.discodeit.common.exception.exceptions.DuplicateAssociationException;
+import com.sprint.mission.discodeit.common.exception.exceptions.EntityNotFoundException;
+import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.channel.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+/**
+ * 읽음 상태(ReadStatus) 비즈니스 로직의 실제 구현 클래스.
+ * 읽음 상태의 생성, 조회, 갱신, 삭제를 처리한다.
+ * PRIVATE 채널의 경우 채널 생성 시에만 ReadStatus가 자동으로 만들어지므로,
+ * 이 서비스에서 직접 생성하는 것은 PUBLIC 채널에 대해서만 가능하다.
+ * 읽기는 클래스에 걸린 readOnly 트랜잭션에서, 쓰기는 메서드의 @Transactional에서 처리한다.
+ */
+@Service
+@RequiredArgsConstructor
+// 기본은 읽기 전용 트랜잭션이다. 쓰기 메서드만 @Transactional로 덮어쓴다.
+@Transactional(readOnly = true)
+public class ReadStatusServiceImpl implements ReadStatusControllerService {
+
+    private final ReadStatusRepository readStatusRepository; // 읽음 상태 저장소
+    private final ChannelRepository channelRepository; // 채널 저장소 (채널 존재 여부 및 타입 확인용)
+    private final UserRepository userRepository; // 사용자 존재 여부 확인용
+
+    // 읽음 상태 생성 (PUBLIC 채널에서만 가능, PRIVATE 채널은 채널 생성 시 자동 생성됨)
+    @Override
+    @Transactional
+    public ReadStatusResult create(CreateReadStatusCommand command) {
+        CreateReadStatusCommand target = Objects.requireNonNull(command);
+        UUID userId = target.userId();
+        UUID channelId = target.channelId();
+        Objects.requireNonNull(userId, "userId는 null일 수 없습니다.");
+        Objects.requireNonNull(
+                channelId,
+                "channelId는 null일 수 없습니다."
+        );
+        requireUserExists(userId);
+        // PRIVATE 여부를 확인해야 해서 채널은 실제로 불러오고, 그 객체를 그대로 연결에 쓴다.
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new EntityNotFoundException(Channel.class, channelId));
+        if (channel.getType() == ChannelType.PRIVATE) { // PRIVATE 채널은 별도 생성 불가
+            throw new ReadStatusCreationNotAllowedException(channelId);
+        }
+
+        // 유저와 채널 id 모두 똑같은 놈 있는 지 체크 (같은 조합이 이미 있으면 중복 예외 발생)
+        // 필요한 건 존재 여부뿐이라 객체를 만들지 않는 exists로 묻는다.
+        if (readStatusRepository.existsByUserIdAndChannelId(userId, channelId)) {
+            throw new DuplicateAssociationException(
+                    ReadStatus.class,
+                    associationContext(userId, channelId)
+            );
+        }
+        // 존재는 위에서 확인했으므로 SELECT 없이 프록시 참조만 얻는다.
+        // findById로 불러오면 지연 로딩이 안 되는 User.status까지 조회가 따라온다.
+        User user = userRepository.getReferenceById(userId);
+        ReadStatus status = new ReadStatus(user, channel, target.lastReadAt());
+        return ReadStatusResult.from(readStatusRepository.save(status));
+    }
+
+    // 특정 사용자 + 특정 채널의 읽음 상태를 조회
+    @Override
+    public ReadStatusResult find(UUID userId, UUID channelId) {
+        return ReadStatusResult.from(getByUserIdAndChannelId(userId, channelId));
+    }
+
+    // 특정 사용자의 모든 채널 읽음 상태를 조회
+    @Override
+    public List<ReadStatusResult> findAllByUserId(UUID userId) {
+        Objects.requireNonNull(userId, "userId는 null일 수 없습니다.");
+        requireUserExists(userId);
+        return readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatusResult::from)
+                .toList();
+    }
+
+    // 마지막 읽음 시각을 현재 시각으로 갱신 (사용자가 채널을 확인했을 때 호출)
+    @Override
+    @Transactional
+    public ReadStatusResult updateLastReadAt(UUID readStatusId, UpdateReadStatusCommand command) {
+        ReadStatus status = readStatusRepository.findById(readStatusId)
+                .orElseThrow(() -> new EntityNotFoundException(ReadStatus.class, readStatusId));
+        status.updateLastReadAt(Objects.requireNonNull(command).lastReadAt());
+        // 영속 상태라 변경 감지로 반영되므로 save를 부르지 않는다.
+        return ReadStatusResult.from(status);
+    }
+
+    // 읽음 상태 삭제 (사용자 + 채널 조합으로 찾아서 삭제)
+    @Override
+    @Transactional
+    public void delete(UUID userId, UUID channelId) {
+        ReadStatus status = getByUserIdAndChannelId(userId, channelId);
+        readStatusRepository.deleteById(status.getId());
+    }
+
+    // 사용자가 존재하는지 확인하고, 없으면 예외를 던지는 헬퍼 메서드
+    private void requireUserExists(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException(User.class, userId);
+        }
+    }
+
+    // userId + channelId 조합으로 ReadStatus를 조회하고, 없으면 예외를 던지는 헬퍼 메서드
+    private ReadStatus getByUserIdAndChannelId(UUID userId, UUID channelId) {
+        Objects.requireNonNull(userId, "userId는 null일 수 없습니다.");
+        Objects.requireNonNull(
+                channelId,
+                "channelId는 null일 수 없습니다."
+        );
+        return readStatusRepository.findByUserIdAndChannelId(userId, channelId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        ReadStatus.class,
+                        associationContext(userId, channelId)
+                ));
+    }
+
+    // 예외 메시지에 포함할 연관 정보 문자열을 생성하는 헬퍼 메서드
+    private String associationContext(UUID userId, UUID channelId) {
+        return "userId=%s, channelId=%s".formatted(userId, channelId);
+    }
+}
