@@ -9,8 +9,5 @@ public record UserStatusCreateRequestDto(
         UUID userId,
         Instant lastAccessAt
 ) {
-    public UserStatus toEntity() {
-            return new UserStatus(userId);
 
-    }
 }

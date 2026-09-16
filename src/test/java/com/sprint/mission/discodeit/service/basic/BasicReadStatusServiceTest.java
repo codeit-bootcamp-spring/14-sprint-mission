@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.channel.domain.ChannelType;
 import com.sprint.mission.discodeit.readStatus.dto.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.readStatus.dto.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.readStatus.dto.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.readStatus.application.basic.BasicReadStatusService;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 import com.sprint.mission.discodeit.readStatus.domain.ReadStatus;
@@ -119,7 +120,7 @@ class BasicReadStatusServiceTest {
         ReadStatus readStatus = readStatusRepository.findAllByUserId(userId).get(0);
         assertNull(readStatus.getLastReadTime());
 
-        readStatusService.update(readStatus.getId(), );
+        readStatusService.update(readStatus.getId(), new ReadStatusUpdateRequestDto(Instant.now()));
 
         ReadStatus updated = readStatusRepository.findById(readStatus.getId()).orElseThrow();
         assertNotNull(updated.getLastReadTime());
@@ -128,7 +129,7 @@ class BasicReadStatusServiceTest {
     @Test
     void 없는_읽음상태를_수정하면_예외가_발생한다() {
         assertThrows(NoSuchElementException.class,
-                () -> readStatusService.update(UUID.randomUUID(), ));
+                () -> readStatusService.update(UUID.randomUUID(), new ReadStatusUpdateRequestDto(Instant.now())));
     }
 
     @Test

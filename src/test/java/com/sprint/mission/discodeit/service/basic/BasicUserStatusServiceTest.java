@@ -119,7 +119,7 @@ class BasicUserStatusServiceTest {
     void 유저ID로_유저상태를_수정할_수_있다() {
         userStatusService.create(new UserStatusCreateRequestDto(userId, Instant.now()));
 
-        UserStatusResponseDto updated = userStatusService.updateByUserId(userId, Instant.now());
+        UserStatusResponseDto updated = userStatusService.updateByUserId(userId, new UserStatusUpdateRequestDto(Instant.now()));
 
         assertEquals(userId, updated.userId());
         assertNotNull(updated.lastAccessAt());
@@ -127,7 +127,7 @@ class BasicUserStatusServiceTest {
 
     @Test
     void 없는_유저ID로_수정하면_예외가_발생한다() {
-        assertThrows(NoSuchElementException.class, () -> userStatusService.updateByUserId(UUID.randomUUID(), Instant.now()));
+        assertThrows(NoSuchElementException.class, () -> userStatusService.updateByUserId(UUID.randomUUID(), new UserStatusUpdateRequestDto(Instant.now())));
     }
 
     @Test
@@ -135,7 +135,7 @@ class BasicUserStatusServiceTest {
         userStatusService.create(new UserStatusCreateRequestDto(userId, Instant.now()));
         UUID id = userStatusRepository.findByUserId(userId).orElseThrow().getId();
 
-        userStatusService.delete(new UserStatusUpdateRequestDto(id,Instant.now()));
+        userStatusService.delete(id);
 
         assertTrue(userStatusRepository.findById(id).isEmpty());
     }
@@ -143,6 +143,6 @@ class BasicUserStatusServiceTest {
     @Test
     void 없는_유저상태를_삭제하면_예외가_발생한다() {
         assertThrows(NoSuchElementException.class,
-                () -> userStatusService.delete(new UserStatusUpdateRequestDto(UUID.randomUUID(),Instant.now())));
+                () -> userStatusService.delete(UUID.randomUUID()));
     }
 }

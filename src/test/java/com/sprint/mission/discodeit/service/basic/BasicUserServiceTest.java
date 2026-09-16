@@ -38,7 +38,7 @@ class BasicUserServiceTest {
         UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
         userService = new BasicUserService(
                 userRepository,
-                new JCFUserStatusRepository(),
+                userStatusRepository,
                 new JCFBinaryContentRepository()
         );
         authService = new BasicAuthService(
@@ -85,7 +85,7 @@ class BasicUserServiceTest {
                         new byte[]{1,2,3,4,5,6,7,8}
                 ));
 
-        UserUpdateRequestDto request = new UserUpdateRequestDto(created.profileId(),"새김양현",
+        UserUpdateRequestDto request = new UserUpdateRequestDto("새김양현",
                 "new@naver.com", "password");
 
         userService.update(created.id(), request, null);

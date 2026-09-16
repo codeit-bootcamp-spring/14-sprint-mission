@@ -10,7 +10,5 @@ public record ReadStatusCreateRequestDto(
          UUID channelId,
          Instant lastReadAt
 ) {
-    public ReadStatus toEntity() {
-        return new ReadStatus(userId, channelId);
-    }
+
 }

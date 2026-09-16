@@ -70,7 +70,7 @@ class BasicMessageServiceTest {
 
         assertEquals("안녕하세요", found.content());
         assertEquals(channelId, found.channelId());
-        assertEquals(author, found.userId());
+        assertEquals(author, found.authorId());
     }
 
     @Test

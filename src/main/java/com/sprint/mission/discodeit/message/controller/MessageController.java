@@ -1,11 +1,17 @@
 package com.sprint.mission.discodeit.message.controller;
 
+import com.sprint.mission.discodeit.common.dto.PageResponse;
 import com.sprint.mission.discodeit.message.dto.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.message.dto.MessageDto;
 import com.sprint.mission.discodeit.message.dto.MessageResponseDto;
 import com.sprint.mission.discodeit.message.application.MessageService;
 import com.sprint.mission.discodeit.message.dto.MessageUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,14 +26,14 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public MessageResponseDto create(@RequestPart(value = "messageCreateRequest") MessageCreateRequestDto request,
-                                     @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments){
+    public MessageDto create(@RequestPart(value = "messageCreateRequest") MessageCreateRequestDto request,
+                             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments){
 
         return messageService.create(request, attachments);
     }
 
     @PatchMapping(value = "/{messageId}")
-    public MessageResponseDto update(@PathVariable UUID messageId,
+    public MessageDto update(@PathVariable UUID messageId,
                                      @RequestBody MessageUpdateRequestDto request){
 
         return messageService.update(messageId, request);
@@ -39,8 +45,11 @@ public class MessageController {
     }
 
     @GetMapping
-    public List<MessageResponseDto> findAllByChannelId(@RequestParam UUID channelId){
-        return messageService.findAllByChannelId(channelId);
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+            @RequestParam UUID channelId,
+            @PageableDefault(size = 50, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable){
+
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, pageable));
     }
 
 
