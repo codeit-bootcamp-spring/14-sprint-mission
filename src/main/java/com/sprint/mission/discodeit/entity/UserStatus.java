@@ -1,47 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-/** 사용자별 마지막 접속 시간. 온라인 여부를 판단하는 데 쓴다. */
-public class UserStatus extends Common {
-    private static final long serialVersionUID = 1L;
+@Entity
+@Table(name = "user_statuses")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    /** 이 시간 안에 접속 기록이 있으면 접속 중으로 본다. */
-    private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(5);
+  @JsonBackReference
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant lastActiveAt;
 
-    private final UUID userId;
-    private Instant lastActiveAt;
+  public UserStatus(User user, Instant lastActiveAt) {
+    setUser(user);
+    this.lastActiveAt = lastActiveAt;
+  }
 
-    public UserStatus(UUID userId, Instant lastActiveAt) {
-        super();
-        this.userId = userId;
-        this.lastActiveAt = lastActiveAt;
+  public void update(Instant lastActiveAt) {
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
     }
+  }
 
-    public UUID getUserId() {
-        return userId;
-    }
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 
-    public Instant getLastActiveAt() {
-        return lastActiveAt;
-    }
-
-    /**
-     * 마지막 접속이 5분 이내면 접속 중으로 본다.
-     * 판단 기준은 도메인 규칙이라 여기 둔다. 서비스마다 계산하면 규칙이 갈라진다.
-     */
-    public boolean isOnline() {
-        if (lastActiveAt == null) {
-            return false;
-        }
-        return Duration.between(lastActiveAt, Instant.now()).compareTo(ONLINE_THRESHOLD) <= 0;
-    }
-
-    public void updateLastActiveAt(Instant newLastActiveAt) {
-        this.lastActiveAt = newLastActiveAt;
-        update();
-    }
-
+  protected void setUser(User user) {
+    this.user = user;
+    user.setStatus(this);
+  }
 }

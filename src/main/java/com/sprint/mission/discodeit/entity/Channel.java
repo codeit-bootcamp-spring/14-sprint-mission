@@ -1,52 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends Common {
-    private static final long serialVersionUID = 1L;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    private ChannelType type;
-    private String channelName;
-    private String description;
+@Entity
+@Table(name = "channels")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
-    public Channel(ChannelType type, String channelName, String description) {
-        super();
-        this.type = type;
-        this.channelName = channelName;
-        this.description = description;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(length = 100)
+  private String name;
+  @Column(length = 500)
+  private String description;
+
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
+
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    public ChannelType getType() {
-        return type;
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * type은 뺐다. PUBLIC/PRIVATE 전환은 참여자 유무 자체가 바뀌는 셈이라 의미가 깨진다.
-     * null인 항목은 바꾸지 않는다 — User.update()와 같은 규칙.
-     */
-    public void update(String newChannelName, String newDescription) {
-        boolean anyValueUpdated = false;
-        if (newChannelName != null && !newChannelName.equals(this.channelName)) {
-            this.channelName = newChannelName;
-            anyValueUpdated = true;
-        }
-        if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            update();
-        }
-    }
-
-    public String toString() {
-        return String.format("채널종류: %s, 채널이름: %s, 설명: %s", type, channelName, description);
-    }
-
+  }
 }

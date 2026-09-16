@@ -1,28 +1,26 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    /** 등록·수정 모두 "현재 상태를 기록한다"는 같은 일이라 한 메서드로 받음. */
-    User save(User user);
+  Optional<User> findByUsername(String username);
 
-    /** 없을 수 있다는 것을 타입에 드러낸다. 없을 때의 처리는 Service가 정함. */
-    Optional<User> findById(UUID id);
+  boolean existsByEmail(String email);
 
-    /** 로그인처럼 username으로 엔티티 자체가 필요할 때 쓴다. existsByUsername과 달리 값을 돌려준다. */
-    Optional<User> findByUsername(String username);
+  boolean existsByUsername(String username);
 
-    List<User> findAll();
+  boolean existsByEmailAndIdNot(String email, UUID id);
 
-    void deleteById(UUID id);
+  boolean existsByUsernameAndIdNot(String username, UUID id);
 
-    // 있는지만 알면 되는데 findAll()로 전부 꺼내오면 데이터가 커질수록 손해.
-    boolean existsByUsername(String username);
-
-    boolean existsByEmail(String email);
+  @Query("SELECT u FROM User u "
+      + "LEFT JOIN FETCH u.profile "
+      + "JOIN FETCH u.status")
+  List<User> findAllWithProfileAndStatus();
 }
