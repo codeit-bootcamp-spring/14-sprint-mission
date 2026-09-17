@@ -1,43 +1,59 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
+@Table(name = "users")
 @Getter
-public class User extends Basic {
-    private String name;
-    private String password;
-    private String email;
-    private UUID profileId; //프로필사진 없어도 됨.
+@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
+public class User extends BaseUpdatableEntity {
 
-    public User(UUID id, String name, String password, String email) {
-        super(id);
-        this.name = name;
-        this.password = password;
-        this.email = email;
-    }
+  @Column(length = 50, nullable = false, unique = true)
+  private String username;
+  @Column(length = 100, nullable = false, unique = true)
+  private String email;
+  @Column(length = 60, nullable = false)
+  private String password;
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
+  private BinaryContent profile;
+  @JsonManagedReference
+  @Setter(AccessLevel.PROTECTED)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
 
-    public void update(String name, String password, String email) {
-        if(name != null) {
-            this.name = name;
-        }
-        if (password != null) {
-            this.password = password;
-        }
-        if (email != null) {
-            this.email = email;
-        }
-        super.updatedAt = Instant.now();
-    }
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
+  }
 
-    public void changeProfile(UUID profileId) {
-        this.profileId = profileId; // null이면 프로필 제거
-        this.updatedAt = Instant.now();
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent newProfile) {
+    if (newUsername != null && !newUsername.equals(this.username)) {
+      this.username = newUsername;
     }
-
-    public String toString() {
-        return String.format("아이디: %s, 생성일: %s, 수정일: %s, 이름: %s, 비밀번호: %s, 이메일: %s", super.id, super.createdAt, this.updatedAt, this.name, this.password, this.email);
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
     }
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
+    }
+    if (newProfile != null) {
+      this.profile = newProfile;
+    }
+  }
 }

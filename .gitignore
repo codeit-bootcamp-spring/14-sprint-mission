@@ -3,13 +3,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-.kotlin
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea
 *.iws
 *.iml
 *.ipr
@@ -41,5 +37,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-### 직렬화 저장 파일 ###
-data/
+
+### Discodeit ###
+.discodeit
+
+### Submission-only local files ###
+docs/
+src/main/generated/

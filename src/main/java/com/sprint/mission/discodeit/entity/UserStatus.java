@@ -1,34 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus extends Basic{
-    private UUID userId;
-    private Instant lastActiveAt;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    public UserStatus(UUID id, UUID userId) {
-        super(id);
-        this.userId = userId;
-        this.lastActiveAt = Instant.now();
+  @JsonBackReference
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant lastActiveAt;
+
+  public UserStatus(User user, Instant lastActiveAt) {
+    setUser(user);
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  public void update(Instant lastActiveAt) {
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
     }
+  }
 
-    public void updateActive() {
-        this.lastActiveAt = Instant.now();
-        super.updatedAt = Instant.now();
-    }
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 
-    public boolean isOnline() {
-
-        if (this.lastActiveAt.isAfter(Instant.now().minusSeconds(300))) {
-            return true;
-        }
-        else {
-            return false;
-        }
-
-    }
+  protected void setUser(User user) {
+    this.user = user;
+    user.setStatus(this);
+  }
 }

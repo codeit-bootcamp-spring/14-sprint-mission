@@ -1,34 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
+@Entity
+@Table(name = "channels")
 @Getter
-public class Channel extends Basic {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
-    private String channelName; //채널명
-    private String description; //채널설명
-    private ChannelType type; //공개, 비공개 채널
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(length = 100)
+  private String name;
+  @Column(length = 500)
+  private String description;
 
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 
-    private Channel(UUID id, String channelName, String description, ChannelType type) {
-        super(id);
-        this.channelName = channelName;
-        this.description = description;
-        this.type = type;
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    public void update(String title) {
-        if (title != null) {
-            this.channelName = title;
-        }
-        super.updatedAt = Instant.now();
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
-
-    public static Channel create(UUID id, String channelName, String description, ChannelType type) {
-        return new Channel(id, channelName, description, type);
-    }
+  }
 }
