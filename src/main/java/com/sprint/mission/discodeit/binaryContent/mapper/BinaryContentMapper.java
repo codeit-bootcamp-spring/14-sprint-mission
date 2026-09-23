@@ -13,6 +13,9 @@ import java.util.UUID;
 public class BinaryContentMapper {
 
     public BinaryContentDto toDto(BinaryContent binaryContent){
+        if (binaryContent == null){
+            return null;
+        }
         return new BinaryContentDto(
                 binaryContent.getId(),
                 binaryContent.getFileName(),

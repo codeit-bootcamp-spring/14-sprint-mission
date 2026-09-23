@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.common.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.common.exception.DuplicateUsernameException;
 import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.user.application.UserService;
@@ -33,6 +34,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -97,7 +99,7 @@ public class BasicUserService implements UserService {
     public List<UserResponseDto> findAll() {
 
         return userRepository.findAll().stream()
-                .map(user -> find(user.getId()))
+                .map(user -> UserResponseDto.from(user, user.getUserStatus()))
                 .toList();
     }
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.user.repository;
 
 import com.sprint.mission.discodeit.user.domain.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,6 +12,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByUserName(String userName);
 
     Optional<User> findByEmail(String email);
+
+    @Override
+    @EntityGraph(attributePaths = {"profile", "userStatus"})
+    List<User> findAll();
 //    void save(User user);
 //    Optional<User> findById(UUID id); // Optional 로 감싸기
 //    List<User> findAll();

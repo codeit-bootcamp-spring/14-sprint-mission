@@ -100,7 +100,7 @@ class BasicChannelServiceTest {
 
         assertThrows(NoSuchElementException.class, () -> channelService.find(created.id()));
         assertTrue(messageRepository.findAllByChannelId(created.id()).isEmpty());
-        assertTrue(readStatusRepository.findAllByChannelId(created.id()).isEmpty());
+        assertTrue(readStatusRepository.findUserIdByChannelId(created.id()).isEmpty());
     }
 
 

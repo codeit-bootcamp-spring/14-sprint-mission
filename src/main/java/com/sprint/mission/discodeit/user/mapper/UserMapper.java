@@ -15,6 +15,9 @@ public class UserMapper {
     private final BinaryContentMapper binaryContentMapper;
 
     public UserDto toDto(User user){
+        if(user == null){
+            return null;
+        }
         return new UserDto(
                 user.getId(),
                 user.getUserName(),

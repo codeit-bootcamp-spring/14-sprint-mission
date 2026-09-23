@@ -47,7 +47,7 @@ public class MessageController {
     @GetMapping
     public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
             @RequestParam UUID channelId,
-            @PageableDefault(size = 50, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable){
+            @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
 
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId, pageable));
     }

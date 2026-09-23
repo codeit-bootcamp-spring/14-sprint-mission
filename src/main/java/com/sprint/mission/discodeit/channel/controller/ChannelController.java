@@ -17,12 +17,12 @@ public class ChannelController {
 
     // public, private 채널 가르는건 service에서 함
     @PostMapping(value = "/public")
-    public ChannelResponseDto publicChannelCreate(@RequestBody PublicChannelCreateRequest request){
+    public ChannelDto publicChannelCreate(@RequestBody PublicChannelCreateRequest request){
         return channelService.publicCreate(request);
     }
 
     @PostMapping(value = "/private")
-    public ChannelResponseDto privateChannelCreate(@RequestBody PrivateChannelCreateRequest request){
+    public ChannelDto privateChannelCreate(@RequestBody PrivateChannelCreateRequest request){
         return channelService.privateCreate(request);
     }
 
@@ -38,7 +38,7 @@ public class ChannelController {
     }
 
     @GetMapping
-    public List<ChannelFindResponseDto> findAllByUserId(@RequestParam UUID userId){
+    public List<ChannelDto> findAllByUserId(@RequestParam UUID userId){
         return channelService.findAllByUserId(userId);
     }
 
