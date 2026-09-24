@@ -12,7 +12,7 @@ public interface ChannelService extends BasicService<Channel> {
 
     ChannelDto privateCreate(PrivateChannelCreateRequest channelCreateRequestDto);
 
-    ChannelResponseDto update(UUID id, ChannelUpdateRequestDto request);
+    ChannelDto update(UUID id, ChannelUpdateRequestDto request);
 
     ChannelDto find(UUID id);
     List<ChannelDto> findAllByUserId(UUID userId);

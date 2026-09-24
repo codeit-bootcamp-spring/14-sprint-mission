@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.user.application;
 
 import com.sprint.mission.discodeit.common.application.BasicService;
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.dto.UserResponseDto;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.domain.User;
@@ -13,15 +14,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService extends BasicService<UserResponseDto> {
-    UserResponseDto create(UserCreateRequestDto userRequestDto, MultipartFile profile);
+    UserDto create(UserCreateRequestDto userRequestDto, MultipartFile profile);
 
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
 
-    UserResponseDto find(UUID id);
+    UserDto find(UUID id);
 
-    List<UserResponseDto> findAll();
+    List<UserDto> findAll();
 
 
-    UserResponseDto update(UUID id, UserUpdateRequestDto userUpdateRequestDto, MultipartFile profile);
+    UserDto update(UUID id, UserUpdateRequestDto userUpdateRequestDto, MultipartFile profile);
 }

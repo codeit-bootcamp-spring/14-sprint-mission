@@ -6,24 +6,13 @@ import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-public class UserMapper {
+@Mapper(componentModel = "spring", uses = BinaryContentMapper.class)
+public interface UserMapper {
 
-    private final BinaryContentMapper binaryContentMapper;
-
-    public UserDto toDto(User user){
-        if(user == null){
-            return null;
-        }
-        return new UserDto(
-                user.getId(),
-                user.getUserName(),
-                user.getEmail(),
-                binaryContentMapper.toDto(user.getProfile()),
-                user.getUserStatus().isOnline()
-        );
-    }
+    @Mapping(target = "username", source = "userName")
+    @Mapping(target = "online", source = "userStatus.online")
+    UserDto toDto(User user);
 }

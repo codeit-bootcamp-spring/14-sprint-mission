@@ -49,7 +49,7 @@ public class BasicReadStatusService implements ReadStatusService {
         User user = userRepository.findById(request.userId()).orElseThrow(NotFoundUserException::new);
         Channel channel = channelRepository.findById(request.channelId()).orElseThrow(NotFoundChannelException::new);
 
-        ReadStatus readStatus = ReadStatus.create(user, channel);
+        ReadStatus readStatus = ReadStatus.create(user, channel, request.lastReadAt());
         readStatusRepository.save(readStatus);
 
         return readStatusMapper.toDto(readStatus);

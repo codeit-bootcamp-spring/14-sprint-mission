@@ -27,7 +27,7 @@ public class ChannelController {
     }
 
     @PatchMapping("/{channelId}")
-    public ChannelResponseDto updatePublicChannel(@PathVariable UUID channelId,
+    public ChannelDto updatePublicChannel(@PathVariable UUID channelId,
             @RequestBody ChannelUpdateRequestDto request){
         return channelService.update(channelId, request);
     }

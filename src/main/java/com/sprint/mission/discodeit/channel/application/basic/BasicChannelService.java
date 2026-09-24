@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.channel.dto.*;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 import com.sprint.mission.discodeit.channel.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.common.entity.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.common.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.readStatus.domain.ReadStatus;
 import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.common.exception.PrivateChannelUpdateNotAllowedException;
@@ -79,17 +80,21 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
-    public ChannelResponseDto update(UUID id, ChannelUpdateRequestDto request) {
-        Channel channel1 = channelCheck(id);
-        if (channel1.getChannelType() == ChannelType.PRIVATE) {
+    public ChannelDto update(UUID id, ChannelUpdateRequestDto request) {
+        Channel channel = channelCheck(id);
+        if (channel.getChannelType() == ChannelType.PRIVATE) {
             throw new PrivateChannelUpdateNotAllowedException();
         }
-        channel1.update(request.newName(), request.newDescription());
+        channel.update(request.newName(), request.newDescription());
 //        channelRepository.save(channel1);  // 변경 감지
 
-        return ChannelResponseDto.from(channel1.getId(), channel1.getCreatedAt(), channel1.getUpdatedAt(),
-                channel1.getChannelType(), channel1.getName(),
-                channel1.getDescription());
+        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
+                .map(BaseEntity::getCreatedAt)
+                .max(Instant::compareTo)
+                .orElse(null);
+
+
+        return channelMapper.toDto(channel, List.of(), lastMessageAt);
     }
 
     @Override

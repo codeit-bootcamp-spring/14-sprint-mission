@@ -6,7 +6,9 @@ import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.common.exception.AuthenticationFailedException;
 import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.user.domain.UserStatus;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.dto.UserResponseDto;
+import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.auth.application.AuthService;
 import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
@@ -23,10 +25,11 @@ public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
-    public AuthLoginResponseDto login(AuthLoginRequestDto authLoginRequestDto) {
+    public UserDto login(AuthLoginRequestDto authLoginRequestDto) {
 
         User user = userRepository.findByUserName(authLoginRequestDto.username()).orElseThrow(NoSuchElementException::new);
 
@@ -36,8 +39,7 @@ public class BasicAuthService implements AuthService {
 
             userStatus.updateLastAccessAt();
 //            userStatusRepository.update(userStatus); // 변경 감지
-            return AuthLoginResponseDto.from(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
-                                             user.getUserName(), user.getEmail(),user.getPassword(), UserResponseDto.ProfileResponse.from(user.getProfile()));
+            return userMapper.toDto(user);
         }
 
         throw new AuthenticationFailedException();
