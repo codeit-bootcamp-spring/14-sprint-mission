@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: discodeit
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create            # 개발 시에는 create 가 나을듯
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: uploads
+
