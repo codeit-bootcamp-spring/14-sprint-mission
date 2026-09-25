@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.domain.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import java.util.List;
 import java.util.Map;
@@ -12,27 +12,28 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class JCFUserStatusRepository implements UserStatusRepository {
-    private final Map<UUID, UserStatus> data;
 
-    @Override
-    public UserStatus save(UserStatus userStatus) {
-        return data.put(userStatus.getUuid(), userStatus);
-    }
+  private final Map<UUID, UserStatus> data;
 
-    @Override
-    public Optional<UserStatus> read(UUID uuid) {
-        return Optional.ofNullable(data.get(uuid));
-    }
+  @Override
+  public UserStatus save(UserStatus userStatus) {
+    return data.put(userStatus.getUuid(), userStatus);
+  }
 
-    @Override
-    public void delete(UUID uuid) {
-        data.remove(uuid);
-    }
+  @Override
+  public Optional<UserStatus> read(UUID uuid) {
+    return Optional.ofNullable(data.get(uuid));
+  }
 
-    @Override
-    public List<UserStatus> readAll() {
-        return data.values().stream().toList();
-    }
+  @Override
+  public void delete(UUID uuid) {
+    data.remove(uuid);
+  }
+
+  @Override
+  public List<UserStatus> readAll() {
+    return data.values().stream().toList();
+  }
 
 
 }

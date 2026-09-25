@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.domain;
 
 import com.sprint.mission.discodeit.util.Instant;
 import java.util.UUID;
@@ -6,25 +6,26 @@ import lombok.Getter;
 
 @Getter
 public class ReadStatus {
-    private final UUID uuid;
-    private final UUID userId;
-    private final UUID channelId;
-    private final Long createdAt;
-    private Long recentReadAt;
 
-    private ReadStatus(UUID userId, UUID channelId) {
-        this.uuid = UUID.randomUUID();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.createdAt = Instant.now();
-    }
+  private final UUID uuid;
+  private final UUID userId;
+  private final UUID channelId;
+  private final Long createdAt;
+  private Long recentReadAt;
 
-    public ReadStatus update(Long recentReadAt) {
-        this.recentReadAt = recentReadAt;
-        return this;
-    }
+  private ReadStatus(UUID userId, UUID channelId) {
+    this.uuid = UUID.randomUUID();
+    this.userId = userId;
+    this.channelId = channelId;
+    this.createdAt = Instant.now();
+  }
 
-    public static ReadStatus create(UUID userId, UUID channelId) {
-        return new ReadStatus(userId, channelId);
-    }
+  public ReadStatus update(Long recentReadAt) {
+    this.recentReadAt = recentReadAt;
+    return this;
+  }
+
+  public static ReadStatus create(UUID userId, UUID channelId) {
+    return new ReadStatus(userId, channelId);
+  }
 }

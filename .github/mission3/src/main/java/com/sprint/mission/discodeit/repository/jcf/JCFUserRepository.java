@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
@@ -14,27 +14,27 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class JCFUserRepository implements UserRepository {
 
-    private final Map<UUID, User> data;
+  private final Map<UUID, User> data;
 
-    @Override
-    public User save(User user) {
-        UUID uuid = user.getId();
-        data.put(uuid, user);
-        return data.get(uuid);
-    }
+  @Override
+  public User save(User user) {
+    UUID uuid = user.getId();
+    data.put(uuid, user);
+    return data.get(uuid);
+  }
 
-    @Override
-    public Optional<User> findById(UUID uuid) {
-        return Optional.of(data.get(uuid));
-    }
+  @Override
+  public Optional<User> findById(UUID uuid) {
+    return Optional.of(data.get(uuid));
+  }
 
-    @Override
-    public void delete(UUID uuid) {
-        data.remove(uuid);
-    }
+  @Override
+  public void delete(UUID uuid) {
+    data.remove(uuid);
+  }
 
-    @Override
-    public List<User> readAll() {
-        return data.values().stream().toList();
-    }
+  @Override
+  public List<User> readAll() {
+    return data.values().stream().toList();
+  }
 }
