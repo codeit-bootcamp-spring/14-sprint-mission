@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.adaptor.dto.userStatusDto;
+package com.sprint.mission.discodeit.application.user.dto;
 
 import java.time.Instant;
 import java.util.UUID;

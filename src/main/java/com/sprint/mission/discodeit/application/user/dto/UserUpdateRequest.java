@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.adaptor.dto.userDto;
+package com.sprint.mission.discodeit.application.user.dto;
 
 public record UserUpdateRequest(
     String newUsername,
