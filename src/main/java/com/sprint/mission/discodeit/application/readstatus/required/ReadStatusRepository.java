@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.application;
+package com.sprint.mission.discodeit.application.readstatus.required;
 
 import com.sprint.mission.discodeit.domain.ReadStatus;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.adaptor.dto.readStatus;
+package com.sprint.mission.discodeit.application.readstatus.dto;
 
 import java.util.UUID;
 
