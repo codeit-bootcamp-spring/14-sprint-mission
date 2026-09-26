@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.user.application.basic;
 
 import com.sprint.mission.discodeit.binaryContent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.dto.UserResponseDto;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.binaryContent.domain.BinaryContent;
@@ -11,6 +12,7 @@ import com.sprint.mission.discodeit.common.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.common.exception.DuplicateUsernameException;
 import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.user.application.UserService;
@@ -33,10 +35,11 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
-    public UserResponseDto create(UserCreateRequestDto userRequestDto, MultipartFile profile) {
+    public UserDto create(UserCreateRequestDto userRequestDto, MultipartFile profile) {
 
         //findByUsername, findByEmail 구현하기
         if (this.findByUsername(userRequestDto.username()).isPresent()) {
@@ -57,7 +60,7 @@ public class BasicUserService implements UserService {
             binaryContentRepository.save(binaryContent);
             try {
                 binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
-            } catch (IOException e){
+            } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
             user.updateProfile(binaryContent);
@@ -69,7 +72,7 @@ public class BasicUserService implements UserService {
         userRepository.save(user);  // 영속성 전이로 자식까지 넣음
 
 
-        return UserResponseDto.from(user, userStatus);
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -86,26 +89,24 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDto find(UUID id) {
+    public UserDto find(UUID id) {
         User user = userCheck(id);
-        UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
-        return UserResponseDto.from(user, userStatus);
+        return userMapper.toDto(user);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponseDto> findAll() {
+    public List<UserDto> findAll() {
 
         return userRepository.findAll().stream()
-                .map(user -> find(user.getId()))
+                .map(userMapper::toDto)
                 .toList();
     }
 
     @Override
     @Transactional
-    public UserResponseDto update(UUID id, UserUpdateRequestDto userUpdateRequestDto, MultipartFile profile) {
+    public UserDto update(UUID id, UserUpdateRequestDto userUpdateRequestDto, MultipartFile profile) {
         User user = userCheck(id);
-        UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
         // 사진이 있으면
         if (profile != null) {
 
@@ -114,14 +115,19 @@ public class BasicUserService implements UserService {
                     profile.getContentType());
 
             user.updateProfile(binaryContent);
-//                binaryContentRepository.save(binaryContent);
+            binaryContentRepository.save(binaryContent);
+            try {
+                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
 
 
         }
 
         user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newEmail(), userUpdateRequestDto.newPassword());
 
-        return UserResponseDto.from(user, userStatus);
+        return userMapper.toDto(user);
     }
 
     @Override

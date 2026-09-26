@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.channel.application.basic;
 import com.sprint.mission.discodeit.channel.domain.ChannelType;
 import com.sprint.mission.discodeit.channel.dto.*;
 import com.sprint.mission.discodeit.channel.domain.Channel;
+import com.sprint.mission.discodeit.channel.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.common.entity.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.common.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.readStatus.domain.ReadStatus;
 import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.common.exception.PrivateChannelUpdateNotAllowedException;
@@ -29,17 +31,18 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final ChannelMapper channelMapper;
 
     @Override
     @Transactional
-    public ChannelResponseDto publicCreate(PublicChannelCreateRequest request) {
+    public ChannelDto publicCreate(PublicChannelCreateRequest request) {
         Channel channel = request.toEntity();
         return publicChannelCreate(channel);
     }
 
     @Override
     @Transactional
-    public ChannelResponseDto privateCreate(PrivateChannelCreateRequest request) {
+    public ChannelDto privateCreate(PrivateChannelCreateRequest request) {
         Channel channel = request.toEntity();
         return privateChannelCreate(channel, request.participantIds());
 
@@ -47,12 +50,12 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional(readOnly = true)
-    public ChannelFindResponseDto find(UUID id) {
+    public ChannelDto find(UUID id) {
         Channel channel = channelCheck(id);
 
         List<UUID> userIds = new ArrayList<>();
         if (channel.getChannelType() == ChannelType.PRIVATE) {
-            userIds = readStatusRepository.findAllByChannelId(channel.getId());
+            userIds = readStatusRepository.findUserIdByChannelId(channel.getId());
         }
 
         Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
@@ -60,34 +63,38 @@ public class BasicChannelService implements ChannelService {
                 .max(Instant::compareTo)
                 .orElse(null);
 
-        return ChannelFindResponseDto.from(channel.getId(),channel.getChannelType(),  channel.getName(), channel.getDescription(),
-                userIds, lastMessageAt);
+        List<User> users = userIds.stream()
+                .map(userId -> userRepository.findById(userId).orElseThrow(NoSuchElementException::new))
+                .toList();
+
+        return channelMapper.toDto(channel, users, lastMessageAt);
     }
 
     // 특정 유저가 볼 수 있는 채널 조회
     @Override
     @Transactional(readOnly = true)
-    public List<ChannelFindResponseDto> findAllByUserId(UUID userId) {
-        return channelRepository.findAll().stream()
-                .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC ||
-                        readStatusRepository.findAllByChannelId(channel.getId()).contains(userId))
-                .map(channel -> find(channel.getId()))
-                .toList();
+    public List<ChannelDto> findAllByUserId(UUID userId) {
+        return channelRepository.findAllVisibleTo(userId);
     }
 
 
     @Override
     @Transactional
-    public ChannelResponseDto update(UUID id, ChannelUpdateRequestDto request) {
-        Channel channel1 = channelCheck(id);
-        if (channel1.getChannelType() == ChannelType.PRIVATE) {
+    public ChannelDto update(UUID id, ChannelUpdateRequestDto request) {
+        Channel channel = channelCheck(id);
+        if (channel.getChannelType() == ChannelType.PRIVATE) {
             throw new PrivateChannelUpdateNotAllowedException();
         }
-        channel1.update(request.newName(), request.newDescription());
+        channel.update(request.newName(), request.newDescription());
 //        channelRepository.save(channel1);  // 변경 감지
-        return ChannelResponseDto.from(channel1.getId(), channel1.getCreatedAt(), channel1.getUpdatedAt(),
-                channel1.getChannelType(), channel1.getName(),
-                channel1.getDescription());
+
+        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
+                .map(BaseEntity::getCreatedAt)
+                .max(Instant::compareTo)
+                .orElse(null);
+
+
+        return channelMapper.toDto(channel, List.of(), lastMessageAt);
     }
 
     @Override
@@ -105,18 +112,19 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    private ChannelResponseDto publicChannelCreate(Channel channel) {
+    private ChannelDto publicChannelCreate(Channel channel) {
 
         channelRepository.save(channel);
-        return ChannelResponseDto.from(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                channel.getChannelType(), channel.getName(), channel.getDescription());
+        return channelMapper.toDto(channel, List.of(), null);
     }
 
 
-    private ChannelResponseDto privateChannelCreate(Channel channel, List<UUID> userIds) {
+    private ChannelDto privateChannelCreate(Channel channel, List<UUID> userIds) {
 
+        List<User> participants = new ArrayList<>();
         for (UUID userId : userIds) {
             User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+            participants.add(user);
 
             ReadStatus readStatus = new ReadStatus(user, channel);
 
@@ -125,8 +133,7 @@ public class BasicChannelService implements ChannelService {
         }
 
         channelRepository.save(channel);
-        return ChannelResponseDto.from(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                channel.getChannelType(), channel.getName(), channel.getDescription());
+        return channelMapper.toDto(channel, participants, null);
     }
 
 

@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.message.application.basic;
 
 import com.sprint.mission.discodeit.binaryContent.domain.BinaryContent;
+import com.sprint.mission.discodeit.binaryContent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 import com.sprint.mission.discodeit.common.dto.PageResponse;
 import com.sprint.mission.discodeit.common.mapper.PageResponseMapper;
-import com.sprint.mission.discodeit.message.MessageMapper;
+import com.sprint.mission.discodeit.message.mapper.MessageMapper;
 import com.sprint.mission.discodeit.message.dto.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.message.dto.MessageDto;
-import com.sprint.mission.discodeit.message.dto.MessageResponseDto;
 import com.sprint.mission.discodeit.message.domain.Message;
 import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentRepository;
@@ -25,10 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
 
@@ -56,7 +58,12 @@ public class BasicMessageService implements MessageService {
 
                 BinaryContent binaryContent = new BinaryContent(file.getOriginalFilename(), file.getSize(),
                         file.getContentType());
-//                    binaryContentRepository.save(binaryContent);  // DB에 CasCade 걸어놨는데 잘 작동하는지 확인
+                binaryContentRepository.save(binaryContent);
+                try {
+                    binaryContentStorage.put(binaryContent.getId(), file.getBytes());
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
                 attachmentList.add(binaryContent);
             }
         }
@@ -77,7 +84,7 @@ public class BasicMessageService implements MessageService {
     @Transactional
     public MessageDto update(UUID id, MessageUpdateRequestDto request) {
         Message message = check(id);
-        message.update(request.newMessage());
+        message.update(request.newContent());
 //        messageRepository.save(message);  // 변경 감지
 
         return messageMapper.toDto(message);
@@ -102,12 +109,17 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    @Transactional
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-        Slice<MessageDto> slice = messageRepository.findAllByChannelId(channelId, pageable)
-                .map(messageMapper::toDto);
+    @Transactional(readOnly = true)
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+        Slice<Message> messages = (cursor == null)
+                ? messageRepository.findAllByChannelId(channelId, pageable)
+                : messageRepository.findAllByChannelIdAndCreatedAtLessThan(channelId, cursor, pageable);
 
-        return pageResponseMapper.fromSlice(slice);
+        Slice<MessageDto> slice = messages.map(messageMapper::toDto);
+
+        List<MessageDto> content = slice.getContent();
+        Instant nextCursor = content.isEmpty() ? null : content.get(content.size() - 1).createdAt();
+        return pageResponseMapper.fromSlice(slice, nextCursor);
     }
 
 

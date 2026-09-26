@@ -67,20 +67,20 @@ public class BasicUserStatusService implements UserStatusService {
                 .toList();
     }
 
-    @Override
-    @Transactional
-    public UserStatusDto update(UUID id){
-        UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        userStatus.updateLastAccessAt();
-
-        return userStatusMapper.toDto(userStatus);
-    }
+//    @Override
+//    @Transactional
+//    public UserStatusDto update(UUID id){
+//        UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(NoSuchElementException::new);
+//        userStatus.updateLastAccessAt();
+//
+//        return userStatusMapper.toDto(userStatus);
+//    }
 
     @Override
     @Transactional
     public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequestDto request){
         UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(NoSuchElementException::new);
-        userStatus.updateLastAccessAt();
+        userStatus.updateLastAccessAt(request.newLastActiveAt());
 //        userStatusRepository.update(userStatus);
 
         return userStatusMapper.toDto(userStatus);

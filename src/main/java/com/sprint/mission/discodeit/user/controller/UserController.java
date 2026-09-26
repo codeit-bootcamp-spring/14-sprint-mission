@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.user.controller;
 
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.dto.UserResponseDto;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusDto;
@@ -28,13 +29,13 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserResponseDto create(@RequestPart(value = "userCreateRequest") UserCreateRequestDto request,
-                                  @RequestPart(value = "profile", required = false) MultipartFile profile){
+    public UserDto create(@RequestPart(value = "userCreateRequest") UserCreateRequestDto request,
+                          @RequestPart(value = "profile", required = false) MultipartFile profile){
         return userService.create(request, profile);
     }
 
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserResponseDto update(@PathVariable UUID userId,
+    public UserDto update(@PathVariable UUID userId,
                        @RequestPart("userUpdateRequest") UserUpdateRequestDto request,
                        @RequestPart(value = "profile", required = false) MultipartFile profile){
         return userService.update(userId, request, profile);
@@ -46,7 +47,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserResponseDto> findAll(){
+    public List<UserDto> findAll(){
         return userService.findAll();
     }
 
