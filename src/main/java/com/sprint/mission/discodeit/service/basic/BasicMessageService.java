@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponseMessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -18,6 +19,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -84,10 +88,12 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId).stream()
-        .map(message -> messageMapper.toDto(message, attachmentIds(message.getId())))
-        .toList();
+  public PageResponseMessageDto findAllByChannelId(UUID channelId, int page) {
+    Slice<MessageDto> messages = messageRepository.findAllByChannelId(
+            channelId, PageRequest.of(page, 50, Sort.by("createdAt").descending()))
+        .map(message -> messageMapper.toDto(message, attachmentIds(message.getId())));
+    return new PageResponseMessageDto(
+        messages.getContent(), messages.getNumber(), messages.getSize(), null);
   }
 
   @Override
