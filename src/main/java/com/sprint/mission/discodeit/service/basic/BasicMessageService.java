@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.MessageAttachments;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentsRepository;
@@ -33,6 +34,7 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final MessageAttachmentsRepository messageAttachmentsRepository;
+  private final MessageMapper messageMapper;
 
   @Override
   @Transactional
@@ -70,13 +72,13 @@ public class BasicMessageService implements MessageService {
         channel,
         author
     );
-    return MessageDto.toDto(messageRepository.save(message), attachmentIds);
+    return messageMapper.toDto(messageRepository.save(message), attachmentIds);
   }
 
   @Override
   public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
-        .map(message -> MessageDto.toDto(message, attachmentIds(message.getId())))
+        .map(message -> messageMapper.toDto(message, attachmentIds(message.getId())))
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
   }
@@ -84,7 +86,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public List<MessageDto> findAllByChannelId(UUID channelId) {
     return messageRepository.findAllByChannelId(channelId).stream()
-        .map(message -> MessageDto.toDto(message, attachmentIds(message.getId())))
+        .map(message -> messageMapper.toDto(message, attachmentIds(message.getId())))
         .toList();
   }
 
@@ -96,7 +98,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     message.update(newContent);
-    return MessageDto.toDto(message, attachmentIds(message.getId()));
+    return messageMapper.toDto(message, attachmentIds(message.getId()));
   }
 
   @Override

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -23,6 +24,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
+  private final UserStatusMapper userStatusMapper;
 
   @Override
   public UserStatusDto create(UserStatusCreateRequest request) {
@@ -40,13 +42,13 @@ public class BasicUserStatusService implements UserStatusService {
 
     Instant lastActiveAt = request.lastActiveAt();
     UserStatus userStatus = new UserStatus(target, lastActiveAt);
-    return UserStatusDto.toDto(userStatusRepository.save(userStatus));
+    return userStatusMapper.toDto(userStatusRepository.save(userStatus));
   }
 
   @Override
   public UserStatusDto find(UUID userStatusId) {
     return userStatusRepository.findById(userStatusId)
-        .map(UserStatusDto::toDto)
+        .map(userStatusMapper::toDto)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
   }
@@ -54,7 +56,7 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public List<UserStatusDto> findAll() {
     return userStatusRepository.findAll().stream()
-        .map(UserStatusDto::toDto)
+        .map(userStatusMapper::toDto)
         .toList();
   }
 
@@ -69,7 +71,7 @@ public class BasicUserStatusService implements UserStatusService {
     userStatus.update(newLastActiveAt);
 
 //    return userStatusRepository.save(userStatus); <- dirty checking으로 자동 업데이트 쿼리 날림
-    return UserStatusDto.toDto(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
@@ -83,7 +85,7 @@ public class BasicUserStatusService implements UserStatusService {
     userStatus.update(newLastActiveAt);
 
 //    return userStatusRepository.save(userStatus);
-    return UserStatusDto.toDto(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override

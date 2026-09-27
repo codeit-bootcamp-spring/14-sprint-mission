@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -29,6 +30,7 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
+  private final ChannelMapper channelMapper;
 
   @Override
   public ChannelDto create(PublicChannelCreateRequest request) {
@@ -128,6 +130,6 @@ public class BasicChannelService implements ChannelService {
           .forEach(participantIds::add);
     }
 
-    return ChannelDto.toDto(channel, participantIds, lastMessageAt);
+    return channelMapper.toDto(channel, participantIds, lastMessageAt);
   }
 }
