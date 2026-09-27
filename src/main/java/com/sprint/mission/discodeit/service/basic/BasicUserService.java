@@ -32,7 +32,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public User create(UserCreateRequest userCreateRequest,
+  public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
@@ -60,7 +60,7 @@ public class BasicUserService implements UserService {
     );
 
     userStatusRepository.save(new UserStatus(createdUser, Instant.now()));
-    return createdUser;
+    return toDto(createdUser);
   }
 
   @Override
@@ -80,7 +80,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
@@ -115,7 +115,7 @@ public class BasicUserService implements UserService {
    /* 트랜잭션 사용해서 컨텍스트내에서 기존값과 새로운값을 비교 <- drity checking
     return userRepository.save(user);
     커밋시 dirty checking에서 값이 바뀌었따면 업데이트 쿼리 날림<- .save() 생략가능 */
-    return user; // <- 이거 실행되고 커밋, db에 업데이트 쿼리 날림 @Transacitonal 덕분
+    return toDto(user); // <- 이거 실행되고 커밋, db에 업데이트 쿼리 날림 @Transacitonal 덕분
   }
 
   @Override
@@ -138,14 +138,6 @@ public class BasicUserService implements UserService {
         .map(UserStatus::isOnline)
         .orElse(null);
 
-    return new UserDto(
-        user.getId(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        user.getUsername(),
-        user.getEmail(),
-        user.getProfile().getId(),
-        online
-    );
+    return UserDto.toDto(user, online);
   }
 }

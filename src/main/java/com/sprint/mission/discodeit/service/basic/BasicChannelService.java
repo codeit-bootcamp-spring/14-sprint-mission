@@ -31,17 +31,17 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
 
   @Override
-  public Channel create(PublicChannelCreateRequest request) {
+  public ChannelDto create(PublicChannelCreateRequest request) {
     String name = request.name();
     String description = request.description();
     Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
-    return channelRepository.save(channel);
+    return toDto(channelRepository.save(channel));
   }
 
   @Override
   @Transactional
-  public Channel create(PrivateChannelCreateRequest request) {
+  public ChannelDto create(PrivateChannelCreateRequest request) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     Channel createdChannel = channelRepository.save(channel);
 
@@ -57,7 +57,7 @@ public class BasicChannelService implements ChannelService {
         ))
         .forEach(readStatusRepository::save);
 
-    return createdChannel;
+    return toDto(createdChannel);
   }
 
   @Override
@@ -85,7 +85,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public Channel update(UUID channelId, PublicChannelUpdateRequest request) {
+  public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     String newName = request.newName();
     String newDescription = request.newDescription();
     Channel channel = channelRepository.findById(channelId)
@@ -95,7 +95,7 @@ public class BasicChannelService implements ChannelService {
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
     channel.update(newName, newDescription);
-    return channel;
+    return toDto(channel);
   }
 
   @Override
@@ -128,13 +128,6 @@ public class BasicChannelService implements ChannelService {
           .forEach(participantIds::add);
     }
 
-    return new ChannelDto(
-        channel.getId(),
-        channel.getType(),
-        channel.getName(),
-        channel.getDescription(),
-        participantIds,
-        lastMessageAt
-    );
+    return ChannelDto.toDto(channel, participantIds, lastMessageAt);
   }
 }
