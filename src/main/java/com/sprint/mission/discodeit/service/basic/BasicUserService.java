@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +31,7 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
+  @Transactional
   public User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = userCreateRequest.username();
@@ -42,25 +44,22 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("User with username " + username + " already exists");
     }
 
-    UUID nullableProfileId = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent).getId();
-        })
+    BinaryContent profile = optionalProfileCreateRequest
+        .map(request -> binaryContentRepository.save(
+            new BinaryContent(
+                request.fileName(),
+                (long) request.bytes().length,
+                request.contentType(),
+                request.bytes()
+            )
+        ))
         .orElse(null);
-    String password = userCreateRequest.password();
 
-    User user = new User(username, email, password, nullableProfileId);
-    User createdUser = userRepository.save(user);
+    User createdUser = userRepository.save(
+        new User(username, email, userCreateRequest.password(), profile)
+    );
 
-    Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
-    userStatusRepository.save(userStatus);
-
+    userStatusRepository.save(new UserStatus(createdUser, Instant.now()));
     return createdUser;
   }
 
@@ -80,6 +79,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional
   public User update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     User user = userRepository.findById(userId)
@@ -94,35 +94,42 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("User with username " + newUsername + " already exists");
     }
 
-    UUID nullableProfileId = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          Optional.ofNullable(user.getProfileId())
+    BinaryContent profile = optionalProfileCreateRequest
+        .map(request -> {
+          Optional.ofNullable(user.getProfile())
+              .map(BinaryContent::getId)
               .ifPresent(binaryContentRepository::deleteById);
 
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent).getId();
+          return binaryContentRepository.save(
+              new BinaryContent(
+                  request.fileName(),
+                  (long) request.bytes().length,
+                  request.contentType(),
+                  request.bytes()
+              )
+          );
         })
         .orElse(null);
 
-    String newPassword = userUpdateRequest.newPassword();
-    user.update(newUsername, newEmail, newPassword, nullableProfileId);
-
+    user.update(newUsername, newEmail, userUpdateRequest.newPassword(), profile);
+   /* 트랜잭션 사용해서 컨텍스트내에서 기존값과 새로운값을 비교 <- drity checking
     return userRepository.save(user);
+    커밋시 dirty checking에서 값이 바뀌었따면 업데이트 쿼리 날림<- .save() 생략가능 */
+    return user; // <- 이거 실행되고 커밋, db에 업데이트 쿼리 날림 @Transacitonal 덕분
   }
 
   @Override
+  @Transactional
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    Optional.ofNullable(user.getProfileId())
-        .ifPresent(binaryContentRepository::deleteById);
-    userStatusRepository.deleteByUserId(userId);
+    BinaryContent profile = user.getProfile();
+    if (profile != null) {
+      binaryContentRepository.deleteById(profile.getId());
+    }
 
+    userStatusRepository.deleteByUserId(userId);
     userRepository.deleteById(userId);
   }
 
@@ -137,7 +144,7 @@ public class BasicUserService implements UserService {
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfileId(),
+        user.getProfile().getId(),
         online
     );
   }

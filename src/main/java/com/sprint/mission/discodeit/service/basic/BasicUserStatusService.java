@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -24,16 +26,19 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public UserStatus create(UserStatusCreateRequest request) {
     UUID userId = request.userId();
+    User target = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("Userid: " + userId + "does not exist"));
 
-    if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException("User with id " + userId + " does not exist");
-    }
+    //필요없음, 위에서 유저를 가져오기 때문에
+//    if (!userRepository.existsById(userId)) {
+//      throw new NoSuchElementException("User with id " + userId + " does not exist");
+//    }
     if (userStatusRepository.findByUserId(userId).isPresent()) {
       throw new IllegalArgumentException("UserStatus with id " + userId + " already exists");
     }
 
     Instant lastActiveAt = request.lastActiveAt();
-    UserStatus userStatus = new UserStatus(userId, lastActiveAt);
+    UserStatus userStatus = new UserStatus(target, lastActiveAt);
     return userStatusRepository.save(userStatus);
   }
 
@@ -51,6 +56,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
 
@@ -59,10 +65,12 @@ public class BasicUserStatusService implements UserStatusService {
             () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
     userStatus.update(newLastActiveAt);
 
-    return userStatusRepository.save(userStatus);
+//    return userStatusRepository.save(userStatus); <- dirty checking으로 자동 업데이트 쿼리 날림
+    return userStatus;
   }
 
   @Override
+  @Transactional
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
 
@@ -71,7 +79,8 @@ public class BasicUserStatusService implements UserStatusService {
             () -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));
     userStatus.update(newLastActiveAt);
 
-    return userStatusRepository.save(userStatus);
+//    return userStatusRepository.save(userStatus);
+    return userStatus;
   }
 
   @Override
