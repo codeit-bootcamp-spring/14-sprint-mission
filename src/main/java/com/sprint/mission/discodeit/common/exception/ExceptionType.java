@@ -50,6 +50,11 @@ public enum ExceptionType {
       Level.WARN,
       HttpURLConnection.HTTP_NOT_FOUND,
       "이름과 비밀번호를 다시 확인해주세요."
+  ),
+  BINARY_CONTENT_NOT_FOUND(
+      Level.WARN,
+      HttpURLConnection.HTTP_NOT_FOUND,
+      "존재하지 않는 바이너리 콘텐츠입니다."
   );
   Level level;
   int status;
