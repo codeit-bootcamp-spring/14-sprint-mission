@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
-import com.sprint.mission.discodeit.dto.response.PageResponseMessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -88,11 +88,11 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public PageResponseMessageDto findAllByChannelId(UUID channelId, int page) {
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page) {
     Slice<MessageDto> messages = messageRepository.findAllByChannelId(
             channelId, PageRequest.of(page, 50, Sort.by("createdAt").descending()))
         .map(message -> messageMapper.toDto(message, attachmentIds(message.getId())));
-    return new PageResponseMessageDto(
+    return new PageResponse<>(
         messages.getContent(), messages.getNumber(), messages.getSize(), null);
   }
 
