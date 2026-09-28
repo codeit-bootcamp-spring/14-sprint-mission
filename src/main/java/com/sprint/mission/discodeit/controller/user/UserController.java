@@ -1,16 +1,20 @@
 package com.sprint.mission.discodeit.controller.user;
 
-import com.sprint.mission.discodeit.common.dto.ApiResponse;
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.data.UserDto;
+import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.user.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,62 +26,95 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+@RequestMapping(value = "/api/users")
+@Tag(name = "User", description = "User API")
+public class UserController implements UserControllerDocs {
     private final UserService userService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api/users")
-    public ResponseEntity<ApiResponse<Void>> createUser(
-            @RequestPart(value = "user") UserCreateRequestDto request,
+    @Override
+    @RequestMapping(
+            method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<User> create(
+            @Parameter(description = "User 생성 정보")
+            @RequestPart(value = "userCreateRequest") UserCreateRequest request,
+
+            @Parameter(description = "User 프로필 이미지")
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
-        userService.save(request, binaryRequest);
+        User savedUser = userService.save(request, binaryRequest);
 
-        return ApiResponse.toSuccess(CustomStatusCode.CREATED, null);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(savedUser);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/api/users/{id}")
-    public ResponseEntity<ApiResponse<Void>> updateUser(
-            @PathVariable(value = "id") UUID userId,
-            @RequestPart(value = "user") UserUpdateRequestDto request,
+    @Override
+    @RequestMapping(
+            method = RequestMethod.PATCH,
+            value = "/{id}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<User> update(
+            @Parameter(description = "수정할 User ID")
+            @PathVariable("id") UUID userId,
+
+            @Parameter(description = "User 수정 정보")
+            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+
+            @Parameter(description = "수정할 User 프로필 이미지")
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
-        userService.update(request, binaryRequest);
-        return ApiResponse.toSuccess(CustomStatusCode.OK, null);
+        User updatedUser = userService.update(UserIdRequestDto.from(userId), userUpdateRequest, binaryRequest);
 
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedUser);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/api/users/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(
-            @PathVariable(value = "id") UUID deleteUserId
+    @Override
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "삭제할 User ID")
+            @PathVariable("id") UUID deleteUserId
     ) {
         userService.delete(UserIdRequestDto.from(deleteUserId));
-        return ApiResponse.toSuccess(CustomStatusCode.OK, null);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/api/users/{id}")
-
-    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(
+    @Override
+    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
+    public ResponseEntity<UserDto> getUser(
             @PathVariable(value = "id") UUID userId
     ) {
-        UserResponseDto userResponseDto = userService.find(UserIdRequestDto.from(userId));
-        return ApiResponse.toSuccess(CustomStatusCode.OK, userResponseDto);
+        UserDto user = userService.find(UserIdRequestDto.from(userId));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(user);
     }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/api/users")
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getUsers(
+    
+    @Override
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<UserDto>> findAll(
     ) {
-        List<UserResponseDto> users = userService.findAll();
-        return ApiResponse.toSuccess(CustomStatusCode.OK, users);
+        List<UserDto> users = userService.findAll();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(users);
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/api/users/{id}")
-    public ResponseEntity<ApiResponse<Void>> updateOnlineStatus(
+    @Override
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/userStatus")
+    public ResponseEntity<UserStatus> updateOnlineStatus(
+            @Parameter(description = "상태를 변경할 User ID")
             @PathVariable(value = "id") UUID userId
     ) {
-        userService.updateUserOnlineStatus(UserIdRequestDto.from(userId));
-        return ApiResponse.toSuccess(CustomStatusCode.OK, null);
+        UserStatus userStatus = userService.updateUserOnlineStatus(UserIdRequestDto.from(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(userStatus);
     }
-
 }
