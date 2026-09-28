@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 
 public record UserUpdateRequest(
-    @NotBlank(message = "닉네임을 비워둘 수 없습니다.")
-    String nickName,  //<- 데이터 선언부
-    @NotBlank(message = "비밀번호를 비워둘 수 없습니다.")
-    String password
+    String newUsername,
+    @Email(message = "email 형식이 올바르지 않습니다.")
+    String newEmail,
+    String newPassword
 ) {
-
 }

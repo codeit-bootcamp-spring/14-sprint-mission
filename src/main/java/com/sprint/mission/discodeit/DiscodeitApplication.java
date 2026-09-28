@@ -8,8 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @OpenAPIDefinition(
 	info = @Info(
-		title = "스프린트 미션5 기본요구사항 API",
-		description = "스프린트 미션5 Discodeit API 문서입니다.",
+		title = "스프린트 미션6 Discodeit API",
+		description = "스프린트 미션6 (JPA 적용) Discodeit API 문서입니다.",
 		version = "v1"
 	)
 )

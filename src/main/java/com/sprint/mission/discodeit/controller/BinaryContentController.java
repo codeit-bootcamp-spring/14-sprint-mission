@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,28 +21,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
     @GetMapping
-    public ResponseEntity<List<BinaryContentDto>> findAll(
+    public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
         @RequestParam List<UUID> binaryContentIds) {
-        log.info("findAll 정상 작동.");
-        List<BinaryContentDto> result =
-            binaryContentService.findAllByIdIn(binaryContentIds)
-                .stream()
-                .map(BinaryContentDto::from)
-                .toList();
-        return ResponseEntity.ok(result);
+        log.info("findAllByIdIn 요청. ids:{}", binaryContentIds);
+        return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds));
     }
 
     @GetMapping("/{binaryContentId}")
     public ResponseEntity<BinaryContentDto> find(@PathVariable UUID binaryContentId) {
-        log.info("find 정상 작동. id:{}", binaryContentId);
-        BinaryContentDto dto = binaryContentService.find(binaryContentId)
-            .map(BinaryContentDto::from)
-            .orElseThrow(() -> new DiscodeitException(ErrorCode.BINARY_CONTENT_NOT_FOUND,
-                "BinaryContent를 찾을 수 없습니다. id: " + binaryContentId));
-        return ResponseEntity.ok(dto);
+        log.info("find 요청. id:{}", binaryContentId);
+        return ResponseEntity.ok(binaryContentService.find(binaryContentId));
     }
 
-
+    @GetMapping("/{binaryContentId}/download")
+    public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
+        log.info("download 요청. id:{}", binaryContentId);
+        BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
+        return binaryContentStorage.download(binaryContent);
+    }
 }

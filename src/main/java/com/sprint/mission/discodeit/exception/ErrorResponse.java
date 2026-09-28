@@ -9,7 +9,6 @@ public record ErrorResponse(
     Instant timestamp
 ) {
 
-
     public static ErrorResponse from(DiscodeitException exception) {
         return new ErrorResponse(
             exception.getErrorCode().name(),
@@ -20,14 +19,15 @@ public record ErrorResponse(
     }
 
     public static ErrorResponse of(ErrorCode errorCode) {
+        return of(errorCode, errorCode.getMessage());
+    }
+
+    public static ErrorResponse of(ErrorCode errorCode, String message) {
         return new ErrorResponse(
             errorCode.name(),
-            errorCode.getMessage(),
+            message,
             errorCode.getHttpStatus().value(),
             Instant.now()
         );
     }
-
-
 }
-

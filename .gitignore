@@ -45,3 +45,6 @@ bin/
 
 ### Data files ###
 *.ser
+
+### Discodeit 로컬 파일 저장소 ###
+.discodeit/

@@ -21,13 +21,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<UserDto> userLogin (@Valid @RequestBody LoginRequest request) {
-        log.info("userLogin 정상 작동. 로그인할 userName:{}", request.userName());
-
+    public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest request) {
+        log.info("login 요청. username:{}", request.username());
         UserDto user = authService.login(request);
         return ResponseEntity.ok(user);
-
     }
-
-
 }

@@ -9,168 +9,111 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true,level = AccessLevel.PRIVATE)
 public class BasicUserService implements UserService {
 
-    UserRepository userRepository;
-    BinaryContentRepository binaryContentRepository;
-    UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
+    private final UserMapper userMapper;
 
+    @Transactional
     @Override
-    public UserDto create(
-        UserCreateRequest request,
-        BinaryContentCreateRequest profileImageRequest) {
+    public UserDto create(UserCreateRequest request, BinaryContentCreateRequest profileRequest) {
+        validateDuplicateUsername(request.username());
+        validateDuplicateEmail(request.email());
 
-        if (userRepository.findByUserName(request.userName()).isPresent()) {
-            throw  new DiscodeitException(ErrorCode.DUPLICATE_USERNAME,"이미 사용 중인 userName입니다: " + request.userName());
-        }
-        if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new DiscodeitException(ErrorCode.DUPLICATE_EMAIL,"이미 사용 중인 email입니다: " + request.email());
-        }
+        BinaryContent profile = saveProfile(profileRequest);
+        User user = new User(request.username(), request.email(), request.password(), profile);
+        new UserStatus(user, Instant.now());
 
-        UUID profileId = null;
-        if (profileImageRequest != null) {
-            BinaryContent binaryContent = BinaryContent.builder()
-                .fileName(profileImageRequest.fileName())
-                .contentType(profileImageRequest.contentType())
-                .bytes(profileImageRequest.bytes())
-                .size(profileImageRequest.bytes()
-                    == null ? 0 : profileImageRequest.bytes().length)
-                .build();
-
-            binaryContentRepository.save(binaryContent);
-            profileId = binaryContent.getId();
-        }
-
-        User user = User.builder()
-            .userName(request.userName())
-            .email(request.email())
-            .password(request.password())
-            .nickName(request.nickName())
-            .profileId(profileId)
-            .build();
-            userRepository.save(user);
-
-
-        UserStatus userStatus = UserStatus.builder()
-            .userId(user.getId())
-            .lastActiveAt(Instant.now())
-            .build();
-        userStatusRepository.save(userStatus);
-
-        return toDto(user, userStatus.isOnline());
+        userRepository.save(user);
+        return userMapper.toDto(user);
     }
 
-
+    @Transactional(readOnly = true)
     @Override
-    public Optional<UserDto> findById(UUID id) {
-        return userRepository.findById(id)
-            .map(user -> toDto(user,isOnline(user.getId())));
+    public UserDto find(UUID userId) {
+        return userMapper.toDto(getUser(userId));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {
         return userRepository.findAll().stream()
-            .map(user->toDto(user,isOnline(user.getId())))
+            .map(userMapper::toDto)
             .toList();
     }
 
+    @Transactional
     @Override
-    public UserDto update(UUID id, UserUpdateRequest request,
-        BinaryContentCreateRequest profileImageRequest) {
+    public UserDto update(UUID userId, UserUpdateRequest request,
+        BinaryContentCreateRequest profileRequest) {
+        User user = getUser(userId);
 
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new DiscodeitException(ErrorCode.USER_NOT_FOUND, "해당 유저를 찾을 수가 없습니다. 유저ID(" + id + ")"));
+        if (request.newUsername() != null && !request.newUsername().equals(user.getUsername())) {
+            validateDuplicateUsername(request.newUsername());
+        }
+        if (request.newEmail() != null && !request.newEmail().equals(user.getEmail())) {
+            validateDuplicateEmail(request.newEmail());
+        }
+        user.update(request.newUsername(), request.newEmail(), request.newPassword());
 
-        if (request.nickName() != null) {
-            user.update(request.nickName());
+        if (profileRequest != null) {
+            user.updateProfile(saveProfile(profileRequest));
         }
 
-        if (request.password() != null) {
-            user.updatePassword(request.password());
-        }
-
-        if (profileImageRequest != null) {
-            if (user.getProfileId() != null) {
-                binaryContentRepository.delete((user.getProfileId()));
-            }
-
-            BinaryContent newBinaryContent = BinaryContent.builder()
-                .fileName(profileImageRequest.fileName())
-                .contentType(profileImageRequest.contentType())
-                .bytes(profileImageRequest.bytes())
-                .size(profileImageRequest.bytes() == null ? 0 : profileImageRequest.bytes().length)
-                .build();
-
-            binaryContentRepository.save(newBinaryContent);
-            user.updateProfileId(newBinaryContent.getId());
-        }
-
-        userRepository.update(user);
-        return toDto(user, isOnline(user.getId()));
+        return userMapper.toDto(user);
     }
 
-
-
+    @Transactional
     @Override
-    public void delete(UUID id) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new DiscodeitException(ErrorCode.USER_NOT_FOUND,"해당 유저가 없습니다. 유저ID:" +id+")"));
+    public void delete(UUID userId) {
+        userRepository.delete(getUser(userId));
+    }
 
-        if (user.getProfileId() != null) {
-            binaryContentRepository.delete(user.getProfileId());
+    private User getUser(UUID userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new DiscodeitException(ErrorCode.USER_NOT_FOUND,
+                "해당 유저를 찾을 수 없습니다. userId: " + userId));
+    }
+
+    private BinaryContent saveProfile(BinaryContentCreateRequest profileRequest) {
+        if (profileRequest == null) {
+            return null;
         }
-
-        userStatusRepository.findAll().stream()
-            .filter(status -> status.getUserId().equals(id))
-            .findFirst()
-            .ifPresent(status -> userStatusRepository.delete(status.getId()));
-
-
-        userRepository.delete(id);
-
+        BinaryContent profile = new BinaryContent(
+            profileRequest.fileName(), (long) profileRequest.bytes().length,
+            profileRequest.contentType());
+        binaryContentRepository.save(profile);
+        binaryContentStorage.put(profile.getId(), profileRequest.bytes());
+        return profile;
     }
 
-    private boolean isOnline(UUID userId) {
-        return userStatusRepository.findAll().stream()
-            .filter(status -> status.getUserId().equals(userId))
-            .findFirst()
-            .map(UserStatus::isOnline)
-            .orElse(false);
-
-
-    }
-
-        private static UserDto toDto(User user, boolean online) {
-            return new UserDto(
-                user.getId(),
-                user.getUserName(),
-                user.getEmail(),
-                user.getNickName(),
-                user.getProfileId(),
-                online,
-                user.getCreatedAt()
-            );
+    private void validateDuplicateUsername(String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new DiscodeitException(ErrorCode.DUPLICATE_USERNAME,
+                "이미 사용 중인 username입니다: " + username);
         }
-
     }
 
-
-
-
-
+    private void validateDuplicateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new DiscodeitException(ErrorCode.DUPLICATE_EMAIL,
+                "이미 사용 중인 email입니다: " + email);
+        }
+    }
+}

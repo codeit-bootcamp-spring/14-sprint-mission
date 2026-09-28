@@ -5,36 +5,29 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import lombok.AccessLevel;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BasicAuthService implements AuthService {
 
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    UserRepository userRepository;
-
+    @Transactional
     @Override
     public UserDto login(LoginRequest request) {
-
-        User user = userRepository.findByUserName(request.userName())
-            .filter(u->u.getPassword().equals(request.password()))
+        User user = userRepository.findByUsername(request.username())
+            .filter(u -> u.getPassword().equals(request.password()))
             .orElseThrow(() -> new DiscodeitException(ErrorCode.INVALID_CREDENTIAL));
 
-        return new UserDto(
-            user.getId(),
-            user.getUserName(),
-            user.getEmail(),
-            user.getNickName(),
-            user.getProfileId(),
-            false,
-            user.getCreatedAt()
-        );
+        user.getStatus().update(Instant.now());
+        return userMapper.toDto(user);
     }
 }

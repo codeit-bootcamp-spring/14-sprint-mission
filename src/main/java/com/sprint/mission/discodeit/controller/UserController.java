@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -37,28 +39,13 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    private BinaryContentCreateRequest profileRequest(
-        MultipartFile profile) throws IOException {
-        if (profile == null || profile.isEmpty()) {
-            return null;
-        }
-        return new BinaryContentCreateRequest(
-            profile.getOriginalFilename(),
-            profile.getContentType(),
-            profile.getBytes()
-        );
-    }
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-
     public ResponseEntity<UserDto> create(
         @RequestPart("userCreateRequest") @Valid UserCreateRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile profile
-    ) throws IOException {
-        log.info("create 정상 작동. user이메일:{}", request.email());
-
-        BinaryContentCreateRequest profileRequest = profileRequest(profile);
-        UserDto created = userService.create(request, profileRequest);
+    ) {
+        log.info("create 요청. email:{}", request.email());
+        UserDto created = userService.create(request, toProfileRequest(profile));
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -66,36 +53,43 @@ public class UserController {
     public ResponseEntity<UserDto> update(
         @PathVariable UUID userId,
         @RequestPart("userUpdateRequest") @Valid UserUpdateRequest request,
-        @RequestPart(value = "profile", required = false)
-        MultipartFile profile) throws IOException {
-
-        log.info("update 정상 작동. 수정할 userId:{}", userId);
-        BinaryContentCreateRequest profileRequest = profileRequest(profile);
-        UserDto updated = userService.update(userId, request, profileRequest);
-        return ResponseEntity.ok(updated);
+        @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) {
+        log.info("update 요청. userId:{}", userId);
+        return ResponseEntity.ok(userService.update(userId, request, toProfileRequest(profile)));
     }
 
-    @DeleteMapping( "/{userId}")
-    public void delete(@PathVariable UUID userId) {
-        log.info("delete 정상 작동. 삭제할 userId:{}", userId);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+        log.info("delete 요청. userId:{}", userId);
         userService.delete(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<UserDto>> findAll() {
-        log.info("findAll 정상 작동.");
-        List<UserDto> users = userService.findAll();
-        return ResponseEntity.ok(users);
+        log.info("findAll 요청");
+        return ResponseEntity.ok(userService.findAll());
     }
 
-    @PatchMapping ( "/{userId}/userStatus")
-    public ResponseEntity<UserStatusDto> userStatusUpdate(
+    @PatchMapping("/{userId}/userStatus")
+    public ResponseEntity<UserStatusDto> updateUserStatus(
         @PathVariable UUID userId,
         @Valid @RequestBody UserStatusUpdateRequest request) {
-        log.info("userStatusUpdate 정상 작동.");
-
-        UserStatusDto userStatus = userStatusService.updateByUserId(userId, request);
-        return ResponseEntity.ok(userStatus);
+        log.info("updateUserStatus 요청. userId:{}", userId);
+        return ResponseEntity.ok(userStatusService.updateByUserId(userId, request));
     }
 
+    private BinaryContentCreateRequest toProfileRequest(MultipartFile profile) {
+        if (profile == null || profile.isEmpty()) {
+            return null;
+        }
+        try {
+            return new BinaryContentCreateRequest(
+                profile.getOriginalFilename(), profile.getContentType(), profile.getBytes());
+        } catch (IOException e) {
+            throw new DiscodeitException(ErrorCode.FILE_STORAGE_ERROR,
+                "프로필 이미지를 읽을 수 없습니다: " + profile.getOriginalFilename());
+        }
+    }
 }
