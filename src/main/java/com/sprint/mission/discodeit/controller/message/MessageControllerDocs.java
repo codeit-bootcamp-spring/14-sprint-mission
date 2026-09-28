@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.controller.message;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.message.data.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.message.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +34,7 @@ public interface MessageControllerDocs {
             content = @Content(schema = @Schema(implementation = Message.class))
     )
     @RequestBody(content = @Content(encoding = @Encoding(name = "messageCreateRequest", contentType = MediaType.APPLICATION_JSON_VALUE)))
-    ResponseEntity<Message> create(
+    ResponseEntity<MessageDto> create(
             MessageCreateRequestDto request,
             @Parameter(description = "Message 첨부 파일들")
             List<MultipartFile> contentFiles
@@ -75,8 +78,14 @@ public interface MessageControllerDocs {
             description = "Message 목록 조회 성공",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = Message.class)))
     )
-    ResponseEntity<List<Message>> getMessagesByChannelId(
+    ResponseEntity<PageResponse<MessageDto>> getMessagesByChannelId(
             @Parameter(description = "조회할 Channel ID")
-            UUID channelId
+            UUID channelId,
+
+            @Parameter(description = "페이징 정보")
+            Pageable pageable,
+
+            @Parameter(description = "페이징 커서 정보")
+            String cursor
     );
 }

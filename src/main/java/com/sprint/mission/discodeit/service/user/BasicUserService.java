@@ -7,15 +7,20 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
+import com.sprint.mission.discodeit.dto.userstatus.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentValidator;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,13 +34,17 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserValidator userValidator;
     private final BinaryContentValidator binaryContentValidator;
+    private final UserMapper userMapper;
+    private final UserStatusMapper userStatusMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
+    @Transactional
     public User save(
             UserCreateRequest requestDto,
             BinaryContentCreateRequestDto profileCreateRequest
     ) {
-        boolean hasDuplicateName = userRepository.existsByName(requestDto.username());
+        boolean hasDuplicateName = userRepository.existsByUsername(requestDto.username());
 
         boolean hasDuplicateEmail = userRepository.existsByEmail(requestDto.email());
 
@@ -50,18 +59,21 @@ public class BasicUserService implements UserService {
 
         User savedUser = requestDto.toEntity(); // 저장될 User Entity
 
-        UserStatus userStatus = new UserStatus(savedUser.getId()); // User 로그인 일시 핸들러 Entity 생성
-        userStatusRepository.save(userStatus); // UserStatus 저장
-
         // 프로필 있으면 생성 후 UUID 반환
-        UUID profileId = Optional.ofNullable(profileCreateRequest)
+        BinaryContent profile = Optional.ofNullable(profileCreateRequest)
                 .map((profileRequest) -> {
                     BinaryContent binaryContent = profileRequest.toEntity();
-                    return binaryContentRepository.save(binaryContent).getId();
+
+                    BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+                    binaryContentStorage.put(savedContent.getId(), profileRequest.bytes());
+                    return savedContent;
                 }).orElse(null);
 
-        savedUser.updateProfile(profileId); // 프로필 ID 업데이트
+        savedUser.updateProfile(profile); // 프로필 ID 업데이트
         userRepository.save(savedUser); // 저장
+
+        UserStatus userStatus = UserStatus.create(savedUser); // User 로그인 일시 핸들러 Entity 생성
+        userStatusRepository.save(userStatus); // UserStatus 저장
 
         return savedUser;
     }
@@ -69,33 +81,27 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto find(UserIdRequestDto requestDto) {
         User currentUser = userValidator.getOrThrow(requestDto.getId());
-        boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
-                .map(UserStatus::isOnline)
-                .orElse(false);
-        return UserDto.of(currentUser, userStatus);
+
+        return userMapper.toDto(currentUser);
     }
 
     @Override
     public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user -> {
-                    boolean userStatus = userStatusRepository.findByUserId(user.getId())
-                            .map(UserStatus::isOnline)
-                            .orElse(false);
-                    return UserDto.of(user, userStatus);
-                })
+                .map(userMapper::toDto)
                 .toList();
     }
 
     @Override
-    public User update(
+    @Transactional
+    public UserDto update(
             UserIdRequestDto userId, UserUpdateRequest userUpdateRequest,
             BinaryContentCreateRequestDto profileCreateRequest
     ) {
         User currentUser = userValidator.getOrThrow(userId.getId());
 
-        boolean hasDuplicateName = userRepository.existsByName(userUpdateRequest.newUsername());
+        boolean hasDuplicateName = userRepository.existsByUsername(userUpdateRequest.newUsername());
 
         boolean hasDuplicateEmail = userRepository.existsByEmail(userUpdateRequest.newEmail());
 
@@ -112,44 +118,52 @@ public class BasicUserService implements UserService {
 
         // 새로운 프로필 데이터가 들어오면 기존 프로필 데이터 삭제 -> 신규 프로필 저장 -> User 엔티티 연계
         Optional.ofNullable(profileCreateRequest)
-                .ifPresent(profileRequest -> {
+                .ifPresent(profileCommand -> {
                     // 이미 프로필이 있다면 제거
-                    Optional.ofNullable(currentUser.getProfileId())
-                            .ifPresent(contentId -> {
-                                binaryContentValidator.getOrThrow(contentId);
-                                binaryContentRepository.delete(contentId);
+                    Optional.ofNullable(currentUser.getProfile())
+                            .ifPresent(content -> {
+                                binaryContentValidator.getOrThrow(content.getId());
+                                binaryContentStorage.delete(content.getId());
+                                binaryContentRepository.delete(content);
                             });
 
                     // 프로필 저장
-                    BinaryContent binaryContent = profileRequest.toEntity();
+                    BinaryContent binaryContent = profileCommand.toEntity();
                     binaryContentRepository.save(binaryContent);
-                    currentUser.updateProfile(binaryContent.getId());
+                    binaryContentStorage.put(binaryContent.getId(), profileCommand.bytes());
+
+                    currentUser.updateProfile(binaryContent);
                 });
 
-        userRepository.update(currentUser.getId(), currentUser);
-        return currentUser;
+        return userMapper.toDto(currentUser);
     }
 
     @Override
+    @Transactional
     public void delete(UserIdRequestDto requestDto) {
         User deleteUser = userValidator.getOrThrow(requestDto.getId());
 
         userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
 
-        Optional.ofNullable(deleteUser.getProfileId())
-                .ifPresent(binaryContentRepository::delete);
+        Optional.ofNullable(deleteUser.getProfile())
+                .ifPresent(binaryContent -> {
+                    UUID deletedId = binaryContent.getId();
+                    binaryContentStorage.delete(deletedId);
+                    binaryContentRepository.delete(binaryContent);
+                });
 
-        userRepository.delete(requestDto.getId()); // 유저 삭제
+        userRepository.delete(deleteUser); // 유저 삭제
     }
 
     @Override
-    public UserStatus updateUserOnlineStatus(UserIdRequestDto requestDto) {
+    @Transactional
+    public UserStatusDto updateUserOnlineStatus(UserIdRequestDto requestDto) {
         User user = userValidator.getOrThrow(requestDto.getId());
         UserStatus status = userStatusRepository.findByUserId(user.getId())
-                .orElse(new UserStatus(requestDto.getId()));
+                .orElse(UserStatus.create(user));
         status.updateLastAccessAt();
-        userStatusRepository.update(status);
 
-        return status;
+
+        return userStatusMapper.toDto(status);
     }
 }

@@ -3,14 +3,15 @@ package com.sprint.mission.discodeit.service.userstatus;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,14 +22,12 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public void save(UserStatusCreateRequestDto request) {
-        this.userRepository.findById(request.getUserId())
+    public void save(User user) {
+        this.userRepository.findById(user.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.USER_NOT_FOUND));
 
-//        this.userStatusRepository.findByUserId(request.getUserId())
-
-
-        this.userStatusRepository.save(request.toEntity());
+        this.userStatusRepository.findByUserId(user.getId());
+        this.userStatusRepository.save(UserStatus.create(user));
 
     }
 
@@ -44,31 +43,31 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    @Transactional
     public UserStatus update(UserStatusUpdateRequestDto request) {
         UserStatus updateUserStatus = this.userStatusRepository.findById(request.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
         updateUserStatus.updateLastAccessAt();
-        this.userStatusRepository.update(updateUserStatus);
         return updateUserStatus;
     }
 
     @Override
+    @Transactional
     public UserStatus updateByUserId(UserIdRequestDto requestDto) {
         UserStatus updateUserStatus = this.userStatusRepository.findByUserId(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
         updateUserStatus.updateLastAccessAt();
 
-        this.userStatusRepository.update(updateUserStatus);
         return updateUserStatus;
     }
 
     @Override
     public void delete(UserStatusIdRequestDto requestDto) {
-        this.userStatusRepository.findByUserId(requestDto.getId())
+        UserStatus deletedEntity = this.userStatusRepository.findByUserId(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
-        this.userStatusRepository.delete(requestDto.getId());
+        this.userStatusRepository.delete(deletedEntity);
     }
 }
