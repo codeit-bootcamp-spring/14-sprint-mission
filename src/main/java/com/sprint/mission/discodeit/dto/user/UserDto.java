@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import com.sprint.mission.discodeit.domain.user.UserStatus;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -11,7 +12,7 @@ public record UserDto(UUID id,
                       Instant updatedAt,
                       String username,
                       String email,
-                      UUID profileId,
+                      BinaryContent profile,
                       Boolean online) {
 
     public static UserDto of(User user, UserStatus userStatus) {
@@ -19,9 +20,9 @@ public record UserDto(UUID id,
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
-                user.getName(),
+                user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
+                user.getProfile(),
                 userStatus.isOnline()
         );
     }

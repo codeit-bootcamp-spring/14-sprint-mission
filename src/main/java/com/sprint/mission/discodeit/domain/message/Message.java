@@ -1,44 +1,53 @@
 package com.sprint.mission.discodeit.domain.message;
 
 import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
+import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.user.User;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
-@ToString
+@Entity
+@Table(name = "messages")
 @Getter
-public final class Message extends BaseUpdatableEntity {
+@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Message extends BaseUpdatableEntity {
     @ToString.Include
     private String content;
     @ToString.Include
-    private final UUID userId;
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private User author;
     @ToString.Include
-    private final UUID channelId;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Channel channel;
+    @OneToMany(
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
+    @JoinTable(name = "message_attachments")
+    private final List<BinaryContent> attachments = new ArrayList<>();
 
-    private final List<UUID> attachmentIds = new ArrayList<>();
-
-    public Message(String content, UUID userId, UUID channelId, @Nullable List<UUID> attachmentIds) {
+    public Message(String content, User author, Channel channel, @Nullable List<BinaryContent> attachments) {
         super();
         this.content = content;
-        this.userId = userId;
-        this.channelId = channelId;
-
-        if (Objects.nonNull(attachmentIds)) {
-            this.attachmentIds.addAll(attachmentIds);
+        this.author = author;
+        this.channel = channel;
+        if (Objects.nonNull(attachments)) {
+            this.attachments.addAll(attachments);
         }
-    }
-
-    public Message(String content, UUID userId, UUID channelId) {
-        this(content, userId, channelId, null);
-    }
-
-    public Message updateContent(String content) {
-        this.content = content;
-        return this;
     }
 }

@@ -3,9 +3,8 @@ package com.sprint.mission.discodeit.application;
 import com.sprint.mission.discodeit.common.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import com.sprint.mission.discodeit.domain.user.UserStatus;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +26,13 @@ public class UserApplication {
                                  String password,
                                  CreateBinaryContentCommand createProfileCommand
     ) {
-        UUID profileId = createProfileAndThenGetId(createProfileCommand);
-        User created = userService.create(name, email, password, profileId);
-        UserStatus userStatus = userStatusService.create(new UserStatus(created.getId()));
+        BinaryContent profile = binaryContentService.create(BinaryContent.of(
+                        createProfileCommand.fileName(),
+                        createProfileCommand.contentType(),
+                        createProfileCommand.content())
+        );
+        User created = userService.create(name, email, password, profile);
+        UserStatus userStatus = userStatusService.create(new UserStatus(created));
         return UserDto.of(created, userStatus);
     }
 
@@ -71,12 +74,12 @@ public class UserApplication {
         // 4. Message 삭제
         // 5. BinaryContent(profile) 삭제
         User toBeDeleted = userService.findById(id);
-        UUID profileId = toBeDeleted.getProfileId();
+        BinaryContent profile = toBeDeleted.getProfile();
 
         // binaryContent(profile)가 Null일 수도 있어서 여기서 검사했는데 마음에 안듦
         // 이게 최선..?
-        if (Objects.nonNull(profileId)) {
-            binaryContentService.deleteById(toBeDeleted.getProfileId());
+        if (Objects.nonNull(profile)) {
+            binaryContentService.deleteById(profile.getId());
         }
 
         readStatusService.deleteByUserId(id);

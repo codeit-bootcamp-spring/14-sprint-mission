@@ -3,27 +3,37 @@ package com.sprint.mission.discodeit.domain.channel;
 import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Entity
+@Table(name = "channels")
 @ToString(onlyExplicitlyIncluded = true)
 @Getter
-public final class Channel extends BaseUpdatableEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
     @ToString.Include
+    @Column(length = 100)
     private String name;
     @ToString.Include
+    @Column(length = 500)
     private String description;
 
     @ToString.Include
-    private final ChannelType channelType;
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private ChannelType type;
 
-    private Channel(ChannelType channelType, String name, String description) {
+    private Channel(ChannelType type, String name, String description) {
         super();
-        this.channelType = channelType;
+        this.type = type;
         this.name = name;
         this.description = description;
     }
@@ -44,7 +54,7 @@ public final class Channel extends BaseUpdatableEntity {
     }
 
     public Channel updateNameAndDescription(String name, String description) {
-        if(channelType.equals(ChannelType.PRIVATE)) {
+        if(type.equals(ChannelType.PRIVATE)) {
             throw new CustomException(ExceptionType.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED);
         }
         this.name = name;
@@ -53,10 +63,10 @@ public final class Channel extends BaseUpdatableEntity {
     }
 
     public boolean isPrivate() {
-        return channelType.equals(ChannelType.PRIVATE);
+        return type.equals(ChannelType.PRIVATE);
     }
 
     public boolean isPublic() {
-        return channelType.equals(ChannelType.PUBLIC);
+        return type.equals(ChannelType.PUBLIC);
     }
 }

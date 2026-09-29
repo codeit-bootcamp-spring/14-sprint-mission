@@ -19,7 +19,7 @@ public record ChannelResponseDto(@NotNull UUID id,
     public static ChannelResponseDto of(Channel channel, List<UUID> participantIds) {
         return new ChannelResponseDto(
                 channel.getId(),
-                channel.getChannelType(),
+                channel.getType(),
                 channel.getName(),
                 channel.getDescription(),
                 channel.isPrivate() ? participantIds : null,

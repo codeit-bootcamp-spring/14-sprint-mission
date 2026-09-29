@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import com.sprint.mission.discodeit.domain.user.UserStatus;
 
 import java.time.Instant;
 import java.util.Optional;

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.common.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.message.Message;
+import com.sprint.mission.discodeit.domain.user.User;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,16 +26,23 @@ public class MessageCreateService {
 
     public Message create(String content, UUID channelId, UUID userId,
                           List<CreateBinaryContentCommand> createFileCommands) {
-        userService.validateExistsById(userId);
+        User user = userService.findById(userId);
         Channel channel = channelService.findById(channelId);
 
         if (channel.isPrivate() && !readStatusService.existsByUserAndChannel(userId, channelId)) {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
-        List<UUID> createdAttachmentIds = createFilesAndThenGetIdIfNotNullOrElseGetNull(createFileCommands);
+        List<BinaryContent> createdAttachments = createFileCommands.stream()
+                .map(command -> binaryContentService.create(BinaryContent.of(
+                                command.fileName(),
+                                command.contentType(),
+                                command.content()
+                        )
+                ))
+                .toList();
 
-        Message message = new Message(content, userId, channelId, createdAttachmentIds);
+        Message message = new Message(content, user, channel, createdAttachments);
         Message created = messageService.create(message);
         channelService.update(channel.getId(), created.getCreatedAt());
 

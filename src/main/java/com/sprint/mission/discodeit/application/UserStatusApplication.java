@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.application;
 
-import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.domain.user.UserStatus;
 import com.sprint.mission.discodeit.dto.user.UserStatusDto;
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +19,9 @@ public class UserStatusApplication {
     private final UserService userService;
 
     public UserStatus create(UUID userId) {
-        userService.validateExistsById(userId);
+        User user = userService.findById(userId);
         userStatusService.validateUserIdAvailable(userId);
-        UserStatus userStatus = new UserStatus(userId);
+        UserStatus userStatus = new UserStatus(user);
         return userStatusService.create(userStatus);
     }
 

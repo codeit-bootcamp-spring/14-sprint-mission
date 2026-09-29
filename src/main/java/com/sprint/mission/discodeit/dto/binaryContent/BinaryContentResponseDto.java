@@ -10,13 +10,13 @@ public record BinaryContentResponseDto(UUID id,
                                        String fileName,
                                        String contentType,
                                        byte[] bytes) {
-    public static BinaryContentResponseDto of(BinaryContent binaryContent) {
+    public static BinaryContentResponseDto from(BinaryContent binaryContent) {
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
                 binaryContent.getCreatedAt(),
                 binaryContent.getFileName(),
                 binaryContent.getContentType(),
-                binaryContent.getContent()
+                binaryContent.getBytes()
         );
     }
 }

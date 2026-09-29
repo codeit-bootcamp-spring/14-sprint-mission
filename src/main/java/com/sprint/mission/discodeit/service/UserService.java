@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.annotation.Nullable;
@@ -16,13 +17,17 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
 
-    public User create(String name, String email, String password, @Nullable UUID profileId) {
+    public User create(String name, String email, String password, @Nullable BinaryContent profile) {
         validateNameAndEmailAvailable(name, email);
-        return userRepository.create(new User(name, email, password, profileId));
+        return userRepository.create(new User(name, email, password, profile));
     }
 
     public User findById(UUID id) {
         return validateExistsAndThenFindById(id);
+    }
+
+    public List<User> findByIds(List<UUID> userIds) {
+        return userRepository.findByIds(userIds);
     }
 
     public List<User> findAll() {

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.application;
 
+import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpsertResponse;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.domain.channel.Channel;
@@ -29,13 +30,12 @@ public class ChannelApplication {
 
     public ChannelUpsertResponse createPrivateChannel(List<UUID> userIds) {
         userService.validateAllExists(userIds);
-
+        List<User> users = userService.findByIds(userIds);
         Channel channel = Channel.createPrivateChannel(userIds);
-        UUID channelId = channel.getId();
 
         // 참여 User의 정보를 받아 User 별 ReadStatus 정보 생성
-        List<ReadStatus> readStatuses = userIds.stream()
-                .map(userId -> new ReadStatus(userId, channelId, null))
+        List<ReadStatus> readStatuses = users.stream()
+                .map(user -> new ReadStatus(user, channel, null))
                 .toList();
         readStatusService.createAll(readStatuses);
 

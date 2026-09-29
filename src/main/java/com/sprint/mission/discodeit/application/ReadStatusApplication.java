@@ -25,7 +25,7 @@ public class ReadStatusApplication {
         User user = userService.findById(userId);
         Channel channel = channelService.findById(channelId);
         readStatusService.validateAlreadyExistsByUserAndChannel(user.getId(), channel.getId());
-        ReadStatus readStatus = new ReadStatus(userId, channelId, lastReadAt);
+        ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
         ReadStatus created = readStatusService.create(readStatus);
         return ReadStatusResponse.of(created);
     }

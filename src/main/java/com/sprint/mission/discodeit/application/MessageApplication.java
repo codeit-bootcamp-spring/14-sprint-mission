@@ -51,7 +51,7 @@ public class MessageApplication {
 
     public MessageResponseDto deleteMessage(UUID id) {
         Message toBeDeleted = messageService.findById(id);
-        binaryContentService.deleteById(toBeDeleted.getAttachmentIds());
+//        binaryContentService.deleteById(toBeDeleted.getAttachmentIds());
         Message deleted = messageService.deleteById(id);
         return MessageResponseDto.of(deleted);
     }

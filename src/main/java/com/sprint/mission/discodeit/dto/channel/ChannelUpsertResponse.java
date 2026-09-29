@@ -19,7 +19,7 @@ public record ChannelUpsertResponse(@NotNull UUID id,
                 created.getId(),
                 created.getCreatedAt(),
                 created.getUpdatedAt(),
-                created.getChannelType(),
+                created.getType(),
                 created.getName(),
                 created.getDescription()
         );

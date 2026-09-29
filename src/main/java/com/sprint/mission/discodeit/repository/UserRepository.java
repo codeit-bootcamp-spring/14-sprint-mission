@@ -17,4 +17,6 @@ public interface UserRepository extends CrudRepository<User> {
     Optional<User> findByNameAndPassword(String name, String password);
 
     User update(@Nullable UUID id, @Nullable String name, @Nullable String email, @Nullable String password, @Nullable UUID profileId);
+
+    List<User> findByIds(List<UUID> userIds);
 }

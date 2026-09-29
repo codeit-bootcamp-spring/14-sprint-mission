@@ -19,12 +19,12 @@ public class BinaryContentApplication {
     }
 
     public BinaryContentResponseDto getBinaryContent(UUID id) {
-        return BinaryContentResponseDto.of(binaryContentService.findById(id));
+        return BinaryContentResponseDto.from(binaryContentService.findById(id));
     }
 
     public List<BinaryContentResponseDto> getAllBinaryContents(List<UUID> ids) {
         return binaryContentService.findAllById(ids).stream()
-                .map(BinaryContentResponseDto::of)
+                .map(BinaryContentResponseDto::from)
                 .toList();
     }
 

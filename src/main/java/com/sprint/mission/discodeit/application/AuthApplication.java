@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import com.sprint.mission.discodeit.domain.user.UserStatus;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
