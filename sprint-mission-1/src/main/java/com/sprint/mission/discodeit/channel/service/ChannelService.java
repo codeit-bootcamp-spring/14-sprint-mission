@@ -22,11 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class ChannelService {
 
@@ -42,6 +44,8 @@ public class ChannelService {
         Channel channel = new Channel(channelPublicCreateRequestDto.name(),
             ChannelType.PUBLIC, channelPublicCreateRequestDto.description());
         channelRepository.save(channel);
+
+        log.info("공개 채널 생성 완료: channelId={}", channel.getId());
         return toResponseDto(channel);
     }
 
@@ -65,6 +69,7 @@ public class ChannelService {
             participants.add(user);
         }
 
+        log.info("비공개 채널 생성 완료: channelId={}", channel.getId());
         return channelMapper.toDto(channel, participants, null);
     }
 
@@ -87,6 +92,7 @@ public class ChannelService {
         channel.update(channelUpdateRequestDto.newName(),
             channelUpdateRequestDto.newDescription());
 
+        log.info("채널 수정 완료: channelId={}", channel.getId());
         return toResponseDto(channel);
     }
 
@@ -124,6 +130,8 @@ public class ChannelService {
 
         readStatusRepository.deleteByChannel(channel);
         channelRepository.delete(channel);
+
+        log.info("채널 삭제 완료: channelId={}", channel.getId());
     }
 
     private Map<UUID, Instant> findLastMessageAtMap(List<UUID> channelIds) {
