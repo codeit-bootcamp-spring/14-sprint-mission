@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.domain.user.User;
-import jakarta.annotation.Nullable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -9,15 +8,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    boolean existsByName(String name);
+    boolean existsByUsername(String username);
 
-    boolean existsAllByIds(List<UUID> ids);
+    boolean existsByUsernameOrEmail(String username, String email);
 
-    boolean existsByNameOrEmail(String name, String email);
+    Optional<User> findByUsernameAndPassword(String username, String password);
 
-    Optional<User> findByNameAndPassword(String name, String password);
+    List<User> findByIdIn(List<UUID> userIds);
 
-    User update(@Nullable UUID id, @Nullable String name, @Nullable String email, @Nullable String password, @Nullable UUID profileId);
+    boolean existsByUsernameAndIdNot(String username, UUID id);
 
-    List<User> findByIds(List<UUID> userIds);
+    boolean existsByEmailAndIdNot(String email, UUID id);
 }

@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -25,22 +26,43 @@ public class User extends BaseUpdatableEntity {
     private String password;
 
     @ToString.Include
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToOne(
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
     @JoinColumn(unique = true)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private BinaryContent profile;
 
+    @OneToOne(
+            mappedBy = "user",
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
+    private UserStatus status;
+
+
+    public static User create(
+            String username,
+            String email,
+            String password,
+            BinaryContent createdProfile
+    ) {
+        User user = new User(username, email, password, createdProfile);
+        user.status = UserStatus.create(user);
+        return user;
+    }
+
     public User(String username, String email, String password, @Nullable BinaryContent profile) {
         super();
-        validateNotNullAndThenAssign(username, ()-> this.username = username);
+        validateNotNullAndThenAssign(username, () -> this.username = username);
         validateNotNullAndThenAssign(email, () -> this.email = email);
         validateNotNullAndThenAssign(password, () -> this.password = password);
-
         assignIfNotNull(profile, () -> this.profile = profile);
     }
 
     public User update(String username, String email, String password, @Nullable BinaryContent profile) {
-        assignIfNotNull(username, ()-> this.username = username);
+        assignIfNotNull(username, () -> this.username = username);
         assignIfNotNull(email, () -> this.email = email);
         assignIfNotNull(password, () -> this.password = password);
         assignIfNotNull(profile, () -> this.profile = profile);
@@ -60,4 +82,16 @@ public class User extends BaseUpdatableEntity {
         }
     }
 
+    public boolean isOnline() {
+        return status.isOnline();
+    }
+
+    public Instant getLastSeenAt() {
+        return status.getLastSeenAt();
+    }
+
+    public User updateLastActiveAt(Instant newLastActiveAt) {
+        this.status.updateLastSeenAt(newLastActiveAt);
+        return this;
+    }
 }

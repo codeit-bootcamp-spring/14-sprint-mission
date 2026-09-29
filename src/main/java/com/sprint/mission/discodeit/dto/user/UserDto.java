@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.user.UserStatus;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record UserDto(UUID id,
@@ -15,7 +16,7 @@ public record UserDto(UUID id,
                       BinaryContent profile,
                       Boolean online) {
 
-    public static UserDto of(User user, UserStatus userStatus) {
+    public static UserDto of(User user) {
         return new UserDto(
                 user.getId(),
                 user.getCreatedAt(),
@@ -23,7 +24,13 @@ public record UserDto(UUID id,
                 user.getUsername(),
                 user.getEmail(),
                 user.getProfile(),
-                userStatus.isOnline()
+                user.isOnline()
         );
+    }
+
+    public static List<UserDto> from(List<User> users) {
+        return users.stream()
+                .map(UserDto::of)
+                .toList();
     }
 }
