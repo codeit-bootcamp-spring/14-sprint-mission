@@ -17,7 +17,7 @@ public class ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
 
     public ReadStatus create(ReadStatus readStatus) {
-        return readStatusRepository.create(readStatus);
+        return readStatusRepository.save(readStatus);
     }
 
     public List<ReadStatus> createAll(List<ReadStatus> readStatuses) {

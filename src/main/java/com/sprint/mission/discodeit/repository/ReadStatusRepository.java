@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public interface ReadStatusRepository extends CrudRepository<ReadStatus> {
+public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
     boolean existsByUserAndChannel(UUID userId, UUID channelId);
 
     List<ReadStatus> createAll(List<ReadStatus> readStatuses);
