@@ -1,23 +1,18 @@
 package com.sprint.mission.discodeit.domain.channel;
 
-import com.sprint.mission.discodeit.domain.common.ModifiableEntity;
+import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ToString(onlyExplicitlyIncluded = true)
 @Getter
-public final class Channel extends ModifiableEntity {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public final class Channel extends BaseUpdatableEntity {
     @ToString.Include
     private String name;
     @ToString.Include
@@ -54,7 +49,6 @@ public final class Channel extends ModifiableEntity {
         }
         this.name = name;
         this.description = description;
-        super.markedAsUpdate(Instant.now());
         return this;
     }
 

@@ -30,7 +30,7 @@ public class FileChannelRepository extends AbstractFileRepository<Channel>
 
     @Override
     public void update(UUID id, Instant newUpdatedAt) {
-        super.buffer.get(id).markedAsUpdate(newUpdatedAt);
+//        super.buffer.get(id).markedAsUpdate(newUpdatedAt);
         super.writeFromBufferToFile();
     }
 }

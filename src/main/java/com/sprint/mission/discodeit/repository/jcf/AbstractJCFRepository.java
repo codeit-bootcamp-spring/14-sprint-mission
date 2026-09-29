@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.domain.common.BasicEntity;
+import com.sprint.mission.discodeit.domain.base.BaseEntity;
 import com.sprint.mission.discodeit.repository.CrudRepository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public abstract class AbstractJCFRepository<T extends BasicEntity> implements CrudRepository<T> {
+public abstract class AbstractJCFRepository<T extends BaseEntity> implements CrudRepository<T> {
     protected final Map<UUID, T> STORE = new ConcurrentHashMap<>();
 
     @Override

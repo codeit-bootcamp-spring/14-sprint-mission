@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
-import com.sprint.mission.discodeit.domain.common.BasicEntity;
+import com.sprint.mission.discodeit.domain.base.BaseEntity;
 import com.sprint.mission.discodeit.repository.CrudRepository;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractFileRepository<T extends BasicEntity> implements CrudRepository<T> {
+public abstract class AbstractFileRepository<T extends BaseEntity> implements CrudRepository<T> {
 
     protected final File file;
     protected final Map<UUID, T> EMPTY_BUFFER = new ConcurrentHashMap<>();

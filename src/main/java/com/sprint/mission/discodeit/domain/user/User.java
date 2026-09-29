@@ -1,21 +1,16 @@
 package com.sprint.mission.discodeit.domain.user;
 
-import com.sprint.mission.discodeit.domain.common.ModifiableEntity;
+import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 @ToString(onlyExplicitlyIncluded = true)
 @Getter
-public final class User extends ModifiableEntity {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public final class User extends BaseUpdatableEntity {
     @ToString.Include
     private String name;
     private String email;
@@ -31,8 +26,6 @@ public final class User extends ModifiableEntity {
         validateNotNullAndThenAssign(password, () -> this.password = password);
 
         assignIfNotNull(profileId, () -> this.profileId = profileId);
-
-        super.markedAsUpdate(Instant.now());
     }
 
     public User update(String name, String email, String password, @Nullable  UUID profileId) {
@@ -40,7 +33,6 @@ public final class User extends ModifiableEntity {
         assignIfNotNull(email, () -> this.email = email);
         assignIfNotNull(password, () -> this.password = password);
         assignIfNotNull(profileId, () -> this.profileId = profileId);
-        super.markedAsUpdate(Instant.now());
         return this;
     }
 

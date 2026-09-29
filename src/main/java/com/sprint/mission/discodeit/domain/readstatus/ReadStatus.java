@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.readstatus;
 
-import com.sprint.mission.discodeit.domain.common.ModifiableEntity;
+import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
  */
 @Getter
 @ToString
-public class ReadStatus extends ModifiableEntity {
+public class ReadStatus extends BaseUpdatableEntity {
     private final UUID userId;
     private final UUID channelId;
 
@@ -28,7 +28,7 @@ public class ReadStatus extends ModifiableEntity {
 
     public ReadStatus update(Instant newLastReadAt) {
         this.lastReadAt = newLastReadAt;
-        markedAsUpdate(Instant.now());
+//        markedAsUpdate(Instant.now());
         return this;
     }
 }

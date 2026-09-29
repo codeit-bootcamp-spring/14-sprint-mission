@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.domain.message;
 
-import com.sprint.mission.discodeit.domain.common.ModifiableEntity;
+import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,10 +12,7 @@ import java.util.UUID;
 
 @ToString
 @Getter
-public final class Message extends ModifiableEntity {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public final class Message extends BaseUpdatableEntity {
     @ToString.Include
     private String content;
     @ToString.Include
@@ -44,7 +39,6 @@ public final class Message extends ModifiableEntity {
 
     public Message updateContent(String content) {
         this.content = content;
-        super.markedAsUpdate(Instant.now());
         return this;
     }
 }

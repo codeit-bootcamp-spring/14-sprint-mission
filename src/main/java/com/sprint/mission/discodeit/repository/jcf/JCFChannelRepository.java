@@ -24,6 +24,6 @@ public class JCFChannelRepository extends AbstractJCFRepository<Channel>
 
     @Override
     public void update(UUID id, Instant newUpdatedAt) {
-        super.STORE.get(id).markedAsUpdate(newUpdatedAt);
+//        super.STORE.get(id).markedAsUpdate(newUpdatedAt);
     }
 }
