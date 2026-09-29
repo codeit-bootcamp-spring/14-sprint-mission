@@ -23,9 +23,10 @@ spring:
     show-sql: true
 
 discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
 
 server:
   forward-headers-strategy: native
