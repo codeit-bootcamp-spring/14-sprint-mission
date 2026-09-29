@@ -9,6 +9,9 @@ spring:
   application:
     name: Discodeit
   servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
     encoding:
       charset: UTF-8
       force: true
@@ -19,3 +22,32 @@ springdoc:
   swagger-ui:
     tags-sorter: alpha          # Controller 알파벳 정렬
     operations-sorter: alpha    # URL 알파벳 정렬
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+  java:
+    version: ${java.version:17}
+  spring-boot:
+    version: '4.1.0'
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: org.postgresql.Driver
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
