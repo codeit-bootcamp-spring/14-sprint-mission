@@ -1,3 +1,24 @@
 discodeit:
   repository:
     type: file
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:54322/discodeit
+    username: discodeit_user
+    password: discodeit1234
+
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+      ddl-auto: validate
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        format_sql: true
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbbc.bind: TRACE
