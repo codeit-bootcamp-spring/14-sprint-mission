@@ -1,23 +1,50 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.message.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface MessageService {
-    Message createMessage(MessageCreationDto dto);
+@Service
+@RequiredArgsConstructor
+public class MessageService {
+    private final MessageRepository messageRepository;
 
-    Optional<Message> getMessage(UUID id);
+    public Message create(Message message) {
+        return messageRepository.save(message);
+    }
 
-    List<Message> getAllMessages();
+    public Message findById(UUID id) {
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE));
+    }
 
-    List<Message> getAllByChannelId(UUID channelId);
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannel_Id(channelId);
+    }
 
-    void updateMessage(UUID id, MessageUpdateDto dto);
+    public Message updateContent(UUID id, String content) {
+        return findById(id).updateContent(content);
+    }
 
-    void deleteMessage(UUID id);
+    public Message deleteById(UUID id) {
+        Message deleting = findById(id);
+        messageRepository.delete(deleting);
+        return deleting;
+    }
+
+    public void deleteAllByChannelId(UUID channelId) {
+        messageRepository.deleteAllByChannel_Id(channelId);
+    }
+
+    public Optional<Instant> findLastMessageAtByChannelId(UUID channelId) {
+        return messageRepository.findLatestMessageByChannelId(channelId);
+    }
 }
