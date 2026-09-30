@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.IService.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,11 +22,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final UserStatusRepository userStatusRepository;
 
     @Override
@@ -71,12 +74,19 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
 
-        user.update(requestDto.newUsername(), requestDto.newEmail());
+        user.update(requestDto.newUsername(), requestDto.newEmail(), null);
 
         if (profileRequest != null) {
+            BinaryContent oldProfile = user.getProfile();
+
             BinaryContent profile = profileRequest.toEntity();
             binaryContentRepository.save(profile);
             user.updateProfile(profile);
+
+            if (oldProfile != null) {
+                binaryContentStorage.delete(oldProfile.getId()); // 실제 파일 삭제
+                binaryContentRepository.delete(oldProfile);      // DB 레코드도 삭제
+            }
         }
 
         UserStatus userStatus = userStatusRepository.findByUser_Id(id)
@@ -90,6 +100,14 @@ public class BasicUserService implements UserService {
     public void delete(UUID id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+        BinaryContent profile = user.getProfile(); // 유저 삭제 전에 미리 참조 잡아둠
+
+        userRepository.deleteById(id);   // FK 참조 끊기(유저 먼저 삭제)
+
+        if (profile != null) {
+            binaryContentStorage.delete(profile.getId());
+            binaryContentRepository.delete(profile);
+        }
 
         userRepository.deleteById(id);
     }

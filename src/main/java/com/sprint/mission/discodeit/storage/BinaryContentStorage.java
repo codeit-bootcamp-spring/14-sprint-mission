@@ -12,4 +12,6 @@ public interface BinaryContentStorage {
 
     ResponseEntity<?> download(BinaryContentResponseDto binaryContentDto);
 
+    void delete(UUID binaryContentId);
+
 }

@@ -74,4 +74,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
                 "attachment; filename=\"" + binaryContentDto.fileName() + "\"")
             .body(resource);
     }
+
+    @Override
+    public void delete(UUID binaryContentId) {
+        Path path = resolvePath(binaryContentId);
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            throw new UncheckedIOException("파일 삭제 실패: "+ binaryContentId, e);
+        }
+    }
 }

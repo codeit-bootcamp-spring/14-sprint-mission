@@ -2,16 +2,19 @@ package com.sprint.mission.discodeit.dto.message;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public record MessageResponseDto(
 
     UUID id,
-    UUID userId,
+    UUID authorId,
     UUID channelId,
-    String text,
-    List<UUID> attachmentIds
+    String content,
+    List<UUID> attachmentIds,
+    Instant createdAt,
+    Instant updatedAt
 ) {
 
     public static MessageResponseDto from(Message message) {
@@ -22,7 +25,9 @@ public record MessageResponseDto(
             message.getContent(),
             message.getAttachments().stream()
                 .map(BinaryContent::getId)
-                .toList()
+                .toList(),
+            message.getCreatedAt(),
+            message.getUpdatedAt()
 
         );
     }
