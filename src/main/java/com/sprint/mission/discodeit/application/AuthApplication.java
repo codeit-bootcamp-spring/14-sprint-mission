@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -13,6 +14,7 @@ import java.time.Instant;
 public class AuthApplication {
     private final UserService userService;
 
+    @Transactional(readOnly = true)
     public UserDto login(String name, String password) {
         User retrieved = userService.findByNameAndPassword(name, password);
         retrieved.updateLastActiveAt(Instant.now());
