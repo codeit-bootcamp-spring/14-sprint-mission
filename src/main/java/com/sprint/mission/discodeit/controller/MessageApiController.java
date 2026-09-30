@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,6 +39,9 @@ public class MessageApiController {
     }
 
     private List<CreateBinaryContentCommand> createCommandIfNotNull(List<MultipartFile> files) {
+        if (Objects.isNull(files)) {
+            return Collections.emptyList();
+        }
         return files.stream()
                 .map(this::createCommandIfNotNull)
                 .toList();

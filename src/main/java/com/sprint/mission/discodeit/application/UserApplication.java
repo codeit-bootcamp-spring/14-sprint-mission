@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserStatusDto;
 import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.*;
 public class UserApplication {
     private final UserService userService;
     private final ReadStatusService readStatusService;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Transactional
     public UserDto createAccount(
@@ -29,9 +31,16 @@ public class UserApplication {
     ) {
         BinaryContent createdProfile = createProfile(createProfileCommand);
         User createdUser = userService.create(User.create(
-                username, email, password ,createdProfile
+                username, email, password, createdProfile
         ));
+        saveCreatedProfile(createProfileCommand, createdProfile);
         return UserDto.from(createdUser);
+    }
+
+    private void saveCreatedProfile(CreateBinaryContentCommand createProfileCommand, BinaryContent createdProfile) {
+        if (Objects.nonNull(createdProfile)) {
+            binaryContentStorage.put(createdProfile.getId(), createProfileCommand.content());
+        }
     }
 
     @Transactional
@@ -54,6 +63,8 @@ public class UserApplication {
         BinaryContent createdProfile = createProfile(createProfileCommand);
         User updating = userService.findById(id);
         User updated = userService.update(updating, username, email, password, createdProfile);
+        userService.flush();
+        saveCreatedProfile(createProfileCommand, createdProfile);
         return UserDto.from(updated);
     }
 
@@ -70,14 +81,15 @@ public class UserApplication {
     }
 
 
-
     private @Nullable BinaryContent createProfile(CreateBinaryContentCommand profileCreateCommand) {
-        return Objects.nonNull(profileCreateCommand) ?
-                BinaryContent.of(
-                        profileCreateCommand.fileName(),
-                        profileCreateCommand.contentType(),
-                        profileCreateCommand.content()
-                )
-                : null;
+        if (Objects.isNull(profileCreateCommand)) {
+            return null;
+        }
+
+        return BinaryContent.of(
+                profileCreateCommand.fileName(),
+                profileCreateCommand.contentType(),
+                profileCreateCommand.content()
+        );
     }
 }

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class MessageCreateService {
     private final ChannelService channelService;
     private final ReadStatusService readStatusService;
     private final MessageService messageService;
+    private final BinaryContentStorage binaryContentStorage;
 
     public Message create(String content, UUID channelId, UUID userId,
                           List<CreateBinaryContentCommand> createFileCommands) {
@@ -32,8 +34,8 @@ public class MessageCreateService {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
-        List<BinaryContent> createdAttachments = createFilesIfNotNull(createFileCommands);
-        return messageService.create(
+        List<BinaryContent> createdAttachments = createFiles(createFileCommands);
+        Message created = messageService.create(
                 Message.of(
                         content,
                         user,
@@ -41,9 +43,22 @@ public class MessageCreateService {
                         createdAttachments
                 )
         );
+
+        saveCreatedAttachments(createdAttachments, createFileCommands);
+        return created;
     }
 
-    private @Nullable List<BinaryContent> createFilesIfNotNull(List<CreateBinaryContentCommand> createFileCommands) {
+    private void saveCreatedAttachments(List<BinaryContent> createdAttachments, List<CreateBinaryContentCommand> createFileCommands) {
+        if (Objects.nonNull(createFileCommands) && !createFileCommands.isEmpty()) {
+            for (int i = 0; i < createFileCommands.size(); i++) {
+                UUID id = createdAttachments.get(i).getId();
+                byte[] content = createFileCommands.get(i).content();
+                binaryContentStorage.put(id, content);
+            }
+        }
+    }
+
+    private @Nullable List<BinaryContent> createFiles(List<CreateBinaryContentCommand> createFileCommands) {
         if (Objects.isNull(createFileCommands) || createFileCommands.isEmpty()) {
             return null;
         }

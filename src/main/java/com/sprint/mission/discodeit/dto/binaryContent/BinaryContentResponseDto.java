@@ -8,15 +8,13 @@ import java.util.UUID;
 public record BinaryContentResponseDto(UUID id,
                                        String fileName,
                                        Long size,
-                                       String contentType,
-                                       byte[] bytes) {
+                                       String contentType) {
     public static BinaryContentResponseDto from(BinaryContent binaryContent) {
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
                 binaryContent.getFileName(),
                 binaryContent.getSize(),
-                binaryContent.getContentType(),
-                binaryContent.getBytes()
+                binaryContent.getContentType()
         );
     }
 

@@ -1,6 +1,8 @@
 discodeit:
-  repository:
-    type: file
+  storage:
+    type: local
+    local:
+      root-path: src/main/java/com/sprint/mission/discodeit/storage/storage
 
 spring:
   datasource:

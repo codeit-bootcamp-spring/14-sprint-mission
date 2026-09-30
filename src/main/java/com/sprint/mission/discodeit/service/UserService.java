@@ -84,4 +84,8 @@ public class UserService {
             throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);
         }
     }
+
+    public void flush() {
+        userRepository.flush();
+    }
 }
