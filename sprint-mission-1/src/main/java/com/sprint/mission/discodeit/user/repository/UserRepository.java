@@ -1,24 +1,20 @@
 package com.sprint.mission.discodeit.user.repository;
 
 import com.sprint.mission.discodeit.user.entity.User;
-
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    User userAdd(User user);
+    Optional<User> findByUserName(@NotBlank String username);
 
-    Optional<User> findByUser(UUID userId);
+    Optional<User> findByEmail(@NotBlank String email);
 
-    Optional<User> findByUserName(String name);
-
-    Optional<User> findByUserEmail(String email);
-
-    void delete(User user);
-
-    void update(User user);
-
-    List<User> findAllUser();
+    @Override
+    @EntityGraph(attributePaths = {"status", "profile"})
+    List<User> findAll();
 }

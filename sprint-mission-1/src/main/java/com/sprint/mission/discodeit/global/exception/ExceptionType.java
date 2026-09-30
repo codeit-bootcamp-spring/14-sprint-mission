@@ -68,6 +68,22 @@ public enum ExceptionType {
         "찾으시는 메세지가 존재하지 않습니다"
     ),
 
+    BINARY_CONTENT_NOT_FOUND(
+        Level.WARN,
+        HttpStatus.NOT_FOUND,
+        "찾으시는 이미지가 존재하지 않습니다"
+    ),
+    FILE_SAVE_FAILED(
+        Level.ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        "파일을 저장하는데 실패했습니다"
+    ),
+    FILE_NOT_FOUND(
+        Level.ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        "파일을 찾을 수 없습니다"
+    ),
+
 
     AUTH_INVALID(
         Level.WARN,
@@ -75,6 +91,11 @@ public enum ExceptionType {
         "아이디 또는 비밀번호가 올바르지 않습니다"
     ),
 
+    READ_STATUS_CONFLICT(
+        Level.WARN,
+        HttpStatus.CONFLICT,
+        "이미 존재하는 읽음 상태입니다"
+    ),
 
     VALIDATION_FAILED(
         Level.WARN,

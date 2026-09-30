@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.user.controller;
 
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.user.dto.UserDto;
-import com.sprint.mission.discodeit.user.dto.UserResponse;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,12 +30,11 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "사용자 생성")
-    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/api/users",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResponse> create(
+    public ResponseEntity<UserDto> create(
         @Valid @RequestPart(value = "userCreateRequest") UserCreateRequestDto userCreateRequestDto,
         @RequestPart(value = "profile", required = false) MultipartFile profile) {
         return ResponseEntity
@@ -49,7 +46,7 @@ public class UserController {
     @RequestMapping(method = RequestMethod.PATCH,
         value = "/api/users/{userId}",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResponse> update(
+    public ResponseEntity<UserDto> update(
         @Parameter(description = "사용자 ID")
         @PathVariable UUID userId,
         @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequestDto userUpdateRequestDto,
@@ -60,7 +57,6 @@ public class UserController {
     }
 
     @Operation(summary = "사용자 삭제")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.DELETE, value = "/api/users/{userId}")
     public ResponseEntity<Void> delete(
         @Parameter(description = "사용자 ID")

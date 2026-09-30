@@ -1,22 +1,57 @@
 package com.sprint.mission.discodeit.message.repository;
 
+import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.message.entity.Message;
-
+import com.sprint.mission.discodeit.user.entity.User;
+import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface MessageRepository {
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    Message messageAdd(Message message);
+    Slice<Message> findAllByChannel(Channel channel, Pageable pageable);
 
-    Optional<Message> findByMessage(UUID messageID);
+    @Modifying
+    @Query("update Message m set m.author = null where m.author = :user")
+    void clearAuthor(@Param("user") User user);
 
-    void delete(Message message);
+    @Query("""
+        select m.channel.id, max(m.createdAt)
+        from Message m
+        where m.channel.id in :channelIds
+        group by m.channel.id
+        """)
+    List<Object[]> findLastMessageAtByChannelIds(@Param("channelIds") List<UUID> channelIds);
 
-    void update(Message message);
+    @Query("select max(m.createdAt) from Message m where m.channel = :channel")
+    Instant findLastMessageAt(@Param("channel") Channel channel);
 
-    void deleteByChannelId(UUID channelId);
+    @Query("""
+        select m from Message m
+        left join fetch m.author a
+        left join fetch a.profile
+        left join fetch a.status
+        where m.channel.id = :channelId
+        order by m.createdAt desc
+        """)
+    List<Message> findLatest(@Param("channelId") UUID channelId, Pageable pageable);
 
-    List<Message> findAllMessage(UUID channelId);
+    @Query("""
+        select m from Message m
+        left join fetch m.author a
+        left join fetch a.profile
+        left join fetch a.status
+        where m.channel.id = :channelId
+          and m.createdAt < :cursor
+        order by m.createdAt desc
+        """)
+    List<Message> findBefore(@Param("channelId") UUID channelId,
+        @Param("cursor") Instant cursor,
+        Pageable pageable);
 }
