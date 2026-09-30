@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
@@ -39,10 +41,13 @@ public class BasicUserService implements UserService {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
+    log.debug("유저 생성 시작 - 입력 이름: {} 입력 이메일: {}", username, email);
     if (userRepository.existsByEmail(email)) {
+      log.warn("중복된 이메일 - 입력 이메일: {}", email);
       throw new IllegalArgumentException("User with email " + email + " already exists");
     }
     if (userRepository.existsByUsername(username)) {
+      log.warn("중복된 사용자 이름 - 입력 이름: {}", username);
       throw new IllegalArgumentException("User with username " + username + " already exists");
     }
 
@@ -60,6 +65,7 @@ public class BasicUserService implements UserService {
     User createdUser = userRepository.save(
         new User(username, email, userCreateRequest.password(), profile)
     );
+    log.debug("유저 생성 완료 - 입력 이름: {} 입력 이메일: {}", createdUser.getUsername(), createdUser.getEmail());
 
     userStatusRepository.save(new UserStatus(createdUser, Instant.now()));
     return toDto(createdUser);
@@ -84,15 +90,21 @@ public class BasicUserService implements UserService {
   @Transactional
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    log.debug("유저 업데이트 시작 - userId: {}, 유저이름: {} ", userId, userUpdateRequest.newUsername());
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("존재하지 않는 유저 조회 - userId: {}", userId);
+          return new NoSuchElementException("User with id " + userId + " not found");
+        });
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
     if (userRepository.existsByEmail(newEmail)) {
+      log.warn("이미 존재하는 이메일 - email: {}", newEmail);
       throw new IllegalArgumentException("User with email " + newEmail + " already exists");
     }
     if (userRepository.existsByUsername(newUsername)) {
+      log.warn("이미 존재하는 이름 - userName: {}", newUsername);
       throw new IllegalArgumentException("User with username " + newUsername + " already exists");
     }
 
@@ -114,6 +126,7 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     user.update(newUsername, newEmail, userUpdateRequest.newPassword(), profile);
+    log.debug("유저 업데이트 완료 - 업데이트 된 userId: {}, 변경 된 이름: {}",user.getId(), user.getUsername());
    /* 트랜잭션 사용해서 컨텍스트내에서 기존값과 새로운값을 비교 <- drity checking
     return userRepository.save(user);
     커밋시 dirty checking에서 값이 바뀌었따면 업데이트 쿼리 날림<- .save() 생략가능 */
@@ -123,8 +136,12 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional
   public void delete(UUID userId) {
+    log.debug("유저 삭제 시작 - 삭제 대상 id: {}", userId);
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("존재하지 않는 유저 조회 - userId: {}", userId);
+          return new NoSuchElementException("User with id " + userId + " not found");
+        });
 
     BinaryContent profile = user.getProfile();
     if (profile != null) {
@@ -133,6 +150,7 @@ public class BasicUserService implements UserService {
 
     userStatusRepository.deleteByUserId(userId);
     userRepository.deleteById(userId);
+    log.debug("유저 삭제 완료 - userId: {}, 유저 이름: {} ", userId, user.getUsername());
   }
 
   private UserDto toDto(User user) {

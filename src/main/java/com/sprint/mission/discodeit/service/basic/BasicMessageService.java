@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -44,13 +46,16 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    log.debug("메세지 생성 시작"); // TODO: 이럴땐 뭐찍어야하지? 질문하기
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
 
     if (!channelRepository.existsById(channelId)) {
+      log.warn("조회된 채널 없음 - 채널아이디: {}", channelId);
       throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
     }
     if (!userRepository.existsById(authorId)) {
+      log.warn("조회된 유저 없음 - 유저아이디: {}", authorId);
       throw new NoSuchElementException("Author with id " + authorId + " does not exist");
     }
 
@@ -76,7 +81,9 @@ public class BasicMessageService implements MessageService {
         channel,
         author
     );
-    return messageMapper.toDto(messageRepository.save(message), attachmentIds);
+    Message target = messageRepository.save(message);
+    log.debug("메세지 생성 완료 - 메세지아이디: {}", target.getId());
+    return messageMapper.toDto(target, attachmentIds);
   }
 
   @Override
@@ -99,27 +106,37 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+    log.debug("메세지 업데이트 시작 - 수정할 메세지아이디: {}", messageId);
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            () -> {
+              log.warn("존재하지 않는 메세지 조회- 메세지아이디: {}", messageId);
+              return new NoSuchElementException("Message with id " + messageId + " not found");
+            });
     message.update(newContent);
+    log.debug("메세지 업데이트 완료 - 메세지아이디: {}", message.getId());
     return messageMapper.toDto(message, attachmentIds(message.getId()));
   }
 
   @Override
   @Transactional
   public void delete(UUID messageId) {
+    log.debug("메세지 삭제 시작 - 삭제할 메세지 아이디: {}", messageId);
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "Message with id " + messageId + " not found"
-        ));
+        .orElseThrow(() -> {
+          log.warn("존재하지 않는 메세지 조회- 메세지아이디: {}", messageId);
+          return new NoSuchElementException(
+              "Message with id " + messageId + " not found"
+          );
+        });
 
     messageAttachmentsRepository.findAllByMessageId(messageId).stream()
         .map(MessageAttachments::getAttachment)
         .forEach(binaryContentRepository::delete);
 
     messageRepository.delete(message);
+    log.debug("메세지 삭제 완료 - 삭제된 메세지 아이디: {}", message.getId());
   }
 
   private List<UUID> attachmentIds(UUID messageId) {
