@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Message extends BaseUpdatableEntity {
 
-
+  @Column(columnDefinition = "text", nullable = false)
   private String content;
 
   //cascade = CascadeType.ALL쓰면 message가 삭제되면 channel가 삭제가 되어서 쓰면 안됨 ( 맞지 않음 )
@@ -35,7 +36,7 @@ public class Message extends BaseUpdatableEntity {
 
   //cascade = CascadeType.ALL쓰면 message가 삭제되면 user가 삭제가 되어서 쓰면 안됨
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", columnDefinition = "uuid")
+  @JoinColumn(name = "author_id", columnDefinition = "uuid")
   private User author;
 
   //cascade = CascadeType.ALL 메세지가 삭제가 되면 파일도 삭제가 되어야 함.

@@ -26,7 +26,6 @@ public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
-  private final UserMapper userMapper;
   private final UserStatusMapper userStatusMapper;
 
   @Transactional
