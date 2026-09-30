@@ -22,7 +22,6 @@ public class MessageCreateService {
     private final ChannelService channelService;
     private final ReadStatusService readStatusService;
     private final MessageService messageService;
-    private final BinaryContentService binaryContentService;
 
     public Message create(String content, UUID channelId, UUID userId,
                           List<CreateBinaryContentCommand> createFileCommands) {
@@ -51,15 +50,12 @@ public class MessageCreateService {
 
         return createFileCommands.stream()
                 .map(command ->
-                        binaryContentService.create(
-                                BinaryContent.of(
-                                        command.fileName(),
-                                        command.contentType(),
-                                        command.content()
-                                )
+                        BinaryContent.of(
+                                command.fileName(),
+                                command.contentType(),
+                                command.content()
                         )
                 )
                 .toList();
     }
-
 }
