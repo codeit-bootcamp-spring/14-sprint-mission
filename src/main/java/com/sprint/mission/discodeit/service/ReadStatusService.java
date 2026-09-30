@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.readstatus.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +17,13 @@ public class ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
 
     public ReadStatus create(ReadStatus readStatus) {
+        validateUserAndChannelAvailable(readStatus);
         return readStatusRepository.save(readStatus);
     }
 
     public List<ReadStatus> createAll(List<ReadStatus> readStatuses) {
-        return readStatusRepository.createAll(readStatuses);
+        validateUserAndChannelAvailable(readStatuses);
+        return readStatusRepository.saveAll(readStatuses);
     }
 
     public ReadStatus findById(UUID id) {
@@ -31,11 +33,11 @@ public class ReadStatusService {
 
 
     public List<UUID> findAllUserIdsByChannelId(UUID channelId) {
-        return readStatusRepository.findAllUserIdsByChannelId(channelId);
+        return readStatusRepository.findAllUserIdByChannelId(channelId);
     }
 
     public boolean existsByUserAndChannel(UUID userId, UUID channelId) {
-        return readStatusRepository.existsByUserAndChannel(userId, channelId);
+        return readStatusRepository.existsByUserIdAndChannelId(userId, channelId);
     }
 
     public List<ReadStatus> findAllByUserId(UUID userId) {
@@ -43,31 +45,37 @@ public class ReadStatusService {
     }
 
     public ReadStatus update(UUID id, Instant newLastReadAt) {
-        validateExists(id);
-        return readStatusRepository.update(id, newLastReadAt);
-    }
-
-    public ReadStatus deleteById(UUID id) {
-        return readStatusRepository.deleteById(id);
+        ReadStatus updating = findById(id);
+        return updating.update(newLastReadAt);
     }
 
     public void deleteByUserId(UUID userId) {
-        readStatusRepository.deleteByUserId(userId);
+        ReadStatus deleting = findByUserId(userId);
+        readStatusRepository.delete(deleting);
+    }
+
+    private ReadStatus findByUserId(UUID userId) {
+        return readStatusRepository.findByUserId(userId);
     }
 
     public void deleteByChannelId(UUID channelId) {
-        readStatusRepository.deleteByChannelId(channelId);
+        ReadStatus deleting = findByChannelId(channelId);
+        readStatusRepository.delete(deleting);
     }
 
-    public void validateExists(UUID id) {
-        if (!readStatusRepository.existsById(id)) {
-            throw new CustomException(ExceptionType.READSTATUS_NOT_FOUND_IN_DATABASE);
+    private ReadStatus findByChannelId(UUID channelId) {
+        return readStatusRepository.findByChannelId(channelId);
+    }
+
+    private void validateUserAndChannelAvailable(ReadStatus readStatus) {
+        if (readStatusRepository.existsByUserIdAndChannelId(readStatus.getUserId(), readStatus.getChannelId())) {
+            throw new CustomException(ExceptionType.READSTATUS_ALREADY_EXISTS);
         }
     }
 
-    public void validateAlreadyExistsByUserAndChannel(UUID userId, UUID channelID) {
-        if (readStatusRepository.existsByUserAndChannel(userId, channelID)) {
-            throw new CustomException(ExceptionType.READSTATUS_ALREADY_EXISTS);
+    private void validateUserAndChannelAvailable(List<ReadStatus> readStatuses) {
+        for (ReadStatus readStatus : readStatuses) {
+            validateUserAndChannelAvailable(readStatus);
         }
     }
 }

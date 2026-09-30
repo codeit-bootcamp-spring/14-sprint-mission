@@ -37,7 +37,7 @@ public class ChannelApplication {
         Channel channel = Channel.createPrivateChannel(userIds);
 
         // 참여 User의 정보를 받아 User 별 ReadStatus 정보 생성
-        List<ReadStatus> readStatuses = ReadStatus.of(users, channel);
+        List<ReadStatus> readStatuses = ReadStatus.of(users, channel, Instant.now());
         readStatusService.createAll(readStatuses);
 
         Channel created = channelService.create(channel);

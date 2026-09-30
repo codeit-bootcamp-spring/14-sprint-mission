@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -21,19 +22,17 @@ public class ReadStatusApplication {
     private final UserService userService;
     private final ChannelService channelService;
 
+    @Transactional
     public ReadStatusResponse create(UUID userId, UUID channelId, Instant lastReadAt) {
         User user = userService.findById(userId);
         Channel channel = channelService.findById(channelId);
-        readStatusService.validateAlreadyExistsByUserAndChannel(user.getId(), channel.getId());
-        ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
-        ReadStatus created = readStatusService.create(readStatus);
+        ReadStatus created = readStatusService.create(
+                ReadStatus.of(user, channel, lastReadAt)
+        );
         return ReadStatusResponse.of(created);
     }
 
-    public ReadStatus getReadStatus(UUID id) {
-        return readStatusService.findById(id);
-    }
-
+    @Transactional
     public List<ReadStatusResponse> getAllReadStatusByUserId(UUID userId) {
         userService.validateExistsById(userId);
         return readStatusService.findAllByUserId(userId).stream()
@@ -44,9 +43,5 @@ public class ReadStatusApplication {
     public ReadStatusResponse updateReadStatus(UUID publicReadStatusId, Instant newLastReadAt) {
         ReadStatus updated = readStatusService.update(publicReadStatusId, newLastReadAt);
         return ReadStatusResponse.of(updated);
-    }
-
-    public void deleteReadStatus(UUID id) {
-        readStatusService.deleteById(id);
     }
 }

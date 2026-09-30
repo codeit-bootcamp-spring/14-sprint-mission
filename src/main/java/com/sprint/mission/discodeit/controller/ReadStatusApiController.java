@@ -20,7 +20,7 @@ public class ReadStatusApiController {
 
     // 1. 특정 채널의 메세지 수신 정보를 생성할 수 있다.
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     public ReadStatusResponse createReadStatus(@Valid @RequestBody ReadStatusCreateDto request) {
         return readStatusApplication.create(
                 request.userId(),
@@ -31,7 +31,7 @@ public class ReadStatusApiController {
 
     // 2. 특정 채널의 메시지 수신 정보를 수정할 수 있다.
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{publicReadStatusId}")
+    @PatchMapping(value = "/{publicReadStatusId}")
     public ReadStatusResponse updateReadStatus(@PathVariable UUID publicReadStatusId,
                                                      @Valid @RequestBody ReadStatusUpdateDto request) {
         return readStatusApplication.updateReadStatus(publicReadStatusId, request.newLastReadAt());
@@ -39,7 +39,7 @@ public class ReadStatusApiController {
 
     // 3.  특정 사용자의 메시지 수신 정보를 조회할 수 있다.
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public List<ReadStatusResponse> getUserReadStatus(@RequestParam UUID userId) {
         return readStatusApplication.getAllReadStatusByUserId(userId);
     }

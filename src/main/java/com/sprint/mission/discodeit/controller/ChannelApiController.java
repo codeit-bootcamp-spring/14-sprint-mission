@@ -16,9 +16,8 @@ import java.util.UUID;
 public class ChannelApiController {
     private final ChannelApplication channelApplication;
 
-    // 1. 공개 채널을 생성할 수 있다.
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(method = RequestMethod.POST, value = "/public")
+    @PostMapping(value = "/public")
     public ChannelUpsertResponse createPublicChannel(@Valid @RequestBody PublicChannelCreateDto request) {
         return channelApplication.createPublicChannel(
                 request.name(),
@@ -26,10 +25,8 @@ public class ChannelApiController {
         );
     }
 
-    // TODO 유저 없어서 테스트 진행 불가. 유저 다 구현 후 여기부터 진행
-    // 2. 비공개 채널을 생성할 수 있다.
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(method = RequestMethod.POST, value = "/private")
+    @PostMapping(value = "/private")
     public ChannelUpsertResponse createPrivateChannel(@Valid @RequestBody PrivateChannelCreateDto request) {
         return channelApplication.createPrivateChannel(
                 request.participantIds()
@@ -37,7 +34,7 @@ public class ChannelApiController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{publicChannelId}")
+    @PatchMapping(value = "/{publicChannelId}")
     public ChannelUpsertResponse updateChannelName(@PathVariable UUID publicChannelId,
                                                 @Valid @RequestBody ChannelUpdateNameDto request) {
         return channelApplication.updateChannelName(
@@ -49,14 +46,14 @@ public class ChannelApiController {
 
     // 3. 채널을 삭제할 수 있다.
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    @DeleteMapping(value = "/{id}")
     public void deleteChannel(@PathVariable UUID id) {
         channelApplication.deleteChannel(id);
     }
 
     // 4. 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
     @ResponseStatus(HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public List<ChannelResponseDto> getAllChannels(@RequestParam UUID userId) {
         return channelApplication.getAllChannelsByUserId(userId);
     }

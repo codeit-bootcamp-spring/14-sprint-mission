@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현하는 도메인 모델입니다.
@@ -44,18 +45,26 @@ public class ReadStatus extends BaseUpdatableEntity {
         this.lastReadAt = lastReadAt;
     }
 
-    public static ReadStatus of(User user, Channel channel) {
-        return new ReadStatus(user, channel, null);
+    public static ReadStatus of(User user, Channel channel, Instant lastReadAt) {
+        return new ReadStatus(user, channel, lastReadAt);
     }
 
-    public static List<ReadStatus> of(List<User> users, Channel channel) {
+    public static List<ReadStatus> of(List<User> users, Channel channel, Instant lastReadAt) {
         return users.stream()
-                .map(user -> of(user, channel))
+                .map(user -> of(user, channel, lastReadAt))
                 .toList();
     }
 
     public ReadStatus update(Instant newLastReadAt) {
         this.lastReadAt = newLastReadAt;
         return this;
+    }
+
+    public UUID getUserId() {
+        return user.getId();
+    }
+
+    public UUID getChannelId() {
+        return channel.getId();
     }
 }
