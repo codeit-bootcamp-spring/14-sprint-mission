@@ -20,7 +20,7 @@ import lombok.Setter;
 
 @Getter
 @Table
-@Entity(name = "user")
+@Entity(name = "users")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity {
 
@@ -68,5 +68,9 @@ public class User extends BaseUpdatableEntity {
       this.profile = newProfileId;
       anyValueUpdated = true;
     }
+  }
+
+  public void assignStatus(UserStatus status) {
+    this.status = status;
   }
 }
