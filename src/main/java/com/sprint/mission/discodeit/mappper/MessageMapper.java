@@ -25,7 +25,7 @@ public class MessageMapper {
         .orElse(null);
     return new MessageDto(
         message.getId(),
-        message.getCreateAt(),
+        message.getCreatedAt(),
         message.getUpdateAt(),
         message.getContent(),
         message.getChannel().getId(),
