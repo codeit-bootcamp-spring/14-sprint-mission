@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Transactional
   @Override
@@ -51,8 +53,10 @@ public class BasicUserService implements UserService {
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent);
+              contentType);
+          BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(createdBinaryContent.getId(),bytes);
+          return createdBinaryContent;
         })
         .orElse(null);
     String password = userCreateRequest.password();
@@ -107,8 +111,10 @@ public class BasicUserService implements UserService {
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent);
+              contentType);
+          BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(createdBinaryContent.getId(),bytes);
+          return createdBinaryContent;
         })
         .orElse(null);
 
