@@ -29,12 +29,12 @@ import lombok.NoArgsConstructor;
 public class ReadStatus extends BaseUpdatableEntity {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "user_id", referencedColumnName = "uuid")
+  @JoinColumn(name = "user_id", columnDefinition = "uuid")
   private User user;
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "channel_id", referencedColumnName = "uuid")
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
   private Channel channel;
-  @Column(columnDefinition = "last read time", nullable = false)
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastReadAt;
 
   public ReadStatus(User user, Channel channel, Instant lastReadAt) {
