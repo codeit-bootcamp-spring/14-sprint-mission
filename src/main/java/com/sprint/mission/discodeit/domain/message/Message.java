@@ -16,6 +16,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "messages")
@@ -67,5 +68,9 @@ public class Message extends BaseUpdatableEntity {
     public Message updateContent(String content) {
         this.content = content;
         return this;
+    }
+
+    public UUID getChannelId() {
+        return this.channel.getId();
     }
 }

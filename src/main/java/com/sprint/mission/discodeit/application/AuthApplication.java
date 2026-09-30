@@ -18,6 +18,6 @@ public class AuthApplication {
     public UserDto login(String name, String password) {
         User retrieved = userService.findByNameAndPassword(name, password);
         retrieved.updateLastActiveAt(Instant.now());
-        return UserDto.of(retrieved);
+        return UserDto.from(retrieved);
     }
 }

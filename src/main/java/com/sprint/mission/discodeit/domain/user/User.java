@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -88,6 +89,10 @@ public class User extends BaseUpdatableEntity {
 
     public Instant getLastSeenAt() {
         return status.getLastSeenAt();
+    }
+
+    public UUID getStatusId() {
+        return this.status.getId();
     }
 
     public User updateLastActiveAt(Instant newLastActiveAt) {

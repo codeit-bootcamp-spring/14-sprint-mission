@@ -31,13 +31,13 @@ public class UserApplication {
         User createdUser = userService.create(User.create(
                 username, email, password ,createdProfile
         ));
-        return UserDto.of(createdUser);
+        return UserDto.from(createdUser);
     }
 
     @Transactional
     public UserDto getUser(UUID id) {
         User foundUser = userService.findById(id);
-        return UserDto.of(foundUser);
+        return UserDto.from(foundUser);
     }
 
     @Transactional
@@ -54,7 +54,7 @@ public class UserApplication {
         BinaryContent createdProfile = createProfile(createProfileCommand);
         User updating = userService.findById(id);
         User updated = userService.update(updating, username, email, password, createdProfile);
-        return UserDto.of(updated);
+        return UserDto.from(updated);
     }
 
     @Transactional

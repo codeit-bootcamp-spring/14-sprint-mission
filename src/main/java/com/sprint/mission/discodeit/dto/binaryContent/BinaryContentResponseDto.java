@@ -2,21 +2,27 @@ package com.sprint.mission.discodeit.dto.binaryContent;
 
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 
-import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record BinaryContentResponseDto(UUID id,
-                                       Instant createdAt,
                                        String fileName,
+                                       Long size,
                                        String contentType,
                                        byte[] bytes) {
     public static BinaryContentResponseDto from(BinaryContent binaryContent) {
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
-                binaryContent.getCreatedAt(),
                 binaryContent.getFileName(),
+                binaryContent.getSize(),
                 binaryContent.getContentType(),
                 binaryContent.getBytes()
         );
+    }
+
+    public static List<BinaryContentResponseDto> from(List<BinaryContent> binaryContents) {
+        return binaryContents.stream()
+                .map(BinaryContentResponseDto::from)
+                .toList();
     }
 }
