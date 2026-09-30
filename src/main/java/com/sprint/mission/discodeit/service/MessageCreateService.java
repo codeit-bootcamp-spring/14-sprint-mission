@@ -34,9 +34,14 @@ public class MessageCreateService {
         }
 
         List<BinaryContent> createdAttachments = createFilesIfNotNull(createFileCommands);
-        Message message = new Message(content, user, channel, createdAttachments);
-        Message created = messageService.create(message);
-        return created;
+        return messageService.create(
+                Message.of(
+                        content,
+                        user,
+                        channel,
+                        createdAttachments
+                )
+        );
     }
 
     private @Nullable List<BinaryContent> createFilesIfNotNull(List<CreateBinaryContentCommand> createFileCommands) {

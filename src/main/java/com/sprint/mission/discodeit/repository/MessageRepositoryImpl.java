@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.discodeit.domain.message.QMessage;
 import lombok.RequiredArgsConstructor;
@@ -11,15 +12,17 @@ import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
-public class MessageRepositoryImpl implements MessageRepositoryCustom{
+public class MessageRepositoryImpl implements MessageRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QMessage message = QMessage.message;
 
     @Override
     public Optional<Instant> findLatestMessageByChannelId(UUID channelId) {
-        return queryFactory
+        JPAQuery<Instant> query = queryFactory
                 .select(message.createdAt.max())
                 .from(message)
-                .stream().findAny();
+                .where(message.channel.id.eq(channelId));
+
+        return Optional.ofNullable(query.fetchOne());
     }
 }

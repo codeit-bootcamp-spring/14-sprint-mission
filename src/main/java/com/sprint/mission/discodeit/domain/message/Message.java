@@ -38,10 +38,14 @@ public class Message extends BaseUpdatableEntity {
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )
-    @JoinTable(name = "message_attachments")
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id")
+    )
     private final List<BinaryContent> attachments = new ArrayList<>();
 
-    public Message(String content, User author, Channel channel, @Nullable List<BinaryContent> attachments) {
+    private Message(String content, User author, Channel channel, @Nullable List<BinaryContent> attachments) {
         super();
         this.content = content;
         this.author = author;
@@ -49,5 +53,19 @@ public class Message extends BaseUpdatableEntity {
         if (Objects.nonNull(attachments)) {
             this.attachments.addAll(attachments);
         }
+    }
+
+    public static Message of(
+            String content,
+            User author,
+            Channel channel,
+            @Nullable List<BinaryContent> attachments
+    ) {
+        return new Message(content, author, channel, attachments);
+    }
+
+    public Message updateContent(String content) {
+        this.content = content;
+        return this;
     }
 }

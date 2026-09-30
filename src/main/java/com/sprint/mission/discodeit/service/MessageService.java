@@ -18,7 +18,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
 
     public Message create(Message message) {
-        return messageRepository.create(message);
+        return messageRepository.save(message);
     }
 
     public Message findById(UUID id) {
@@ -26,37 +26,22 @@ public class MessageService {
                 .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE));
     }
 
-    public List<Message> findAll() {
-        return messageRepository.findAll();
-    }
-
     public List<Message> findAllByChannelId(UUID channelId) {
         return messageRepository.findAllByChannelId(channelId);
     }
 
-
     public Message updateContent(UUID id, String content) {
-        validateExists(id);
-        return messageRepository.updateContent(id, content);
+        return findById(id).updateContent(content);
     }
 
     public Message deleteById(UUID id) {
-        validateExists(id);
-        return messageRepository.deleteById(id);
-    }
-
-    public void deleteAllByUserId(UUID userId) {
-        messageRepository.deleteAllByUserId(userId);
+        Message deleting = findById(id);
+        messageRepository.delete(deleting);
+        return deleting;
     }
 
     public void deleteAllByChannelId(UUID channelId) {
         messageRepository.deleteAllByChannelId(channelId);
-    }
-
-    public void validateExists(UUID id) {
-        if (!messageRepository.existsById(id)) {
-            throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE);
-        }
     }
 
     public Optional<Instant> findLastMessageAtByChannelId(UUID channelId) {

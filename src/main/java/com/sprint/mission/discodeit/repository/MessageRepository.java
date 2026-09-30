@@ -10,9 +10,5 @@ public interface MessageRepository
         extends JpaRepository<Message, UUID>, MessageRepositoryCustom{
     List<Message> findAllByChannelId(UUID channelId);
 
-    Message updateContent(UUID id, String content);
-
-    void deleteAllByUserId(UUID userId);
-
     void deleteAllByChannelId(UUID channelId);
 }
