@@ -16,7 +16,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   void deleteAllByChannelId(UUID channelId);
 
-  Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
+  Slice<Message> findAllByChannelId(UUID channelId);
 
   @Query("SELECT m.createAt "
       + "FROM Message m "

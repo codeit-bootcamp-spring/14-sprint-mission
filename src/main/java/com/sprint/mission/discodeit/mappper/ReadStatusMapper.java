@@ -2,10 +2,14 @@ package com.sprint.mission.discodeit.mappper;
 
 import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import lombok.Getter;
+import org.springframework.stereotype.Component;
 
+@Component
+@Getter
 public class ReadStatusMapper {
 
-  ReadStatusDto toDto(ReadStatus status) {
+  public ReadStatusDto toDto(ReadStatus status) {
     return new ReadStatusDto(
         status.getId(),
         status.getUser().getId(),

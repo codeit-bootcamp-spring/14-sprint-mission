@@ -9,17 +9,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-  User save(User user);
-
   Optional<User> findById(UUID id);
 
   Optional<User> findByUsername(String username);
-
-  List<User> findAll();
-
-  boolean existsById(UUID id);
-
-  void deleteById(UUID id);
 
   boolean existsByEmail(String email);
 
