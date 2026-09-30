@@ -24,10 +24,10 @@ public class Channel extends BaseUpdatableEntity {
   @Column(nullable = false)
   private ChannelType type;
 
-  @Column(nullable = false)
+  @Column(length = 50)
   private String name;
 
-  @Column(nullable = false)
+  @Column(length = 500)
   private String description;
 
   public Channel(ChannelType type, String name, String description) {
