@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID>, ReadStatusRepositoryCustom{
-    boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
+    boolean existsByUser_IdAndChannel_Id(UUID userId, UUID channelId);
 
-    List<ReadStatus> findAllByUserId(UUID userId);
+    List<ReadStatus> findAllByUser_Id(UUID userId);
 
-    ReadStatus findByUserId(UUID userId);
+    ReadStatus findByUser_Id(UUID userId);
 
-    ReadStatus findByChannelId(UUID channelId);
+    ReadStatus findByChannel_Id(UUID channelId);
 }

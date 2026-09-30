@@ -37,11 +37,11 @@ public class ReadStatusService {
     }
 
     public boolean existsByUserAndChannel(UUID userId, UUID channelId) {
-        return readStatusRepository.existsByUserIdAndChannelId(userId, channelId);
+        return readStatusRepository.existsByUser_IdAndChannel_Id(userId, channelId);
     }
 
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
+        return readStatusRepository.findAllByUser_Id(userId);
     }
 
     public ReadStatus update(UUID id, Instant newLastReadAt) {
@@ -55,7 +55,7 @@ public class ReadStatusService {
     }
 
     private ReadStatus findByUserId(UUID userId) {
-        return readStatusRepository.findByUserId(userId);
+        return readStatusRepository.findByUser_Id(userId);
     }
 
     public void deleteByChannelId(UUID channelId) {
@@ -64,11 +64,11 @@ public class ReadStatusService {
     }
 
     private ReadStatus findByChannelId(UUID channelId) {
-        return readStatusRepository.findByChannelId(channelId);
+        return readStatusRepository.findByChannel_Id(channelId);
     }
 
     private void validateUserAndChannelAvailable(ReadStatus readStatus) {
-        if (readStatusRepository.existsByUserIdAndChannelId(readStatus.getUserId(), readStatus.getChannelId())) {
+        if (readStatusRepository.existsByUser_IdAndChannel_Id(readStatus.getUserId(), readStatus.getChannelId())) {
             throw new CustomException(ExceptionType.READSTATUS_ALREADY_EXISTS);
         }
     }

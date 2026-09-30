@@ -27,7 +27,7 @@ public class MessageService {
     }
 
     public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId);
+        return messageRepository.findAllByChannel_Id(channelId);
     }
 
     public Message updateContent(UUID id, String content) {
@@ -41,7 +41,7 @@ public class MessageService {
     }
 
     public void deleteAllByChannelId(UUID channelId) {
-        messageRepository.deleteAllByChannelId(channelId);
+        messageRepository.deleteAllByChannel_Id(channelId);
     }
 
     public Optional<Instant> findLastMessageAtByChannelId(UUID channelId) {

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface MessageRepository
         extends JpaRepository<Message, UUID>, MessageRepositoryCustom{
-    List<Message> findAllByChannelId(UUID channelId);
+    List<Message> findAllByChannel_Id(UUID channelId);
 
-    void deleteAllByChannelId(UUID channelId);
+    void deleteAllByChannel_Id(UUID channelId);
 }
