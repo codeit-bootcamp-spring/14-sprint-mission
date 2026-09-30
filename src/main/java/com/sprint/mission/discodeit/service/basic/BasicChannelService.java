@@ -52,7 +52,7 @@ public class BasicChannelService implements ChannelService {
     log.debug("(비공개)채널 생성 시작 - 채널타입: {}", ChannelType.PRIVATE);
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     Channel createdChannel = channelRepository.save(channel);
-    log.debug("(비공개)채널 생성 완료 - 채널아이디: {}, 채널타입: {}", createdChannel.getId(), ChannelType.PRIVATE);
+    log.debug("(비공개)채널 생성 요청 - 채널아이디: {}, 채널타입: {}", createdChannel.getId(), ChannelType.PRIVATE);
 
 //    request.participantIds().stream()
 //        .map(userId -> new ReadStatus(userId, createdChannel.getId(), channel.getCreatedAt()))
@@ -109,7 +109,7 @@ public class BasicChannelService implements ChannelService {
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
     channel.update(newName, newDescription);
-    log.debug("채널 업데이트 완료 - 채널아이디: {}", channel.getId());
+    log.debug("채널 업데이트 요청 - 채널아이디: {}", channel.getId());
     return toDto(channel);
   }
 
@@ -128,7 +128,7 @@ public class BasicChannelService implements ChannelService {
     readStatusRepository.deleteAllByChannelId(channel.getId());
 
     channelRepository.deleteById(channelId);
-    log.debug("채널 삭제 완료 - 삭제된 채널아디디: {}", channelId);
+    log.debug("채널 삭제 요청 - 삭제된 채널아디디: {}", channelId);
   }
 
   private ChannelDto toDto(Channel channel) {

@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -65,7 +67,7 @@ public class BasicUserService implements UserService {
     User createdUser = userRepository.save(
         new User(username, email, userCreateRequest.password(), profile)
     );
-    log.debug("유저 생성 완료 - 입력 이름: {} 입력 이메일: {}", createdUser.getUsername(), createdUser.getEmail());
+    log.debug("유저 생성 요청 - 입력 이름: {} 입력 이메일: {}", createdUser.getUsername(), createdUser.getEmail());
 
     userStatusRepository.save(new UserStatus(createdUser, Instant.now()));
     return toDto(createdUser);
@@ -90,7 +92,15 @@ public class BasicUserService implements UserService {
   @Transactional
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    log.debug("유저 업데이트 시작 - userId: {}, 유저이름: {} ", userId, userUpdateRequest.newUsername());
+    long requestedFieldCount = Stream.of(
+            userUpdateRequest.newUsername(),
+            userUpdateRequest.newEmail(),
+            userUpdateRequest.newPassword()
+        )
+        .filter(Objects::nonNull)
+        .count();
+    log.debug("유저 업데이트 요청 처리 - userId={}, requestedFieldCount={}",
+        userId, requestedFieldCount);
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
           log.warn("존재하지 않는 유저 조회 - userId: {}", userId);
@@ -126,7 +136,7 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     user.update(newUsername, newEmail, userUpdateRequest.newPassword(), profile);
-    log.debug("유저 업데이트 완료 - 업데이트 된 userId: {}, 변경 된 이름: {}",user.getId(), user.getUsername());
+    log.debug("유저 업데이트 요청 - 업데이트 된 userId: {}, 변경 된 이름: {}",user.getId(), user.getUsername());
    /* 트랜잭션 사용해서 컨텍스트내에서 기존값과 새로운값을 비교 <- drity checking
     return userRepository.save(user);
     커밋시 dirty checking에서 값이 바뀌었따면 업데이트 쿼리 날림<- .save() 생략가능 */
@@ -150,7 +160,7 @@ public class BasicUserService implements UserService {
 
     userStatusRepository.deleteByUserId(userId);
     userRepository.deleteById(userId);
-    log.debug("유저 삭제 완료 - userId: {}, 유저 이름: {} ", userId, user.getUsername());
+    log.debug("유저 삭제 요청 - userId: {}, 유저 이름: {} ", userId, user.getUsername());
   }
 
   private UserDto toDto(User user) {

@@ -82,7 +82,7 @@ public class BasicMessageService implements MessageService {
         author
     );
     Message target = messageRepository.save(message);
-    log.debug("메세지 생성 완료 - 메세지아이디: {}", target.getId());
+    log.debug("메세지 생성 요청 - 메세지아이디: {}", target.getId());
     return messageMapper.toDto(target, attachmentIds);
   }
 
@@ -115,7 +115,7 @@ public class BasicMessageService implements MessageService {
               return new NoSuchElementException("Message with id " + messageId + " not found");
             });
     message.update(newContent);
-    log.debug("메세지 업데이트 완료 - 메세지아이디: {}", message.getId());
+    log.debug("메세지 업데이트 요청 - 메세지아이디: {}", message.getId());
     return messageMapper.toDto(message, attachmentIds(message.getId()));
   }
 
@@ -136,7 +136,7 @@ public class BasicMessageService implements MessageService {
         .forEach(binaryContentRepository::delete);
 
     messageRepository.delete(message);
-    log.debug("메세지 삭제 완료 - 삭제된 메세지 아이디: {}", message.getId());
+    log.debug("메세지 삭제 요청 - 삭제된 메세지 아이디: {}", message.getId());
   }
 
   private List<UUID> attachmentIds(UUID messageId) {
