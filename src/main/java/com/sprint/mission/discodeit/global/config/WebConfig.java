@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.global.config;
 
-import com.sprint.mission.discodeit.web.controller.resolver.LoginMemberArgumentResolver;
+import com.sprint.mission.discodeit.global.auth.LoginMemberArgumentResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
