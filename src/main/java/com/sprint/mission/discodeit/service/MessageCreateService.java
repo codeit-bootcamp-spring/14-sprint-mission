@@ -33,33 +33,28 @@ public class MessageCreateService {
             throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
-        List<BinaryContent> createdAttachments = createFileCommands.stream()
-                .map(command -> binaryContentService.create(BinaryContent.of(
-                                command.fileName(),
-                                command.contentType(),
-                                command.content()
-                        )
-                ))
-                .toList();
-
+        List<BinaryContent> createdAttachments = createFilesIfNotNull(createFileCommands);
         Message message = new Message(content, user, channel, createdAttachments);
         Message created = messageService.create(message);
-        channelService.update(channel.getId(), created.getCreatedAt());
-
         return created;
     }
 
-    private @Nullable List<UUID> createFilesAndThenGetIdIfNotNullOrElseGetNull(List<CreateBinaryContentCommand> createFileCommands) {
-        return Objects.nonNull(createFileCommands) ?
-                createFileCommands.stream()
-                        .map(command -> {
-                            return binaryContentService.create(BinaryContent.of(
-                                    command.fileName(),
-                                    command.contentType(),
-                                    command.content()
-                            )).getId();
-                        }).toList()
-                : null;
+    private @Nullable List<BinaryContent> createFilesIfNotNull(List<CreateBinaryContentCommand> createFileCommands) {
+        if (Objects.isNull(createFileCommands) || createFileCommands.isEmpty()) {
+            return null;
+        }
+
+        return createFileCommands.stream()
+                .map(command ->
+                        binaryContentService.create(
+                                BinaryContent.of(
+                                        command.fileName(),
+                                        command.contentType(),
+                                        command.content()
+                                )
+                        )
+                )
+                .toList();
     }
 
 }

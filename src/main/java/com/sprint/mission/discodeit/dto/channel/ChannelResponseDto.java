@@ -16,14 +16,14 @@ public record ChannelResponseDto(@NotNull UUID id,
                                  @Nullable List<UUID> participantIds,
                                  @NotNull Instant lastMessageAt) {
 
-    public static ChannelResponseDto of(Channel channel, List<UUID> participantIds) {
+    public static ChannelResponseDto of(Channel channel, List<UUID> participantIds, Instant lastMessageAt) {
         return new ChannelResponseDto(
                 channel.getId(),
                 channel.getType(),
                 channel.getName(),
                 channel.getDescription(),
                 channel.isPrivate() ? participantIds : null,
-                channel.getUpdatedAt()
+                lastMessageAt
         );
     }
 }

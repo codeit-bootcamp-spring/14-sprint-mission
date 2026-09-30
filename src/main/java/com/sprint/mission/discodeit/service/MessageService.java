@@ -7,7 +7,9 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -55,5 +57,9 @@ public class MessageService {
         if (!messageRepository.existsById(id)) {
             throw new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE);
         }
+    }
+
+    public Optional<Instant> findLastMessageAtByChannelId(UUID channelId) {
+        return messageRepository.findLatestMessageByChannelId(channelId);
     }
 }

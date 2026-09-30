@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +16,7 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
 
     public Channel create(Channel channel) {
-        return channelRepository.create(channel);
+        return channelRepository.save(channel);
     }
 
     public Channel findById(UUID id) {
@@ -29,24 +28,19 @@ public class ChannelService {
         return channelRepository.findAll();
     }
 
-    public Channel deleteById(UUID id) {
-        validateExists(id);
-        return channelRepository.deleteById(id);
+    public void deleteById(UUID id) {
+        Channel deleting = findById(id);
+        channelRepository.delete(deleting);
     }
 
     public Channel updateNameAndDescription(UUID id, String name, String description) {
-        validateExists(id);
-        return channelRepository.updateNameAndDescription(id, name, description);
+        Channel updating = findById(id);
+        return updating.updateNameAndDescription(name, description);
     }
 
     public void validateExists(UUID id) {
         if (!channelRepository.existsById(id)) {
             throw new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE);
         }
-    }
-
-    public void update(UUID id, Instant newUpdatedAt) {
-        validateExists(id);
-        channelRepository.update(id, newUpdatedAt);
     }
 }
