@@ -1,5 +1,13 @@
+node_modules/
+dist/
+.DS_Store
+.idea/
+.vscode/
+*.local
+.gradle/
 .gradle
 build/
+uploads/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

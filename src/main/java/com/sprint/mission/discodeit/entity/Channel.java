@@ -1,44 +1,59 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Getter
-public class Channel implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
-    private ChannelType type;
-    private String name;
-    private String description;
+@Entity
+@Table(name = "channels")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
-    public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    ChannelType type;
+
+    @Column(length = 100)
+    String name;
+
+    @Column(length = 500)
+    String description;
+
+    public enum ChannelType {
+        PUBLIC, PRIVATE
+    }
+
+    private Channel(ChannelType type, String name, String description) {
         this.type = type;
         this.name = name;
         this.description = description;
     }
 
-    public void update(String newName, String newDescription) {
-        boolean anyValueUpdated = false;
-        if (newName != null && !newName.equals(this.name)) {
-            this.name = newName;
-            anyValueUpdated = true;
-        }
-        if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
-            anyValueUpdated = true;
-        }
+    public static Channel create(ChannelType type, String name, String description) {
+        return new Channel(type, name, description);
+    }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
+    public void update(String name, String description) {
+        if (name != null) {
+            this.name = name;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+    }
+
+    public void updateType(ChannelType type) {
+        if (type != null) {
+            this.type = type;
         }
     }
 }
