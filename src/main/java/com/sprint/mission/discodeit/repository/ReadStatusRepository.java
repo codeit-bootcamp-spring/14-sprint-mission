@@ -3,22 +3,15 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReadStatusRepository {
-    //메모리 업데이트 반환값이 필요없다고 생각함
-    void save(ReadStatus readStatus);
+public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-    //메모리에서 id로 읽기상태 읽어오기
-    ReadStatus findById(UUID id);
+  List<ReadStatus> findAllByUserId(UUID userId);
 
-    //읽기상태 목록 가져오기
-    List<ReadStatus> findAll();
+  List<ReadStatus> findAllByChannelId(UUID channelId);
 
-    List<ReadStatus> findAllByChannelId(UUID channelId);
-
-    List<ReadStatus> findAllByUserId(UUID userId);
-
-    //메모리에서 읽기상태 지우기
-    void delete(UUID id);
+  void deleteAllByChannelId(UUID channelId);
 }

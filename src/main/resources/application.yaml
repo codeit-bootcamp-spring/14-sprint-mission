@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: discodeit
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/discodeit}
+    username: ${DB_USERNAME:discodeit_user}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      # 서버가 재시작해도 데이터는 보존
+      ddl-auto: update
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB # 한 번에 최대 업로드 가능 용량

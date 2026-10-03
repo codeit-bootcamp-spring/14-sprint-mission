@@ -1,43 +1,52 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
-@Setter
+@Entity
 @Getter
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private String channelName;
-    private List<UUID> memberIds;
-    private ChannelType channelType;
+  private static final long serialVersionUID = 1L;
+  @Id
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private ChannelType type;
+  private String name;
+  private String description;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  public Channel(ChannelType type, String name, String description) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 
-    public Channel(String channelName, List<UUID> memberIds, ChannelType channelType) {
-        this.channelName = channelName;
-        this.memberIds = memberIds;
-        this.channelType = channelType;
-
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+  public void update(String newName, String newDescription) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+      anyValueUpdated = true;
     }
 
-    public Channel(String channelName, List<UUID> memberIds) {
-        this(channelName, memberIds, ChannelType.PUBLIC);
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    public void setUpdatedAt() {
-        this.updatedAt = Instant.now();
-    }
+  }
 }

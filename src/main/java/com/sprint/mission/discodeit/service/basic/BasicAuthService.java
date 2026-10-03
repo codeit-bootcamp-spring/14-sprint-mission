@@ -1,34 +1,36 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.authdto.AuthCreateRequestDto;
-import com.sprint.mission.discodeit.dto.userdto.UserResponseDto;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.CustomRuntimeException;
-import com.sprint.mission.discodeit.exception.ExceptionType;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
+import java.util.NoSuchElementException;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicAuthService implements AuthService {
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository; // 접속 상태 조회를 위해 추가
 
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
-    @Override
-    public UserResponseDto login(AuthCreateRequestDto authCreateRequestDto) {
-        User user = userRepository.findByName(authCreateRequestDto.getName());
-        if (Objects.isNull(user)) {
-            // throw new RuntimeException("올바른 이름을 입력해주세요.");
-            throw new CustomRuntimeException(ExceptionType.USER_BY_USERNAME_NOT_FOUND, authCreateRequestDto.getName());
-        }
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
-        return UserResponseDto.from(user, userStatus);
+  @Override
+  public UserDto login(LoginRequest loginRequest) {
+    String username = loginRequest.username();
+    String password = loginRequest.password();
+
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(
+            () -> new NoSuchElementException("User with username " + username + " not found"));
+
+    if (!user.getPassword().equals(password)) {
+      throw new IllegalArgumentException("Wrong password");
     }
+
+    return userMapper.toDto(user, null);
+  }
 }

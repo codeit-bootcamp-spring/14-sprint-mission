@@ -1,36 +1,77 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Setter
+@Entity
+@Table(name = "users")
 @Getter
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private String name;
-    private final String email;
+  private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  @Id
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  @Column(length = 50)
+  private String username;
+  @Column(length = 100)
+  private String email;
+  @Column(length = 60)
+  private String password;
 
-    public User(String email, String name) {
-        this.name = name;
-        this.email = email;
+  @OneToOne
+  @JoinColumn(name = "profile_id", nullable = true)
+  @OnDelete(action = OnDeleteAction.SET_NULL) //삭제하면 널처리
+  private BinaryContent profile;     // BinaryContent
 
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
+  }
+
+  public void update(String newUsername, String newEmail, String newPassword, BinaryContent newProfile) {
+    boolean anyValueUpdated = false;
+    if (newUsername != null && !newUsername.equals(this.username)) {
+      this.username = newUsername;
+      anyValueUpdated = true;
+    }
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
+      anyValueUpdated = true;
+    }
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
+      anyValueUpdated = true;
+    }
+    if (newProfile != null && !newProfile.equals(this.profile)) {
+      this.profile = newProfile;
+      anyValueUpdated = true;
     }
 
-    public void setUpdatedAt() {
-        this.updatedAt = Instant.now();
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 }

@@ -1,53 +1,82 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.messagedto.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.messagedto.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.messagedto.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.controller.api.MessageApi;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
 @RequestMapping("/api/messages")
-public class MessageController {
-    private final MessageService messageService;
+public class MessageController implements MessageApi {
 
-    // URL 충돌방지를 위해 consumes로 미디어 타입 명시
-    @RequestMapping(method = RequestMethod.POST, value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public MessageResponseDto send(@RequestBody MessageCreateRequestDto dto) {
-        return messageService.createMessage(dto);
-    }
+  private final MessageService messageService;
 
-    // URL 충돌방지를 위해 consumes로 미디어 타입 명시
-    @RequestMapping(method = RequestMethod.POST, value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public MessageResponseDto sendWithAttachments(@RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
-                                                  @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
-        return messageService.createMessage(dto);
-    }
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<MessageDto> create(
+      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+  ) {
+    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdMessage);
+  }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{messageId}")
-    public MessageResponseDto modify(@PathVariable UUID messageId,
-                                     @RequestBody MessageUpdateRequestDto dto) {
-        return messageService.updateMessage(messageId, dto);
-    }
+  @PatchMapping(path = "{messageId}")
+  public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
+      @RequestBody MessageUpdateRequest request) {
+    MessageDto updatedMessage = messageService.update(messageId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedMessage);
+  }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{messageId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID messageId) {
-        messageService.deleteMessage(messageId);
-    }
+  @DeleteMapping(path = "{messageId}")
+  public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
+    messageService.delete(messageId);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
+  }
 
-    @RequestMapping(method = RequestMethod.GET, value = "")
-    public List<MessageResponseDto> getMessageListByChannelId(@RequestParam UUID channelId) {
-        return messageService.findAllByChannelId(channelId);
-    }
+  @GetMapping
+  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+      @RequestParam("channelId") UUID channelId,
+      @RequestParam(defaultValue = "0") int page) {
+    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, page);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(messages);
+  }
 }

@@ -1,5 +1,0 @@
-[variables]
-NIXPACKS_JDK_VERSION = "17"
-
-[phases.build]
-cmds = ["./gradlew bootJar -x test"]

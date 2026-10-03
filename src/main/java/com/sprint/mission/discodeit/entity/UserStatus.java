@@ -1,42 +1,60 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 
+import java.io.Serializable;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Getter //response dto에서 써야댐
-@Setter
-//유저의 마지막 활동시간을 관리하는 엔티티
-public class UserStatus {
-    private final UUID userId;
-    private Instant lastActiveAt; //login으로 하고싶은데 나중에 login엔티티랑 헷갈릴듯
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus implements Serializable {
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  private static final long serialVersionUID = 1L;
+  @Id
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  @OneToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE) //연쇄 삭제
+  private User user;
+  private Instant lastActiveAt;
 
-    public UserStatus(UUID userId) {
-        this.userId = userId;
-        this.lastActiveAt = Instant.now();
+  public UserStatus(User user, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.user = user;
+    this.lastActiveAt = lastActiveAt;
+  }
 
-        this.id=UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+  public void update(Instant lastActiveAt) {
+    boolean anyValueUpdated = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      anyValueUpdated = true;
     }
 
-    public void setUpdatedAt() {
-        this.updatedAt = Instant.now();
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    public void setLastActiveAt() {
-        this.lastActiveAt = Instant.now();
-        setUpdatedAt();
-    }
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-    public boolean isOnline() {
-        // 300초 이내면 true반환
-        return this.lastActiveAt.plusSeconds(300).isAfter(Instant.now());
-    }
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 }
