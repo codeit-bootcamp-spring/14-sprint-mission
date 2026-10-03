@@ -34,14 +34,13 @@ public class ChannelApplication {
     @Transactional
     public ChannelUpsertResponse createPrivateChannel(List<UUID> userIds) {
         List<User> users = userService.findByIds(userIds);
-        Channel channel = Channel.createPrivateChannel(userIds);
+        Channel creatingChannel = Channel.createPrivateChannel(userIds);
+        Channel createdChannel = channelService.create(creatingChannel);
 
         // 참여 User의 정보를 받아 User 별 ReadStatus 정보 생성
-        List<ReadStatus> readStatuses = ReadStatus.of(users, channel, Instant.now());
+        List<ReadStatus> readStatuses = ReadStatus.of(users, createdChannel, Instant.now());
         readStatusService.createAll(readStatuses);
-
-        Channel created = channelService.create(channel);
-        return ChannelUpsertResponse.of(created);
+        return ChannelUpsertResponse.of(createdChannel);
     }
 
     // 1. DTO를 활용해 가장 최근 메시지의 시간 정보 포함
