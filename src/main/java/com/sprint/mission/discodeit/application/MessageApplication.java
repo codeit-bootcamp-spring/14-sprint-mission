@@ -2,13 +2,17 @@ package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.common.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.domain.message.Message;
+import com.sprint.mission.discodeit.dto.common.PageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -26,11 +30,23 @@ public class MessageApplication {
     }
 
     @Transactional
-    public List<MessageResponseDto> getAllByChannelId(UUID channelId) {
+    public PageResponse<MessageResponseDto, Instant> getAllByChannelId(
+            UUID channelId,
+            Instant cursor,
+            Pageable pageable
+    ) {
         channelService.validateExists(channelId);
-        return messageService.findAllByChannelId(channelId).stream()
-                .map(MessageResponseDto::of)
-                .toList();
+        Slice<MessageResponseDto> retrieved = messageService.findAllByChannelId(
+                        channelId,
+                        Optional.ofNullable(cursor).orElse(Instant.now(Clock.systemDefaultZone())),
+                        pageable
+                )
+                .map(MessageResponseDto::of);
+
+        return PageResponse.fromSlice(
+                retrieved,
+                MessageResponseDto::createdAt
+        );
     }
 
     @Transactional

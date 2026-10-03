@@ -1,17 +1,24 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.message;
 
 import com.sprint.mission.discodeit.common.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.common.multipart.MultiPartFileUtil;
+import com.sprint.mission.discodeit.dto.common.PageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.application.MessageApplication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -72,7 +79,18 @@ public class MessageApiController {
     // 4. 특정 채널의 메세지 목록을 조회할 수 있다.
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<MessageResponseDto> getChannelMessages(@RequestParam UUID channelId) {
-        return messageApplication.getAllByChannelId(channelId);
+    public PageResponse<MessageResponseDto, Instant> getChannelMessages(
+            @RequestParam UUID channelId,
+            @RequestParam(required = false) LocalDateTime cursor,
+            @PageableDefault(
+                    size = 50,
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ) {
+        return messageApplication.getAllByChannelId(
+                channelId,
+                cursor.atZone(ZoneId.systemDefault()).toInstant(),
+                pageable
+        );
     }
 }

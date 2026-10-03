@@ -5,10 +5,11 @@ import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,8 +27,12 @@ public class MessageService {
                 .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE));
     }
 
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannel_Id(channelId);
+    public Slice<Message> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+        return messageRepository.findAllByChannelId(
+                channelId,
+                cursor,
+                pageable
+        );
     }
 
     public Message updateContent(UUID id, String content) {
