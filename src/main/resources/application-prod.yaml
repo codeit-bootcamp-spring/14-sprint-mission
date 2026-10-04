@@ -4,6 +4,7 @@ server:
 spring:
   datasource:
     url: ${DB_URL}
+    driver-class-name: org.postgresql.Driver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
@@ -12,3 +13,7 @@ spring:
 logging:
   level:
     com.sprint.mission.discodeit: info
+management:
+  endpoint:
+    health:
+      show-details: never
