@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.common.storage;
 
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

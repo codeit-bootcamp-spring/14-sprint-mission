@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.common.multipart;
 
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +19,7 @@ public class MultiPartFileUtil {
 
     private void validateNotNullAndNotEmpty(MultipartFile file) {
         if (Objects.isNull(file) || file.isEmpty()) {
-            throw new CustomException(ExceptionType.FILE_NOT_FOUND);
+            throw new MultiPartFileException(MultiPartFileExceptionType.FILE_NOT_FOUND);
         }
     }
 
@@ -29,7 +27,7 @@ public class MultiPartFileUtil {
         try {
             return file.getBytes();
         } catch (IOException e) {
-            throw new CustomException(ExceptionType.FILE_IO_FAILED);
+            throw new MultiPartFileException(MultiPartFileExceptionType.FILE_IO_FAILED);
         }
     }
 }
