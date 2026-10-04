@@ -20,7 +20,7 @@ public record UserDto(
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfile().getId(),
+        user.getProfile() != null ? user.getProfile().getId() : null,
         online
     );
   }
