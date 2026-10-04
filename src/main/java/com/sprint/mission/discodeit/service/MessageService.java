@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
 import com.querydsl.core.Tuple;
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.message.Message;
+import com.sprint.mission.discodeit.domain.message.MessageException;
+import com.sprint.mission.discodeit.domain.message.MessageExceptionType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,7 @@ public class MessageService {
 
     public Message findById(UUID id) {
         return messageRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ExceptionType.MESSAGE_NOT_FOUND_IN_DATABASE));
+                .orElseThrow(() -> new MessageException(MessageExceptionType.MESSAGE_NOT_FOUND));
     }
 
     public Slice<Message> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
