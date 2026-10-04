@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.readstatus;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.discodeit.domain.readstatus.QReadStatus;
+import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +22,16 @@ public class ReadStatusRepositoryImpl implements ReadStatusRepositoryCustom {
                 .select(readStatus.user.id)
                 .from(readStatus)
                 .where(readStatus.channel.id.eq(channelId))
+                .fetch();
+    }
+
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return queryFactory
+                .selectFrom(readStatus)
+                .join(readStatus.user).fetchJoin()
+                .join(readStatus.channel).fetchJoin()
+                .where(readStatus.user.id.eq(userId))
                 .fetch();
     }
 }

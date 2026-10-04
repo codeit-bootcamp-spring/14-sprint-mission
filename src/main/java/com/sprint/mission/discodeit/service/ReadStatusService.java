@@ -41,7 +41,7 @@ public class ReadStatusService {
     }
 
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUser_Id(userId);
+        return readStatusRepository.findAllByUserId(userId);
     }
 
     public ReadStatus update(UUID id, Instant newLastReadAt) {
