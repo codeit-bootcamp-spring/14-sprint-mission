@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.domain.user.UserException;
+import com.sprint.mission.discodeit.domain.user.UserExceptionType;
 import com.sprint.mission.discodeit.repository.user.UserRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class UserService {
 
     public User findById(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE));
+                .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
     }
 
     public List<User> findByIds(List<UUID> userIds) {
@@ -44,7 +44,7 @@ public class UserService {
     public User findByNameAndPassword(String name, String password) {
         validateExistsByName(name);
         return userRepository.findByUsernameAndPassword(name, password)
-                .orElseThrow(() -> new CustomException(ExceptionType.LOGIN_FAILED));
+                .orElseThrow(() -> new UserException(UserExceptionType.LOGIN_FAILED));
     }
 
     public User update(User updating, String username, String email, String password, @Nullable BinaryContent profile) {
@@ -60,28 +60,28 @@ public class UserService {
 
     public void validateExistsById(UUID id) {
         if (!userRepository.existsById(id)) {
-            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
+            throw new UserException(UserExceptionType.USER_NOT_FOUND);
         }
     }
 
     private void validateExistsByName(String name) {
         if(!userRepository.existsByUsername(name)) {
-            throw new CustomException(ExceptionType.USER_NOT_FOUND_IN_DATABASE);
+            throw new UserException(UserExceptionType.USER_NOT_FOUND);
         }
     }
 
     private void validateNameAndEmailAvailable(String name, String email) {
         if (userRepository.existsByUsernameOrEmail(name, email)) {
-            throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);
+            throw new UserException(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT);
         }
     }
 
     private void validateUsernameAndEmailAvailableWhereUserNot(String username, String email, UUID id) {
         if(userRepository.existsByUsernameAndIdNot(username, id)) {
-            throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);
+            throw new UserException(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT);
         }
         if (userRepository.existsByEmailAndIdNot(email, id)) {
-            throw new CustomException(ExceptionType.USER_UNIQUE_FIELD_CONFLICT);
+            throw new UserException(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT);
         }
     }
 

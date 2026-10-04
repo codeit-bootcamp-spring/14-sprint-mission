@@ -14,13 +14,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handle(CustomException exception) {
-        ExceptionType type = exception.getType();
-        log.makeLoggingEventBuilder(type.getLogLevel())
+        log.makeLoggingEventBuilder(exception.getLogLevel())
                 .setCause(exception)
-                .log(type.getDescription());
+                .log("[{}]: {}", exception.getTitle(), exception.getDescription());
         return ResponseEntity
-                .status(type.getHttpStatus())
-                .body(ErrorResponse.of(type.getResponse()));
+                .status(exception.getHttpStatus())
+                .body(ErrorResponse.of(exception.getDescription()));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
