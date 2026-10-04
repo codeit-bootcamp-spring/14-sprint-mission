@@ -1,5 +1,8 @@
-package com.sprint.mission.discodeit.exception;
+package com.sprint.mission.discodeit.common.advice;
 
+import com.sprint.mission.discodeit.common.ErrorCode;
+import com.sprint.mission.discodeit.common.ErrorResponse;
+import com.sprint.mission.discodeit.common.exception.DiscodeitException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +27,23 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(e.getMessage());
+  }
+
+  @ExceptionHandler(DiscodeitException.class)
+  public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
+    ErrorCode errorCode = e.getErrorCode();
+
+    ErrorResponse errorResponse = new ErrorResponse(
+        e.getTimestamp(),
+        errorCode.toString(),
+        errorCode.getMessage(),
+        e.getDetails(),
+        e.getClass().getSimpleName(),
+        errorCode.getStatus()
+    );
+    return ResponseEntity
+        .status(e.getErrorCode().getStatus())
+        .body(errorResponse);
   }
 
   @ExceptionHandler(Exception.class)

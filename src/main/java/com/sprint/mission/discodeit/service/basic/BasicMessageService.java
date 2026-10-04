@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
@@ -46,17 +49,17 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-    log.debug("메세지 생성 시작"); // TODO: 이럴땐 뭐찍어야하지? 질문하기
+    log.debug("메세지 생성 시작"); /* TODO: 이럴땐 뭐찍어야하지? 질문하기 debug, trace? 아니면 컨트롤러에 info? */
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
 
     if (!channelRepository.existsById(channelId)) {
       log.warn("조회된 채널 없음 - 채널아이디: {}", channelId);
-      throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
+      throw new ChannelNotFoundException(channelId);
     }
     if (!userRepository.existsById(authorId)) {
       log.warn("조회된 유저 없음 - 유저아이디: {}", authorId);
-      throw new NoSuchElementException("Author with id " + authorId + " does not exist");
+      throw new UserNotFoundException(authorId);
     }
 
     Channel channel = channelRepository.getReferenceById(channelId);
@@ -91,7 +94,7 @@ public class BasicMessageService implements MessageService {
     return messageRepository.findById(messageId)
         .map(message -> messageMapper.toDto(message, attachmentIds(message.getId())))
         .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            () -> new MessageNotFoundException(messageId));
   }
 
   @Override
@@ -112,7 +115,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> {
               log.warn("존재하지 않는 메세지 조회- 메세지아이디: {}", messageId);
-              return new NoSuchElementException("Message with id " + messageId + " not found");
+              return new MessageNotFoundException(messageId);
             });
     message.update(newContent);
     log.debug("메세지 업데이트 요청 - 메세지아이디: {}", message.getId());
@@ -126,9 +129,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> {
           log.warn("존재하지 않는 메세지 조회- 메세지아이디: {}", messageId);
-          return new NoSuchElementException(
-              "Message with id " + messageId + " not found"
-          );
+          return new MessageNotFoundException(messageId);
         });
 
     messageAttachmentsRepository.findAllByMessageId(messageId).stream()
