@@ -12,11 +12,6 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ExceptionType {
-    LOCAL_STORAGE_DIRECTORY_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "디렉토리 생성 실패", "파일 로컬 저장 디렉토리 생성에 실패했습니다.", "파일 로컬 저장 디렉토리 생성에 실패했습니다."),
-    LOCAL_STORAGE_FILE_ALREADY_EXISTS(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 이미 존재", "로컬 저장소에 이미 파일이 존재합니다.", "로컬 저장소에 이미 파일이 존재합니다."),
-    LOCAL_STORAGE_FILE_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 미존재", "로컬 저장소에 파일이 존재하지 않습니다.", "로컬 저장소에 파일이 존재하지 않습니다."),
-    LOCAL_STORAGE_FILE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 생성 실패", "로컬 저장소에 파일 저장을 실패했습니다.", "로컬 저장소에 파일 저장을 실패했습니다."),
-    LOCAL_STORAGE_FILE_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 조회 실패", "로컬 저장소의 파일 조회에 실패했습니다.", "로컬 저장소의 파일 조회에 실패했습니다."),
 
 
 

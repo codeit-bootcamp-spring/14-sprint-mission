@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.domain.channel.ChannelException;
 import com.sprint.mission.discodeit.domain.channel.ChannelExceptionType;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.common.storage.BinaryContentStorage;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
