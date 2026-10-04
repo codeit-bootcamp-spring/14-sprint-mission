@@ -1,0 +1,46 @@
+package com.sprint.mission.discodeit.repository.channel;
+
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.channel.ChannelType;
+import com.sprint.mission.discodeit.domain.channel.QChannel;
+import com.sprint.mission.discodeit.domain.readstatus.QReadStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+@RequiredArgsConstructor
+public class ChannelRepositoryImpl implements ChannelRepositoryCustom {
+    private final JPAQueryFactory queryFactory;
+    private final QChannel channel = QChannel.channel;
+
+    @Override
+    public List<Channel> findAccessibleByUserId(UUID userId) {
+        return queryFactory
+                .selectFrom(channel)
+                .where(channelTypeEqualsPublic()
+                        .or(readStatusExists(userId))
+                )
+                .fetch();
+    }
+
+    private BooleanExpression channelTypeEqualsPublic() {
+        return channel.type.eq(ChannelType.PUBLIC);
+    }
+
+    private BooleanExpression readStatusExists(UUID userId) {
+        QReadStatus readStatus = QReadStatus.readStatus;
+        return queryFactory
+                .selectFrom(readStatus)
+                .where(
+                        readStatus.user.id.eq(userId),
+                        readStatus.channel.eq(channel)
+                )
+                .exists();
+    }
+
+}

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.channel.Channel;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.channel.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +24,8 @@ public class ChannelService {
                 .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
     }
 
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
+    public List<Channel> findAccessibleByUserId(UUID userId) {
+        return channelRepository.findAccessibleByUserId(userId);
     }
 
     public void deleteById(UUID id) {

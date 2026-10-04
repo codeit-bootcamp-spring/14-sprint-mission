@@ -50,19 +50,9 @@ public class ChannelApplication {
     @Transactional
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
         userService.validateExistsById(userId);
-        return findAccessibleChannels(userId).stream()
+        return channelService.findAccessibleByUserId(userId).stream()
                 .map(this::getChannelResponseDto)
                 .toList();
-    }
-
-    private List<Channel> findAccessibleChannels(UUID userId) {
-        return channelService.findAll().stream()
-                .filter(channel -> isChannelAccessible(channel, userId))
-                .toList();
-    }
-
-    private boolean isChannelAccessible(Channel channel, UUID userId) {
-        return channel.isPublic() || readStatusService.existsByUserAndChannel(userId, channel.getId());
     }
 
     private ChannelResponseDto getChannelResponseDto(Channel channel) {
