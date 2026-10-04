@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
+import com.sprint.mission.discodeit.domain.readstatus.ReadStatusException;
+import com.sprint.mission.discodeit.domain.readstatus.ReadStatusExceptionType;
 import com.sprint.mission.discodeit.repository.readstatus.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,12 +28,7 @@ public class ReadStatusService {
 
     public ReadStatus findById(UUID id) {
         return readStatusRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ExceptionType.READSTATUS_NOT_FOUND_IN_DATABASE));
-    }
-
-
-    public List<UUID> findAllUserIdsByChannelId(UUID channelId) {
-        return readStatusRepository.findAllUserIdByChannelId(channelId);
+                .orElseThrow(() -> new ReadStatusException(ReadStatusExceptionType.READ_STATUS_NOT_FOUND));
     }
 
     public boolean existsByUserAndChannel(UUID userId, UUID channelId) {
@@ -69,7 +64,7 @@ public class ReadStatusService {
 
     private void validateUserAndChannelAvailable(ReadStatus readStatus) {
         if (readStatusRepository.existsByUser_IdAndChannel_Id(readStatus.getUserId(), readStatus.getChannelId())) {
-            throw new CustomException(ExceptionType.READSTATUS_ALREADY_EXISTS);
+            throw new ReadStatusException(ReadStatusExceptionType.READ_STATUS_ALREADY_EXISTS);
         }
     }
 
