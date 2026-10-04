@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@Validated
 @RequestMapping("/api/readStatuses")
 public class ReadStatusController implements ReadStatusApi {
 
