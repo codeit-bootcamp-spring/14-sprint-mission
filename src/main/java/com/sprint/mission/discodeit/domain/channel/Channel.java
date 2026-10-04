@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.domain.channel;
 import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,6 +32,14 @@ public class Channel extends BaseUpdatableEntity {
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private ChannelType type;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "read_statuses",
+            joinColumns = @JoinColumn(name = "channel_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> participants = new ArrayList<>();
 
     private Channel(ChannelType type, String name, String description) {
         super();

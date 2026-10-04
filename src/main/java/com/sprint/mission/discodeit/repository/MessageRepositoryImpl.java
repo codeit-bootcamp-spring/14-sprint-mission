@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.discodeit.domain.message.QMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -17,12 +16,12 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
     QMessage message = QMessage.message;
 
     @Override
-    public Optional<Instant> findLatestMessageByChannelId(UUID channelId) {
-        JPAQuery<Instant> query = queryFactory
-                .select(message.createdAt.max())
+    public List<Tuple> findLatestMessageByChannelId(List<UUID> channelIds) {
+        return queryFactory
+                .select(message.channel.id, message.createdAt.max())
                 .from(message)
-                .where(message.channel.id.eq(channelId));
-
-        return Optional.ofNullable(query.fetchOne());
+                .where(message.channel.id.in(channelIds))
+                .groupBy(message.channel.id)
+                .fetch();
     }
 }

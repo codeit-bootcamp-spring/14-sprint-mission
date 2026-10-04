@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.repository;
 
-import java.time.Instant;
-import java.util.Optional;
+import com.querydsl.core.Tuple;
+
+import java.util.List;
 import java.util.UUID;
 
 public interface MessageRepositoryCustom {
-    Optional<Instant> findLatestMessageByChannelId(UUID channelId);
+    List<Tuple> findLatestMessageByChannelId(List<UUID> channelIds);
 }

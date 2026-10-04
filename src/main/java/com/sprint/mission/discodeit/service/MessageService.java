@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.querydsl.core.Tuple;
 import com.sprint.mission.discodeit.common.exception.CustomException;
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.message.Message;
@@ -10,8 +11,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +53,13 @@ public class MessageService {
         messageRepository.deleteAllByChannel_Id(channelId);
     }
 
-    public Optional<Instant> findLastMessageAtByChannelId(UUID channelId) {
-        return messageRepository.findLatestMessageByChannelId(channelId);
+    public Map<UUID, Instant> findLastMessageAtByChannelId(List<UUID> channelIds) {
+        List<Tuple> latestMessageByChannelId = messageRepository.findLatestMessageByChannelId(channelIds);
+
+        return latestMessageByChannelId.stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(0, UUID.class),
+                        tuple -> Optional.ofNullable(tuple.get(1, Instant.class)).orElse(null)
+                ));
     }
 }

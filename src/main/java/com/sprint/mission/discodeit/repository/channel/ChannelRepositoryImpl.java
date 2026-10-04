@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.ChannelType;
 import com.sprint.mission.discodeit.domain.channel.QChannel;
 import com.sprint.mission.discodeit.domain.readstatus.QReadStatus;
+import com.sprint.mission.discodeit.domain.user.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,9 +21,14 @@ public class ChannelRepositoryImpl implements ChannelRepositoryCustom {
 
     @Override
     public List<Channel> findAccessibleByUserId(UUID userId) {
+        QUser participant = new QUser("participant");
         return queryFactory
-                .selectFrom(channel)
-                .where(channelTypeEqualsPublic()
+                .selectFrom(channel).distinct()
+                .leftJoin(channel.participants, participant).fetchJoin()
+                .leftJoin(participant.status).fetchJoin()
+                .leftJoin(participant.profile).fetchJoin()
+                .where(
+                        channelTypeEqualsPublic()
                         .or(readStatusExists(userId))
                 )
                 .fetch();

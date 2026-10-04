@@ -50,28 +50,19 @@ public class ChannelApplication {
     @Transactional
     public List<ChannelResponseDto> getAllChannelsByUserId(UUID userId) {
         userService.validateExistsById(userId);
-        return channelService.findAccessibleByUserId(userId).stream()
-                .map(this::getChannelResponseDto)
+        List<Channel> accessibleChannels = channelService.findAccessibleByUserId(userId);
+        List<UUID> channelIds = accessibleChannels.stream()
+                .map(Channel::getId)
                 .toList();
-    }
+        Map<UUID, Instant> channelLastMessageAt = messageService.findLastMessageAtByChannelId(channelIds);
 
-    private ChannelResponseDto getChannelResponseDto(Channel channel) {
-        // Join해서 한 번에 가져오면 ReadStatus Domain Service에서 User 뱉는게 마음에 안듦
-        // 그렇다고 계층 지킨답시고 쿼리 두 번 날리는 것도 마음에 안듦
-        // 일단 그냥 쿼리 두 번 함
-        // ManyToMany는 안티패턴?
-        // 이게 마음에 안들면 JPA 쓰지마셈 ㅇㅇ 딴지 걸면 할 말은 없음
-        List<UUID> participantIds = readStatusService.findAllUserIdsByChannelId(channel.getId());
-        List<User> participants = userService.findByIds(participantIds);
-        // 채널에 메세지가 없어도 정상 흐름이므로 Optional을 Application에서 해제함.
-        //
-        // 기존에는 마지막 메세지 시간을 channel.updatedAt으로 판단했으나,
-        // 1. 메세지가 생성됐다고 channel의 updatedAt을 갱신하는게 타당한지 의문이고 (message가 연관관계의 주인)
-        // 2. 요구사항에서 테이블 스키마를 고정해놔서 channel 내에 lastMessageAt 필드를 추가할 수 없어서
-        // 최근 메세지를 직접 찾는 방식으로 변경했는데 이게 좋은 방식인지도 잘 모르곘음
-        Instant lastMessageAt = messageService.findLastMessageAtByChannelId(channel.getId())
-                .orElse(channel.getUpdatedAt());
-        return ChannelResponseDto.of(channel, participants, lastMessageAt);
+        return accessibleChannels.stream()
+                .map(channel -> ChannelResponseDto.of(
+                        channel,
+                        channel.getParticipants(),
+                        Optional.ofNullable(channelLastMessageAt.get(channel.getId())).orElse(channel.getUpdatedAt())
+                ))
+                .toList();
     }
 
     @Transactional
