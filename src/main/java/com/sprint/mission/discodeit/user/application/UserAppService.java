@@ -21,12 +21,14 @@ import com.sprint.mission.discodeit.user.domain.UserStatus;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserAppService implements UserRegister, UserModifier, UserRemover, UserStatusCommand {
 
   private final UserCommand userCommand;
@@ -40,6 +42,7 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
     BinaryContent savedProfile = registerProfile(profile);
     User user = userCommand.create(request.username(), request.email(), request.password(),
         savedProfile);
+    log.info("유저 생성 완료: user={}", user);
     return userMapper.toDto(user);
   }
 

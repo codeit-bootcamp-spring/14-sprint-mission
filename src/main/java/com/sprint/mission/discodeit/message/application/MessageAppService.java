@@ -20,12 +20,14 @@ import com.sprint.mission.discodeit.user.domain.User;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MessageAppService implements MessageRegister, MessageModifier,
     MessageRemover {
 
@@ -52,6 +54,7 @@ public class MessageAppService implements MessageRegister, MessageModifier,
     List<BinaryContent> binaryContents = binaryContentRegister.register(
         attachments == null ? List.of() : attachments);
     Message message = messageCommand.create(request.content(), channel, user, binaryContents);
+    log.info("메세지 생성 완료: message = {}", message);
     return messageMapper.toDto(message);
   }
 

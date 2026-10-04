@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.message.application.provided.query.MessageFi
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
+@Slf4j
 public class MessageApiController {
 
   private final MessageRegister messageRegister;
@@ -43,8 +45,10 @@ public class MessageApiController {
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
     List<BinaryContentCreateRequest> files = binaryContentRequestMapper.toCreateRequests(
         attachments);
+    MessageDto messageDto = messageRegister.register(request, files);
+    log.debug("메세지 응답: messageDto = {}", messageDto);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(messageRegister.register(request, files));
+        .body(messageDto);
   }
 
   @RequestMapping(method = RequestMethod.DELETE, value = "/{messageId}")

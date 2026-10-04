@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -54,6 +56,7 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
   @Override
   public ChannelDto registerPublic(PublicChannelCreateRequest request) {
     Channel channel = channelCommand.createPublic(request.name(), request.description());
+    log.info("공개 채널 생성: channel = {}", channel);
     return channelMapper.toDto(channel, List.of(), null);
   }
 
@@ -62,6 +65,7 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
     Channel channel = channelCommand.createPrivate();
     List<User> participants = userEntityFinder.getEntitiesById(request.participantIds());
     readStatusCommand.createAll(channel, participants, Instant.now());
+    log.info("비공개 채널 생성: channel = {}", channel);
     return channelMapper.toDto(channel, participants, null);
   }
 

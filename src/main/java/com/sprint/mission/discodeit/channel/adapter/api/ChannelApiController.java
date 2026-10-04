@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.channel.application.provided.query.ChannelFi
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
+@Slf4j
 public class ChannelApiController {
 
   private final ChannelRegister channelRegister;
@@ -33,6 +35,7 @@ public class ChannelApiController {
   public ResponseEntity<ChannelDto> createPublic(
       @RequestBody PublicChannelCreateRequest request) {
     ChannelDto channelDto = channelRegister.registerPublic(request);
+    log.debug("공개 채널: channelDto = {}", channelDto);
     return ResponseEntity.status(201).body(channelDto);
   }
 
@@ -40,6 +43,7 @@ public class ChannelApiController {
   public ResponseEntity<ChannelDto> createPrivate(
       @RequestBody PrivateChannelCreateRequest request) {
     ChannelDto channelDto = channelRegister.registerPrivate(request);
+    log.debug("비공개 채널: channelDto = {}", channelDto);
     return ResponseEntity.status(201).body(channelDto);
   }
 

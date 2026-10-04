@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.user.application.provided.query.UserFinder;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
+@Slf4j
 public class UserApiController {
 
   private final UserRegister userRegister;
@@ -62,6 +64,7 @@ public class UserApiController {
     BinaryContentCreateRequest binaryContentCreateRequest = binaryContentRequestMapper.toCreateRequest(
         profile);
     UserDto response = userRegister.register(request, binaryContentCreateRequest);
+    log.debug("유저 등록 완료: userId={}", response.id());
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
