@@ -38,6 +38,8 @@ public class User extends BaseUpdatableEntity {
 
     @OneToOne(
             mappedBy = "user",
+            optional = false,
+            fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )
