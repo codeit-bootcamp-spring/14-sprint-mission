@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.domain.channel;
 
 import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -65,7 +63,7 @@ public class Channel extends BaseUpdatableEntity {
 
     public Channel updateNameAndDescription(String name, String description) {
         if(type.equals(ChannelType.PRIVATE)) {
-            throw new CustomException(ExceptionType.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED);
+            throw new ChannelException(ChannelExceptionType.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED);
         }
         this.name = name;
         this.description = description;

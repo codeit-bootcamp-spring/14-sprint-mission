@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.channel.ChannelException;
+import com.sprint.mission.discodeit.domain.channel.ChannelExceptionType;
 import com.sprint.mission.discodeit.repository.channel.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class ChannelService {
 
     public Channel findById(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
+                .orElseThrow(() -> new ChannelException(ChannelExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE));
     }
 
     public List<Channel> findAccessibleByUserId(UUID userId) {
@@ -40,7 +40,7 @@ public class ChannelService {
 
     public void validateExists(UUID id) {
         if (!channelRepository.existsById(id)) {
-            throw new CustomException(ExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE);
+            throw new ChannelException(ChannelExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE);
         }
     }
 }

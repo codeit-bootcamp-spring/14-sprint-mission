@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.common.exception.CustomException;
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import com.sprint.mission.discodeit.common.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.channel.ChannelException;
+import com.sprint.mission.discodeit.domain.channel.ChannelExceptionType;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -31,7 +31,7 @@ public class MessageCreateService {
         Channel channel = channelService.findById(channelId);
 
         if (channel.isPrivate() && !readStatusService.existsByUserAndChannel(userId, channelId)) {
-            throw new CustomException(ExceptionType.NO_ACCESS_TO_CHANNEL);
+            throw new ChannelException(ChannelExceptionType.NO_ACCESS_TO_CHANNEL);
         }
 
         List<BinaryContent> createdAttachments = createFiles(createFileCommands);
