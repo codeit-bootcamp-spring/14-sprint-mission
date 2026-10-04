@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -83,7 +82,7 @@ public class MessageController implements MessageApi {
   @GetMapping
   public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId,
-      @RequestParam(defaultValue = "0") @PositiveOrZero(message = "페이지는 0 이상이어야 합니다") int page) {
+      @RequestParam(defaultValue = "0") int page) {
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, page);
     return ResponseEntity
         .status(HttpStatus.OK)
