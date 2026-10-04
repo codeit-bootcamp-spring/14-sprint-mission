@@ -19,10 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -87,9 +84,13 @@ public class MessageApiController {
                     direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {
+        Instant instantCursor = Optional.ofNullable(cursor)
+                .orElse(LocalDateTime.now(ZoneId.systemDefault()))
+                .atZone(ZoneId.systemDefault()).toInstant();
+
         return messageApplication.getAllByChannelId(
                 channelId,
-                cursor.atZone(ZoneId.systemDefault()).toInstant(),
+                instantCursor,
                 pageable
         );
     }
