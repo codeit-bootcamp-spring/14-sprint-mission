@@ -29,8 +29,6 @@ public class ReadStatusRepositoryImpl implements ReadStatusRepositoryCustom {
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return queryFactory
                 .selectFrom(readStatus)
-                .join(readStatus.user).fetchJoin()
-                .join(readStatus.channel).fetchJoin()
                 .where(readStatus.user.id.eq(userId))
                 .fetch();
     }
