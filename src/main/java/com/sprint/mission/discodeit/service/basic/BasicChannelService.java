@@ -131,8 +131,8 @@ public class BasicChannelService implements ChannelService {
     readStatusRepository.deleteAllByChannelId(channel.getId());
 
     channelRepository.deleteById(channelId);
-    //TODO: 오타수정
-    log.debug("채널 삭제 요청 - 삭제된 채널아디디: {}", channelId);
+    //DONE: 오타수정
+    log.debug("채널 삭제 요청 - 삭제된 채널아디이디: {}", channelId);
   }
 
   private ChannelDto toDto(Channel channel) {
