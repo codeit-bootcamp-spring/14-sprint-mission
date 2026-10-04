@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.user;
 
-import com.sprint.mission.discodeit.common.exception.IExceptionType;
+import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public enum UserExceptionType implements IExceptionType {
+public enum UserExceptionType implements ExceptionType {
     LOGIN_FAILED(HttpStatus.BAD_REQUEST, Level.INFO, "로그인 실패", "잘못된 username 혹은 password 입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, Level.INFO, "User 미존재", "Database에서 해당 User를 찾을 수 없음."),
     USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, Level.INFO, "UserStatus 미존재", "Database에서 해당 UserStatus 찾을 수 없음"),

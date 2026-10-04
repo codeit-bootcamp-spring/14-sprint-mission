@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public abstract class CustomException extends RuntimeException{
-    private final IExceptionType type;
+    private final ExceptionType type;
 
-    protected CustomException(IExceptionType type) {
+    protected CustomException(ExceptionType type) {
         super(type.getTitle() + type.getDescription());
         this.type = type;
     }

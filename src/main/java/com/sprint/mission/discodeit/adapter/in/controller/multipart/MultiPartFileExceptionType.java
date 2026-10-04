@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.binaryContent;
+package com.sprint.mission.discodeit.adapter.in.controller.multipart;
 
 import com.sprint.mission.discodeit.common.exception.ExceptionType;
 import lombok.AccessLevel;
@@ -11,14 +11,14 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public enum BinaryContentExceptionType implements ExceptionType {
+public enum MultiPartFileExceptionType implements ExceptionType {
 
-    BINARY_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, Level.INFO, "BinaryContent 미존재", "Database에서 해당 BinaryContent 찾을 수 없음", "등록되지 않은 BinaryContent입니다."),
+    FILE_NOT_FOUND(HttpStatus.UNPROCESSABLE_CONTENT, Level.INFO, "비어있거나 존재하지 않는 파일", "처리해야 하는 MultipartFile이 없거나 비어 있음"),
+    FILE_IO_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 업로드 실패", "파일 업로드 실패"),
 
     ;
     HttpStatus httpStatus;
     Level logLevel;
     String title;
     String description;
-    String response;
 }
