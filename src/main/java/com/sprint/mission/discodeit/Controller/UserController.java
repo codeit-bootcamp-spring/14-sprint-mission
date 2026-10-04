@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.util.BinaryContentMapper;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -40,9 +42,13 @@ public class UserController {
     public ResponseEntity<UserResponseDto> create(
         @RequestPart("userCreateRequest") UserCreateRequestDto request,
         @RequestPart(value = "profile", required = false) MultipartFile profile) {
+        log.debug("유저 생성 API 호출: email={}", request.email());
+
         BinaryContentCreateRequestDto profileRequest =
             binaryContentMapper.toBinaryContentCreateRequestDto(profile);
         UserResponseDto response = userService.create(request, profileRequest);
+
+        log.info("유저 생성 API 응답: userId={}", response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -52,15 +58,23 @@ public class UserController {
         @RequestPart("userUpdateRequest") UserUpdateRequestDto request,
         @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
+        log.debug("유저 수정 API 호출: userId={}", userId);
+
         BinaryContentCreateRequestDto profileRequest =
             binaryContentMapper.toBinaryContentCreateRequestDto(profile);
         UserResponseDto response = userService.update(userId, request, profileRequest);
+
+        log.info("유저 수정 API 응답: userId={}", response.id());
         return ResponseEntity.ok(response);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{userId}")
     public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+        log.debug("유저 삭제 API 호출: userId={}", userId);
+
         userService.delete(userId);
+
+        log.info("유저 삭제 API 응답: userId={}", userId);
         return ResponseEntity.noContent().build();
     }
 

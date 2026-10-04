@@ -41,5 +41,7 @@ bin/
 .vscode/
 
 ### Mac OS ###
-.DS_Store*.ser
+.DS_Store
+*.ser
 .discodeit/
+application-prod.yaml

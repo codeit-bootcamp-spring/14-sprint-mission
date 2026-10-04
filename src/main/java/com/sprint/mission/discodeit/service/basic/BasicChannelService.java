@@ -20,9 +20,11 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,24 +36,32 @@ public class BasicChannelService  implements ChannelService {
 
     @Override
     public ChannelResponseDto createPublic(PublicChannelCreateRequestDto request) {
+        log.debug("public 채널 생성 요청: name={}", request.name());
         Channel channel = request.toEntity();
         channelRepository.save(channel);
+        log.info("public 채널 생성 완료: channelId={}", channel.getId());
         return ChannelResponseDto.from(channel, List.of(), null);
     }
 
     @Override
     public ChannelResponseDto createPrivate(PrivateChannelCreateRequestDto request) {
+        log.debug("private 채널 생성 요청: participantCount={}", request.participantIds().size());
+
         Channel channel = new Channel(ChannelType.PRIVATE);
         channelRepository.save(channel);
 
         for (UUID userId : request.participantIds()) {
             User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다: " + userId));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 유저를 참여자로 채널 생성 시도: userId={}", userId);
+                    return new IllegalArgumentException("존재하지 않는 유저입니다: " + userId);
+                });
 
             ReadStatus readStatus = new ReadStatus(user, channel, Instant.now());
             readStatusRepository.save(readStatus);
         }
-
+        log.info("private 채널 생성 완료: channelId={}, participantCount={}",
+            channel.getId(), request.participantIds().size());
         return ChannelResponseDto.from(channel, request.participantIds(), null);
     }
 
@@ -76,10 +86,16 @@ public class BasicChannelService  implements ChannelService {
 
     @Override
     public ChannelResponseDto update(UUID id, ChannelUpdateRequestDto updateRequest) {
+        log.debug("채널 수정 요청: channelId={}", id);
+
         Channel channel = channelRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
+            .orElseThrow(() ->{
+                log.warn("존재하지 않는 채널 수정 시도: channelId={}", id);
+                return new NoSuchElementException("존재하지 않는 채널입니다.");
+            });
 
         if (channel.getType() == ChannelType.PRIVATE) {
+            log.warn("PRIVATE 채널 수정 시도: channelId={}", id);
             throw new IllegalArgumentException("PRIVATE 채널은 수정할 수 없습니다.");
         }
 
@@ -90,16 +106,22 @@ public class BasicChannelService  implements ChannelService {
             .map(Message::getCreatedAt)
             .orElse(null);
 
+        log.info("채널 수정 완료: channelId={}", id);
         return ChannelResponseDto.from(channel, List.of(), lastMessageAt);
     }
 
     @Override
     public void delete(UUID id) {
+        log.debug("채널 삭제 요청: channelId={}", id);
+
         Channel channel = channelRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
+            .orElseThrow(() -> {
+                log.warn("존재하지 않는 채널 삭제 시도: channelId={}", id);
+                return new NoSuchElementException("존재하지 않는 채널입니다.");
+            });
 
         channelRepository.deleteById(id);
-
+        log.info("채널 삭제 완료: channelId={}", id);
     }
 
     @Override

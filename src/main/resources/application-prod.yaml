@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/discodeit
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+server:
+  port: ${SERVER_PORT:80}
+
+logging:
+  level:
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: debug
