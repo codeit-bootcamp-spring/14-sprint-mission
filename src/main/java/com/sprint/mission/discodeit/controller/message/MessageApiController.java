@@ -81,6 +81,7 @@ public class MessageApiController {
             @RequestParam(required = false) LocalDateTime cursor,
             @PageableDefault(
                     size = 50,
+                    sort = {"createdAt"},
                     direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {

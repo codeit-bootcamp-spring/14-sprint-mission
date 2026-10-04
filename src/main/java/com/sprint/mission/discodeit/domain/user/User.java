@@ -28,6 +28,7 @@ public class User extends BaseUpdatableEntity {
 
     @ToString.Include
     @OneToOne(
+            fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )

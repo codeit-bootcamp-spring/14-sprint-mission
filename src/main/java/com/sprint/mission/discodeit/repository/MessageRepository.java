@@ -14,8 +14,13 @@ public interface MessageRepository
     void deleteAllByChannel_Id(UUID channelId);
 
     @Query("""
-            SELECT m FROM Message m
-            WHERE m.channel.id=:channelId AND m.createdAt < :cursor""")
+            SELECT DISTINCT m FROM Message m
+            LEFT JOIN FETCH m.attachments
+            LEFT JOIN FETCH m.author a
+            LEFT JOIN FETCH a.status
+            LEFT JOIN FETCH a.profile
+            WHERE m.channel.id=:channelId AND m.createdAt < :cursor"""
+    )
     Slice<Message> findAllByChannelId(
             UUID channelId,
             Instant cursor,
