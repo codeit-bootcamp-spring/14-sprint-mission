@@ -61,6 +61,11 @@ public enum ErrorCode {
         Level.WARN,
         HttpURLConnection.HTTP_NOT_FOUND,
         "읽음 상태를 찾을 수 없습니다."
+    ),
+    INCORRECT_REQUEST(
+        Level.WARN,
+        HttpURLConnection.HTTP_BAD_REQUEST,
+        "올바른 입력이 아닙니다."
     );
 
     Level level;

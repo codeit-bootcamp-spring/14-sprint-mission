@@ -5,9 +5,12 @@ import com.sprint.mission.discodeit.common.ErrorResponse;
 import com.sprint.mission.discodeit.common.exception.DiscodeitException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.Instant;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -43,6 +46,22 @@ public class GlobalExceptionHandler {
     );
     return ResponseEntity
         .status(e.getErrorCode().getStatus())
+        .body(errorResponse);
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    ErrorCode errorCode = ErrorCode.INCORRECT_REQUEST;
+    ErrorResponse errorResponse = new ErrorResponse(
+        Instant.now(),
+        errorCode.toString(),
+        errorCode.getMessage(),
+        Map.of(),
+        e.getClass().getSimpleName(),
+        errorCode.getStatus()
+    );
+    return ResponseEntity
+        .status(errorCode.getStatus())
         .body(errorResponse);
   }
 
