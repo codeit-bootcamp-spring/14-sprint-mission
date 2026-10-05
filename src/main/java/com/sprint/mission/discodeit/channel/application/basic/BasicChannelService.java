@@ -1,21 +1,25 @@
 package com.sprint.mission.discodeit.channel.application.basic;
 
-import com.sprint.mission.discodeit.channel.domain.ChannelType;
-import com.sprint.mission.discodeit.channel.dto.*;
+import com.sprint.mission.discodeit.channel.application.ChannelService;
 import com.sprint.mission.discodeit.channel.domain.Channel;
+import com.sprint.mission.discodeit.channel.domain.ChannelType;
+import com.sprint.mission.discodeit.channel.dto.ChannelDto;
+import com.sprint.mission.discodeit.channel.dto.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.channel.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.channel.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.channel.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.common.entity.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.common.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.readStatus.domain.ReadStatus;
 import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import com.sprint.mission.discodeit.common.exception.PrivateChannelUpdateNotAllowedException;
-import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
+import com.sprint.mission.discodeit.readStatus.domain.ReadStatus;
 import com.sprint.mission.discodeit.readStatus.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.channel.application.ChannelService;
 import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -37,6 +42,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto publicCreate(PublicChannelCreateRequest request) {
         Channel channel = request.toEntity();
+
         return publicChannelCreate(channel);
     }
 
@@ -44,6 +50,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto privateCreate(PrivateChannelCreateRequest request) {
         Channel channel = request.toEntity();
+
         return privateChannelCreate(channel, request.participantIds());
 
     }
@@ -115,6 +122,7 @@ public class BasicChannelService implements ChannelService {
     private ChannelDto publicChannelCreate(Channel channel) {
 
         channelRepository.save(channel);
+        log.info("public 채널 생성 성공 - channelId = {}, name = {}", channel.getId(), channel.getName());
         return channelMapper.toDto(channel, List.of(), null);
     }
 
@@ -123,16 +131,21 @@ public class BasicChannelService implements ChannelService {
 
         List<User> participants = new ArrayList<>();
         for (UUID userId : userIds) {
-            User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+            User user = userRepository.findById(userId).orElseThrow(() -> {
+                log.warn("private 채널 생성 실패 - 존재하지 않는 사용자: userId = {}", userId);
+                return new NoSuchElementException();
+            });
             participants.add(user);
 
             ReadStatus readStatus = new ReadStatus(user, channel);
 
             // 여기 read statusRepository 에다가 넣기
             readStatusRepository.save(readStatus);
+            log.debug("readStatus 생성 성공 - readStatusId = {}", readStatus.getId());
         }
 
         channelRepository.save(channel);
+        log.info("privateChannel 생성 성공 - channelId = {}", channel.getId());
         return channelMapper.toDto(channel, participants, null);
     }
 

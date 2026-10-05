@@ -46,3 +46,4 @@ out/
 .discodeit/
 
 logs/
+.logs/

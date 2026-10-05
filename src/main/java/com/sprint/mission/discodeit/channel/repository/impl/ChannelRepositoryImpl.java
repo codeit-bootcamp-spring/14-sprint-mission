@@ -6,17 +6,11 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 import com.sprint.mission.discodeit.channel.domain.ChannelType;
-import com.sprint.mission.discodeit.channel.domain.QChannel;
 import com.sprint.mission.discodeit.channel.dto.ChannelDto;
-import com.sprint.mission.discodeit.channel.dto.ChannelFindResponseDto;
 import com.sprint.mission.discodeit.channel.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.channel.repository.ChannelResponseCustom;
-import com.sprint.mission.discodeit.message.domain.QMessage;
-import com.sprint.mission.discodeit.readStatus.domain.QReadStatus;
-import com.sprint.mission.discodeit.user.domain.QUser;
 import com.sprint.mission.discodeit.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
@@ -24,15 +18,16 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.sprint.mission.discodeit.channel.domain.QChannel.channel;
+import static com.sprint.mission.discodeit.message.domain.QMessage.message;
+import static com.sprint.mission.discodeit.readStatus.domain.QReadStatus.readStatus;
+import static com.sprint.mission.discodeit.user.domain.QUser.user;
+
 @RequiredArgsConstructor
 public class ChannelRepositoryImpl implements ChannelResponseCustom {
 
     private final ChannelMapper channelMapper;
     private final JPAQueryFactory jpaQueryFactory;
-    private static final QMessage message = QMessage.message1;
-    private static final QChannel channel = QChannel.channel;
-    private static final QReadStatus readStatus = QReadStatus.readStatus;
-    private static final QUser user = QUser.user;
 
     @Override
     public List<ChannelDto> findAllVisibleTo(UUID userId) {
@@ -51,7 +46,7 @@ public class ChannelRepositoryImpl implements ChannelResponseCustom {
                                         .where(readStatus.user.id.eq(userId)))))
                 .fetch();
 
-        if(rows.isEmpty()){
+        if (rows.isEmpty()) {
             return List.of();
         }
 
