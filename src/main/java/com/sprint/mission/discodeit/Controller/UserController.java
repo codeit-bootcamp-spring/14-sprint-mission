@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.service.IService.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
 import com.sprint.mission.discodeit.util.BinaryContentMapper;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class UserController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponseDto> create(
-        @RequestPart("userCreateRequest") UserCreateRequestDto request,
+        @Valid @RequestPart("userCreateRequest") UserCreateRequestDto request,
         @RequestPart(value = "profile", required = false) MultipartFile profile) {
         log.debug("유저 생성 API 호출: email={}", request.email());
 

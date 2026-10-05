@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.service.IService.ChannelService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class ChannelController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/public")
     public ResponseEntity<ChannelResponseDto> createPublic(
-        @RequestBody PublicChannelCreateRequestDto request
+        @Valid @RequestBody PublicChannelCreateRequestDto request
     ) {
         log.debug("public 채널 생성 API 호출: name={}", request.name());
 

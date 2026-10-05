@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.service.basic.ReadStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class ReadStatusController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ReadStatusResponseDto> create(
-        @RequestBody ReadStatusCreateRequestDto request
+        @Valid @RequestBody ReadStatusCreateRequestDto request
     ) {
         ReadStatusResponseDto response = readStatusService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

@@ -1,16 +1,40 @@
 package com.sprint.mission.discodeit.exception;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException e) {
+        Map<String, Object> details = new LinkedHashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(fieldError ->
+            details.merge(fieldError.getField(), fieldError.getDefaultMessage(),
+                (existing, added) -> existing + ", " + added)
+        );
+
+        log.warn("요청 유효성 검증 실패: {}", details);
+
+        ErrorResponse body = new ErrorResponse(
+            Instant.now(),
+            "VALIDATION_FAILED",
+            "요청 값이 올바르지 않습니다.",
+            details,
+            e.getClass().getSimpleName(),
+            HttpStatus.BAD_REQUEST.value()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
 
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {

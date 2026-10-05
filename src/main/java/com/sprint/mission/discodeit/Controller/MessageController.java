@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.service.IService.MessageService;
 import com.sprint.mission.discodeit.util.BinaryContentMapper;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +40,7 @@ public class MessageController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageResponseDto> create(
-        @RequestPart("messageCreateRequest") MessageCreateRequestDto request,
+        @Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto request,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         log.debug("메시지 생성 API 호출: channelId={}, authorId={}, attachmentCount={}",
