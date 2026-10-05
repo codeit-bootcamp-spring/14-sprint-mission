@@ -1,13 +1,5 @@
-DROP TABLE IF EXISTS message_attachments CASCADE;
-DROP TABLE IF EXISTS messages CASCADE;
-DROP TABLE IF EXISTS read_statuses CASCADE;
-DROP TABLE IF EXISTS user_statuses CASCADE;
-DROP TABLE IF EXISTS channels CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS binary_contents CASCADE;
-DROP TYPE IF EXISTS channel_type CASCADE;
 
-CREATE TABLE binary_contents (
+CREATE TABLE IF NOT EXISTS binary_contents (
                                  id           UUID PRIMARY KEY,
                                  created_at   TIMESTAMPTZ NOT NULL,
                                  file_name    VARCHAR(255) NOT NULL,
@@ -17,7 +9,7 @@ CREATE TABLE binary_contents (
 );
 
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
                        id         UUID PRIMARY KEY,
                        created_at TIMESTAMPTZ NOT NULL,
                        updated_at TIMESTAMPTZ,
@@ -29,7 +21,7 @@ CREATE TABLE users (
 );
 
 
-CREATE TABLE channels (
+CREATE TABLE IF NOT EXISTS channels (
                           id          UUID PRIMARY KEY,
                           created_at  TIMESTAMPTZ NOT NULL,
                           updated_at  TIMESTAMPTZ,
@@ -40,7 +32,7 @@ CREATE TABLE channels (
 );
 
 
-CREATE TABLE user_statuses (
+CREATE TABLE IF NOT EXISTS user_statuses (
                                id             UUID PRIMARY KEY,
                                created_at     TIMESTAMPTZ NOT NULL,
                                updated_at     TIMESTAMPTZ,
@@ -50,7 +42,7 @@ CREATE TABLE user_statuses (
 );
 
 
-CREATE TABLE read_statuses (
+CREATE TABLE IF NOT EXISTS read_statuses (
                                id           UUID PRIMARY KEY,
                                created_at   TIMESTAMPTZ NOT NULL,
                                updated_at   TIMESTAMPTZ,
@@ -63,7 +55,7 @@ CREATE TABLE read_statuses (
 );
 
 
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
                           id         UUID PRIMARY KEY,
                           created_at TIMESTAMPTZ NOT NULL,
                           updated_at TIMESTAMPTZ,
@@ -75,7 +67,7 @@ CREATE TABLE messages (
 );
 
 
-CREATE TABLE message_attachments (
+CREATE TABLE IF NOT EXISTS message_attachments (
                                      message_id    UUID NOT NULL
                                          REFERENCES messages(id) ON DELETE CASCADE,
                                      attachment_id UUID NOT NULL

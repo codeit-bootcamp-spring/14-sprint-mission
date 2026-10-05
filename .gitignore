@@ -42,3 +42,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+*.ser
+.discodeit/
+application-prod.yaml

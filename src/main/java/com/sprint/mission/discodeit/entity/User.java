@@ -40,9 +40,10 @@ public class User extends BaseUpdatableEntity {
         this.profile = profile;
     }
 
-    public void update(String name, String email) {
+    public void update(String name, String email, String password) {
         if (name != null) this.username = name;
         if (email != null) this.email = email;
+        if(password != null) this.password = password;
     }
 
     public void updateProfile(BinaryContent profile) {
