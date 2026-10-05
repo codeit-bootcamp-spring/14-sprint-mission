@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.exception;
 
+import java.time.Instant;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,26 +12,51 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e) {
-        log.warn("리소스를 찾을 수 없음: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    @ExceptionHandler(DiscodeitException.class)
+    public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
+        HttpStatus status = resolveStatus(e.getErrorCode());
+        log.warn("비즈니스 예외 발생: code={}, details={}", e.getErrorCode(), e.getDetails());
+
+        ErrorResponse body = new ErrorResponse(
+            e.getTimestamp(),
+            e.getErrorCode().name(),
+            e.getMessage(),
+            e.getDetails(),
+            e.getClass().getSimpleName(),
+            status.value()
+        );
+        return ResponseEntity.status(status).body(body);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
-        log.warn("잘못된 요청: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        log.error("처리되지 않은 런타임 예외 발생", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류가 발생했습니다");
-    }
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error("예상치 못한 예외 발생", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류가 발생했습니다");
+
+        ErrorResponse body = new ErrorResponse(
+            Instant.now(),
+            "INTERNAL_SERVER_ERROR",
+            "서버 내부 오류가 발생했습니다.",
+            Map.of(),
+            e.getClass().getSimpleName(),
+            HttpStatus.INTERNAL_SERVER_ERROR.value()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    private HttpStatus resolveStatus(ErrorCode code) {
+        return switch (code) {
+            case USER_NOT_FOUND,
+                 USER_STATUS_NOT_FOUND,
+                 CHANNEL_NOT_FOUND,
+                 MESSAGE_NOT_FOUND,
+                 BINARY_CONTENT_NOT_FOUND,
+                 READ_STATUS_NOT_FOUND -> HttpStatus.NOT_FOUND;       // 404
+            case DUPLICATE_USER,
+                 DUPLICATE_USER_STATUS,
+                 DUPLICATE_READ_STATUS -> HttpStatus.CONFLICT;        // 409
+            case PRIVATE_CHANNEL_UPDATE -> HttpStatus.FORBIDDEN;      // 403
+            case INVALID_CREDENTIALS -> HttpStatus.UNAUTHORIZED;      // 401
+        };
     }
 
 

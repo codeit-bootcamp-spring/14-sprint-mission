@@ -9,6 +9,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -45,12 +48,12 @@ public class BasicMessageService implements MessageService {
         Channel channel = channelRepository.findById(messageRequest.channelId())
             .orElseThrow(() -> {
                 log.warn("존재하지 않는 채널에서 메세지 생성 시도: channelId={}",messageRequest.channelId());
-                return new NoSuchElementException("존재하지 않는 채널입니다.");
+                return new ChannelNotFoundException(messageRequest.channelId());
             });
         User author = userRepository.findById(messageRequest.authorId())
             .orElseThrow(() -> {
                 log.warn("존재하지 않는 유저가 메세지 생성 시도: authorId={}",messageRequest.authorId());
-                return new NoSuchElementException("존재하지 않는 유저입니다.");
+                return new UserNotFoundException(messageRequest.authorId());
             });
 
         List<BinaryContent> attachments = new ArrayList<>();
@@ -83,7 +86,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("존재하지 않는 메세지 수정 시도: messageId={}", id);
-                return new NoSuchElementException("존재하지 않는 메시지입니다.");
+                return new MessageNotFoundException(id);
             });
 
         message.setContent(request.newContent());
@@ -97,7 +100,8 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("없는 메세지 삭제 시도: messageId={}",id);
-                return new NoSuchElementException("없는 메시지입니다.");});
+                return new MessageNotFoundException(id);
+            });
 
 
         messageRepository.deleteById(id);

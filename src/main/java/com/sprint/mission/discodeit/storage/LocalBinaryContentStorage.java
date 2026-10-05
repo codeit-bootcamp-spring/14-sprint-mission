@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +65,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
         Path path = resolvePath(binaryContentId);
         if (!Files.exists(path)) {
             log.warn("존재하지 않는 파일 다운로드 시도: binaryContentId={}", binaryContentId);
-            throw new NoSuchElementException("파일을 찾을 수 없습니다: " + binaryContentId);
+            throw new BinaryContentNotFoundException(binaryContentId);
         }
         try {
             return Files.newInputStream(path);

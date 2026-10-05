@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import java.util.NoSuchElementException;
@@ -20,14 +22,14 @@ public class AuthService {
 
     public UserResponseDto login(LoginRequestDto loginRequest) {
         User user = userRepository.findByUsername(loginRequest.username())
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+            .orElseThrow(() -> new InvalidCredentialsException(loginRequest.username()));
 
         if (!user.getPassword().equals(loginRequest.password())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidCredentialsException(loginRequest.username());
         }
 
         UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저 상태입니다."));
+            .orElseThrow(() -> UserStatusNotFoundException.byUserId(user.getId()));
 
         boolean online = userStatus.isOnline();
         return UserResponseDto.from(user, online);

@@ -6,10 +6,15 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusAlreadyExistException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.IService.IReadStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,15 +32,16 @@ public class ReadStatusService implements IReadStatusService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
 
+
     @Override
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto request) {
         Channel channel = channelRepository.findById(request.channelId())
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
+            .orElseThrow(() -> new ChannelNotFoundException(request.channelId()));
         User user = userRepository.findById(request.userId())
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+            .orElseThrow(() -> new UserNotFoundException(request.userId()));
 
         if (readStatusRepository.existsByUser_IdAndChannel_Id(user.getId(), channel.getId())) {
-            throw new IllegalArgumentException("이미 존재하는 읽음 상태입니다.");
+            throw new ReadStatusAlreadyExistException(user.getId(), channel.getId());
         }
 
         ReadStatus readStatus = request.toEntity(user, channel);
@@ -48,7 +54,7 @@ public class ReadStatusService implements IReadStatusService {
     @Transactional(readOnly = true)
     public ReadStatusResponseDto find(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("없는 읽음 상태입니다."));
+            .orElseThrow(() -> new ReadStatusNotFoundException(id));
 
         return ReadStatusResponseDto.from(readStatus);
     }
@@ -65,7 +71,7 @@ public class ReadStatusService implements IReadStatusService {
     @Override
     public ReadStatusResponseDto update(UUID id, ReadStatusUpdateRequestDto request) {
         ReadStatus readStatus = readStatusRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 읽음 상태입니다."));
+            .orElseThrow(() -> new ReadStatusNotFoundException(id));
 
         readStatus.update(request.newLastReadAt());
         // save() 불필요 - 변경 감지로 자동 반영
@@ -76,8 +82,9 @@ public class ReadStatusService implements IReadStatusService {
     @Override
     public void delete(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 읽음 상태입니다."));
+            .orElseThrow(() -> new ReadStatusNotFoundException(id));
 
         readStatusRepository.deleteById(id);
+
     }
 }

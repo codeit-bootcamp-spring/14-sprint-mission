@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusAlreadyExistException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.IService.IUserStatusService;
@@ -28,10 +31,10 @@ public class UserStatusService implements IUserStatusService {
     @Override
     public UserStatusResponseDto create(UserStatusCreateRequestDto request) {
         User user = userRepository.findById(request.userId())
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+            .orElseThrow(() -> new UserNotFoundException(request.userId()));
 
         if (userStatusRepository.existsByUser_Id(request.userId())) {
-            throw new IllegalArgumentException("이미 존재하는 유저 상태입니다.");
+            throw new UserStatusAlreadyExistException(request.userId());
         }
 
         UserStatus userStatus = request.toEntity(user);
@@ -44,7 +47,7 @@ public class UserStatusService implements IUserStatusService {
     @Transactional(readOnly = true)
     public UserStatusResponseDto find(UUID id) {
         UserStatus userStatus = userStatusRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("없는 유저 상태입니다."));
+            .orElseThrow(() -> UserStatusNotFoundException.byId(id));
         return UserStatusResponseDto.from(userStatus);
     }
 
@@ -59,7 +62,7 @@ public class UserStatusService implements IUserStatusService {
     @Override
     public UserStatusResponseDto update(UUID id, UserStatusUpdateDto request) {
         UserStatus userStatus = userStatusRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저 상태입니다."));
+            .orElseThrow(() -> UserStatusNotFoundException.byId(id));
 
         userStatus.update(request.newLastActiveAt());
 
@@ -70,7 +73,7 @@ public class UserStatusService implements IUserStatusService {
     @Override
     public UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateDto request) {
         UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저 상태입니다."));
+            .orElseThrow(() -> UserStatusNotFoundException.byUserId(userId));
 
         userStatus.update(request.newLastActiveAt());
 
@@ -80,8 +83,9 @@ public class UserStatusService implements IUserStatusService {
 
     @Override
     public void deleteById(UUID id) {
-        UserStatus userStatus = userStatusRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저 상태입니다."));
+        if (!userStatusRepository.existsById(id)) {
+            throw UserStatusNotFoundException.byId(id);
+        }
 
         userStatusRepository.deleteById(id);
     }
