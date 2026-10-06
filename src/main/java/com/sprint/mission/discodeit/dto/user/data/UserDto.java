@@ -1,34 +1,17 @@
 package com.sprint.mission.discodeit.dto.user.data;
 
+import com.sprint.mission.discodeit.dto.binarycontent.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.user.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
-import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class UserDto {
-    UUID id;
-    Instant createdAt;
-    Instant updatedAt;
-    String username;
-    String email;
-    UUID profileId;
-    Boolean online;
-
-    public static UserDto of(User user, boolean online) {
+public record UserDto(UUID id, String username, String email, BinaryContentDto profile, Boolean online) {
+    public static UserDto of(User user, BinaryContentDto binaryContentDto, boolean online) {
         return new UserDto(
                 user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
+                binaryContentDto,
                 online
         );
     }

@@ -7,113 +7,132 @@ import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.dto.message.data.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.binarycontent.BinaryContentValidator;
 import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final ChannelValidator channelValidator;
     private final UserValidator userValidator;
-    private final BinaryContentValidator binaryContentValidator;
+    private final MessageMapper messageMapper;
+    private final PageResponseMapper pageResponseMapper;
 
 
     @Override
-    public Message save(
+    @Transactional
+    public MessageDto save(
             MessageCreateRequestDto requestDto,
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
     ) {
 
-        userValidator.getOrThrow(requestDto.getAuthorId());
-        channelValidator.getOrThrow(requestDto.getChannelId());
+        User user = userValidator.getOrThrow(requestDto.authorId());
+        Channel channel = channelValidator.getOrThrow(requestDto.channelId());
 
-        Message savedMessage = requestDto.toEntity();
+        Message savedMessage = Message.create(requestDto.content(), user, channel);
 
-        List<UUID> contentIds = Optional.ofNullable(messageContentCreateRequests)
+        List<BinaryContent> contents = Optional.ofNullable(messageContentCreateRequests)
                 .filter(list -> !list.isEmpty())
                 .map(messageBinaryContents -> {
                     return messageBinaryContents.stream().map(messageBinaryContent -> {
                         BinaryContent binaryContent = messageBinaryContent.toEntity();
-                        return binaryContentRepository.save(binaryContent).getId();
+                        BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+                        binaryContentStorage.put(savedContent.getId(), messageBinaryContent.bytes());
+                        return savedContent;
                     }).toList();
                 })
                 .orElse(Collections.emptyList());
 
-        savedMessage.addAttachmentIds(contentIds);
+        savedMessage.addAttachments(contents);
         messageRepository.save(savedMessage);
-        return savedMessage;
+
+        return messageMapper.toDto(savedMessage);
     }
 
     @Override
-    public Message find(MessageIdRequestDto requestDto) {
-        return messageRepository.findById(requestDto.getId())
+    public MessageDto find(MessageIdRequestDto requestDto) {
+
+        Message message = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
 
-    }
-
-    @Override
-    public List<Message> findByUserId(UserIdRequestDto requestDto) {
-        userValidator.getOrThrow(requestDto.getId());
-
-        return messageRepository.findByUserId(requestDto.getId())
-                .stream().toList();
-    }
-
-    @Override
-    public List<Message> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto) {
-
-        userValidator.getOrThrow(userRequestDto.getId());
-        channelValidator.getOrThrow(channelRequestDto.getId());
-
-        return messageRepository.findByChannelIdAndUserId(userRequestDto.getId(), channelRequestDto.getId())
-                .stream().toList();
+        return messageMapper.toDto(message);
 
     }
 
+
     @Override
-    public List<Message> findAllByChannelId(ChannelIdRequestDto requestDto) {
+    @Transactional(readOnly = true)
+    public PageResponse<MessageDto> findAllByChannelId(
+            ChannelIdRequestDto requestDto,
+            Pageable pageable,
+            String cursor
+    ) {
         channelValidator.getOrThrow(requestDto.getId());
+        Slice<Message> messagesSlice;
 
-        return messageRepository.findByChannelId(requestDto.getId())
-                .stream().toList();
+        if (cursor == null || cursor.isBlank()) {
+            messagesSlice = messageRepository.findFirstPage(requestDto.getId(), pageable);
+        } else {
+            messagesSlice = messageRepository.findByChannelId(requestDto.getId(), Instant.parse(cursor), pageable);
+        }
+        String nextCursor = null;
+        if (messagesSlice.hasNext() && messagesSlice.hasContent()) {
+            List<Message> contents = messagesSlice.getContent();
+            nextCursor = contents.get(contents.size() - 1).getCreatedAt().toString();
+        }
+        Slice<MessageDto> dtoSlice = messagesSlice.map(messageMapper::toDto);
+
+        return pageResponseMapper.fromSlice(dtoSlice, nextCursor);
     }
 
     @Override
-    public Message update(
+    @Transactional
+    public MessageDto update(
             MessageIdRequestDto messageIdRequest,
             MessageUpdateRequestDto request
     ) {
         Message updateMessage = messageRepository.findById(messageIdRequest.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
-
         updateMessage.update(request.getNewContent());
-        messageRepository.update(updateMessage.getId(), updateMessage);
 
-        return updateMessage;
+        return messageMapper.toDto(updateMessage);
     }
 
+
     @Override
+    @Transactional
     public void delete(MessageIdRequestDto requestDto) {
         Message deleteMessage = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
-
-
-        deleteMessage.getAttachmentIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
-        messageRepository.delete(requestDto.getId()); // 메시지 삭제
+        List<BinaryContent> deletedBinaryContent = deleteMessage.getAttachments().stream().toList();
+        binaryContentRepository.deleteAll(deletedBinaryContent); // 수정 파일 Id 값들 전부 데이터 삭제
+        deletedBinaryContent.stream().map(BaseEntity::getId)
+                .forEach(binaryContentStorage::delete);
+        messageRepository.delete(deleteMessage); // 메시지 삭제
     }
 }

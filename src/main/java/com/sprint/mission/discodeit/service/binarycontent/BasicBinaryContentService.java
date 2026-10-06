@@ -4,10 +4,14 @@ import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentIdRequestDto;
+import com.sprint.mission.discodeit.dto.binarycontent.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.common.IdRequestDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,13 +21,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
 
     @Override
     public BinaryContent save(BinaryContentCreateRequestDto requestDto) {
-        BinaryContent savedContent = this.binaryContentRepository.save(requestDto.toEntity());
-
-        return savedContent;
+        BinaryContent savedBinaryContent = this.binaryContentRepository.save(requestDto.toEntity());
+        binaryContentStorage.put(savedBinaryContent.getId(), requestDto.bytes());
+        return savedBinaryContent;
     }
 
 
@@ -36,15 +41,27 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public List<BinaryContent> findAllByIdIn(List<BinaryContentIdRequestDto> requestDto) {
         List<UUID> ids = requestDto.stream().map(IdRequestDto::getId).toList();
-        return this.binaryContentRepository.findAllByIdIn(ids)
+        return this.binaryContentRepository.findByIdIn(ids)
                 .stream().toList();
     }
 
     @Override
     public void delete(BinaryContentIdRequestDto requestDto) {
-        this.binaryContentRepository.findById(requestDto.getId())
+        BinaryContent deletedEntity = this.binaryContentRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
 
-        this.binaryContentRepository.delete(requestDto.getId());
+        this.binaryContentRepository.delete(deletedEntity);
+    }
+
+    @Override
+    public ResponseEntity<?> findFile(UUID fileId) {
+        BinaryContent binaryContent = binaryContentRepository.findById(fileId)
+                .orElse(null);
+
+        if (binaryContent == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        BinaryContentDto binaryContentDto = BinaryContentDto.of(binaryContent);
+
+        return binaryContentStorage.download(binaryContentDto);
     }
 }
