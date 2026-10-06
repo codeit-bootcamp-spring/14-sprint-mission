@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
@@ -39,6 +41,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
     channelRepository.save(channel);
+    log.info("공개 채널 생성 완료: id={}, name={}", channel.getId(), name);
     return channelMapper.toDto(channel);
   }
 
@@ -52,7 +55,7 @@ public class BasicChannelService implements ChannelService {
         .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
         .toList();
     readStatusRepository.saveAll(readStatuses);
-
+    log.info("비공개 채널 생성 완료: id={}, 참여자 수={}", channel.getId(), readStatuses.size());
     return channelMapper.toDto(channel);
   }
 
@@ -91,6 +94,7 @@ public class BasicChannelService implements ChannelService {
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
     channel.update(newName, newDescription);
+    log.info("채널 수정 완료: id={}", channelId);
     return channelMapper.toDto(channel);
   }
 
@@ -105,5 +109,6 @@ public class BasicChannelService implements ChannelService {
     readStatusRepository.deleteAllByChannelId(channelId);
 
     channelRepository.deleteById(channelId);
+    log.info("채널 삭제 완료: id={}", channelId);
   }
 }

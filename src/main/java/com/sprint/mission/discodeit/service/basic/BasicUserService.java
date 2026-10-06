@@ -19,9 +19,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
@@ -55,6 +57,7 @@ public class BasicUserService implements UserService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("파일 업로드 완료: id={}, filename={}", binaryContent.getId(), fileName);
           return binaryContent;
         })
         .orElse(null);
@@ -65,6 +68,7 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = new UserStatus(user, now);
 
     userRepository.save(user);
+    log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
     return userMapper.toDto(user);
   }
 
@@ -109,12 +113,14 @@ public class BasicUserService implements UserService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("파일 업로드 완료: id={}, filename={}", binaryContent.getId(), fileName);
           return binaryContent;
         })
         .orElse(null);
 
     String newPassword = userUpdateRequest.newPassword();
     user.update(newUsername, newEmail, newPassword, nullableProfile);
+    log.info("사용자 수정 완료: id={}", userId);
 
     return userMapper.toDto(user);
   }
@@ -127,5 +133,6 @@ public class BasicUserService implements UserService {
     }
 
     userRepository.deleteById(userId);
+    log.info("사용자 삭제 완료: id={}", userId);
   }
 }

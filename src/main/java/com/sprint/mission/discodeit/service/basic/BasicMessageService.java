@@ -23,11 +23,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
@@ -66,6 +68,7 @@ public class BasicMessageService implements MessageService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("파일 업로드 완료: id={}, fileName={}", binaryContent.getId(), fileName);
           return binaryContent;
         })
         .toList();
@@ -79,6 +82,7 @@ public class BasicMessageService implements MessageService {
     );
 
     messageRepository.save(message);
+    log.info("메시지 생성 완료: id={}, ChannelId={}", message.getId(), channelId);
     return messageMapper.toDto(message);
   }
 
@@ -117,6 +121,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     message.update(newContent);
+    log.info("메시지 수정 완료: id={}", messageId);
     return messageMapper.toDto(message);
   }
 
@@ -128,5 +133,6 @@ public class BasicMessageService implements MessageService {
     }
 
     messageRepository.deleteById(messageId);
+    log.info("메시지 삭제 완료: id={}", messageId);
   }
 }
