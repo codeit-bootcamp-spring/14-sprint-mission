@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.auth.application.basic;
 import com.sprint.mission.discodeit.auth.application.AuthService;
 import com.sprint.mission.discodeit.auth.dto.AuthLoginRequestDto;
 import com.sprint.mission.discodeit.common.exception.AuthenticationFailedException;
-import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.common.exception.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.domain.UserStatus;
 import com.sprint.mission.discodeit.user.dto.UserDto;
@@ -35,12 +35,12 @@ public class BasicAuthService implements AuthService {
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> {
                     log.warn("로그인 실패 - 존재하지 않는 사용자: username = {}", username);
-                    return new NoSuchElementException();
+                    return new AuthenticationFailedException(username);
                 });
 
         if (user.checkPassword(authLoginRequestDto.password())) {
             UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                    .orElseThrow(NoSuchElementException::new);
+                    .orElseThrow(() -> UserStatusNotFoundException.byUserId(user.getId()));
 
             userStatus.updateLastAccessAt();
 //            userStatusRepository.update(userStatus); // 변경 감지
@@ -50,7 +50,7 @@ public class BasicAuthService implements AuthService {
         }
 
         log.warn("로그인 실패 - 비밀번호 불일치: username = {}", user.getUserName());
-        throw new AuthenticationFailedException();
+        throw new AuthenticationFailedException(username);
 
     }
 }

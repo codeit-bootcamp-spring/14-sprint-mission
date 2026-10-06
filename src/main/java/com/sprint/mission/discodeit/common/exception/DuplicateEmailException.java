@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.common.exception;
 
-public class DuplicateEmailException extends DiscodeitException{
+import java.util.Collections;
 
-    public DuplicateEmailException() {
-        super(ErrorCode.DUPLICATE_EMAIL);
+public class DuplicateEmailException extends UserException {
+
+    public DuplicateEmailException(String email) {
+        super(ErrorCode.DUPLICATE_EMAIL, Collections.singletonMap("email", email));
     }
 }

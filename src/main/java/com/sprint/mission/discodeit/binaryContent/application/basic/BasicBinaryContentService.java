@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.binaryContent.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.binaryContent.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.common.exception.BinaryContentNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("바이너리 컨텐츠 찾기 실패 - id = {}", id);
-                    return new NoSuchElementException();
+                    return new BinaryContentNotFoundException(id);
                 });
 
         log.debug("바이너리 컨텐츠 찾기 성공 - id = {}", id);
@@ -71,7 +71,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         // 비어 있으면 예외 발생
         if (response.isEmpty()) {
             log.warn("바이너리 컨텐츠 찾기 실패 - ids = {}", ids);
-            throw new NoSuchElementException();
+            throw new BinaryContentNotFoundException(ids);
         }
 
         log.debug("바이너리 컨텐츠 찾기 성공 - ids = {}", ids);
@@ -84,7 +84,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("바이너리 컨텐츠 찾기 실패(삭제) - id = {}", id);
-                    return new NoSuchElementException();
+                    return new BinaryContentNotFoundException(id);
                 });
 
         binaryContentRepository.deleteById(binaryContent.getId());

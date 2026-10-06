@@ -9,7 +9,9 @@ import com.sprint.mission.discodeit.message.mapper.MessageMapper;
 import com.sprint.mission.discodeit.message.dto.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.message.dto.MessageDto;
 import com.sprint.mission.discodeit.message.domain.Message;
-import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.common.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.message.dto.MessageUpdateRequestDto;
@@ -18,6 +20,7 @@ import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.message.application.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -48,8 +52,14 @@ public class BasicMessageService implements MessageService {
     @Transactional
     public MessageDto create(MessageCreateRequestDto request, List<MultipartFile> attachments) {
 
-        Channel channel = channelRepository.findById(request.channelId()).orElseThrow(NoSuchElementException::new);
-        User author = userRepository.findById(request.authorId()).orElseThrow(NoSuchElementException::new);
+        Channel channel = channelRepository.findById(request.channelId()).orElseThrow(() -> {
+            log.warn("메시지 생성 실패 - 존재하지 않는 채널: channelId = {}", request.channelId());
+            return new ChannelNotFoundException(request.channelId());
+        });
+        User author = userRepository.findById(request.authorId()).orElseThrow(() -> {
+            log.warn("메시지 생성 실패 - 존재하지 않는 사용자: authorId = {}", request.authorId());
+            return new UserNotFoundException(request.authorId());
+        });
 
         List<BinaryContent> attachmentList = new ArrayList<>();
 
@@ -62,6 +72,7 @@ public class BasicMessageService implements MessageService {
                 try {
                     binaryContentStorage.put(binaryContent.getId(), file.getBytes());
                 } catch (IOException e) {
+                    log.error("메시지 첨부파일 저장 실패 - fileName = {}", file.getOriginalFilename(), e);
                     throw new UncheckedIOException(e);
                 }
                 attachmentList.add(binaryContent);
@@ -70,6 +81,8 @@ public class BasicMessageService implements MessageService {
 
         Message message = Message.create(attachmentList, request.content(), channel, author);
         messageRepository.save(message);
+        log.info("메시지 생성 성공 - messageId = {}, channelId = {}, attachments = {}",
+                message.getId(), channel.getId(), attachmentList.size());
         return messageMapper.toDto(message);
     }
 
@@ -77,6 +90,7 @@ public class BasicMessageService implements MessageService {
     @Transactional(readOnly = true)
     public MessageDto find(UUID id) {
         Message message = check(id);
+        log.debug("메시지 조회 성공 - messageId = {}", id);
         return messageMapper.toDto(message);
     }
 
@@ -87,6 +101,7 @@ public class BasicMessageService implements MessageService {
         message.update(request.newContent());
 //        messageRepository.save(message);  // 변경 감지
 
+        log.info("메시지 수정 성공 - messageId = {}", id);
         return messageMapper.toDto(message);
     }
 
@@ -103,8 +118,9 @@ public class BasicMessageService implements MessageService {
         // 안해도 삭제됨
 
 
+        int attachmentCount = attachments.size();
         messageRepository.deleteById(id);
-
+        log.info("메시지 삭제 성공 - messageId = {}, attachments = {}", id, attachmentCount);
 
     }
 
@@ -119,12 +135,17 @@ public class BasicMessageService implements MessageService {
 
         List<MessageDto> content = slice.getContent();
         Instant nextCursor = content.isEmpty() ? null : content.get(content.size() - 1).createdAt();
+        log.debug("채널별 메시지 목록 조회 성공 - channelId = {}, count = {}, hasNext = {}",
+                channelId, content.size(), slice.hasNext());
         return pageResponseMapper.fromSlice(slice, nextCursor);
     }
 
 
     private Message check(UUID id) {
 
-        return messageRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return messageRepository.findById(id).orElseThrow(() -> {
+            log.warn("메시지 찾기 실패 - 존재하지 않는 메시지: messageId = {}", id);
+            return new MessageNotFoundException(id);
+        });
     }
 }
