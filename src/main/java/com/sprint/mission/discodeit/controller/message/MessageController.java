@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +21,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -37,9 +44,10 @@ public class MessageController implements MessageControllerDocs {
     @Override
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> create(
-            @RequestPart(value = "messageCreateRequest") MessageCreateRequestDto request,
+            @RequestPart(value = "messageCreateRequest") @Valid MessageCreateRequestDto request,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> contentFiles
     ) throws IOException {
+        log.info("메세지 생성 진입 user : {}, channel : {}", request.authorId(), request.channelId());
         List<BinaryContentCreateRequestDto> binaryRequests = BinaryContentMapper.toList(contentFiles);
         MessageDto savedMessage = messageService.save(request, binaryRequests);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMessage);
@@ -50,7 +58,8 @@ public class MessageController implements MessageControllerDocs {
     public ResponseEntity<Message> updateMessage(
             @PathVariable(value = "id") UUID messageId,
             @RequestBody MessageUpdateRequestDto request
-    ) throws IOException {
+    ) {
+        log.info("메세지 수정 : {}", messageId);
         messageService.update(MessageIdRequestDto.from(messageId), request);
         return ResponseEntity.status(HttpStatus.OK).body(null);
 
@@ -62,6 +71,7 @@ public class MessageController implements MessageControllerDocs {
             @Parameter(description = "삭제할 Message ID")
             @PathVariable(value = "id") UUID messageId
     ) {
+        log.info("메세지 삭제 : {}", messageId);
         messageService.delete(MessageIdRequestDto.from(messageId));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 

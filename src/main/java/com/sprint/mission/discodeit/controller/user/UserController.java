@@ -11,12 +11,17 @@ import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.user.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -31,7 +36,7 @@ import java.util.UUID;
 public class UserController implements UserControllerDocs {
     private final UserService userService;
 
-
+    // throws IOException 처리 필요할듯 (체크예외..> 언체크)
     @Override
     @RequestMapping(
             method = RequestMethod.POST,
@@ -39,11 +44,12 @@ public class UserController implements UserControllerDocs {
     )
     public ResponseEntity<User> create(
             @Parameter(description = "User 생성 정보")
-            @RequestPart(value = "userCreateRequest") UserCreateRequest request,
+            @RequestPart(value = "userCreateRequest") @Valid UserCreateRequest request,
 
             @Parameter(description = "User 프로필 이미지")
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
+        log.info("사용자 생성 진입");
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
         User savedUser = userService.save(request, binaryRequest);
 
@@ -63,11 +69,12 @@ public class UserController implements UserControllerDocs {
             @PathVariable("id") UUID userId,
 
             @Parameter(description = "User 수정 정보")
-            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
 
             @Parameter(description = "수정할 User 프로필 이미지")
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
+        log.info("사용자 수정 진입 수정 User : {}", userId);
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
         UserDto updatedUser = userService.update(UserIdRequestDto.from(userId), userUpdateRequest, binaryRequest);
 
@@ -82,6 +89,7 @@ public class UserController implements UserControllerDocs {
             @Parameter(description = "삭제할 User ID")
             @PathVariable("id") UUID deleteUserId
     ) {
+        log.info("사용자 삭제 진입 삭제 User : {}", deleteUserId);
         userService.delete(UserIdRequestDto.from(deleteUserId));
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
