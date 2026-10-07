@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class MessageService {
 
@@ -82,6 +84,7 @@ public class MessageService {
         Message message = new Message(user, channel, messageCreateRequestDto.content(),
             binaryContents);
 
+        log.info("메시지 생성 완료: messageId={}", message.getId());
         return messageMapper.toDto(messageRepository.save(message));
     }
 
@@ -96,18 +99,20 @@ public class MessageService {
 
         message.updateMessage(messageUpdateRequestDto.newContent());
 
+        log.info("메시지 수정 완료: messageId={}", message.getId());
         return messageMapper.toDto(message);
     }
 
     @Transactional
     public void messageDelete(UUID messageId) {
-        Message messages = messageRepository.findById(messageId)
+        Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new DiscodeitException(
                 ExceptionType.MESSAGE_NOT_FOUND,
                 Map.of("messageId", messageId)
             ));
 
-        messageRepository.delete(messages);
+        messageRepository.delete(message);
+        log.info("메시지 삭제 완료: messageId={}", message.getId());
     }
 
     public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size) {

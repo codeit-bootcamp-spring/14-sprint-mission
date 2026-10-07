@@ -1,3 +1,4 @@
+*.log
 my-api.json
 .idea
 .gradle

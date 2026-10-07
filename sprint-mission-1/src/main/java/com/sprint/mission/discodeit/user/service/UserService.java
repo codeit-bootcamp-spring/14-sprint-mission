@@ -21,12 +21,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class UserService {
 
@@ -77,6 +79,7 @@ public class UserService {
 
         userStatusRepository.save(UserStatus.create(user));
 
+        log.info("사용자 생성 완료: userId={}", user.getId());
         return userMapper.toDto(user);
     }
 
@@ -114,6 +117,7 @@ public class UserService {
                 Map.of("userId", user.getId()
                 )));
 
+        log.info("사용자 수정 완료: userId={}", user.getId());
         return userMapper.toDto(user);
     }
 
@@ -128,6 +132,8 @@ public class UserService {
         readStatusRepository.deleteAllByUser(user);
         messageRepository.clearAuthor(user);
         userRepository.delete(user);
+
+        log.info("사용자 삭제 완료: userId={}", user.getId());
     }
 
     public List<UserDto> findAll() {
