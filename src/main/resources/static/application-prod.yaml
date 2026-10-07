@@ -1,0 +1,9 @@
+server:
+  prot: 80
+
+spring:
+  datasource:
+    dirver-class-name: org.postresql.Driver
+    url: jdbc:postgresql://운영서버주소:5432/discodeit
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
