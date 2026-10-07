@@ -44,3 +44,6 @@ bin/
 ### Submission-only local files ###
 docs/
 src/main/generated/
+
+### Logs ###
+.logs/
