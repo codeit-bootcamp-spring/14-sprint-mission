@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.application;
 
 import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.userDto.UserResponse;
@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface UserService {
 
-    UserResponse create(UserCreateRequest userCreateRequest);
+  UserResponse create(UserCreateRequest userCreateRequest);
 
-    UserResponse findById(UUID uuid);
+  UserResponse findById(UUID uuid);
 
-    UserResponse update(UserRequest userRequest);
+  UserResponse update(UserRequest userRequest);
 
-    void delete(UUID uuid);
+  void delete(UUID uuid);
 
-    List<UserResponse> readAll();
+  List<UserResponse> readAll();
 }

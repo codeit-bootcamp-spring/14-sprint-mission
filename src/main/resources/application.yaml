@@ -1,0 +1,31 @@
+spring:
+  profiles:
+    default: dev
+
+  application:
+    name: discodeit
+
+  config:
+    import: "optional:file:.env[.properties]"
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        globally_quoted_identifiers: true
+  # 바이너리 컨텐츠 저장
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.domain;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum ChannelType {
-    PUBLIC("공개 채널"),
-    PRIVATE("비공개 채널");
+  PUBLIC("공개 채널"),
+  PRIVATE("비공개 채널");
 
-    String description;
+  String description;
 }

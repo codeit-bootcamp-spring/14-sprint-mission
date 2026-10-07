@@ -1,0 +1,12 @@
+package com.sprint.mission.discodeit.message.application.required;
+
+import com.sprint.mission.discodeit.message.domain.Message;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MessageRepository extends JpaRepository<Message, UUID> {
+
+
+  Optional<Message> findFirstByChannel_IdOrderByCreatedAtDesc(UUID channelId);
+}
