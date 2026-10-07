@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,6 +23,7 @@ public class Channel implements Serializable {
   private Instant createdAt;
   private Instant updatedAt;
   //
+  @Enumerated(EnumType.STRING)
   private ChannelType type;
   private String name;
   private String description;

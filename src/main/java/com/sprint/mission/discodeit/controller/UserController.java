@@ -10,7 +10,9 @@ import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController implements UserApi {
@@ -33,12 +36,14 @@ public class UserController implements UserApi {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Override
   public ResponseEntity<UserDto> create(
-      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto createdUser = userService.create(userCreateRequest, profileRequest);
+    log.info("유저 생성 완료 - userId={}, profileAttached={}",
+        createdUser.id(), createdUser.profileId() != null);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdUser);
@@ -51,12 +56,14 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+    log.info("유저 업데이트 완료 - userId={}, profileAttached={}",
+        updatedUser.id(), updatedUser.profileId() != null);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUser);
@@ -66,6 +73,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
     userService.delete(userId);
+    log.info("유저 삭제 완료 - userId={}", userId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
@@ -83,7 +91,7 @@ public class UserController implements UserApi {
   @PatchMapping(path = "{userId}/userStatus")
   @Override
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
+      @Valid @RequestBody UserStatusUpdateRequest request) {
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
