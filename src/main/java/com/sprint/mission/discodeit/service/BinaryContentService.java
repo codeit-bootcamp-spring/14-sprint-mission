@@ -1,36 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Service
-@RequiredArgsConstructor
-@Transactional
-public class BinaryContentService {
+public interface BinaryContentService {
 
-    private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
-    private final BinaryContentMapper binaryContentMapper;
+  BinaryContentDto create(BinaryContentCreateRequest request);
 
-    @Transactional
-    public BinaryContent uploadFile(String fileName, Long size, String contentType, byte[] bytes) {
-        BinaryContent fileMetadata = BinaryContent.create(fileName, size, contentType);
-        BinaryContent savedMetadata = binaryContentRepository.save(fileMetadata);
-        binaryContentStorage.put(savedMetadata.getId(), bytes);
+  BinaryContentDto find(UUID binaryContentId);
 
-        return savedMetadata;
-    }
+  List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds);
 
-    public BinaryContentDto getFile(UUID fileId) {
-        BinaryContent binaryContent = binaryContentRepository.findById(fileId)
-            .orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다."));
-        return binaryContentMapper.toDto(binaryContent);
-    }
+  void delete(UUID binaryContentId);
 }

@@ -9,51 +9,33 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
-@Getter
 @Entity
 @Table(name = "channels")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel extends BaseUpdatableEntity {
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    ChannelType type;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(length = 100)
+  private String name;
+  @Column(length = 500)
+  private String description;
 
-    @Column(length = 100)
-    String name;
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 
-    @Column(length = 500)
-    String description;
-
-    public enum ChannelType {
-        PUBLIC, PRIVATE
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    private Channel(ChannelType type, String name, String description) {
-        this.type = type;
-        this.name = name;
-        this.description = description;
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
-
-    public static Channel create(ChannelType type, String name, String description) {
-        return new Channel(type, name, description);
-    }
-
-    public void update(String name, String description) {
-        if (name != null) {
-            this.name = name;
-        }
-        if (description != null) {
-            this.description = description;
-        }
-    }
-
-    public void updateType(ChannelType type) {
-        if (type != null) {
-            this.type = type;
-        }
-    }
+  }
 }

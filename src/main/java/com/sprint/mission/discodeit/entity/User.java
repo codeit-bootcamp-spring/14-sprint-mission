@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,59 +12,48 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import lombok.Setter;
 
-@Getter
 @Entity
 @Table(name = "users")
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
 public class User extends BaseUpdatableEntity {
 
-    @Column(nullable = false, unique = true, length = 50)
-    String username;
+  @Column(length = 50, nullable = false, unique = true)
+  private String username;
+  @Column(length = 100, nullable = false, unique = true)
+  private String email;
+  @Column(length = 60, nullable = false)
+  private String password;
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
+  private BinaryContent profile;
+  @JsonManagedReference
+  @Setter(AccessLevel.PROTECTED)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
 
-    @Column(nullable = false, unique = true, length = 100)
-    String email;
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
+  }
 
-    @Column(nullable = false, length = 60)
-    String password;
-
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_id", unique = true)
-    BinaryContent profile;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    UserStatus status;
-
-    private User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent newProfile) {
+    if (newUsername != null && !newUsername.equals(this.username)) {
+      this.username = newUsername;
     }
-
-    public static User create(String username, String email, String password) {
-        return new User(username, email, password);
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
     }
-
-    public void update(String username, String email, BinaryContent profile) {
-        if (username != null) {
-            this.username = username;
-        }
-        if (email != null) {
-            this.email = email;
-        }
-        if (profile != null) {
-            this.profile = profile;
-        }
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
     }
-
-    public void updatePassword(String newPassword) {
-        this.password = newPassword;
+    if (newProfile != null) {
+      this.profile = newProfile;
     }
-
-    public void updateStatus(UserStatus status) {
-        this.status = status;
-    }
+  }
 }

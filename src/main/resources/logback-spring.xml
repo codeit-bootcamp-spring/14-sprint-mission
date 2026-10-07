@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- 1. 로그 패턴 설정 -->
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 2. 콘솔(화면)에 출력하는 설정 -->
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+    <!-- 기본 로그 파일 경로와 이름 -->
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+
+    <!-- 일자별 롤링(분리) 및 보관 기간 설정 -->
+    <file>.logs/discodeit.log</file>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 하루가 지나면 날짜가 붙은 파일로 백업됨 -->
+      <fileNamePattern>.logs/discodeit-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <!-- 로그 파일을 최대 30일간 보관 (30일이 지난 파일은 자동 삭제) -->
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <!-- 3. 파일로 저장하는 설정 -->
+  <property name="LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+  <!-- 4. 스프링 프로파일에 따른 출력 방식 연결 -->
+  <!-- 기본적으로 콘솔과 파일에 모두 로그를 남김 -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+
+</configuration>
