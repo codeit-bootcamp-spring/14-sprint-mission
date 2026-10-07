@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    # H2 인메모리 + PostgreSQL 호환 모드
+    url: jdbc:h2:mem:${random.uuid};MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: never # schema.sql 대신 엔티티 기준으로 스키마 생성
+  jpa:
+    hibernate:
+      ddl-auto: create # 테스트 시작 시 스키마를 새로 만든다
+    open-in-view: false
+  test:
+    database:
+      replace: none # @DataJpaTest가 위 H2 설정(PostgreSQL 모드)을 다른 내장 DB로 바꾸지 않게 한다
+
+logging:
+  level:
+    com.sprint.mission.discodeit: debug
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: build/test-storage

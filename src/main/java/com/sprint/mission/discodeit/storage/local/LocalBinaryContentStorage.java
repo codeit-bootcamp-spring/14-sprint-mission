@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.storage.local;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentStorageException;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -8,8 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -37,21 +40,22 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       try {
         Files.createDirectories(root);
       } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException(e);
+        throw new IllegalStateException("로컬 저장소 디렉터리를 만들 수 없습니다: " + root, e);
       }
     }
+    log.info("로컬 파일 저장소 초기화 완료: root={}", root.toAbsolutePath());
   }
 
   public UUID put(UUID binaryContentId, byte[] bytes) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.exists(filePath)) {
-      throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
+      throw new BinaryContentStorageException("file already exists", binaryContentId);
     }
     try (OutputStream outputStream = Files.newOutputStream(filePath)) {
       outputStream.write(bytes);
+      log.debug("파일 저장 완료: id={}, size={}", binaryContentId, bytes.length);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new BinaryContentStorageException(binaryContentId, e);
     }
     return binaryContentId;
   }
@@ -59,13 +63,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.notExists(filePath)) {
-      throw new NoSuchElementException("File with key " + binaryContentId + " does not exist");
+      throw new BinaryContentNotFoundException(binaryContentId);
     }
     try {
       return Files.newInputStream(filePath);
     } catch (IOException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+      throw new BinaryContentStorageException(binaryContentId, e);
     }
   }
 
@@ -76,6 +79,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Override
   public ResponseEntity<Resource> download(BinaryContentDto metaData) {
     InputStream inputStream = get(metaData.id());
+    log.info("파일 다운로드: id={}, fileName={}", metaData.id(), metaData.fileName());
     Resource resource = new InputStreamResource(inputStream);
 
     return ResponseEntity

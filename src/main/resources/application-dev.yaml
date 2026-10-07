@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: ${DB_PASSWORD}
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.sprint.mission.discodeit: debug

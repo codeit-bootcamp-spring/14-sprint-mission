@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.dto.request;
 
+import jakarta.validation.constraints.Size;
+
 public record PublicChannelUpdateRequest(
-    String newName,
-    String newDescription
+    @Size(min = 1, max = 100) String newName,
+    @Size(max = 500) String newDescription
 ) {
 
 }
