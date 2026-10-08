@@ -15,8 +15,6 @@ spring:
     encoding:
       charset: UTF-8
       force: true
-  profiles:
-    active: dev
 
 springdoc:
   swagger-ui:
