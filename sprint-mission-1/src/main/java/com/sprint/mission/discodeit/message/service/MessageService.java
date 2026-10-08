@@ -81,11 +81,12 @@ public class MessageService {
             }
         }
 
-        Message message = new Message(user, channel, messageCreateRequestDto.content(),
-            binaryContents);
+        Message message = messageRepository.save(
+            new Message(user, channel, messageCreateRequestDto.content(),
+                binaryContents));
 
         log.info("메시지 생성 완료: messageId={}", message.getId());
-        return messageMapper.toDto(messageRepository.save(message));
+        return messageMapper.toDto(message);
     }
 
     @Transactional
