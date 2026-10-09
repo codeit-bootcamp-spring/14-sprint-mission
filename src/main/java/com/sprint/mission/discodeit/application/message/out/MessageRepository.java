@@ -1,0 +1,29 @@
+package com.sprint.mission.discodeit.application.message.out;
+
+import com.sprint.mission.discodeit.domain.message.Message;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.time.Instant;
+import java.util.UUID;
+
+public interface MessageRepository
+        extends JpaRepository<Message, UUID>, MessageRepositoryCustom {
+    void deleteAllByChannel_Id(UUID channelId);
+
+    @Query("""
+            SELECT DISTINCT m FROM Message m
+            LEFT JOIN FETCH m.attachments
+            LEFT JOIN FETCH m.author a
+            LEFT JOIN FETCH a.status
+            LEFT JOIN FETCH a.profile
+            WHERE m.channel.id=:channelId AND m.createdAt < :cursor"""
+    )
+    Slice<Message> findAllByChannelId(
+            UUID channelId,
+            Instant cursor,
+            Pageable pageable
+    );
+}

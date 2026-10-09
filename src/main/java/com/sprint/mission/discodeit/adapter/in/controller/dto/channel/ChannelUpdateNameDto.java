@@ -1,0 +1,8 @@
+package com.sprint.mission.discodeit.adapter.in.controller.dto.channel;
+
+
+import jakarta.validation.constraints.NotNull;
+
+public record ChannelUpdateNameDto(@NotNull String newName,
+                                   @NotNull String newDescription) {
+}

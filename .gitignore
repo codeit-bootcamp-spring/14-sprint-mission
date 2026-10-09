@@ -47,3 +47,9 @@ bin/
 
 ### FileRepository data files ###
 *.ser
+
+## api test ##
+postman/
+
+### BinaryContent Local Stroage ###
+src/main/java/com/sprint/mission/discodeit/storage/storage/**
