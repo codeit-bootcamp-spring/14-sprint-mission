@@ -28,7 +28,7 @@ public class BasicAuthService implements AuthService {
             () -> new UserNotFoundByUsernameException(username));
 
     if (!user.getPassword().equals(password)) {
-      throw new InvalidPasswordException(user.getPassword());
+      throw new InvalidPasswordException(user.getUsername());
     }
 
     return userMapper.toDto(user, null);
