@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.user.application.basic;
 
 import com.sprint.mission.discodeit.binaryContent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.user.dto.UserCreateRequestDto;
+import com.sprint.mission.discodeit.user.dto.UserDto;
 import com.sprint.mission.discodeit.user.dto.UserResponseDto;
 import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.binaryContent.domain.BinaryContent;
@@ -9,12 +10,14 @@ import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.domain.UserStatus;
 import com.sprint.mission.discodeit.common.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.common.exception.DuplicateUsernameException;
-import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
+import com.sprint.mission.discodeit.common.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.user.application.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -33,17 +37,20 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
-    public UserResponseDto create(UserCreateRequestDto userRequestDto, MultipartFile profile) {
+    public UserDto create(UserCreateRequestDto userRequestDto, MultipartFile profile) {
 
         //findByUsername, findByEmail 구현하기
         if (this.findByUsername(userRequestDto.username()).isPresent()) {
-            throw new DuplicateUsernameException();
+            log.warn("사용자 생성 실패 - 중복 username: username = {}", userRequestDto.username());
+            throw new DuplicateUsernameException(userRequestDto.username());
         }
         if (this.findByEmail(userRequestDto.email()).isPresent()) {
-            throw new DuplicateEmailException();
+            log.warn("사용자 생성 실패 - 중복 email: email = {}", userRequestDto.email());
+            throw new DuplicateEmailException(userRequestDto.email());
         }
 
         User user = User.create(userRequestDto.username(), userRequestDto.email(), userRequestDto.password());
@@ -57,7 +64,8 @@ public class BasicUserService implements UserService {
             binaryContentRepository.save(binaryContent);
             try {
                 binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
-            } catch (IOException e){
+            } catch (IOException e) {
+                log.error("사용자 생성 중 프로필 이미지 저장 실패 - username = {}", userRequestDto.username(), e);
                 throw new UncheckedIOException(e);
             }
             user.updateProfile(binaryContent);
@@ -68,8 +76,8 @@ public class BasicUserService implements UserService {
 
         userRepository.save(user);  // 영속성 전이로 자식까지 넣음
 
-
-        return UserResponseDto.from(user, userStatus);
+        log.info("사용자 생성 성공 - userId = {}, username = {}", user.getId(), user.getUserName());
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -86,26 +94,27 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDto find(UUID id) {
+    public UserDto find(UUID id) {
         User user = userCheck(id);
-        UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
-        return UserResponseDto.from(user, userStatus);
+        log.debug("사용자 조회 성공 - userId = {}", id);
+        return userMapper.toDto(user);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponseDto> findAll() {
+    public List<UserDto> findAll() {
 
-        return userRepository.findAll().stream()
-                .map(user -> find(user.getId()))
+        List<UserDto> users = userRepository.findAll().stream()
+                .map(userMapper::toDto)
                 .toList();
+        log.debug("사용자 목록 조회 성공 - count = {}", users.size());
+        return users;
     }
 
     @Override
     @Transactional
-    public UserResponseDto update(UUID id, UserUpdateRequestDto userUpdateRequestDto, MultipartFile profile) {
+    public UserDto update(UUID id, UserUpdateRequestDto userUpdateRequestDto, MultipartFile profile) {
         User user = userCheck(id);
-        UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow();
         // 사진이 있으면
         if (profile != null) {
 
@@ -114,14 +123,21 @@ public class BasicUserService implements UserService {
                     profile.getContentType());
 
             user.updateProfile(binaryContent);
-//                binaryContentRepository.save(binaryContent);
+            binaryContentRepository.save(binaryContent);
+            try {
+                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+            } catch (IOException e) {
+                log.error("사용자 수정 중 프로필 이미지 저장 실패 - userId = {}", id, e);
+                throw new UncheckedIOException(e);
+            }
 
 
         }
 
         user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newEmail(), userUpdateRequestDto.newPassword());
 
-        return UserResponseDto.from(user, userStatus);
+        log.info("사용자 수정 성공 - userId = {}, profileChanged = {}", id, profile != null);
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -136,11 +152,15 @@ public class BasicUserService implements UserService {
 //        userStatusRepository.deleteByUserId(user.getId());
         // 유저 삭제
         userRepository.deleteById(id);
+        log.info("사용자 삭제 성공 - userId = {}", id);
     }
 
 
     private User userCheck(UUID id) {
 
-        return userRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return userRepository.findById(id).orElseThrow(() -> {
+            log.warn("사용자 찾기 실패 - 존재하지 않는 사용자: userId = {}", id);
+            return new UserNotFoundException(id);
+        });
     }
 }

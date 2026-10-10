@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService extends BasicService<Channel> {
-    ChannelResponseDto publicCreate(PublicChannelCreateRequest channelCreateRequestDto);
+    ChannelDto publicCreate(PublicChannelCreateRequest channelCreateRequestDto);
 
-    ChannelResponseDto privateCreate(PrivateChannelCreateRequest channelCreateRequestDto);
+    ChannelDto privateCreate(PrivateChannelCreateRequest channelCreateRequestDto);
 
-    ChannelResponseDto update(UUID id, ChannelUpdateRequestDto request);
+    ChannelDto update(UUID id, ChannelUpdateRequestDto request);
 
-    ChannelFindResponseDto find(UUID id);
-    List<ChannelFindResponseDto> findAllByUserId(UUID userId);
+    ChannelDto find(UUID id);
+    List<ChannelDto> findAllByUserId(UUID userId);
 
 }

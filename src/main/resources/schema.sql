@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS user_statuses CASCADE;
 DROP TABLE IF EXISTS channels CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS binary_contents CASCADE;
-DROP TABLE IF EXISTS message_attachment CASCADE;
+DROP TABLE IF EXISTS message_attachments CASCADE;
 
 create table binary_contents
 (
@@ -66,7 +66,7 @@ create table messages
     author_id  UUID        references users (id) on delete set null
 );
 
-create table message_attachment
+create table message_attachments
 (
     message_id    UUID not null references messages (id) on delete CASCADE,
     attachment_id UUID not null references binary_contents (id) on DELETE CASCADE

@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=discodeit
+      - POSTGRES_USER=discodeit_user
+      - POSTGRES_PASSWORD=discodeit1234
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U discodeit_user -d discodeit"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  spring-app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/discodeit
+      - SPRING_DATASOURCE_USERNAME=discodeit_user
+      - SPRING_DATASOURCE_PASSWORD=discodeit1234
+    volumes:
+      - log-data:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    volumes:
+      - log-data:/var/log/app:ro
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    depends_on:
+      - elasticsearch
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+volumes:
+  log-data:
+  pg-data:

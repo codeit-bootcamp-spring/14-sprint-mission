@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.common.exception;
 
-public class DuplicateUsernameException extends DiscodeitException{
+import java.util.Collections;
 
-    public DuplicateUsernameException(){
-        super(ErrorCode.DUPLICATE_USERNAME);
+public class DuplicateUsernameException extends UserException {
+
+    public DuplicateUsernameException(String username) {
+        super(ErrorCode.DUPLICATE_USERNAME, Collections.singletonMap("username", username));
     }
-
 }

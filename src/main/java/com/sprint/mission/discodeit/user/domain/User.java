@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.user.domain;
 
+import com.sprint.mission.discodeit.common.exception.InvalidUserInputException;
 import com.sprint.mission.discodeit.binaryContent.domain.BinaryContent;
 import com.sprint.mission.discodeit.common.entity.BaseUpdatableEntity;
 import jakarta.annotation.Nullable;
@@ -83,19 +84,19 @@ public class User extends BaseUpdatableEntity {
 
     private static void validateUserName(String userName){
         if(userName == null || userName.isBlank()){
-            throw new IllegalArgumentException("userName은 비어 있을 수 없습니다.");
+            throw new InvalidUserInputException("username", "username은 비어 있을 수 없습니다.");
         }
     }
 
     private static void validateEmail(String email){
         if(email == null || email.isBlank() || !email.contains("@")){
-            throw new IllegalArgumentException("올바른 email 형식이 아닙니다.");
+            throw new InvalidUserInputException("email", "올바른 email 형식이 아닙니다.");
         }
     }
 
     private static void validatePassword(String password){
         if(password == null || password.isBlank()){
-            throw new IllegalArgumentException("password는 비어있을 수 없습니다.");
+            throw new InvalidUserInputException("password", "password는 비어있을 수 없습니다.");
         }
     }
 
