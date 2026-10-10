@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.message.dto.MessageDto;
 import com.sprint.mission.discodeit.message.dto.MessageResponseDto;
 import com.sprint.mission.discodeit.message.application.MessageService;
 import com.sprint.mission.discodeit.message.dto.MessageUpdateRequestDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public MessageDto create(@RequestPart(value = "messageCreateRequest") MessageCreateRequestDto request,
+    public MessageDto create(@Valid @RequestPart(value = "messageCreateRequest") MessageCreateRequestDto request,
                              @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments){
         log.debug("메시지 생성 요청 - channelId : {}, authorId : {}, attachments : {}",
                 request.channelId(), request.authorId(), attachments == null ? 0 : attachments.size());
@@ -38,7 +39,7 @@ public class MessageController {
 
     @PatchMapping(value = "/{messageId}")
     public MessageDto update(@PathVariable UUID messageId,
-                                     @RequestBody MessageUpdateRequestDto request){
+                                     @Valid @RequestBody MessageUpdateRequestDto request){
         log.debug("메시지 수정 요청 - messageId : {}", messageId);
         return messageService.update(messageId, request);
     }

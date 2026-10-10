@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.user.application.UserService;
 import com.sprint.mission.discodeit.user.application.UserStatusService;
 import com.sprint.mission.discodeit.user.dto.userStatus.UserStatusUpdateRequestDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserDto create(@RequestPart(value = "userCreateRequest") UserCreateRequestDto request,
+    public UserDto create(@Valid @RequestPart(value = "userCreateRequest") UserCreateRequestDto request,
                           @RequestPart(value = "profile", required = false) MultipartFile profile){
         log.debug("사용자 생성 요청 - username : {}, hasProfile : {}", request.username(), profile != null);
         return userService.create(request, profile);
@@ -39,7 +40,7 @@ public class UserController {
 
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserDto update(@PathVariable UUID userId,
-                       @RequestPart("userUpdateRequest") UserUpdateRequestDto request,
+                       @Valid @RequestPart("userUpdateRequest") UserUpdateRequestDto request,
                        @RequestPart(value = "profile", required = false) MultipartFile profile){
         log.debug("사용자 수정 요청 - userId : {}, hasProfile : {}", userId, profile != null);
         return userService.update(userId, request, profile);

@@ -142,6 +142,9 @@ public class BasicChannelService implements ChannelService {
 
     private ChannelDto privateChannelCreate(Channel channel, List<UUID> userIds) {
 
+        // ReadStatus가 채널을 참조하므로 채널을 먼저 저장 (참여자 확인 실패 시 트랜잭션 롤백)
+        channelRepository.save(channel);
+
         List<User> participants = new ArrayList<>();
         for (UUID userId : userIds) {
             User user = userRepository.findById(userId).orElseThrow(() -> {
@@ -157,7 +160,6 @@ public class BasicChannelService implements ChannelService {
             log.debug("readStatus 생성 성공 - readStatusId = {}", readStatus.getId());
         }
 
-        channelRepository.save(channel);
         log.info("privateChannel 생성 성공 - channelId = {}", channel.getId());
         return channelMapper.toDto(channel, participants, null);
     }

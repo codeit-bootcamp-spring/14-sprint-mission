@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.message.dto;
 
-import com.sprint.mission.discodeit.message.domain.Message;
+import jakarta.validation.constraints.NotBlank;
 
-import java.util.List;
-import java.util.UUID;
-
-public record MessageUpdateRequestDto(String newContent
-                                      ) {
+public record MessageUpdateRequestDto(
+        @NotBlank(message = "수정할 메시지 내용은 필수입니다.")
+        String newContent
+) {
 
 
 //    public Message toEntity(){
