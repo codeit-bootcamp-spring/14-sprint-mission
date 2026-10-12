@@ -49,16 +49,16 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-    log.debug("메세지 생성 시작"); /* TODO: 이럴땐 뭐찍어야하지? 질문하기 debug, trace? 아니면 컨트롤러에 info? */
+    log.info("메시지 생성 요청 - 채널아이디: {} 유저아이디: {} 첨부파일 수: {}",
+        messageCreateRequest.channelId(), messageCreateRequest.authorId(),
+        binaryContentCreateRequests.size());
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
 
     if (!channelRepository.existsById(channelId)) {
-      log.warn("조회된 채널 없음 - 채널아이디: {}", channelId);
       throw new ChannelNotFoundException(channelId);
     }
     if (!userRepository.existsById(authorId)) {
-      log.warn("조회된 유저 없음 - 유저아이디: {}", authorId);
       throw new UserNotFoundException(authorId);
     }
 
@@ -85,7 +85,6 @@ public class BasicMessageService implements MessageService {
         author
     );
     Message target = messageRepository.save(message);
-    log.debug("메세지 생성 요청 - 메세지아이디: {}", target.getId());
     return messageMapper.toDto(target, attachmentIds);
   }
 
@@ -109,35 +108,26 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
-    log.debug("메세지 업데이트 시작 - 수정할 메세지아이디: {}", messageId);
+    log.info("메시지 업데이트 요청 - 메세지아이디: {}", messageId);
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(
-            () -> {
-              log.warn("존재하지 않는 메세지 조회- 메세지아이디: {}", messageId);
-              return new MessageNotFoundException(messageId);
-            });
+        .orElseThrow(() -> new MessageNotFoundException(messageId));
     message.update(newContent);
-    log.debug("메세지 업데이트 요청 - 메세지아이디: {}", message.getId());
     return messageMapper.toDto(message, attachmentIds(message.getId()));
   }
 
   @Override
   @Transactional
   public void delete(UUID messageId) {
-    log.debug("메세지 삭제 시작 - 삭제할 메세지 아이디: {}", messageId);
+    log.info("메시지 삭제 요청 - 메세지아이디: {}", messageId);
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> {
-          log.warn("존재하지 않는 메세지 조회- 메세지아이디: {}", messageId);
-          return new MessageNotFoundException(messageId);
-        });
+        .orElseThrow(() -> new MessageNotFoundException(messageId));
 
     messageAttachmentsRepository.findAllByMessageId(messageId).stream()
         .map(MessageAttachments::getAttachment)
         .forEach(binaryContentRepository::delete);
 
     messageRepository.delete(message);
-    log.debug("메세지 삭제 요청 - 삭제된 메세지 아이디: {}", message.getId());
   }
 
   private List<UUID> attachmentIds(UUID messageId) {
