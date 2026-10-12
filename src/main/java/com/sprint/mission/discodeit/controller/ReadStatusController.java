@@ -28,34 +28,24 @@ public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
-   @PostMapping
+    @PostMapping
     public ResponseEntity<ReadStatusDto> create(
         @Valid @RequestBody ReadStatusCreateRequest request) {
-        log.info("create 정상 작동. channelId:{}", request.channelId());
-
-        ReadStatusDto created = readStatusService.create(request);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        log.info("create 요청. userId:{}, channelId:{}", request.userId(), request.channelId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(readStatusService.create(request));
     }
-
 
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<ReadStatusDto> update(
         @PathVariable UUID readStatusId,
-        @RequestBody ReadStatusUpdateRequest request) {
-
-        log.info("update 정상 작동.");
-        ReadStatusDto updated = readStatusService.update(readStatusId, request);
-        return ResponseEntity.ok(updated);
+        @Valid @RequestBody ReadStatusUpdateRequest request) {
+        log.info("update 요청. readStatusId:{}", readStatusId);
+        return ResponseEntity.ok(readStatusService.update(readStatusId, request));
     }
 
     @GetMapping
-    public ResponseEntity<List<ReadStatusDto>> findAllByUserId(
-        @RequestParam UUID userId) {
-        log.info("findAllByUserId 정상 작동. Id:{}", userId);
-
-        List<ReadStatusDto> findAllUser = readStatusService.findAllByUserId(userId);
-
-        return ResponseEntity.ok(findAllUser);
+    public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam UUID userId) {
+        log.info("findAllByUserId 요청. userId:{}", userId);
+        return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
     }
 }

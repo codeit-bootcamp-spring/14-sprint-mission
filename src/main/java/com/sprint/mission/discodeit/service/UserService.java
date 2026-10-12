@@ -5,25 +5,18 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-
 
 public interface UserService {
 
-    UserDto create(UserCreateRequest request,
-        BinaryContentCreateRequest profileImageRequest);
+    UserDto create(UserCreateRequest request, BinaryContentCreateRequest profileRequest);
 
-    Optional<UserDto> findById(UUID id);
+    UserDto find(UUID userId);
 
     List<UserDto> findAll();
 
-    UserDto update(UUID id, UserUpdateRequest request,
-        BinaryContentCreateRequest profileImageRequest);
+    UserDto update(UUID userId, UserUpdateRequest request,
+        BinaryContentCreateRequest profileRequest);
 
-    void  delete(UUID id);
-
-
-
-
+    void delete(UUID userId);
 }
