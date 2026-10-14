@@ -16,7 +16,7 @@ public class AuthApplication {
     private final UserService userService;
 
     @MutationLog
-    @Transactional(readOnly = true)
+    @Transactional
     public UserDto login(String name, String password) {
         User retrieved = userService.findByNameAndPassword(name, password);
         retrieved.updateLastActiveAt(Instant.now());
