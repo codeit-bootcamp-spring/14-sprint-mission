@@ -84,4 +84,19 @@ public class Channel extends BaseUpdatableEntity {
     public boolean isPublic() {
         return type.equals(ChannelType.PUBLIC);
     }
+
+    public void validateAccessible(
+            boolean participating,
+            UUID userId
+    ) {
+        if (isPrivate() && !participating) {
+            throw new ChannelException(
+                    ChannelExceptionType.NO_ACCESS_TO_CHANNEL,
+                    Map.of(
+                            "channel", getId(),
+                            "userId", userId
+                    )
+            );
+        }
+    }
 }

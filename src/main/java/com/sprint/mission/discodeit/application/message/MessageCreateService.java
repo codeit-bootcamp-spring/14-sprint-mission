@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.application.message;
 import com.sprint.mission.discodeit.adapter.in.controller.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.channel.Channel;
-import com.sprint.mission.discodeit.domain.channel.ChannelException;
-import com.sprint.mission.discodeit.domain.channel.ChannelExceptionType;
 import com.sprint.mission.discodeit.application.channel.ChannelService;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.domain.user.User;
@@ -16,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -34,15 +31,8 @@ public class MessageCreateService {
         User user = userService.findById(userId);
         Channel channel = channelService.findById(channelId);
 
-        if (channel.isPrivate() && !readStatusService.existsByUserAndChannel(userId, channelId)) {
-            throw new ChannelException(
-                    ChannelExceptionType.NO_ACCESS_TO_CHANNEL,
-                    Map.of(
-                            "channel", channelId,
-                            "userId", userId
-                    )
-            );
-        }
+        boolean participating = readStatusService.existsByUserAndChannel(userId, channelId);
+        channel.validateAccessible(participating, userId);
 
         List<BinaryContent> createdAttachments = createFiles(createFileCommands);
         Message created = messageService.create(
