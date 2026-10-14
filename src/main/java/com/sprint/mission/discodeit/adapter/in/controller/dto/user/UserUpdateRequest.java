@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.adapter.in.controller.dto.user;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-public record UserUpdateRequest(@NotBlank String newUsername,
-                                @NotBlank @Email String newEmail,
-                                @NotBlank String newPassword) {
+public record UserUpdateRequest(@Nullable @Size(max = 50) String newUsername,
+                                @Nullable @Email @Size(max = 50) String newEmail,
+                                @Nullable String newPassword) {
 
 }
