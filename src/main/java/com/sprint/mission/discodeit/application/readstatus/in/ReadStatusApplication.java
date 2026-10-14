@@ -44,6 +44,7 @@ public class ReadStatusApplication {
     }
 
     @MutationLog
+    @Transactional
     public ReadStatusResponse updateReadStatus(UUID publicReadStatusId, Instant newLastReadAt) {
         ReadStatus updated = readStatusService.update(publicReadStatusId, newLastReadAt);
         return ReadStatusResponse.of(updated);
