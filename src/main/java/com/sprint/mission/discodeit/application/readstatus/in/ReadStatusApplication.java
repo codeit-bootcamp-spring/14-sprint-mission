@@ -28,6 +28,7 @@ public class ReadStatusApplication {
     public ReadStatusResponse create(UUID userId, UUID channelId, Instant lastReadAt) {
         User user = userService.findById(userId);
         Channel channel = channelService.findById(channelId);
+        channel.validateReadStatusAllowed();
         ReadStatus created = readStatusService.create(
                 ReadStatus.of(user, channel, lastReadAt)
         );

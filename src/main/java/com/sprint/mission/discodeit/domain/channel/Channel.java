@@ -8,10 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -96,6 +93,15 @@ public class Channel extends BaseUpdatableEntity {
                             "channel", getId(),
                             "userId", userId
                     )
+            );
+        }
+    }
+
+    public void validateReadStatusAllowed() {
+        if (isPublic()) {
+            throw new ChannelException(
+                    ChannelExceptionType.READ_STATUS_NOT_ALLOWED,
+                    Collections.emptyMap()
             );
         }
     }
