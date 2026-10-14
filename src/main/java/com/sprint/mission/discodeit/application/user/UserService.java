@@ -88,7 +88,7 @@ public class UserService {
             throw new UserException(
                     UserExceptionType.USER_UNIQUE_FIELD_CONFLICT,
                     Map.of(
-                            "name,", name,
+                            "username,", name,
                             "email", email
                     )
             );
