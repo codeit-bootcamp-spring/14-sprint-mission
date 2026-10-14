@@ -22,10 +22,7 @@ public class ChannelService {
 
     public Channel findById(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> new ChannelException(
-                        ChannelExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE,
-                        Map.of("id", id)
-                ));
+                .orElseThrow(() -> getChannelNotFoundException(id));
     }
 
     public List<Channel> findAccessibleByUserId(UUID userId) {
@@ -44,10 +41,14 @@ public class ChannelService {
 
     public void validateExists(UUID id) {
         if (!channelRepository.existsById(id)) {
-            throw new ChannelException(
-                    ChannelExceptionType.CHANNEL_NOT_FOUND_IN_DATABASE,
-                    Map.of("id", id)
-            );
+            throw getChannelNotFoundException(id);
         }
+    }
+
+    private ChannelException getChannelNotFoundException(UUID id) {
+        return new ChannelException(
+                ChannelExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("id", id)
+        );
     }
 }
