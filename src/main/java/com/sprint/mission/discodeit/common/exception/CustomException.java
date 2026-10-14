@@ -13,7 +13,11 @@ public abstract class CustomException extends RuntimeException{
     private final Map<String, Object> details;
 
     protected CustomException(ExceptionType type, Map<String, Object> details) {
-        super(type.getTitle() + type.getDescription());
+        this(type, details, null);
+    }
+
+    protected CustomException(ExceptionType type, Map<String, Object> details, Exception cause) {
+        super(type.getTitle() + type.getDescription(), cause);
         this.timestamp = Instant.now();
         this.type = type;
         this.details = details;

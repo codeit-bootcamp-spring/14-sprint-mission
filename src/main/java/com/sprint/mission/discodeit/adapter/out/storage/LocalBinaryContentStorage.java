@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.adapter.out.storage;
 
 import com.sprint.mission.discodeit.application.binarycontent.out.BinaryContentStorage;
 import com.sprint.mission.discodeit.adapter.in.controller.dto.binaryContent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.common.log.MutationLog;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -43,11 +43,13 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
         try {
             Files.createDirectory(root);
+            log.info("LocalStorage 경로 디렉토리 생성 완료");
         } catch (IOException e) {
-            throw new StorageException(StorageExceptionType.LOCAL_STORAGE_DIRECTORY_CREATION_FAILED, Collections.emptyMap());
+            throw new StorageException(StorageExceptionType.LOCAL_STORAGE_DIRECTORY_CREATION_FAILED, Collections.emptyMap(), e);
         }
     }
 
+    @MutationLog
     @Override
     public UUID put(UUID id, byte[] bytes) {
         Path path = resolvePath(id);
@@ -58,7 +60,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             Files.write(path, bytes);
         } catch (IOException e) {
-            throw new StorageException(StorageExceptionType.LOCAL_STORAGE_FILE_CREATION_FAILED, Collections.emptyMap());
+            throw new StorageException(StorageExceptionType.LOCAL_STORAGE_FILE_CREATION_FAILED, Collections.emptyMap(), e);
         }
         return id;
     }
@@ -73,7 +75,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             return Files.newInputStream(path);
         } catch (IOException e) {
-            throw new StorageException(StorageExceptionType.LOCAL_STORAGE_FILE_READ_FAILED, Collections.emptyMap());
+            throw new StorageException(StorageExceptionType.LOCAL_STORAGE_FILE_READ_FAILED, Collections.emptyMap(), e);
         }
     }
 
