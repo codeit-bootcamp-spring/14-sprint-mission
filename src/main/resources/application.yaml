@@ -2,7 +2,7 @@ spring:
   application:
     name: discodeit
   profiles:
-    default: dev
+    default: prod
   servlet:
     multipart:
       max-file-size: 10MB # 파일 하나의 최대 크기
