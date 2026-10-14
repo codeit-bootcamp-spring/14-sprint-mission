@@ -16,8 +16,10 @@ public record PageResponse<T, S>(
             Slice<T> slice,
             Function<T, S> nextCursorExtractor
     ) {
-        T last = slice.getContent().get(slice.getContent().size() - 1);
-        S nextCursor = nextCursorExtractor.apply(last);
+        S nextCursor = slice.hasContent()
+                ? nextCursorExtractor.apply(
+                        slice.getContent().get(slice.getNumberOfElements() - 1))
+                : null;
 
         return new PageResponse<>(
                 slice.getContent(),
