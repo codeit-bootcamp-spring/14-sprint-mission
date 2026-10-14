@@ -48,22 +48,12 @@ public class ReadStatusService {
         return updating.update(newLastReadAt);
     }
 
-    public void deleteByUserId(UUID userId) {
-        ReadStatus deleting = findByUserId(userId);
-        readStatusRepository.delete(deleting);
-    }
-
-    private ReadStatus findByUserId(UUID userId) {
-        return readStatusRepository.findByUser_Id(userId);
+    public void deleteAllByUserId(UUID userId) {
+        readStatusRepository.deleteAllByUser_Id(userId);
     }
 
     public void deleteByChannelId(UUID channelId) {
-        ReadStatus deleting = findByChannelId(channelId);
-        readStatusRepository.delete(deleting);
-    }
-
-    private ReadStatus findByChannelId(UUID channelId) {
-        return readStatusRepository.findByChannel_Id(channelId);
+        readStatusRepository.deleteAllByChannel_Id(channelId);
     }
 
     private void validateUserAndChannelAvailable(ReadStatus readStatus) {

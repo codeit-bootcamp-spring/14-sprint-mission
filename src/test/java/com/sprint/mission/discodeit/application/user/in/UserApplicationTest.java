@@ -239,7 +239,8 @@ class UserApplicationTest {
 
         userApplication.deleteAccount(userId);
 
-        verify(readStatusService).deleteByUserId(userId);
+        verify(userService).validateExistsById(userId);
+        verify(readStatusService).deleteAllByUserId(userId);
         verify(userService).deleteById(userId);
     }
 

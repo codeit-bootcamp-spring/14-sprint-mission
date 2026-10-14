@@ -79,6 +79,7 @@ public class ChannelApplication {
     @Transactional
     public void deleteChannel(UUID id) {
         // 채널 내부 message 삭제
+        channelService.validateExists(id);
         messageService.deleteAllByChannelId(id);
         readStatusService.deleteByChannelId(id);
         channelService.deleteById(id);

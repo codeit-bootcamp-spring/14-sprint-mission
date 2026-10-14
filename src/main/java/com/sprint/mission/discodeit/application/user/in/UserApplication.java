@@ -74,7 +74,8 @@ public class UserApplication {
     @MutationLog
     @Transactional
     public void deleteAccount(UUID id) {
-        readStatusService.deleteByUserId(id);
+        userService.validateExistsById(id);
+        readStatusService.deleteAllByUserId(id);
         userService.deleteById(id);
     }
 
