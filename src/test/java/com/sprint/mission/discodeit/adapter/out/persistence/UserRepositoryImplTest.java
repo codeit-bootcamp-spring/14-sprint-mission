@@ -19,17 +19,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({
         QueryDslConfig.class,
-        UserRepositoryCustomImpl.class,
+        UserRepositoryImpl.class,
 })
 @DataJpaTest(
         excludeAutoConfiguration = DataJpaRepositoriesAutoConfiguration.class
 )
-class UserRepositoryCustomImplTest {
+class UserRepositoryImplTest {
     @Autowired
     TestEntityManager em;
 
     @Autowired
-    UserRepositoryCustomImpl userRepository;
+    UserRepositoryImpl userRepository;
 
     @Test
     @DisplayName("User 다건 조회 성공")
