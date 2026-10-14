@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -61,14 +62,12 @@ public class User extends BaseUpdatableEntity {
     public User(String username, String email, String password, @Nullable BinaryContent profile) {
         super();
         if (Objects.isNull(username) || Objects.isNull(email) || Objects.isNull(password)) {
-            throw new UserException(
-                    UserExceptionType.USER_MISSING_UPSERT_ARGUMENT,
-                    Map.of(
-                            "username", username,
-                            "email", email,
-                            "password", password
-                    )
-            );
+            Map<String, Object> details = new HashMap<>();
+            details.put("username", username);
+            details.put("email", email);
+            details.put("password", password);
+
+            throw new UserException(UserExceptionType.USER_MISSING_UPSERT_ARGUMENT, details);
         }
         this.username = username;
         this.email = email;
@@ -76,7 +75,7 @@ public class User extends BaseUpdatableEntity {
         assignIfNotNull(profile, () -> this.profile = profile);
     }
 
-    public User update(String username, String email, String password, @Nullable BinaryContent profile) {
+    public User update(String username, String email, String password, BinaryContent profile) {
         assignIfNotNull(username, () -> this.username = username);
         assignIfNotNull(email, () -> this.email = email);
         assignIfNotNull(password, () -> this.password = password);
