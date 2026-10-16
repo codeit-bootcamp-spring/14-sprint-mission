@@ -2,15 +2,20 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.1.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.sprint.mission'
-version = '0.0.1-SNAPSHOT'
+version = '1.2-M8'
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+springBoot {
+    buildInfo()
 }
 
 repositories {
@@ -46,12 +51,27 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // AWS
+    implementation 'software.amazon.awssdk:s3:2.31.7'
 }
 
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
 
 tasks.named('test') {
+    finalizedBy jacocoTestReport
     useJUnitPlatform()
     testLogging {
         showStandardStreams = true
     }
+}
+
+tasks.named('jar') {
+    enabled = false
 }

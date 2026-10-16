@@ -1,8 +1,4 @@
 spring:
-  datasource:
-    url: ${DATABASE_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -16,4 +12,10 @@ logging:
     org.hibernate.SQL: info
 
 server:
-  port: 8080
+  port: 80
+
+management:
+  endpoint:
+    health:
+      show-details: never
+  info.env.enabled: false

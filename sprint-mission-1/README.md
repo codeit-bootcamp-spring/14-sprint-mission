@@ -1,3 +1,1 @@
-# 프로그램 개요
-
-# 시나리오
+[![codecov](https://codecov.io/github/kim-yejunn/14-sprint-mission/branch/%EA%B9%80%EC%98%88%EC%A4%80/graph/badge.svg?token=MHAHCFVFYV)](https://codecov.io/github/kim-yejunn/14-sprint-mission/tree/%EA%B9%80%EC%98%88%EC%A4%80)
