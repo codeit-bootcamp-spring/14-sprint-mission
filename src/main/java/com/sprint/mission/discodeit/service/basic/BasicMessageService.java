@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.repository.MessageAttachmentsRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final MessageAttachmentsRepository messageAttachmentsRepository;
   private final MessageMapper messageMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -65,16 +67,16 @@ public class BasicMessageService implements MessageService {
     Channel channel = channelRepository.getReferenceById(channelId);
     User author = userRepository.getReferenceById(authorId);
 
-    List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+    List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
           String fileName = attachmentRequest.fileName();
           String contentType = attachmentRequest.contentType();
           byte[] bytes = attachmentRequest.bytes();
 
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-          return createdBinaryContent.getId();
+              contentType);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContentRepository.save(binaryContent);
         })
         .toList();
 
@@ -85,22 +87,27 @@ public class BasicMessageService implements MessageService {
         author
     );
     Message target = messageRepository.save(message);
-    return messageMapper.toDto(target, attachmentIds);
+    messageAttachmentsRepository.saveAll(attachments.stream()
+        .map(attachment -> new MessageAttachments(target, attachment))
+        .toList());
+    return messageMapper.toDto(target, attachments);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
-        .map(message -> messageMapper.toDto(message, attachmentIds(message.getId())))
+        .map(message -> messageMapper.toDto(message, attachments(message.getId())))
         .orElseThrow(
             () -> new MessageNotFoundException(messageId));
   }
 
   @Override
+  @Transactional(readOnly = true)
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page) {
     Slice<MessageDto> messages = messageRepository.findAllByChannelId(
             channelId, PageRequest.of(page, 50, Sort.by("createdAt").descending()))
-        .map(message -> messageMapper.toDto(message, attachmentIds(message.getId())));
+        .map(message -> messageMapper.toDto(message, attachments(message.getId())));
     return new PageResponse<>(
         messages.getContent(), messages.getNumber(), messages.getSize(), null);
   }
@@ -113,7 +120,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new MessageNotFoundException(messageId));
     message.update(newContent);
-    return messageMapper.toDto(message, attachmentIds(message.getId()));
+    return messageMapper.toDto(message, attachments(message.getId()));
   }
 
   @Override
@@ -130,9 +137,9 @@ public class BasicMessageService implements MessageService {
     messageRepository.delete(message);
   }
 
-  private List<UUID> attachmentIds(UUID messageId) {
+  private List<BinaryContent> attachments(UUID messageId) {
     return messageAttachmentsRepository.findAllByMessageId(messageId).stream()
-        .map(attachment -> attachment.getAttachment().getId())
+        .map(MessageAttachments::getAttachment)
         .toList();
   }
 

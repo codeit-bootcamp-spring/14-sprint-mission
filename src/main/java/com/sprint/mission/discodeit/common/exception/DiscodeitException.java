@@ -19,4 +19,10 @@ public class DiscodeitException extends RuntimeException{
         this.errorCode = errorCode;
         this.details = details;
     }
+    public DiscodeitException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.timestamp = Instant.now();
+        this.errorCode = errorCode;
+        this.details =  null;
+    }
 }

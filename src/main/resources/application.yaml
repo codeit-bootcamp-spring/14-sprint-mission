@@ -15,8 +15,10 @@ spring:
 
 discodeit:
   storage:
-    type: database
-    path: ${spring.datasource.url}
+    type: local
+    local:
+      root-path: ./storage
+    path: ${discodeit.storage.local.root-path}
 
 management:
   endpoints:

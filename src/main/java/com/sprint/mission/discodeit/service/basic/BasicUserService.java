@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -54,14 +56,15 @@ public class BasicUserService implements UserService {
     }
 
     BinaryContent profile = optionalProfileCreateRequest
-        .map(request -> binaryContentRepository.save(
-            new BinaryContent(
-                request.fileName(),
-                (long) request.bytes().length,
-                request.contentType(),
-                request.bytes()
-            )
-        ))
+        .map(request -> {
+          BinaryContent binaryContent = new BinaryContent(
+              request.fileName(),
+              (long) request.bytes().length,
+              request.contentType()
+          );
+          binaryContentStorage.put(binaryContent.getId(), request.bytes());
+          return binaryContentRepository.save(binaryContent);
+        })
         .orElse(null);
 
     User createdUser = userRepository.save(
@@ -120,14 +123,13 @@ public class BasicUserService implements UserService {
               .map(BinaryContent::getId)
               .ifPresent(binaryContentRepository::deleteById);
 
-          return binaryContentRepository.save(
-              new BinaryContent(
-                  request.fileName(),
-                  (long) request.bytes().length,
-                  request.contentType(),
-                  request.bytes()
-              )
+          BinaryContent binaryContent = new BinaryContent(
+              request.fileName(),
+              (long) request.bytes().length,
+              request.contentType()
           );
+          binaryContentStorage.put(binaryContent.getId(), request.bytes());
+          return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
 

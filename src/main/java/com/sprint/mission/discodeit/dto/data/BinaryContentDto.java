@@ -9,8 +9,7 @@ public record BinaryContentDto(
     Instant createdAt,
     String fileName,
     Long size,
-    String contentType,
-    byte[] bytes
+    String contentType
 ) {
   public static BinaryContentDto toDto(BinaryContent binaryContent) {
     return new BinaryContentDto(
@@ -18,8 +17,7 @@ public record BinaryContentDto(
         binaryContent.getCreatedAt(),
         binaryContent.getFileName(),
         binaryContent.getSize(),
-        binaryContent.getContentType(),
-        binaryContent.getBytes()
+        binaryContent.getContentType()
     );
   }
 }

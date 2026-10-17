@@ -15,6 +15,8 @@ services:
     build: .
     ports:
       - "8081:80"
+    volumes:
+      - binary-content-data:/app/storage
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       DB_URL: jdbc:postgresql://postgres:5432/discodeit
@@ -25,3 +27,4 @@ services:
       - postgres
 volumes:
   postgres-data:
+  binary-content-data:
