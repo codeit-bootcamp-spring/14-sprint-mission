@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+
+logging:
+  level:
+    com.sprint.mission.discodeit: info
+
+server:
+  port: ${SERVER_PORT:8080}
