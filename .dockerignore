@@ -1,4 +1,5 @@
 .env
+discodeit.env
 .env.*
 .git
 .gradle
