@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.dto.data;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 
 public record MessageDto(
@@ -12,9 +13,11 @@ public record MessageDto(
     String content,
     UUID channelId,
     UUID authorId,
-    List<UUID> attachmentIds
+    List<UUID> attachmentIds,
+    List<BinaryContentDto> attachments,
+    UserDto author
 ) {
-  public static MessageDto toDto(Message message, List<UUID> attachmentIds) {
+  public static MessageDto toDto(Message message, List<BinaryContent> attachments) {
     return new MessageDto(
         message.getId(),
         message.getCreatedAt(),
@@ -22,7 +25,9 @@ public record MessageDto(
         message.getContent(),
         message.getChannel().getId(),
         message.getAuthor().getId(),
-        attachmentIds
+        attachments.stream().map(BinaryContent::getId).toList(),
+        attachments.stream().map(BinaryContentDto::toDto).toList(),
+        UserDto.toDto(message.getAuthor(), null)
     );
   }
 }

@@ -86,7 +86,7 @@ public class MessageIntegrationTest {
         Message message = messageRepository.saveAndFlush(
             new Message("수정 전 메세지입니다.", channel, user)
         );
-        MessageUpdateRequest request = new MessageUpdateRequest("수정 후 메세지입니다.");
+        MessageUpdateRequest request = new MessageUpdateRequest("수정 된 메세지입니다.");
 
         mockMvc.perform(
                 patch("/api/messages/{messageId}", message.getId())

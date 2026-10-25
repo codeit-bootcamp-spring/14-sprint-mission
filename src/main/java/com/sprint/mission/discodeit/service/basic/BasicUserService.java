@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,40 +38,38 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    log.info("유저 생성 요청 - 입력 이름: {} 입력 이메일: {}", userCreateRequest.username(), userCreateRequest.email());
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
-    log.debug("유저 생성 시작 - 입력 이름: {} 입력 이메일: {}", username, email);
     if (userRepository.existsByEmail(email)) {
-      log.warn("중복된 이메일 - 입력 이메일: {}", email);
       throw new EmailAlreadyExistsException(email);
     }
     if (userRepository.existsByUsername(username)) {
-      log.warn("중복된 사용자 이름 - 입력 이름: {}", username);
       throw new UsernameAlreadyExistsException(username);
     }
 
     BinaryContent profile = optionalProfileCreateRequest
-        .map(request -> binaryContentRepository.save(
-            new BinaryContent(
-                request.fileName(),
-                (long) request.bytes().length,
-                request.contentType(),
-                request.bytes()
-            )
-        ))
+        .map(request -> {
+          BinaryContent binaryContent = new BinaryContent(
+              request.fileName(),
+              (long) request.bytes().length,
+              request.contentType()
+          );
+          binaryContentStorage.put(binaryContent.getId(), request.bytes());
+          return binaryContentRepository.save(binaryContent);
+        })
         .orElse(null);
 
     User createdUser = userRepository.save(
         new User(username, email, userCreateRequest.password(), profile)
     );
-    log.debug("유저 생성 요청 - 입력 이름: {} 입력 이메일: {}", createdUser.getUsername(), createdUser.getEmail());
-
     userStatusRepository.save(new UserStatus(createdUser, Instant.now()));
     return toDto(createdUser);
   }
@@ -101,22 +100,20 @@ public class BasicUserService implements UserService {
         )
         .filter(Objects::nonNull)
         .count();
-    log.debug("유저 업데이트 요청 처리 - userId={}, requestedFieldCount={}",
+    log.info("유저 업데이트 요청 - userId={}, requestedFieldCount={}",
         userId, requestedFieldCount);
+
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.warn("존재하지 않는 유저 조회 - userId: {}", userId);
-          return new UserNotFoundException(userId);
-        });
+        .orElseThrow(() -> new UserNotFoundException(userId));
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
-    if (userRepository.existsByEmail(newEmail)) {
-      log.warn("이미 존재하는 이메일 - email: {}", newEmail);
+    if (newEmail != null && !newEmail.equals(user.getEmail()) //널이 아니다 && 기존값과 같지 않으면서 && ...
+        && userRepository.existsByEmail(newEmail)) {
       throw new EmailAlreadyExistsException(newEmail);
     }
-    if (userRepository.existsByUsername(newUsername)) {
-      log.warn("이미 존재하는 이름 - userName: {}", newUsername);
+    if (newUsername != null && !newUsername.equals(user.getUsername()) //널이 아니다 && 기존값과 같지 않으면서 && ...
+        && userRepository.existsByUsername(newUsername)) {
       throw new UsernameAlreadyExistsException(newUsername);
     }
 
@@ -126,19 +123,18 @@ public class BasicUserService implements UserService {
               .map(BinaryContent::getId)
               .ifPresent(binaryContentRepository::deleteById);
 
-          return binaryContentRepository.save(
-              new BinaryContent(
-                  request.fileName(),
-                  (long) request.bytes().length,
-                  request.contentType(),
-                  request.bytes()
-              )
+          BinaryContent binaryContent = new BinaryContent(
+              request.fileName(),
+              (long) request.bytes().length,
+              request.contentType()
           );
+          binaryContentStorage.put(binaryContent.getId(), request.bytes());
+          return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
 
     user.update(newUsername, newEmail, userUpdateRequest.newPassword(), profile);
-    log.debug("유저 업데이트 요청 - 업데이트 된 userId: {}, 변경 된 이름: {}",user.getId(), user.getUsername());
+//    log.debug("유저 업데이트 요청 - 업데이트 된 userId: {}, 변경 된 이름: {}",user.getId(), user.getUsername());
    /* 트랜잭션 사용해서 컨텍스트내에서 기존값과 새로운값을 비교 <- drity checking
     return userRepository.save(user);
     커밋시 dirty checking에서 값이 바뀌었따면 업데이트 쿼리 날림<- .save() 생략가능 */
@@ -148,12 +144,9 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional
   public void delete(UUID userId) {
-    log.debug("유저 삭제 시작 - 삭제 대상 id: {}", userId);
+    log.info("유저 삭제 요청 - 삭제 대상 id: {}", userId);
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.warn("존재하지 않는 유저 조회 - userId: {}", userId);
-          return new UserNotFoundException(userId);
-        });
+        .orElseThrow(() -> new UserNotFoundException(userId));
 
     BinaryContent profile = user.getProfile();
     if (profile != null) {
@@ -162,7 +155,7 @@ public class BasicUserService implements UserService {
 
     userStatusRepository.deleteByUserId(userId);
     userRepository.deleteById(userId);
-    log.debug("유저 삭제 요청 - userId: {}, 유저 이름: {} ", userId, user.getUsername());
+//    log.debug("유저 삭제 요청 - userId: {}, 유저 이름: {} ", userId, user.getUsername());
   }
 
   private UserDto toDto(User user) {

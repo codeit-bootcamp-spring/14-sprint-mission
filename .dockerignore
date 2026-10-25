@@ -1,0 +1,11 @@
+.env
+discodeit.env
+.env.*
+.git
+.gradle
+build
+.logs
+.idea
+.vscode
+*.iml
+.DS_Store
