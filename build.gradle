@@ -7,7 +7,7 @@ plugins {
 
 
 group = 'com.sprint.mission'
-version = '1.0-SNAPSHOT'
+version = '1.2-M8'
 
 
 java {
@@ -46,17 +46,21 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
     // admin
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.2.3'
+    // implementation 'de.codecentric:spring-boot-admin-starter-client:3.2.3'
 
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    // aws
+    implementation 'software.amazon.awssdk:s3:2.31.7'
 
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 's3테스트'
+    }
     finalizedBy 'jacocoTestReport' // 테스트 후에 JaCoCo 리포트 생성
 }
 

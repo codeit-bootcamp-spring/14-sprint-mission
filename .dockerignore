@@ -1,0 +1,15 @@
+.dockerignore
+.gitignore
+.gitattributes
+Dockerfile
+.git
+.github
+.gradle
+.idea
+admin
+build
+docs
+logs
+.discodeit-files
+.env
+discodeit.env
