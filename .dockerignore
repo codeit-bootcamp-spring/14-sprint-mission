@@ -1,0 +1,14 @@
+.git
+.gradle
+.idea
+build
+out
+.logs
+.discodeit
+docs
+*.md
+.env
+discodeit.env
+*.pem
+docker-compose.yml
+Dockerfile

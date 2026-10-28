@@ -47,3 +47,8 @@ src/main/generated/
 
 ### Logs ###
 .logs/
+
+### Secrets ###
+.env
+discodeit.env
+*.pem
