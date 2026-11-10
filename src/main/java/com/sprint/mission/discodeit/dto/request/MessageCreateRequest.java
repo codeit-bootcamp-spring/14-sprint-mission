@@ -6,14 +6,14 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 public record MessageCreateRequest(
-    @NotBlank(message = "메시지 내용은 필수입니다.")
-    @Size(max = 2000, message = "메시지 내용은 2000자를 초과할 수 없습니다.")
+    @NotBlank(message = "메시지 내용은 필수입니다")
+    @Size(max = 2000, message = "메시지 내용은 2000자 이하여야 합니다")
     String content,
-
-    @NotNull(message = "채널 ID는 필수입니다.")
+    
+    @NotNull(message = "채널 ID는 필수입니다")
     UUID channelId,
-
-    @NotNull(message = "작성자 ID는 필수입니다.")
+    
+    @NotNull(message = "작성자 ID는 필수입니다")
     UUID authorId
 ) {
 
