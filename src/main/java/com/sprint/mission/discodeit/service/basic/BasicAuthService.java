@@ -9,10 +9,12 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
@@ -20,6 +22,7 @@ public class BasicAuthService implements AuthService {
 
   @Override
   public UserDto login(LoginRequest loginRequest) {
+    log.info("로그인 요청 - 입력 이름: {}", loginRequest.username());
     String username = loginRequest.username();
     String password = loginRequest.password();
 
@@ -28,7 +31,7 @@ public class BasicAuthService implements AuthService {
             () -> new UserNotFoundByUsernameException(username));
 
     if (!user.getPassword().equals(password)) {
-      throw new InvalidPasswordException(user.getPassword());
+      throw new InvalidPasswordException(user.getUsername());
     }
 
     return userMapper.toDto(user, null);

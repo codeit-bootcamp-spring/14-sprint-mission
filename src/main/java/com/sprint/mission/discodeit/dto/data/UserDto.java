@@ -11,9 +11,15 @@ public record UserDto(
     String username,
     String email,
     UUID profileId,
-    Boolean online
+    Boolean online,
+    BinaryContentDto profile
 ) {
   public static UserDto toDto(User user, Boolean online) {
+    BinaryContentDto profile = null;
+    if (user.getProfile() != null) {
+      profile = BinaryContentDto.toDto(user.getProfile());
+    }
+
     return new UserDto(
         user.getId(),
         user.getCreatedAt(),
@@ -21,7 +27,8 @@ public record UserDto(
         user.getUsername(),
         user.getEmail(),
         user.getProfile() != null ? user.getProfile().getId() : null,
-        online
+        online,
+        profile
     );
   }
 }

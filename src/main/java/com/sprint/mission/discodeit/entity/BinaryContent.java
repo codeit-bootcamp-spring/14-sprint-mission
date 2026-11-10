@@ -24,15 +24,13 @@ public class BinaryContent implements Serializable {
   private Long size;
   @Column(length = 100)
   private String contentType;
-  private byte[] bytes;
 
-  public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+  public BinaryContent(String fileName, Long size, String contentType) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
     //
     this.fileName = fileName;
     this.size = size;
     this.contentType = contentType;
-    this.bytes = bytes;
   }
 }

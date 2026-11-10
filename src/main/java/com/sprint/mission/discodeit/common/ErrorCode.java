@@ -66,6 +66,11 @@ public enum ErrorCode {
         Level.WARN,
         HttpURLConnection.HTTP_BAD_REQUEST,
         "올바른 입력이 아닙니다."
+    ),
+    ERROR_FILES_STORE(
+        Level.WARN,
+        HttpURLConnection.HTTP_SERVER_ERROR,
+        "파일 입출력 도중 문제가 발생했습니다."
     );
 
     Level level;

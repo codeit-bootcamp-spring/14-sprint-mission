@@ -17,3 +17,6 @@ management:
   endpoint:
     health:
       show-details: never
+  info:
+    env:
+      enabled: false

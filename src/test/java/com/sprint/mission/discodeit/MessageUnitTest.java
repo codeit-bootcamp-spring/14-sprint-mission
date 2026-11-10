@@ -23,6 +23,7 @@ import com.sprint.mission.discodeit.repository.MessageAttachmentsRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,6 +46,8 @@ public class MessageUnitTest {
     private BinaryContentRepository binaryContentRepository;
     @Mock
     private MessageAttachmentsRepository messageAttachmentsRepository;
+    @Mock
+    private BinaryContentStorage binaryContentStorage;
 
     private BasicMessageService messageService;
 
@@ -56,7 +59,8 @@ public class MessageUnitTest {
             userRepository,
             binaryContentRepository,
             messageAttachmentsRepository,
-            new MessageMapper()
+            new MessageMapper(),
+            binaryContentStorage
         );
     }
 
