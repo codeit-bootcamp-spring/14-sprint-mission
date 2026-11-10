@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public abstract class BaseEntity {
 
     @CreatedDate
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
