@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.application.channel.in;
 
 import com.sprint.mission.discodeit.common.log.MutationLog;
 import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.adapter.in.controller.dto.channel.ChannelUpsertResponse;
-import com.sprint.mission.discodeit.adapter.in.controller.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.adapter.in.controller.channel.dto.ChannelUpsertResponse;
+import com.sprint.mission.discodeit.adapter.in.controller.channel.dto.ChannelResponseDto;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.application.channel.ChannelService;

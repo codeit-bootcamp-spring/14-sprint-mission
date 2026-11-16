@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.application.user.in;
 
-import com.sprint.mission.discodeit.adapter.in.controller.dto.user.UserDto;
+import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
 import com.sprint.mission.discodeit.adapter.in.controller.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.application.binarycontent.out.BinaryContentStorage;
 import com.sprint.mission.discodeit.application.readstatus.ReadStatusService;

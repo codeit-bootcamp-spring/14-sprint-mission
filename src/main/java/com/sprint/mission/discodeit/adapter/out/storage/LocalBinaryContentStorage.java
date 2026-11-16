@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.out.storage;
 
 import com.sprint.mission.discodeit.application.binarycontent.out.BinaryContentStorage;
-import com.sprint.mission.discodeit.adapter.in.controller.dto.binaryContent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.adapter.in.controller.binaryContent.dto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.common.log.MutationLog;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

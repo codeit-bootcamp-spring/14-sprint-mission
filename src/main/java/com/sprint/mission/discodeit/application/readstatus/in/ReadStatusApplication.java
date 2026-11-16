@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.common.log.MutationLog;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.adapter.in.controller.dto.readStatus.ReadStatusResponse;
+import com.sprint.mission.discodeit.adapter.in.controller.readStatus.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.application.channel.ChannelService;
 import com.sprint.mission.discodeit.application.readstatus.ReadStatusService;
 import com.sprint.mission.discodeit.application.user.UserService;

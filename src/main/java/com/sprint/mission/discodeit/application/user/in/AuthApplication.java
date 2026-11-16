@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.application.user.in;
 import com.sprint.mission.discodeit.application.user.UserService;
 import com.sprint.mission.discodeit.common.log.MutationLog;
 import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.adapter.in.controller.dto.user.UserDto;
+import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.adapter.out.storage;
 
-import com.sprint.mission.discodeit.adapter.in.controller.dto.binaryContent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.adapter.in.controller.binaryContent.dto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.application.binarycontent.out.BinaryContentStorage;
 import com.sprint.mission.discodeit.config.aws.AwsProperties;
 import lombok.RequiredArgsConstructor;

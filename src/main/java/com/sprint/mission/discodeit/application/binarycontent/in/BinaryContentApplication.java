@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.application.binarycontent.in;
 
-import com.sprint.mission.discodeit.adapter.in.controller.dto.binaryContent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.adapter.in.controller.binaryContent.dto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.application.binarycontent.BinaryContentService;
 import com.sprint.mission.discodeit.application.binarycontent.out.BinaryContentStorage;
 import com.sprint.mission.discodeit.common.log.MutationLog;
