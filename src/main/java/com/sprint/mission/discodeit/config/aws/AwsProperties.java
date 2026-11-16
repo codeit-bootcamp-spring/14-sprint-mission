@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.config;
+package com.sprint.mission.discodeit.config.aws;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
