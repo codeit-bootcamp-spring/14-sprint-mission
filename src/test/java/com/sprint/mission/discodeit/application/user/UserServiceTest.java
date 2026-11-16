@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
     @Mock
     UserRepository userRepository;
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @InjectMocks
     UserService userService;
@@ -40,9 +43,10 @@ class UserServiceTest {
                 .thenReturn(false);
         when(userRepository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
+        when(passwordEncoder.encode(creating.getPassword())).thenReturn(creating.getPassword());
 
         // when
-        User created = userService.create(creating);
+        User created = userService.create(creating.getUsername(), creating.getEmail(), creating.getPassword(), creating.getProfile());
 
         // then
         assertThat(created.getUsername()).isEqualTo(creating.getUsername());
@@ -52,7 +56,7 @@ class UserServiceTest {
         assertThat(created.getProfile().getSize()).isEqualTo(creating.getProfile().getSize());
 
         verify(userRepository).existsByUsernameOrEmail(creating.getUsername(), creating.getEmail());
-        verify(userRepository).save(creating);
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
@@ -71,7 +75,7 @@ class UserServiceTest {
         // when
         UserException thrown = catchThrowableOfType(
                 UserException.class,
-                () -> userService.create(creating)
+                () -> userService.create(creating.getUsername(), creating.getEmail(), creating.getPassword(), creating.getProfile())
         );
 
         // then

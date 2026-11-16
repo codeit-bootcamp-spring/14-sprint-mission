@@ -33,9 +33,7 @@ public class UserApplication {
             CreateBinaryContentCommand createProfileCommand
     ) {
         BinaryContent createdProfile = createProfile(createProfileCommand);
-        User createdUser = userService.create(User.create(
-                username, email, password, createdProfile
-        ));
+        User createdUser = userService.create(username, email, password, createdProfile);
         saveCreatedProfile(createProfileCommand, createdProfile);
         return UserDto.from(createdUser);
     }

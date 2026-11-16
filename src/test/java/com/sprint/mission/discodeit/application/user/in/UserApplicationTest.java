@@ -44,8 +44,8 @@ class UserApplicationTest {
         String password = "1234";
         CreateBinaryContentCommand command = createBinaryContentCommand();
 
-        when(userService.create(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(userService.create(eq(username), eq(email), eq(password), any(BinaryContent.class)))
+                .thenAnswer(invocation -> User.create(username, email, password, invocation.getArgument(3)));
 
         // when
         UserDto response = userApplication.createAccount(username, email, password, command);
@@ -57,12 +57,7 @@ class UserApplicationTest {
         assertThat(response.profile().getContentType()).isEqualTo(command.contentType());
         assertThat(response.profile().getSize()).isEqualTo(command.content().length);
 
-        verify(userService).create(argThat(user ->
-                user.getUsername().equals(username)
-                        && user.getEmail().equals(email)
-                        && user.getPassword().equals(password)
-                        && user.getProfile() != null
-        ));
+        verify(userService).create(eq(username), eq(email), eq(password), any(BinaryContent.class));
         verify(binaryContentStorage).put(
                 response.profile().getId(),
                 command.content()
@@ -77,8 +72,8 @@ class UserApplicationTest {
         String password = "1234";
         CreateBinaryContentCommand command = null;
 
-        when(userService.create(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(userService.create(eq(username), eq(email), eq(password), isNull()))
+                .thenReturn(User.create(username, email, password, null));
 
         // when
         UserDto created = userApplication.createAccount(username, email, password, command);
@@ -87,7 +82,7 @@ class UserApplicationTest {
         assertThat(created.username()).isEqualTo(username);
         assertThat(created.email()).isEqualTo(email);
 
-        verify(userService).create(any(User.class));
+        verify(userService).create(username, email, password, null);
         verifyNoInteractions(binaryContentStorage);
     }
 
@@ -100,7 +95,7 @@ class UserApplicationTest {
         CreateBinaryContentCommand command = createBinaryContentCommand();
 
         UserException expectedException = userUniqueFieldConflict(username, email);
-        when(userService.create(any(User.class)))
+        when(userService.create(eq(username), eq(email), eq(password), any(BinaryContent.class)))
                 .thenThrow(expectedException);
 
         // when && then
@@ -108,7 +103,7 @@ class UserApplicationTest {
                 userApplication.createAccount(username, email, password, command)
         ).isSameAs(expectedException);
 
-        verify(userService).create(any(User.class));
+        verify(userService).create(eq(username), eq(email), eq(password), any(BinaryContent.class));
         verifyNoInteractions(binaryContentStorage);
     }
 

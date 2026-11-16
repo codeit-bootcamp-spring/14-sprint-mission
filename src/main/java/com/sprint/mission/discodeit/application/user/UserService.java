@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.domain.user.UserExceptionType;
 import com.sprint.mission.discodeit.application.user.out.UserRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -18,9 +19,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public User create(User creating) {
-        validateNameAndEmailAvailable(creating.getUsername(), creating.getEmail());
+    public User create(String username, String email, String password, @Nullable BinaryContent profile) {
+        validateNameAndEmailAvailable(username, email);
+        User creating = User.create(username, email, passwordEncoder.encode(password), profile);
         return userRepository.save(creating);
     }
 
@@ -47,22 +50,19 @@ public class UserService {
     }
 
     public User findByNameAndPassword(String name, String password) {
-        validateExistsByName(name);
-        return userRepository.findByUsernameAndPassword(name, password)
-                .orElseThrow(() -> new UserException(
-                                UserExceptionType.LOGIN_FAILED,
-                                Map.of(
-                                        "name", name,
-                                        "password", password
-                                )
-                        )
-                );
+        User user = userRepository.findByUsername(name)
+                .orElseThrow(() -> new UserException(UserExceptionType.LOGIN_FAILED, Map.of("name", name)));
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new UserException(UserExceptionType.LOGIN_FAILED, Map.of("name", name));
+        }
+        return user;
     }
 
     public User update(UUID id, String username, String email, String password, @Nullable BinaryContent profile) {
         validateUsernameAndEmailAvailableWhereUserNot(username, email, id);
         User updating = findById(id);
-        return updating.update(username, email, password, profile);
+        String encodedPassword = password == null ? null : passwordEncoder.encode(password);
+        return updating.update(username, email, encodedPassword, profile);
     }
 
 
@@ -74,12 +74,6 @@ public class UserService {
     public void validateExistsById(UUID id) {
         if (!userRepository.existsById(id)) {
             throw new UserException(UserExceptionType.USER_NOT_FOUND, Map.of("id", id));
-        }
-    }
-
-    private void validateExistsByName(String name) {
-        if (!userRepository.existsByUsername(name)) {
-            throw new UserException(UserExceptionType.USER_NOT_FOUND, Map.of("name", name));
         }
     }
 
