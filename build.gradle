@@ -24,6 +24,8 @@ dependencies {
 	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'software.amazon.awssdk:s3:2.31.7'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
