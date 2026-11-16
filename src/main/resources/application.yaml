@@ -1,8 +1,9 @@
 discodeit:
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
       root-path: src/main/java/com/sprint/mission/discodeit/storage/storage
+      root-path: ${STORAGE_PATH}
 
 spring:
   datasource:
