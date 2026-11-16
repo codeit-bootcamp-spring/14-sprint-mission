@@ -2,8 +2,12 @@ discodeit:
   storage:
     type: ${STORAGE_TYPE:local}
     local:
-      root-path: src/main/java/com/sprint/mission/discodeit/storage/storage
       root-path: ${STORAGE_PATH}
+    s3:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region: ${AWS_REGION}
+      bucket: ${AWS_S3_BUCKET}
 
 spring:
   datasource:
@@ -12,7 +16,7 @@ spring:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-      ddl-auto: validate
+      ddl-auto: update
   servlet:
     multipart:
       max-file-size: 10MB

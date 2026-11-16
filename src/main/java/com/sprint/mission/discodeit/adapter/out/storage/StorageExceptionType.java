@@ -19,6 +19,8 @@ public enum StorageExceptionType implements ExceptionType {
     LOCAL_STORAGE_FILE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 생성 실패", "로컬 저장소에 파일 저장을 실패했습니다."),
     LOCAL_STORAGE_FILE_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 조회 실패", "로컬 저장소의 파일 조회에 실패했습니다."),
 
+    S3_STORAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 저장 실패", "S3 파일 업로드에 실패했습니다."),
+    S3_STORAGE_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, Level.ERROR, "파일 조회 실패", "S3 파일 저장에 실패했습니다"),
     ;
     HttpStatus httpStatus;
     Level logLevel;
