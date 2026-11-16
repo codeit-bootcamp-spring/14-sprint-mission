@@ -9,7 +9,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,12 +42,12 @@ public class LoggingAspect {
     }
 
     private Map<String, Object> getArgMap(String[] parameterNames, Object[] args) {
-        return IntStream.range(0, Integer.min(parameterNames.length, args.length))
-                .boxed()
-                .collect(Collectors.toMap(
-                        i -> parameterNames[i],
-                        i -> args[i]
-                ));
+        Map<String, Object> argMap = new LinkedHashMap<>();
+        for (int i = 0; i < args.length; i++) {
+            argMap.put(parameterNames[i], args[i]);
+        }
+
+        return argMap;
     }
 
     private void appendStartLog(String className, String methodName, Map<String, Object> argMap) {
