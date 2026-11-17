@@ -1,0 +1,512 @@
+{
+  "info": {
+    "_postman_id": "fd14f1c5-a496-4771-8225-34eab0b69ce7",
+    "name": "스프린트 미션 4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27868685"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "유저 생성",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userName\" : \"김양현\",\r\n    \"email\" : \"yyy2724@naver.com\",\r\n    \"password\" : \"1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "유저 수정",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"newEmail@naver.com\",\r\n    \"data\" : [1,2,3]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/users/0a51be15-fd77-41cc-99cb-3c81a2c1edd8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "0a51be15-fd77-41cc-99cb-3c81a2c1edd8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "유저 전체조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/users",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "유저 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/users/dc2159d8-a0c3-4d75-bbb0-f84742287b66",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "dc2159d8-a0c3-4d75-bbb0-f84742287b66"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "유저 상태 업데이트",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/users/3433329d-e2ef-453a-bb83-0329ec5a0146/status",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "3433329d-e2ef-453a-bb83-0329ec5a0146",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "로그인",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\" : \"김양현\",\r\n    \"password\" : \"1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/auth/login",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "BinaryContent",
+      "item": [
+        {
+          "name": "사진 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/binary?ids=3377f75d-19fa-43aa-9434-0c02517f840b",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "binary"
+              ],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "3377f75d-19fa-43aa-9434-0c02517f840b"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Channel",
+      "item": [
+        {
+          "name": "public 채널 만들기",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"channelType\" : \"PUBLIC\",\r\n    \"title\" : \"공영방송\",\r\n    \"memo\" : \"공영방송메모\",\r\n    \"userIds\": []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/channels",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "channels"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "private 채널 만들기",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"channelType\" : \"PRIVATE\",\r\n    \"title\" : \"개인방송2\",\r\n    \"memo\" : \"개인방송메모2\",\r\n    \"userIds\": [\"0a51be15-fd77-41cc-99cb-3c81a2c1edd8\" \r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/channels",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "channels"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "public 채널 수정",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"channelType\" : \"PUBLIC\",\r\n    \"title\" : \"수정\",\r\n    \"memo\" : \"메모수정\",\r\n    \"userIds\" : []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/channels/aa566bb4-a077-4a2b-b199-b561ca3588d4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "channels",
+                "aa566bb4-a077-4a2b-b199-b561ca3588d4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "채널 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/channels/1d2d4a3f-49b4-4d29-908c-257098cf3995",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "channels",
+                "1d2d4a3f-49b4-4d29-908c-257098cf3995"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "유저가 접근 가능한 채널 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/channels/1687bb95-d1f0-483d-91e7-af4ce74474a6",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "channels",
+                "1687bb95-d1f0-483d-91e7-af4ce74474a6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "item": [
+        {
+          "name": "메세지 생성",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"attachmentIds\" : [],\r\n    \"message\" : \"메세지 내용\",\r\n    \"channelId\" : \"aa566bb4-a077-4a2b-b199-b561ca3588d4\",\r\n    \"userId\" : \"0a51be15-fd77-41cc-99cb-3c81a2c1edd8\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/messages",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "messages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "메세지 수정",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"message\" : \"메세지 수정\",\r\n    \"channelId\" : \"aa566bb4-a077-4a2b-b199-b561ca3588d4\",\r\n    \"userId\" : \"0a51be15-fd77-41cc-99cb-3c81a2c1edd8\",\r\n    \"attachmentIds\" : []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/messages/0bd223ea-84c4-4bb8-a465-466ebd8dce41",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "messages",
+                "0bd223ea-84c4-4bb8-a465-466ebd8dce41"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "메세지 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/messages/03e4ff4c-3392-470b-9749-1c57d6f3102c",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "messages",
+                "03e4ff4c-3392-470b-9749-1c57d6f3102c"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "채널에서 나온 메세지 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/messages/aa566bb4-a077-4a2b-b199-b561ca3588d4",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "messages",
+                "aa566bb4-a077-4a2b-b199-b561ca3588d4"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ReadStatus",
+      "item": [
+        {
+          "name": "메세지 상태 생성",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n    \"channelId\": \"aa566bb4-a077-4a2b-b199-b561ca3588d4\",\r\n    \"userId\": \"0a51be15-fd77-41cc-99cb-3c81a2c1edd8\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/api/readStatus",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "readStatus"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "메세지 상태 수정",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/readStatus/c6a42223-abb0-416b-95ae-a1575888b3c8",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "readStatus",
+                "c6a42223-abb0-416b-95ae-a1575888b3c8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "유저가 쓴 메세지 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:8080/api/readStatus/0a51be15-fd77-41cc-99cb-3c81a2c1edd8",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "readStatus",
+                "0a51be15-fd77-41cc-99cb-3c81a2c1edd8"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

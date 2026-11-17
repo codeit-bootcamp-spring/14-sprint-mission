@@ -1,0 +1,12 @@
+build/
+admin/build/
+.gradle/
+out/
+.idea/
+*.iml
+logs/
+.logs/
+.discodeit/
+.env
+*.env
+.git/
