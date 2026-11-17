@@ -28,13 +28,13 @@ public class AwsS3Config {
     @Bean
     public S3Client s3Client() {
         return S3Client.builder()
-                .region(Region.of(properties.getRegion()))
+                .region(Region.of(properties.region()))
                 .credentialsProvider(
-                        StringUtils.hasText(properties.getAccessKey())
+                        StringUtils.hasText(properties.accessKey())
                                 ? StaticCredentialsProvider.create(
                                         AwsBasicCredentials.create(
-                                                properties.getAccessKey(),
-                                                properties.getSecretKey()
+                                                properties.accessKey(),
+                                                properties.secretKey()
                                         )
                                 )
                                 : DefaultCredentialsProvider.create()
@@ -45,13 +45,13 @@ public class AwsS3Config {
     @Bean
     public S3Presigner s3Presigner() {
         return S3Presigner.builder()
-                .region(Region.of(properties.getRegion()))
+                .region(Region.of(properties.region()))
                 .credentialsProvider(
-                        StringUtils.hasText(properties.getAccessKey())
+                        StringUtils.hasText(properties.accessKey())
                                 ? StaticCredentialsProvider.create(
                                 AwsBasicCredentials.create(
-                                        properties.getAccessKey(),
-                                        properties.getSecretKey()
+                                        properties.accessKey(),
+                                        properties.secretKey()
                                 )
                         )
                                 : DefaultCredentialsProvider.create()

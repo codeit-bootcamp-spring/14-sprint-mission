@@ -44,7 +44,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         try {
             String key = makeS3ObjectKey(id);
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(properties.getBucket())
+                    .bucket(properties.bucket())
                     .key(key)
                     .contentType("image/png")
                     .build();
@@ -76,7 +76,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         try {
             String key = makeS3ObjectKey(id);
             GetObjectRequest request = GetObjectRequest.builder()
-                    .bucket(properties.getBucket())
+                    .bucket(properties.bucket())
                     .key(key)
                     .build();
 
@@ -104,7 +104,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     private String generatePresignedUrl(String key) {
-        String bucket = properties.getBucket();
+        String bucket = properties.bucket();
 //        String region = properties.getRegion();
 //        String encodedKey = URLEncoder.encode(key, StandardCharsets.UTF_8).replace("+", "%20");
 
