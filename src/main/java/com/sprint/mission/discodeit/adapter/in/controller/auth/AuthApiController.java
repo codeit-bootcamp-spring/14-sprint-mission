@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.adapter.in.controller.auth;
 
+import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
+import com.sprint.mission.discodeit.config.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,5 +26,11 @@ public class AuthApiController {
                 .status(HttpStatus.NON_AUTHORITATIVE_INFORMATION)
                 .header(HttpHeaders.SET_COOKIE, tokenValue)
                 .build();
+    }
+
+    @GetMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto getUserBySessionId(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return userDetails.getUserDto();
     }
 }
