@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.adapter.in.controller.auth;
 
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
+import com.sprint.mission.discodeit.application.user.in.UserApplication;
 import com.sprint.mission.discodeit.config.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class AuthApiController {
+
+    private final UserApplication application;
 
     @GetMapping("/csrf-token")
     public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
@@ -32,5 +36,13 @@ public class AuthApiController {
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUserBySessionId(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return userDetails.getUserDto();
+    }
+
+    @PutMapping("/role")
+    public UserDto updateUserRole(@Valid @RequestBody UserRoleUpdateRequest request) {
+        return application.updateUserRole(
+                request.userId(),
+                request.newRole()
+        );
     }
 }

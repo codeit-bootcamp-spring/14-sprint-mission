@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.adapter.in.controller.multipart.CreateBinary
 import com.sprint.mission.discodeit.common.log.MutationLog;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.application.readstatus.ReadStatusService;
+import com.sprint.mission.discodeit.domain.user.Role;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserStatusDto;
@@ -95,5 +96,12 @@ public class UserApplication {
                 profileCreateCommand.contentType(),
                 profileCreateCommand.content()
         );
+    }
+
+    @Transactional
+    public UserDto updateUserRole(UUID userId, Role role) {
+        User found = userService.findById(userId);
+        User updated = found.updateRole(role);
+        return UserDto.from(updated);
     }
 }
