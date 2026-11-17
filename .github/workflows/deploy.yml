@@ -73,12 +73,19 @@ jobs:
 
       - name: 기존 서비스 중단 (프리티어 리소스 고려)
         run: |
-          aws ecs update-service --cluster $CLUSTER --service $SERVICE --desired-count 0
-          aws ecs wait services-stable --cluster $CLUSTER --services $SERVICE
+          TASKS=$(aws ecs list-tasks --cluster $CLUSTER --service-name $SERVICE \
+            --query 'taskArns' --output text)
+
+          aws ecs update-service --cluster $CLUSTER --service $SERVICE \
+            --desired-count 0 --query 'service.desiredCount'
+
+          if [ -n "$TASKS" ] && [ "$TASKS" != "None" ]; then
+            aws ecs wait tasks-stopped --cluster $CLUSTER --tasks $TASKS
+          fi
 
       - name: 새 태스크 정의로 서비스 업데이트
         run: |
           aws ecs update-service --cluster $CLUSTER --service $SERVICE \
             --task-definition ${{ steps.task-def.outputs.arn }} \
-            --desired-count 1
+            --desired-count 1 --query 'service.taskDefinition'
           aws ecs wait services-stable --cluster $CLUSTER --services $SERVICE
