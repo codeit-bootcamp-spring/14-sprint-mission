@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.time.Instant;
 import java.util.*;
@@ -45,7 +44,8 @@ public class User extends BaseUpdatableEntity {
     )
     private UserStatus status;
 
-    private List<GrantedAuthority> authorities;
+    @Column(nullable = false, length = 20)
+    private Role role;
 
     public static User create(
             String username,
@@ -71,7 +71,7 @@ public class User extends BaseUpdatableEntity {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.authorities = UserRoles.USER_ROLES;
+        this.role = Role.USER;
         assignIfNotNull(profile, () -> this.profile = profile);
     }
 
@@ -104,6 +104,11 @@ public class User extends BaseUpdatableEntity {
 
     public User updateLastActiveAt(Instant newLastActiveAt) {
         this.status.updateLastSeenAt(newLastActiveAt);
+        return this;
+    }
+
+    public User updateRole(Role role) {
+        this.role = role;
         return this;
     }
 }

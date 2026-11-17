@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.config.security;
 
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
-import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.domain.user.Role;
 import lombok.Getter;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -17,10 +19,15 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(User user) {
-        this.userDto = UserDto.from(user);
-        this.password = user.getPassword();
-        this.authorities = user.getAuthorities();
+    public CustomUserDetails(UserDto userDto, String password) {
+        this.userDto = userDto;
+        this.password = password;
+        this.authorities = getAuthorityFrom(userDto.role());
+    }
+
+    private Collection<SimpleGrantedAuthority> getAuthorityFrom(Role role) {
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.name());
+        return List.of(authority);
     }
 
     @Override
