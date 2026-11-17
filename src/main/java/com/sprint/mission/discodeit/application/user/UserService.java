@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.application.user;
 
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
+import com.sprint.mission.discodeit.domain.user.Role;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.user.UserException;
 import com.sprint.mission.discodeit.domain.user.UserExceptionType;
@@ -112,5 +113,16 @@ public class UserService {
 
     public void flush() {
         userRepository.flush();
+    }
+
+    public void createBootstrapAdmin(String username, String email, String password) {
+        if (notExistsByRole(Role.ADMIN)) {
+            User newAdmin = User.createAdmin(username, email, passwordEncoder.encode(password));
+            userRepository.save(newAdmin);
+        }
+    }
+
+    private boolean notExistsByRole(Role role) {
+        return !userRepository.existsByRole(role);
     }
 }

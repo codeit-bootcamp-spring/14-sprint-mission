@@ -53,12 +53,22 @@ public class User extends BaseUpdatableEntity {
             String password,
             BinaryContent createdProfile
     ) {
-        User user = new User(username, email, password, createdProfile);
+        Role userRole = Role.USER;
+        User user = new User(username, email, password, createdProfile, userRole);
         user.status = UserStatus.create(user);
         return user;
     }
 
-    private User(String username, String email, String password, @Nullable BinaryContent profile) {
+    public static User createAdmin(
+            String username,
+            String email,
+            String password
+    ) {
+        Role adminRole = Role.ADMIN;
+        return new User(username, email, password, null, adminRole);
+    }
+
+    private User(String username, String email, String password, @Nullable BinaryContent profile, Role role) {
         super();
         if (Objects.isNull(username) || Objects.isNull(email) || Objects.isNull(password)) {
             Map<String, Object> details = new HashMap<>();
@@ -71,7 +81,7 @@ public class User extends BaseUpdatableEntity {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.role = Role.USER;
+        this.role = role;
         assignIfNotNull(profile, () -> this.profile = profile);
     }
 

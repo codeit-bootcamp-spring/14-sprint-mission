@@ -104,4 +104,9 @@ public class UserApplication {
         User updated = found.updateRole(role);
         return UserDto.from(updated);
     }
+
+    @Transactional
+    public void createBootstrapAdmin(String username, String email, String password) {
+        userService.createBootstrapAdmin(username, email, password);
+    }
 }

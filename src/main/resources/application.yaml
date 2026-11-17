@@ -62,3 +62,8 @@ info:
       max-file-size: ${spring.servlet.multipart.max-file-size}
       max-request-size: ${spring.servlet.multipart.max-request-size}
 
+bootstrap:
+  admin:
+    email: ${BOOTSTRAP_ADMIN_EMAIL}
+    username: ${BOOTSTRAP_ADMIN_USERNAME}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD}
