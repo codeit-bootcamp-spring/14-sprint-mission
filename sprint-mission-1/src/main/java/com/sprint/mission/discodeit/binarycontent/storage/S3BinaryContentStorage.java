@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.binarycontent.storage;
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.global.exception.DiscodeitException;
 import com.sprint.mission.discodeit.global.exception.ExceptionType;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -24,7 +23,6 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -68,17 +66,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         }
         log.info("S3 업로드 완료: binaryContentId={}", binaryContentId);
         return binaryContentId;
-    }
-
-    @Override
-    public InputStream get(UUID binaryContentId) {
-        try {
-            return s3Client.getObject(
-                GetObjectRequest.builder().bucket(bucket).key(binaryContentId.toString()).build());
-        } catch (NoSuchKeyException e) {
-            throw new DiscodeitException(ExceptionType.FILE_NOT_FOUND,
-                Map.of("binaryContentId", binaryContentId), e);
-        }
     }
 
     @Override
