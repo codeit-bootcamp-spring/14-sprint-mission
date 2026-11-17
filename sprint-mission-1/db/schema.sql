@@ -129,19 +129,11 @@ ALTER TABLE ONLY public.read_status
 
 
 --
--- Name: read_status read_status_user_id_channel_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: read_status uk_read_status_user_channel; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.read_status
-    ADD CONSTRAINT read_status_user_id_channel_id_key UNIQUE (user_id, channel_id);
-
-
---
--- Name: read_status uks2dq41xxk6kq89ov394a93cqi; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.read_status
-    ADD CONSTRAINT uks2dq41xxk6kq89ov394a93cqi UNIQUE (user_id, channel_id);
+    ADD CONSTRAINT uk_read_status_user_channel UNIQUE (user_id, channel_id);
 
 
 --
