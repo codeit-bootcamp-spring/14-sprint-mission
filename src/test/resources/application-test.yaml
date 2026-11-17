@@ -24,5 +24,6 @@ logging:
 # 통합 테스트에서 업로드한 파일이 프로젝트 저장소를 더럽히지 않도록 build 아래에 저장
 discodeit:
   storage:
+    type: local
     local:
       root-path: build/test-storage

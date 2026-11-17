@@ -47,3 +47,4 @@ out/
 
 logs/
 .logs/
+.env

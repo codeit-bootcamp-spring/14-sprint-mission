@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 import com.sprint.mission.discodeit.binaryContent.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.common.exception.BinaryContentNotFoundException;
 
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
