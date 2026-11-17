@@ -1,15 +1,16 @@
-FROM amazoncorretto:17
-LABEL authors="kyj"
-
+# 1단계: 빌드 (JDK)
+FROM amazoncorretto:17 AS builder
 WORKDIR /app
+COPY gradlew settings.gradle build.gradle ./
+COPY gradle gradle
+RUN ./gradlew dependencies --no-daemon      # 의존성 레이어 캐시
+COPY src src
+RUN ./gradlew bootJar --no-daemon -x test
 
-ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=1.2-M8 \
-    JVM_OPTS=""
-
-COPY . .
-RUN ./gradlew clean build -x test
-
+# 2단계: 실행 (JRE)
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=builder /app/build/libs/app.jar app.jar
+ENV JVM_OPTS=""
 EXPOSE 80
-
-ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
+ENTRYPOINT ["sh", "-c", "exec java $JVM_OPTS -jar app.jar"]
