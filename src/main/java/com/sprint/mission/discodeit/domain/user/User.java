@@ -7,12 +7,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -47,6 +45,7 @@ public class User extends BaseUpdatableEntity {
     )
     private UserStatus status;
 
+    private List<GrantedAuthority> authorities;
 
     public static User create(
             String username,
@@ -59,7 +58,7 @@ public class User extends BaseUpdatableEntity {
         return user;
     }
 
-    public User(String username, String email, String password, @Nullable BinaryContent profile) {
+    private User(String username, String email, String password, @Nullable BinaryContent profile) {
         super();
         if (Objects.isNull(username) || Objects.isNull(email) || Objects.isNull(password)) {
             Map<String, Object> details = new HashMap<>();
@@ -72,6 +71,7 @@ public class User extends BaseUpdatableEntity {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.authorities = UserRoles.USER_ROLES;
         assignIfNotNull(profile, () -> this.profile = profile);
     }
 

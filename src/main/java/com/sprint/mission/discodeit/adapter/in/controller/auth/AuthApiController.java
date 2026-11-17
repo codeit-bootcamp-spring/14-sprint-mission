@@ -1,9 +1,5 @@
 package com.sprint.mission.discodeit.adapter.in.controller.auth;
 
-import com.sprint.mission.discodeit.adapter.in.controller.auth.dto.LoginRequestDto;
-import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
-import com.sprint.mission.discodeit.application.user.in.AuthApplication;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -17,12 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class AuthApiController {
-    private final AuthApplication authApplication;
-
-    @PostMapping(value = "/login")
-    public UserDto login(@Valid @RequestBody LoginRequestDto requestDto) {
-        return authApplication.login(requestDto.username(), requestDto.password());
-    }
 
     @GetMapping("/csrf-token")
     public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
