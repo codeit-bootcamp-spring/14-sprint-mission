@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.binaryContent.domain;
 
 import com.sprint.mission.discodeit.common.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.common.exception.NoSuchElementException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

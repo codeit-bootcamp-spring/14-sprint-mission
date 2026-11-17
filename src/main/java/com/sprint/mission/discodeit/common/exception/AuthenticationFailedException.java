@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.common.exception;
 
-public class AuthenticationFailedException extends DiscodeitException{
+import java.util.Collections;
 
-    public AuthenticationFailedException(){
-        super(ErrorCode.AUTHENTICATION_FAILED);
+public class AuthenticationFailedException extends UserException {
+
+    public AuthenticationFailedException(String username) {
+        super(ErrorCode.AUTHENTICATION_FAILED, Collections.singletonMap("username", username));
     }
 }

@@ -10,11 +10,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serial;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Entity
@@ -23,7 +21,7 @@ import java.util.UUID;
 public class Message extends BaseUpdatableEntity {
 
     @Column(name = "content")
-    private String message;
+    private String content;
 
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
@@ -46,28 +44,28 @@ public class Message extends BaseUpdatableEntity {
 
     private Message(List<BinaryContent> attachments, String message, Channel channel, User author) {
         super();
-        if(attachments == null){
+        if (attachments == null) {
             attachments = new ArrayList<>();
         }
         this.attachments = attachments;
-        this.message = message;
+        this.content = message;
         this.channel = channel;
         this.author = author;
     }
 
-    public static Message create(List<BinaryContent> attachments, String message, Channel channel, User author){
+    public static Message create(List<BinaryContent> attachments, String message, Channel channel, User author) {
         return new Message(attachments, message, channel, author);
     }
 
-    public void update(String message){
-        if(message != null) this.message = message;
+    public void update(String message) {
+        if (message != null) this.content = message;
         this.updateUpdatedAt(Instant.now());
     }
 
     @Override
     public String toString() {
         return "Message{" +
-                "message='" + message + '\'' +
+                "content='" + content + '\'' +
                 ", channel=" + channel +
                 ", User=" + author +
                 '}';

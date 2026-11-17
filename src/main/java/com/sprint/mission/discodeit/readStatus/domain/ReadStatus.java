@@ -33,6 +33,17 @@ public class ReadStatus extends BaseUpdatableEntity {
     private Instant lastReadTime;
 
     // 사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현하는 모델
+    public ReadStatus(User user, Channel channel, Instant lastReadTime) {
+        super();
+        this.user = user;
+        this.channel = channel;
+        this.lastReadTime = lastReadTime;
+        if (lastReadTime == null) {
+            this.lastReadTime = Instant.now();
+        }
+
+    }
+
     public ReadStatus(User user, Channel channel) {
         super();
         this.user = user;
@@ -41,16 +52,14 @@ public class ReadStatus extends BaseUpdatableEntity {
     }
 
     // 마지막 읽은 메세지 시간 업뎃
-    public void updateTime(Instant time){
+    public void updateTime(Instant time) {
         this.lastReadTime = time;
         updateUpdatedAt(Instant.now());
     }
 
-    public static ReadStatus create(User user, Channel channel){
-        return new ReadStatus(user, channel);
+    public static ReadStatus create(User user, Channel channel, Instant lastReadTime) {
+        return new ReadStatus(user, channel, lastReadTime);
     }
-
-
 
 
 }

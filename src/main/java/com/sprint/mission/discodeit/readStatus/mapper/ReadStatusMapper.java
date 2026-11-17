@@ -3,21 +3,17 @@ package com.sprint.mission.discodeit.readStatus.mapper;
 import com.sprint.mission.discodeit.readStatus.domain.ReadStatus;
 import com.sprint.mission.discodeit.readStatus.dto.ReadStatusDto;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.*;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Component
-@RequiredArgsConstructor
-public class ReadStatusMapper {
+@Mapper(componentModel = "spring")
+public interface ReadStatusMapper {
 
-    public ReadStatusDto toDto(ReadStatus readStatus){
-        return new ReadStatusDto(
-                readStatus.getId(),
-                readStatus.getUser().getId(),
-                readStatus.getChannel().getId(),
-                readStatus.getLastReadTime()
-        );
-    }
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "channelId", source = "channel.id")
+    @Mapping(target = "lastReadAt", source = "lastReadTime")
+    ReadStatusDto toDto(ReadStatus readStatus);
 }

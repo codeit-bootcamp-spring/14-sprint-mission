@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.common.exception;
 
-public class PrivateChannelUpdateNotAllowedException extends DiscodeitException{
+import java.util.Map;
+import java.util.UUID;
 
-    public PrivateChannelUpdateNotAllowedException() {
-        super(ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT);
+public class PrivateChannelUpdateNotAllowedException extends ChannelException {
+
+    public PrivateChannelUpdateNotAllowedException(UUID channelId) {
+        super(ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT, Map.of("channelId", channelId));
     }
 }
