@@ -9,13 +9,14 @@ WORKDIR /app
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle settings.gradle ./
+COPY admin admin
 
 # (2) 의존성만 미리 다운로드 → 이 레이어가 캐시됨
-RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon
+RUN chmod +x ./gradlew && ./gradlew :dependencies --no-daemon
 
 # (3) 자주 바뀌는 소스는 마지막에
 COPY src src
-RUN ./gradlew bootJar -x test --no-daemon
+RUN ./gradlew :bootJar -x test --no-daemon
 
 
 # ---------- 2. 런타임 스테이지 ----------
@@ -27,7 +28,6 @@ ENV PROJECT_NAME=discodeit
 ENV PROJECT_VERSION=1.2-M8
 ENV JVM_OPTS=""
 
-# 빌드 스테이지에서 jar 하나만 가져옴
 COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
 
 EXPOSE 80
