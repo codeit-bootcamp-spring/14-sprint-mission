@@ -79,9 +79,14 @@ public enum ExceptionType {
         "파일을 저장하는데 실패했습니다"
     ),
     FILE_NOT_FOUND(
-        Level.ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        Level.WARN,
+        HttpStatus.NOT_FOUND,
         "파일을 찾을 수 없습니다"
+    ),
+    STORAGE_UNAVAILABLE(
+        Level.ERROR,
+        HttpStatus.SERVICE_UNAVAILABLE,
+        "파일 저장소에 일시적으로 접근할 수 없습니다"
     ),
 
 

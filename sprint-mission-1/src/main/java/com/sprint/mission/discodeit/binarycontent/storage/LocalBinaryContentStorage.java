@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
@@ -91,9 +92,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         Path path = resolvePath(binaryContentId);
         try {
             return Files.newInputStream(path);
-        } catch (IOException e) {
+        } catch (NoSuchFileException e) {
             throw new DiscodeitException(
                 ExceptionType.FILE_NOT_FOUND,
+                Map.of("binaryContentId", binaryContentId),
+                e);
+        } catch (IOException e) {
+            throw new DiscodeitException(
+                ExceptionType.STORAGE_UNAVAILABLE,
                 Map.of("binaryContentId", binaryContentId),
                 e);
         }

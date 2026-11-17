@@ -78,10 +78,16 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                 .filename(dto.fileName(), StandardCharsets.UTF_8).build().toString())
             .build();
 
-        URL url = presigner.presignGetObject(GetObjectPresignRequest.builder()
-            .signatureDuration(Duration.ofSeconds(presignedUrlExpiration))
-            .getObjectRequest(getRequest)
-            .build()).url();
+        URL url;
+        try {
+            url = presigner.presignGetObject(GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofSeconds(presignedUrlExpiration))
+                .getObjectRequest(getRequest)
+                .build()).url();
+        } catch (SdkException e) {
+            throw new DiscodeitException(ExceptionType.STORAGE_UNAVAILABLE,
+                Map.of("binaryContentId", dto.id()), e);
+        }
 
         log.info("Presigned URL 발급: binaryContentId={}", dto.id());
         return ResponseEntity.status(HttpStatus.FOUND)
