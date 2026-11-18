@@ -13,6 +13,7 @@ import org.springframework.security.authorization.DefaultAuthorizationManagerFac
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -47,6 +48,11 @@ public class SecurityConfig {
                         .loginProcessingUrl("/api/auth/login")
                         .successHandler(loginSuccessHandler)
                         .failureHandler(loginFailureHandler)
+                )
+                .sessionManagement(session -> session
+                        .sessionConcurrency(concurrency -> concurrency
+                                .maximumSessions(1)
+                        )
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)

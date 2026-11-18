@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -30,6 +32,10 @@ public class CustomUserDetails implements UserDetails {
         return List.of(authority);
     }
 
+    public UUID getUserId() {
+        return userDto.id();
+    }
+
     @Override
     @NullMarked
     public String getUsername() {
@@ -44,5 +50,20 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CustomUserDetails customUserDetails)) {
+            return false;
+
+        }
+
+        return Objects.equals(customUserDetails.getUserId(), this.getUserId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getUserId());
     }
 }
