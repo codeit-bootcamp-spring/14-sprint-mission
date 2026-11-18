@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserStatusDto
 import com.sprint.mission.discodeit.application.binarycontent.out.BinaryContentStorage;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,6 +100,7 @@ public class UserApplication {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDto updateUserRole(UUID userId, Role role) {
         User found = userService.findById(userId);
         User updated = found.updateRole(role);

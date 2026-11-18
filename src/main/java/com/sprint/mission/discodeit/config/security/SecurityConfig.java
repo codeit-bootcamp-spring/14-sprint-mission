@@ -55,10 +55,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/auth/role").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/channels/public").hasRole("CHANNEL_MANAGER")
-                        .requestMatchers(HttpMethod.PATCH, "/api/channels/{id}").hasRole("CHANNEL_MANAGER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/channels/{id}").hasRole("CHANNEL_MANAGER")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )

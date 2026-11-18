@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.application.message.MessageService;
 import com.sprint.mission.discodeit.application.readstatus.ReadStatusService;
 import com.sprint.mission.discodeit.application.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class ChannelApplication {
 
     @MutationLog
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelUpsertResponse createPublicChannel(String name, String description) {
         Channel creating = Channel.createPublicChannel(name, description);
         Channel created = channelService.create(creating);
@@ -70,6 +72,7 @@ public class ChannelApplication {
 
     @MutationLog
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelUpsertResponse updateChannelName(UUID id, String name, String description) {
         Channel updated = channelService.updateNameAndDescription(id, name, description);
         return ChannelUpsertResponse.of(updated);
@@ -77,6 +80,7 @@ public class ChannelApplication {
 
     @MutationLog
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public void deleteChannel(UUID id) {
         // 채널 내부 message 삭제
         channelService.validateExists(id);
