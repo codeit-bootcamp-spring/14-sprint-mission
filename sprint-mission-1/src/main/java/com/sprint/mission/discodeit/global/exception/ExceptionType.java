@@ -124,6 +124,12 @@ public enum ExceptionType {
         Level.ERROR,
         HttpStatus.INTERNAL_SERVER_ERROR,
         "서버 내부 오류가 발생했습니다"
+    ),
+
+    LOGIN_UNAUTHORIZED(
+        Level.WARN,
+        HttpStatus.UNAUTHORIZED,
+        "로그인에 실패했습니다"
     );
 
     Level level;
