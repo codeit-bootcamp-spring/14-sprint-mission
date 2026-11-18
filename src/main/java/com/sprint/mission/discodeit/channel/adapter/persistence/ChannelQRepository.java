@@ -5,7 +5,6 @@ import static com.sprint.mission.discodeit.channel.domain.QChannel.channel;
 import static com.sprint.mission.discodeit.readstatus.domain.QReadStatus.readStatus;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sprint.mission.discodeit.channel.application.required.ChannelQRepository;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 import com.sprint.mission.discodeit.channel.domain.ChannelType;
 import java.util.List;
@@ -15,12 +14,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ChannelQRepositoryImpl implements ChannelQRepository {
+public class ChannelQRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
 
 
-  @Override
   public List<Channel> findAllByUserId(UUID userId) {
 
     return jpaQueryFactory

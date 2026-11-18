@@ -9,7 +9,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.discodeit.common.exception.DiscodeitRuntimeException;
 import com.sprint.mission.discodeit.common.exception.ErrorCode;
-import com.sprint.mission.discodeit.message.application.required.MessageQRepository;
 import com.sprint.mission.discodeit.message.domain.Message;
 import java.time.Instant;
 import java.util.List;
@@ -19,11 +18,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class MessageQRepositoryImpl implements MessageQRepository {
+public class MessageQRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
 
-  @Override
+
   public List<Message> findAllByCursor(UUID channelId, Instant cursor, UUID idAfter, int limit) {
     return jpaQueryFactory.selectFrom(message)
         .join(message.channel, channel)
