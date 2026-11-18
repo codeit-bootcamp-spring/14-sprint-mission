@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +40,7 @@ public class UserService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserDto userCreate(UserCreateRequestDto userCreateRequestDto,
@@ -74,7 +76,8 @@ public class UserService {
         }
 
         User user = userRepository.save(
-            User.create(userCreateRequestDto.username(), userCreateRequestDto.password(),
+            User.create(userCreateRequestDto.username(),
+                passwordEncoder.encode(userCreateRequestDto.password()),
                 userCreateRequestDto.email(), binaryContent));
 
         userStatusRepository.save(UserStatus.create(user));
@@ -108,7 +111,8 @@ public class UserService {
             user.updateProfile(binaryContent);
         }
 
-        user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newPassword(),
+        user.update(userUpdateRequestDto.newUsername(),
+            passwordEncoder.encode(userUpdateRequestDto.newPassword()),
             userUpdateRequestDto.newEmail());
 
         userStatusRepository.findByUser(user)
