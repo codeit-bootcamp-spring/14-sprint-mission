@@ -65,7 +65,7 @@ public class UserApiController {
         profile);
     UserDto response = userRegister.register(request, binaryContentCreateRequest);
     log.debug("유저 등록 완료: userId={}", response.id());
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/{id}")

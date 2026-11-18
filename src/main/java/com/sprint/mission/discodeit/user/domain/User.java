@@ -23,8 +23,9 @@ public class User extends BaseUpdatableEntity {
 
   @Column(name = "username", nullable = false, unique = true, length = 50)
   private String username;
+
   @Column(name = "password", nullable = false, length = 60)
-  private String password;
+  private Password password;
 
   @Column(name = "email", nullable = false, length = 100, unique = true)
   private Email email;
@@ -42,7 +43,7 @@ public class User extends BaseUpdatableEntity {
   )
   private UserStatus userStatus;
 
-  private User(String name, String password, Email email, BinaryContent profile) {
+  private User(String name, Password password, Email email, BinaryContent profile) {
     this.username = name;
     this.password = password;
     this.email = Objects.requireNonNull(email, "email 값은 필수임.");
@@ -55,7 +56,7 @@ public class User extends BaseUpdatableEntity {
   }
 
 
-  public User update(String updateName, String password, Email email, BinaryContent profile) {
+  public User update(String updateName, Password password, Email email, BinaryContent profile) {
     if (updateName != null) {
       this.username = updateName;
     }
@@ -78,7 +79,8 @@ public class User extends BaseUpdatableEntity {
   }
 
 
-  public static User create(String username, String password, Email email, BinaryContent profile) {
+  public static User create(String username, Password password, Email email,
+      BinaryContent profile) {
 
     return new User(username, password, email, profile);
   }

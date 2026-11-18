@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.user.application.provided.command.UserRegist
 import com.sprint.mission.discodeit.user.application.provided.command.UserRemover;
 import com.sprint.mission.discodeit.user.application.provided.command.UserStatusCommand;
 import com.sprint.mission.discodeit.user.application.provided.query.UserEntityFinder;
+import com.sprint.mission.discodeit.user.application.required.PasswordHasher;
 import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.domain.UserStatus;
 import java.util.List;
@@ -44,11 +45,13 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
   private final UserStatusMapper userStatusMapper;
   private final BinaryContentRegister binaryContentRegister;
   private final ApplicationEventPublisher eventPublisher;
+  private final PasswordHasher passwordHasher;
 
   @Override
   public UserDto register(UserCreateRequest request, BinaryContentCreateRequest profile) {
     BinaryContent savedProfile = registerProfile(profile);
-    User user = userCommand.create(request.username(), request.email(), request.password(),
+    String encodePassword = passwordHasher.hash(request.password());
+    User user = userCommand.create(request.username(), request.email(), encodePassword,
         savedProfile);
     log.info("유저 생성 완료: user={}", user);
     return userMapper.toDto(user);
@@ -63,8 +66,9 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
       deleteProfile(user);
     }
     BinaryContent savedProfile = registerProfile(profile);
+    String encodedPassword = passwordHasher.hash(request.newPassword());
     User updatedUser = userCommand.update(user, request.newUsername(), request.newEmail(),
-        request.newPassword(),
+        encodedPassword,
         savedProfile);
     return userMapper.toDto(updatedUser);
   }
