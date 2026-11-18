@@ -28,6 +28,8 @@ springdoc:
   swagger-ui:
     tags-sorter: alpha          # Controller 알파벳 정렬
     operations-sorter: alpha    # URL 알파벳 정렬
+    csrf:
+      enabled: true
 
 management:
   endpoints:
