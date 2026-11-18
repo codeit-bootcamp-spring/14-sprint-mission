@@ -17,6 +17,7 @@ import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ public class MessageApplication {
     private final ReadStatusService readStatusService;
     private final BinaryContentStorage binaryContentStorage;
 
+    @PreAuthorize("principal.userId == #userId")
     @MutationLog
     @Transactional
     public MessageResponseDto createMessage(String content, UUID channelId, UUID userId,
@@ -104,6 +106,7 @@ public class MessageApplication {
         );
     }
 
+    @PreAuthorize("@messageService.isAuthor(#id, principal.userId)")
     @MutationLog
     @Transactional
     public MessageResponseDto updateMessage(UUID id, String content) {
@@ -111,6 +114,7 @@ public class MessageApplication {
         return MessageResponseDto.of(updated);
     }
 
+    @PreAuthorize("@messageService.isAuthor(#id, principal.userId)")
     @MutationLog
     @Transactional
     public MessageResponseDto deleteMessage(UUID id) {

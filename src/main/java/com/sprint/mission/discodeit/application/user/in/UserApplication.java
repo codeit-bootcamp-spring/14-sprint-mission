@@ -58,6 +58,7 @@ public class UserApplication {
         return UserDto.from(users);
     }
 
+    @PreAuthorize("principal.userId == #id")
     @MutationLog
     @Transactional
     public UserDto updateUser(UUID id,
@@ -71,6 +72,7 @@ public class UserApplication {
         return UserDto.from(updated);
     }
 
+    @PreAuthorize("principal.userId == #id")
     @MutationLog
     @Transactional
     public void deleteAccount(UUID id) {

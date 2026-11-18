@@ -74,4 +74,11 @@ public class Message extends BaseUpdatableEntity {
     public UUID getChannelId() {
         return this.channel.getId();
     }
+
+    public boolean isAuthorBy(UUID userId) {
+        UUID authorId = Objects.nonNull(author)
+                ? author.getId()
+                : null;
+        return Objects.equals(userId, authorId);
+    }
 }

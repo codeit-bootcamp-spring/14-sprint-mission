@@ -66,4 +66,9 @@ public class MessageService {
                         tuple -> Optional.ofNullable(tuple.get(1, Instant.class)).orElse(null)
                 ));
     }
+
+    public boolean isAuthor(UUID id, UUID userId) {
+        Message message = findById(id);
+        return message.isAuthorBy(userId);
+    }
 }
