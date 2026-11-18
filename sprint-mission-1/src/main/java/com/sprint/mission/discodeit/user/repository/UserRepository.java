@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.user.repository;
 
+import com.sprint.mission.discodeit.user.entity.Role;
 import com.sprint.mission.discodeit.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
@@ -17,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Override
     @EntityGraph(attributePaths = {"status", "profile"})
     List<User> findAll();
+
+    boolean existsByRole(Role role);
 }

@@ -13,6 +13,15 @@ spring:
         default_batch_fetch_size: 100
         generate_statistics: true
 
+discodeit:
+  admin:
+    username: ${DISCODEIT_ADMIN_USERNAME:admin}
+    password: ${DISCODEIT_ADMIN_PASSWORD:admin1234}
+    email: ${DISCODEIT_ADMIN_EMAIL:admin@discodeit.com}
+  security:
+    remember-me:
+      key: ${DISCODEIT_REMEMBER_ME_KEY:dev-remember-me-key}
+
 logging:
   level:
     org.hibernate.SQL: debug
