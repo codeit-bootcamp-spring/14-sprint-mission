@@ -8,8 +8,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -18,15 +21,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   CsrfTokenRequestHandler spaCsrfTokenRequestHandler,
                                                    HttpStatusReturningLogoutSuccessHandler logoutSuccessHandler,
                                                    LoginSuccessHandler loginSuccessHandler,
                                                    LoginFailureHandler loginFailureHandler,
-                                                   CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
-                                                   CustomAccessDeniedHandler customAccessDeniedHandler) {
+                                                   AuthenticationEntryPoint customAuthenticationEntryPoint,
+                                                   AccessDeniedHandler customAccessDeniedHandler) {
         return http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                        .csrfTokenRequestHandler(spaCsrfTokenRequestHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
