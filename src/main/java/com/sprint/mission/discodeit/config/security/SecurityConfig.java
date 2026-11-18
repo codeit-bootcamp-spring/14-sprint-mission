@@ -33,6 +33,7 @@ public class SecurityConfig {
                                                    HttpStatusReturningLogoutSuccessHandler logoutSuccessHandler,
                                                    LoginSuccessHandler loginSuccessHandler,
                                                    LoginFailureHandler loginFailureHandler,
+                                                   UserDetailsService userDetailsService,
                                                    AuthenticationEntryPoint customAuthenticationEntryPoint,
                                                    AccessDeniedHandler customAccessDeniedHandler) {
         return http
@@ -53,6 +54,9 @@ public class SecurityConfig {
                         .sessionConcurrency(concurrency -> concurrency
                                 .maximumSessions(1)
                         )
+                )
+                .rememberMe(remember -> remember
+                        .userDetailsService(userDetailsService)
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
