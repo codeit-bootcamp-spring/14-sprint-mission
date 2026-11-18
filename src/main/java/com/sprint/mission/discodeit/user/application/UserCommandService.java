@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.user.application.provided.command.UserComman
 import com.sprint.mission.discodeit.user.application.required.UserRepository;
 import com.sprint.mission.discodeit.user.application.validation.UserValidator;
 import com.sprint.mission.discodeit.user.domain.Email;
+import com.sprint.mission.discodeit.user.domain.Password;
 import com.sprint.mission.discodeit.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,11 @@ public class UserCommandService implements UserCommand {
 
   @Override
   public User create(String username, String emailVal, String password, BinaryContent profile) {
-    Email email = new Email(emailVal);
+    Email email = Email.to(emailVal);
+    Password pwd = Password.to(password);
 
     userValidator.validateCreate(username, email);
-    User user = User.create(username, password, email, profile);
+    User user = User.create(username, pwd, email, profile);
     return userRepository.save(user);
   }
 
@@ -35,10 +37,11 @@ public class UserCommandService implements UserCommand {
   public User update(User user, String username, String emailVal, String password,
       BinaryContent profile) {
     Email email = emailVal == null ? null : new Email(emailVal);
+    Password pwd = Password.to(password);
 
     userValidator.validateUpdate(user, username, email);
 
-    return user.update(username, password, email, profile);
+    return user.update(username, pwd, email, profile);
   }
 
 }

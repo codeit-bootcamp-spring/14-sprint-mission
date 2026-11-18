@@ -23,4 +23,8 @@ public record Email(String value) {
     }
 
   }
+
+  public static Email to(String value) {
+    return new Email(value);
+  }
 }
