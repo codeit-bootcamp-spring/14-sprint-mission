@@ -33,6 +33,8 @@ public class Message extends BaseUpdatableEntity {
   @JoinColumn(name = "author_id")
   @ManyToOne(fetch = FetchType.LAZY)
   private User author;
+
+  
   @JoinTable(name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
       inverseJoinColumns = @JoinColumn(name = "attachment_id"))

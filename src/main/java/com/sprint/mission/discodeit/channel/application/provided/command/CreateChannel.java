@@ -12,6 +12,7 @@ public sealed interface CreateChannel permits CreateChannel.Public, CreateChanne
 
   }
 
+
   record Private(List<UUID> participantsIds) implements CreateChannel {
 
     public Private {

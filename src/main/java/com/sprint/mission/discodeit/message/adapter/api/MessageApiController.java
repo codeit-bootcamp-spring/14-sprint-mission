@@ -53,7 +53,7 @@ public class MessageApiController {
 
   @RequestMapping(method = RequestMethod.DELETE, value = "/{messageId}")
   public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
-    messageRemover.delete(messageId);
+    messageRemover.remove(messageId);
     return ResponseEntity.noContent().build();
   }
 

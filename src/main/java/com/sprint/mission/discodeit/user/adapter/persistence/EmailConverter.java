@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.user.domain.Email;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-@Converter(autoApply = false)
+@Converter(autoApply = true)
 public class EmailConverter implements AttributeConverter<Email, String> {
 
 
