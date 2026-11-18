@@ -36,10 +36,10 @@ class UserRepositoryImplTest {
     void givenSavedUsers_whenFindByIdIn_thenReturnMatchingUsers() {
         // given
         BinaryContent profile = BinaryContent.of("profile.png", "image/png", new byte[]{1});
-        User user1 = User.create("test1", "test1@gmail.com", "1234", profile);
-        User user2 = User.create("test2", "test2@gmail.com", "1234", null);
-        User user3 = User.create("test3", "test3@gmail.com", "1234", null);
-        User user4 = User.create("test4", "test4@gmail.com", "1234", null);
+        User user1 = User.createUser("test1", "test1@gmail.com", "1234", profile);
+        User user2 = User.createUser("test2", "test2@gmail.com", "1234", null);
+        User user3 = User.createUser("test3", "test3@gmail.com", "1234", null);
+        User user4 = User.createUser("test4", "test4@gmail.com", "1234", null);
         List<User> users = List.of(user1, user2, user3, user4);
         users.forEach(em::persist);
         em.flush();
@@ -60,8 +60,8 @@ class UserRepositoryImplTest {
     @DisplayName(value = "User 전체 조회 성공")
     void givenSavedUsers_whenFindAllUser_thenReturnAllUser() {
         List<User> users = List.of(
-                User.create("test1", "test1@gmail.com", "1234", null),
-                User.create("test2", "test2@gmail.com", "1234", null)
+                User.createUser("test1", "test1@gmail.com", "1234", null),
+                User.createUser("test2", "test2@gmail.com", "1234", null)
         );
         users.forEach(em::persist);
         em.flush();

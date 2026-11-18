@@ -33,7 +33,7 @@ class UserServiceTest {
     @Test
     @DisplayName("User 생성 성공 시, 생성 정보를 반환")
     void whenCreateUser_thenReturnCreatedUser() {
-        User creating = User.create(
+        User creating = User.createUser(
                 "test",
                 "test@gmail.com",
                 "1234",
@@ -62,7 +62,7 @@ class UserServiceTest {
     @Test
     @DisplayName("이미 사용중인 username 혹은 email 중복일 때, User 생성 실패 시, ")
     void givenUsernameOrEmailAlreadyExists_whenCreateUserFailed_then() {
-        User creating = User.create(
+        User creating = User.createUser(
                 "existing",
                 "existing@gmail.com",
                 "1234",
@@ -89,7 +89,7 @@ class UserServiceTest {
     @DisplayName("User 삭제 성공")
     void whenDeleteUser_thenUserDeleted() {
         UUID id = UUID.randomUUID();
-        User deleting = User.create(
+        User deleting = User.createUser(
                 "test",
                 "test@gmail.com",
                 "1234",
@@ -106,7 +106,7 @@ class UserServiceTest {
     @Test
     @DisplayName("수정 가능한 모든 인자가 주어진 경우, User 갱신 성공 시, 갱신 정보 반환")
     void givenAllArgument_whenUpdateUser_thenReturnUpdatedUser() {
-        User updating = User.create(
+        User updating = User.createUser(
                 "test",
                 "test@gmail.com",
                 "1234",
@@ -141,7 +141,7 @@ class UserServiceTest {
     @Test
     @DisplayName("수정 가능한 일부 인자가 주어진 경우, User 갱신 성공 시, 갱신된 정보만 반환")
     void givenPartialArgument_whenUpdateUser_thenReturnPartiallyUpdatedUser() {
-        User updating = User.create(
+        User updating = User.createUser(
                 "test",
                 "test@gmail.com",
                 "1234",

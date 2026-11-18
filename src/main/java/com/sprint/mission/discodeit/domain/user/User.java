@@ -47,16 +47,13 @@ public class User extends BaseUpdatableEntity {
     @Column(nullable = false, length = 20)
     private Role role;
 
-    public static User create(
+    public static User createUser(
             String username,
             String email,
             String password,
             BinaryContent createdProfile
     ) {
-        Role userRole = Role.USER;
-        User user = new User(username, email, password, createdProfile, userRole);
-        user.status = UserStatus.create(user);
-        return user;
+        return createAccount(username, email, password, createdProfile, Role.USER);
     }
 
     public static User createAdmin(
@@ -64,8 +61,17 @@ public class User extends BaseUpdatableEntity {
             String email,
             String password
     ) {
-        Role adminRole = Role.ADMIN;
-        return new User(username, email, password, null, adminRole);
+        return createAccount(username, email, password, null, Role.ADMIN);
+    }
+
+    private static User createAccount(String username,
+                               String email,
+                               String password,
+                               BinaryContent createdProfile,
+                               Role role) {
+        User newUser = new User(username, email, password, createdProfile, role);
+        newUser.status = UserStatus.create(newUser);
+        return newUser;
     }
 
     private User(String username, String email, String password, @Nullable BinaryContent profile, Role role) {

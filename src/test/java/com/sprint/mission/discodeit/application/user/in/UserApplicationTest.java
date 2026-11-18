@@ -45,7 +45,7 @@ class UserApplicationTest {
         CreateBinaryContentCommand command = createBinaryContentCommand();
 
         when(userService.create(eq(username), eq(email), eq(password), any(BinaryContent.class)))
-                .thenAnswer(invocation -> User.create(username, email, password, invocation.getArgument(3)));
+                .thenAnswer(invocation -> User.createUser(username, email, password, invocation.getArgument(3)));
 
         // when
         UserDto response = userApplication.createAccount(username, email, password, command);
@@ -73,7 +73,7 @@ class UserApplicationTest {
         CreateBinaryContentCommand command = null;
 
         when(userService.create(eq(username), eq(email), eq(password), isNull()))
-                .thenReturn(User.create(username, email, password, null));
+                .thenReturn(User.createUser(username, email, password, null));
 
         // when
         UserDto created = userApplication.createAccount(username, email, password, command);
@@ -111,7 +111,7 @@ class UserApplicationTest {
     @DisplayName("User 갱신 수정 성공 시, 수정 정보를 반환하고 프로필을 저장한다.")
     void whenUpdateUser_thenReturnUpdatedUser() {
         UUID userId = UUID.randomUUID();
-        User existing = User.create(
+        User existing = User.createUser(
                 "existing",
                 "existing@gmail.com",
                 "existing",
@@ -158,7 +158,7 @@ class UserApplicationTest {
     @DisplayName("프로필 요창이 null일 때, User 수정 성공 시, 수정 정보를 반환한다.")
     void givenNullProfile_whenUpdateUser_thenReturnOnlyUpdatedUser() {
         UUID userId = UUID.randomUUID();
-        User existing = User.create(
+        User existing = User.createUser(
                 "existing",
                 "existing@gmail.com",
                 "existing",

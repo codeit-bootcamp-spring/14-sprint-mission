@@ -24,7 +24,7 @@ public class UserService {
 
     public User create(String username, String email, String password, @Nullable BinaryContent profile) {
         validateNameAndEmailAvailable(username, email);
-        User creating = User.create(username, email, passwordEncoder.encode(password), profile);
+        User creating = User.createUser(username, email, passwordEncoder.encode(password), profile);
         return userRepository.save(creating);
     }
 
