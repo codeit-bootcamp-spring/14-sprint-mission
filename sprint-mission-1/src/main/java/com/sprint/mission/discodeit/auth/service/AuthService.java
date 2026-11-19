@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class AuthService {
     private final UserMapper userMapper;
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDto updateRole(@Valid UserRoleUpdateRequestDto request) {
         User user = userRepository.findById(request.userId())
             .orElseThrow(() -> new DiscodeitException(ExceptionType.USER_NOT_FOUND));
