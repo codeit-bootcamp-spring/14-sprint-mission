@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.auth.application.provided.AuthLogin;
 import com.sprint.mission.discodeit.user.application.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +21,11 @@ public class AuthApiController {
   public ResponseEntity<UserDto> login(@RequestBody LoginRequest request) {
     UserDto response = authLogin.login(request);
     return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/api/auth/csrf-token")
+  public ResponseEntity<Void> csrfToken() {
+    return ResponseEntity.noContent().build();
   }
 
 }
