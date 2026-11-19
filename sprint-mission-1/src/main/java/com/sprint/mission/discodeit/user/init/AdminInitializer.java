@@ -3,7 +3,8 @@ package com.sprint.mission.discodeit.user.init;
 import com.sprint.mission.discodeit.user.entity.Role;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
+import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Slf4j
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 public class AdminInitializer implements ApplicationRunner {
 
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
     private final PasswordEncoder passwordEncoder;
     @Value("${discodeit.admin.username}")
     private String username;
@@ -32,9 +35,18 @@ public class AdminInitializer implements ApplicationRunner {
         if (userRepository.existsByRole(Role.ADMIN)) {
             return;
         }
+        // 같은 username/email의 일반 계정이 있으면 중복 생성하지 않는다 (user_name에 UNIQUE 제약 없음)
+        if (userRepository.findByUserName(username).isPresent()
+            || userRepository.findByEmail(email).isPresent()) {
+            log.warn("어드민 계정 초기화 건너뜀: username 또는 email이 이미 사용 중입니다. username={}",
+                username);
+            return;
+        }
         User admin = User.create(username, passwordEncoder.encode(password), email);
         admin.updateRole(Role.ADMIN);
         userRepository.save(admin);
+        // 회원가입과 같이 UserStatus를 만들어야 프로필 수정 시 USER_STATUS_MISSING_FOR_USER가 나지 않는다
+        userStatusRepository.save(UserStatus.create(admin));
         log.info("어드민 계정 초기화: {}", username);
     }
 }
