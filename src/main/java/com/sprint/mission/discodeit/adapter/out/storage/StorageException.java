@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.adapter.out.storage;
 
-import com.sprint.mission.discodeit.common.exception.CustomException;
+import com.sprint.mission.discodeit.core.common.exception.CustomException;
 
 import java.util.Map;
 

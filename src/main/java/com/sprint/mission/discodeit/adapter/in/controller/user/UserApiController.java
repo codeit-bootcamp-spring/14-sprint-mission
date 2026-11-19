@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.adapter.in.controller.user;
 import com.sprint.mission.discodeit.adapter.in.controller.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.adapter.in.controller.multipart.MultiPartFileUtil;
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.*;
-import com.sprint.mission.discodeit.application.user.in.UserApplication;
+import com.sprint.mission.discodeit.core.application.user.in.UserApplication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

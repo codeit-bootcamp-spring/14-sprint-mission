@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.in.controller.channel.dto;
 
-import com.sprint.mission.discodeit.domain.channel.Channel;
-import com.sprint.mission.discodeit.domain.channel.ChannelType;
+import com.sprint.mission.discodeit.core.domain.channel.Channel;
+import com.sprint.mission.discodeit.core.domain.channel.ChannelType;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 

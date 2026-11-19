@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.adapter.in.controller.auth;
 
-import com.sprint.mission.discodeit.domain.user.Role;
+import com.sprint.mission.discodeit.core.domain.user.Role;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;

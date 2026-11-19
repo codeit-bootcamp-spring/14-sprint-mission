@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.adapter.in.controller.multipart;
 
-import com.sprint.mission.discodeit.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.core.common.exception.ExceptionType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

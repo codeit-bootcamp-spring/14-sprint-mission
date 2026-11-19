@@ -1,0 +1,54 @@
+package com.sprint.mission.discodeit.core.application.channel;
+
+import com.sprint.mission.discodeit.core.application.channel.out.ChannelRepository;
+import com.sprint.mission.discodeit.core.domain.channel.Channel;
+import com.sprint.mission.discodeit.core.domain.channel.ChannelException;
+import com.sprint.mission.discodeit.core.domain.channel.ChannelExceptionType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class ChannelService {
+    private final ChannelRepository channelRepository;
+
+    public Channel create(Channel channel) {
+        return channelRepository.save(channel);
+    }
+
+    public Channel findById(UUID id) {
+        return channelRepository.findById(id)
+                .orElseThrow(() -> getChannelNotFoundException(id));
+    }
+
+    public List<Channel> findAccessibleByUserId(UUID userId) {
+        return channelRepository.findAccessibleByUserId(userId);
+    }
+
+    public void deleteById(UUID id) {
+        Channel deleting = findById(id);
+        channelRepository.delete(deleting);
+    }
+
+    public Channel updateNameAndDescription(UUID id, String name, String description) {
+        Channel updating = findById(id);
+        return updating.updateNameAndDescription(name, description);
+    }
+
+    public void validateExists(UUID id) {
+        if (!channelRepository.existsById(id)) {
+            throw getChannelNotFoundException(id);
+        }
+    }
+
+    private ChannelException getChannelNotFoundException(UUID id) {
+        return new ChannelException(
+                ChannelExceptionType.CHANNEL_NOT_FOUND,
+                Map.of("id", id)
+        );
+    }
+}

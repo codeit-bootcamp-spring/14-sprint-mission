@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.adapter.in.controller.readStatus.dto;
 
-import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
+import com.sprint.mission.discodeit.core.domain.readstatus.ReadStatus;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;

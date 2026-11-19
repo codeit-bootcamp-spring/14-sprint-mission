@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.adapter.in.controller.auth;
 
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
-import com.sprint.mission.discodeit.application.user.in.UserApplication;
-import com.sprint.mission.discodeit.config.security.CustomUserDetails;
+import com.sprint.mission.discodeit.core.application.user.in.UserApplication;
+import com.sprint.mission.discodeit.core.config.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

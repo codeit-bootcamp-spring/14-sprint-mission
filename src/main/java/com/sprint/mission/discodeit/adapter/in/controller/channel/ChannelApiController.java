@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.in.controller.channel;
 
 import com.sprint.mission.discodeit.adapter.in.controller.channel.dto.*;
-import com.sprint.mission.discodeit.application.channel.in.ChannelApplication;
+import com.sprint.mission.discodeit.core.application.channel.in.ChannelApplication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

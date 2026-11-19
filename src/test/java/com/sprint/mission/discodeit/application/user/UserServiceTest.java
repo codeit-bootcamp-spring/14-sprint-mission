@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.application.user;
 
-import com.sprint.mission.discodeit.application.user.out.UserRepository;
-import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
-import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.domain.user.UserException;
-import com.sprint.mission.discodeit.domain.user.UserExceptionType;
+import com.sprint.mission.discodeit.core.application.user.UserService;
+import com.sprint.mission.discodeit.core.application.user.out.UserRepository;
+import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
+import com.sprint.mission.discodeit.core.domain.user.User;
+import com.sprint.mission.discodeit.core.domain.user.UserException;
+import com.sprint.mission.discodeit.core.domain.user.UserExceptionType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

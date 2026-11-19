@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.adapter.out.persistence;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sprint.mission.discodeit.domain.readstatus.QReadStatus;
-import com.sprint.mission.discodeit.domain.readstatus.ReadStatus;
-import com.sprint.mission.discodeit.application.readstatus.out.ReadStatusRepositoryCustom;
+import com.sprint.mission.discodeit.core.domain.readstatus.QReadStatus;
+import com.sprint.mission.discodeit.core.domain.readstatus.ReadStatus;
+import com.sprint.mission.discodeit.core.application.readstatus.out.ReadStatusRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

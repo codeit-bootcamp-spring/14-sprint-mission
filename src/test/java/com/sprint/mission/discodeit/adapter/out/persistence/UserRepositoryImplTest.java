@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.adapter.out.persistence;
 
 import com.sprint.mission.discodeit.adapter.out.persistence.config.QueryDslConfig;
-import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
-import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
+import com.sprint.mission.discodeit.core.domain.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

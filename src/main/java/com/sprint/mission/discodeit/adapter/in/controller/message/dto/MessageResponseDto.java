@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.adapter.in.controller.message.dto;
 
-import com.sprint.mission.discodeit.domain.message.Message;
+import com.sprint.mission.discodeit.core.domain.message.Message;
 import com.sprint.mission.discodeit.adapter.in.controller.binaryContent.dto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
 import jakarta.validation.constraints.NotBlank;

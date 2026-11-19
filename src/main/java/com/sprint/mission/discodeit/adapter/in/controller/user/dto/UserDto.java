@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.adapter.in.controller.user.dto;
 
-import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
-import com.sprint.mission.discodeit.domain.user.Role;
-import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
+import com.sprint.mission.discodeit.core.domain.user.Role;
+import com.sprint.mission.discodeit.core.domain.user.User;
 
 import java.util.UUID;
 

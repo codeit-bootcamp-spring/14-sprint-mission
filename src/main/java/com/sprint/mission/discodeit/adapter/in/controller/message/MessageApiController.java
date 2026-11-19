@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.adapter.in.controller.common.PageResponse;
 import com.sprint.mission.discodeit.adapter.in.controller.message.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.adapter.in.controller.message.dto.MessageResponseDto;
 import com.sprint.mission.discodeit.adapter.in.controller.message.dto.MessageUpdateDto;
-import com.sprint.mission.discodeit.application.message.in.MessageApplication;
+import com.sprint.mission.discodeit.core.application.message.in.MessageApplication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

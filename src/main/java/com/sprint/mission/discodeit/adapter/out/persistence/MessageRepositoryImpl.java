@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.adapter.out.persistence;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sprint.mission.discodeit.application.message.out.MessageRepositoryCustom;
-import com.sprint.mission.discodeit.domain.message.QMessage;
+import com.sprint.mission.discodeit.core.application.message.out.MessageRepositoryCustom;
+import com.sprint.mission.discodeit.core.domain.message.QMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

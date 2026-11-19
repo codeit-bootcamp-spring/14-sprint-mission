@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.adapter.out.persistence;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sprint.mission.discodeit.domain.user.QUser;
-import com.sprint.mission.discodeit.domain.user.User;
-import com.sprint.mission.discodeit.application.user.out.UserRepositoryCustom;
+import com.sprint.mission.discodeit.core.domain.user.QUser;
+import com.sprint.mission.discodeit.core.domain.user.User;
+import com.sprint.mission.discodeit.core.application.user.out.UserRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

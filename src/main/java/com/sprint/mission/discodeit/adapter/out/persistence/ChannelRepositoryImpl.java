@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit.adapter.out.persistence;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sprint.mission.discodeit.domain.channel.Channel;
-import com.sprint.mission.discodeit.application.channel.out.ChannelRepositoryCustom;
-import com.sprint.mission.discodeit.domain.channel.ChannelType;
-import com.sprint.mission.discodeit.domain.channel.QChannel;
-import com.sprint.mission.discodeit.domain.readstatus.QReadStatus;
-import com.sprint.mission.discodeit.domain.user.QUser;
+import com.sprint.mission.discodeit.core.domain.channel.Channel;
+import com.sprint.mission.discodeit.core.application.channel.out.ChannelRepositoryCustom;
+import com.sprint.mission.discodeit.core.domain.channel.ChannelType;
+import com.sprint.mission.discodeit.core.domain.channel.QChannel;
+import com.sprint.mission.discodeit.core.domain.readstatus.QReadStatus;
+import com.sprint.mission.discodeit.core.domain.user.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.adapter.in.controller.readStatus;
 import com.sprint.mission.discodeit.adapter.in.controller.readStatus.dto.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.adapter.in.controller.readStatus.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.adapter.in.controller.readStatus.dto.ReadStatusUpdateDto;
-import com.sprint.mission.discodeit.application.readstatus.in.ReadStatusApplication;
+import com.sprint.mission.discodeit.core.application.readstatus.in.ReadStatusApplication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

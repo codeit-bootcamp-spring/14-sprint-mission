@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.adapter.in.controller.binaryContent.dto;
 
-import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
+import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
 
 import java.util.List;
 import java.util.UUID;
