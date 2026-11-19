@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.user.Role;
 import com.sprint.mission.discodeit.domain.user.User;
 
-import java.util.List;
 import java.util.UUID;
 
 public record UserDto(UUID id,
@@ -14,20 +13,18 @@ public record UserDto(UUID id,
                       Boolean online,
                       Role role) {
 
-    public static UserDto from(User user) {
+    public static UserDto from(User user, boolean isOnline) {
         return new UserDto(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getProfile(),
-                user.isOnline(),
+                isOnline,
                 user.getRole()
         );
     }
 
-    public static List<UserDto> from(List<User> users) {
-        return users.stream()
-                .map(UserDto::from)
-                .toList();
+    public UserDto withOnline(boolean isOnline) {
+        return new UserDto(id, username, email, profile, isOnline, role);
     }
 }

@@ -37,18 +37,6 @@ CREATE TABLE users
         ON DELETE SET NULL
 );
 
-CREATE TABLE user_statuses
-(
-    id             uuid PRIMARY KEY,
-    created_at     timestamp with time zone NOT NULL,
-    updated_at     timestamp with time zone,
-    last_active_at timestamp with time zone NOT NULL,
-    user_id        uuid UNIQUE NOT NULL,
-    FOREIGN KEY (user_id)
-        REFERENCES users (id)
-        ON DELETE CASCADE
-);
-
 CREATE TABLE read_statuses
 (
     id           uuid PRIMARY KEY,

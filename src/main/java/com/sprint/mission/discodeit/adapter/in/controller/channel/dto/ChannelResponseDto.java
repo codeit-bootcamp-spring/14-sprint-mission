@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.adapter.in.controller.channel.dto;
 
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.ChannelType;
-import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -18,13 +17,13 @@ public record ChannelResponseDto(@NotNull UUID id,
                                  @Nullable List<UserDto> participants,
                                  @NotNull Instant lastMessageAt) {
 
-    public static ChannelResponseDto of(Channel channel, List<User> participantIds, Instant lastMessageAt) {
+    public static ChannelResponseDto of(Channel channel, List<UserDto> participants, Instant lastMessageAt) {
         return new ChannelResponseDto(
                 channel.getId(),
                 channel.getType(),
                 channel.getName(),
                 channel.getDescription(),
-                channel.isPrivate() ? UserDto.from(participantIds) : null,
+                participants,
                 lastMessageAt
         );
     }

@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.application.readstatus.ReadStatusService;
 import com.sprint.mission.discodeit.domain.user.Role;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
-import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.application.binarycontent.out.BinaryContentStorage;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -39,7 +37,8 @@ public class UserApplication {
         BinaryContent createdProfile = createProfile(createProfileCommand);
         User createdUser = userService.create(username, email, password, createdProfile);
         saveCreatedProfile(createProfileCommand, createdProfile);
-        return UserDto.from(createdUser);
+        boolean isOnline = authService.isOnline(createdUser);
+        return UserDto.from(createdUser, isOnline);
     }
 
     private void saveCreatedProfile(CreateBinaryContentCommand createProfileCommand, BinaryContent createdProfile) {
@@ -51,13 +50,19 @@ public class UserApplication {
     @Transactional
     public UserDto getUser(UUID id) {
         User foundUser = userService.findById(id);
-        return UserDto.from(foundUser);
+        boolean isOnline = authService.isOnline(foundUser);
+        return UserDto.from(foundUser, isOnline);
     }
 
     @Transactional
     public List<UserDto> getAllUsers() {
         List<User> users = userService.findAll();
-        return UserDto.from(users);
+        return users.stream()
+                .map(user -> {
+                    boolean isOnline = authService.isOnline(user);
+                    return UserDto.from(user, isOnline);
+                })
+                .toList();
     }
 
     @PreAuthorize("principal.userId == #id")
@@ -71,7 +76,8 @@ public class UserApplication {
         User updated = userService.update(id, username, email, password, createdProfile);
         userService.flush();
         saveCreatedProfile(createProfileCommand, createdProfile);
-        return UserDto.from(updated);
+        boolean isOnline = authService.isOnline(updated);
+        return UserDto.from(updated, isOnline);
     }
 
     @PreAuthorize("principal.userId == #id")
@@ -82,14 +88,6 @@ public class UserApplication {
         readStatusService.deleteAllByUserId(id);
         userService.deleteById(id);
     }
-
-    @MutationLog
-    @Transactional
-    public UserStatusDto updateUserStatus(UUID id, Instant newLastActiveAt) {
-        User updated = userService.updateNewLastActiveAt(id, newLastActiveAt);
-        return UserStatusDto.from(updated);
-    }
-
 
     private @Nullable BinaryContent createProfile(CreateBinaryContentCommand profileCreateCommand) {
         if (Objects.isNull(profileCreateCommand)) {
@@ -109,7 +107,8 @@ public class UserApplication {
         User found = userService.findById(userId);
         User updated = found.updateRole(role);
         authService.removeSession(updated);
-        return UserDto.from(updated);
+        boolean isOnline = authService.isOnline(updated);
+        return UserDto.from(updated, isOnline);
     }
 
     @Transactional

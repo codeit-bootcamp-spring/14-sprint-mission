@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,6 +18,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -50,26 +50,11 @@ public class UserService {
         userRepository.delete(deleting);
     }
 
-    public User findByNameAndPassword(String name, String password) {
-        User user = userRepository.findByUsername(name)
-                .orElseThrow(() -> new UserException(UserExceptionType.LOGIN_FAILED, Map.of("name", name)));
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new UserException(UserExceptionType.LOGIN_FAILED, Map.of("name", name));
-        }
-        return user;
-    }
-
     public User update(UUID id, String username, String email, String password, @Nullable BinaryContent profile) {
         validateUsernameAndEmailAvailableWhereUserNot(username, email, id);
         User updating = findById(id);
         String encodedPassword = password == null ? null : passwordEncoder.encode(password);
         return updating.update(username, email, encodedPassword, profile);
-    }
-
-
-    public User updateNewLastActiveAt(UUID id, Instant newLastActiveAt) {
-        User updating = findById(id);
-        return updating.updateLastActiveAt(newLastActiveAt);
     }
 
     public void validateExistsById(UUID id) {

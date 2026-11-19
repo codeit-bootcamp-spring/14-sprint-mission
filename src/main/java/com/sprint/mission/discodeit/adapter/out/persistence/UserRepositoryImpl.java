@@ -34,7 +34,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     private JPAQuery<User> getUserJPAQuery() {
         return queryFactory
                 .selectFrom(user)
-                .join(user.status).fetchJoin()
                 .leftJoin(user.profile).fetchJoin();
     }
 }

@@ -17,14 +17,14 @@ public record MessageResponseDto(@NotNull UUID id,
                                  @NotNull UUID channelId,
                                  @NotNull UserDto author,
                                  @NotNull List<BinaryContentResponseDto> attachments) {
-    public static MessageResponseDto of(Message message) {
+    public static MessageResponseDto of(Message message, boolean authorOnline) {
         return new MessageResponseDto(
                 message.getId(),
                 message.getCreatedAt(),
                 message.getUpdatedAt(),
                 message.getContent(),
                 message.getChannelId(),
-                UserDto.from(message.getAuthor()),
+                UserDto.from(message.getAuthor(), authorOnline),
                 BinaryContentResponseDto.from(message.getAttachments())
         );
     }

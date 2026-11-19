@@ -70,13 +70,4 @@ public class UserApiController {
     public UserDto read(@PathVariable UUID id) {
         return userApplication.getUser(id);
     }
-
-    @ResponseStatus(HttpStatus.OK)
-    @PatchMapping(value = "/{userId}/userStatus")
-    public UserStatusDto updateUserStatus(
-            @PathVariable UUID userId,
-            @Valid @RequestBody UserStatusUpdateRequest request
-    ) {
-        return userApplication.updateUserStatus(userId, request.newLastActiveAt());
-    }
 }

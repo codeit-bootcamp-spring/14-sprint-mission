@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.application.channel.ChannelService;
 import com.sprint.mission.discodeit.application.message.MessageService;
 import com.sprint.mission.discodeit.application.readstatus.ReadStatusService;
 import com.sprint.mission.discodeit.application.user.UserService;
+import com.sprint.mission.discodeit.application.user.AuthService;
+import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class ChannelApplication {
     private final ChannelService channelService;
     private final MessageService messageService;
     private final UserService userService;
+    private final AuthService authService;
     private final ReadStatusService readStatusService;
 
     @MutationLog
@@ -62,11 +65,18 @@ public class ChannelApplication {
         Map<UUID, Instant> channelLastMessageAt = messageService.findLastMessageAtByChannelId(channelIds);
 
         return accessibleChannels.stream()
-                .map(channel -> ChannelResponseDto.of(
-                        channel,
-                        channel.getParticipants(),
-                        Optional.ofNullable(channelLastMessageAt.get(channel.getId())).orElse(channel.getUpdatedAt())
-                ))
+                .map(channel -> {
+                    List<UserDto> participants = channel.isPrivate()
+                            ? channel.getParticipants().stream()
+                                    .map(user -> UserDto.from(user, authService.isOnline(user)))
+                                    .toList()
+                            : null;
+                    return ChannelResponseDto.of(
+                            channel,
+                            participants,
+                            Optional.ofNullable(channelLastMessageAt.get(channel.getId())).orElse(channel.getUpdatedAt())
+                    );
+                })
                 .toList();
     }
 

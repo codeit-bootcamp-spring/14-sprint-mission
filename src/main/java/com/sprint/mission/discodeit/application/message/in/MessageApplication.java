@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.adapter.in.controller.multipart.CreateBinary
 import com.sprint.mission.discodeit.application.channel.ChannelService;
 import com.sprint.mission.discodeit.application.readstatus.ReadStatusService;
 import com.sprint.mission.discodeit.application.user.UserService;
+import com.sprint.mission.discodeit.application.user.AuthService;
 import com.sprint.mission.discodeit.common.log.MutationLog;
 import com.sprint.mission.discodeit.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.domain.channel.Channel;
@@ -31,6 +32,7 @@ public class MessageApplication {
     private final MessageService messageService;
     private final ChannelService channelService;
     private final UserService userService;
+    private final AuthService authService;
     private final ReadStatusService readStatusService;
     private final BinaryContentStorage binaryContentStorage;
 
@@ -57,7 +59,7 @@ public class MessageApplication {
 
         saveCreatedAttachments(createdAttachments, createFileCommands);
 
-        return MessageResponseDto.of(created);
+        return toResponse(created);
     }
 
     private void saveCreatedAttachments(List<BinaryContent> createdAttachments, List<CreateBinaryContentCommand> createFileCommands) {
@@ -98,7 +100,7 @@ public class MessageApplication {
                         Optional.ofNullable(cursor).orElse(Instant.now(Clock.systemDefaultZone())),
                         pageable
                 )
-                .map(MessageResponseDto::of);
+                .map(this::toResponse);
 
         return PageResponse.fromSlice(
                 retrieved,
@@ -111,7 +113,7 @@ public class MessageApplication {
     @Transactional
     public MessageResponseDto updateMessage(UUID id, String content) {
         Message updated = messageService.updateContent(id, content);
-        return MessageResponseDto.of(updated);
+        return toResponse(updated);
     }
 
     @PreAuthorize("@messageService.isAuthor(#id, principal.userId)")
@@ -119,6 +121,10 @@ public class MessageApplication {
     @Transactional
     public MessageResponseDto deleteMessage(UUID id) {
         Message deleted = messageService.deleteById(id);
-        return MessageResponseDto.of(deleted);
+        return toResponse(deleted);
+    }
+
+    private MessageResponseDto toResponse(Message message) {
+        return MessageResponseDto.of(message, authService.isOnline(message.getAuthor()));
     }
 }

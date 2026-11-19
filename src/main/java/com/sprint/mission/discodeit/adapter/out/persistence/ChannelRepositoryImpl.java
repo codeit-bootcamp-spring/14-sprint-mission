@@ -26,7 +26,6 @@ public class ChannelRepositoryImpl implements ChannelRepositoryCustom {
         return queryFactory
                 .selectFrom(channel).distinct()
                 .leftJoin(channel.participants, participant).fetchJoin()
-                .leftJoin(participant.status).fetchJoin()
                 .leftJoin(participant.profile).fetchJoin()
                 .where(
                         channelTypeEqualsPublic()

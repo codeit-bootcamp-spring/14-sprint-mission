@@ -8,7 +8,6 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
 import java.util.*;
 
 @Entity
@@ -35,15 +34,6 @@ public class User extends BaseUpdatableEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private BinaryContent profile;
 
-    @OneToOne(
-            mappedBy = "user",
-            optional = false,
-            fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-            orphanRemoval = true
-    )
-    private UserStatus status;
-
     @Column(nullable = false, length = 20)
     private Role role;
 
@@ -53,7 +43,7 @@ public class User extends BaseUpdatableEntity {
             String password,
             BinaryContent createdProfile
     ) {
-        return createAccount(username, email, password, createdProfile, Role.USER);
+        return new User(username, email, password, createdProfile, Role.USER);
     }
 
     public static User createAdmin(
@@ -61,17 +51,7 @@ public class User extends BaseUpdatableEntity {
             String email,
             String password
     ) {
-        return createAccount(username, email, password, null, Role.ADMIN);
-    }
-
-    private static User createAccount(String username,
-                               String email,
-                               String password,
-                               BinaryContent createdProfile,
-                               Role role) {
-        User newUser = new User(username, email, password, createdProfile, role);
-        newUser.status = UserStatus.create(newUser);
-        return newUser;
+        return new User(username, email, password, null, Role.ADMIN);
     }
 
     private User(String username, String email, String password, @Nullable BinaryContent profile, Role role) {
@@ -104,23 +84,6 @@ public class User extends BaseUpdatableEntity {
         if (Objects.nonNull(t)) {
             runnable.run();
         }
-    }
-
-    public boolean isOnline() {
-        return status.isOnline();
-    }
-
-    public Instant getLastSeenAt() {
-        return status.getLastSeenAt();
-    }
-
-    public UUID getStatusId() {
-        return this.status.getId();
-    }
-
-    public User updateLastActiveAt(Instant newLastActiveAt) {
-        this.status.updateLastSeenAt(newLastActiveAt);
-        return this;
     }
 
     public User updateRole(Role role) {

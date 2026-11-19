@@ -15,7 +15,20 @@ public class AuthService {
     private final SessionRegistry sessionRegistry;
 
     public void removeSession(User user) {
-        CustomUserDetails principal = new CustomUserDetails(UserDto.from(user), user.getPassword());
+        CustomUserDetails principal = getPrincipal(user);
         sessionRegistry.getAllSessions(principal, false).forEach(SessionInformation::expireNow);
+    }
+
+    public boolean isOnline(User user) {
+        CustomUserDetails principal = getPrincipal(user);
+        return sessionsExists(principal);
+    }
+
+    private CustomUserDetails getPrincipal(User user) {
+        return new CustomUserDetails(UserDto.from(user, false), user.getPassword());
+    }
+
+    private boolean sessionsExists(CustomUserDetails principal) {
+        return !sessionRegistry.getAllSessions(principal, false).isEmpty();
     }
 }

@@ -33,7 +33,7 @@ public class AuthApiController {
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     public UserDto getUserBySessionId(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return userDetails.getUserDto();
+        return userDetails.getUserDto().withOnline(true);
     }
 
     @PutMapping("/role")
