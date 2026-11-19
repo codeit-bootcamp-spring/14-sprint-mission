@@ -13,6 +13,8 @@ import org.springframework.security.authorization.DefaultAuthorizationManagerFac
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
@@ -33,6 +36,7 @@ public class SecurityConfig {
                                                    HttpStatusReturningLogoutSuccessHandler logoutSuccessHandler,
                                                    LoginSuccessHandler loginSuccessHandler,
                                                    LoginFailureHandler loginFailureHandler,
+                                                   SessionRegistry sessionRegistry,
                                                    UserDetailsService userDetailsService,
                                                    AuthenticationEntryPoint customAuthenticationEntryPoint,
                                                    AccessDeniedHandler customAccessDeniedHandler) {
@@ -53,6 +57,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionConcurrency(concurrency -> concurrency
                                 .maximumSessions(1)
+                                .sessionRegistry(sessionRegistry)
                         )
                 )
                 .rememberMe(remember -> remember
@@ -69,6 +74,16 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .build();
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
     }
 
     @Bean

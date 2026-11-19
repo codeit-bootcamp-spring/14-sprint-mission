@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.application.user.in;
 
+import com.sprint.mission.discodeit.application.user.AuthService;
 import com.sprint.mission.discodeit.application.user.UserService;
 import com.sprint.mission.discodeit.adapter.in.controller.multipart.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.common.log.MutationLog;
@@ -25,6 +26,7 @@ public class UserApplication {
     private final UserService userService;
     private final ReadStatusService readStatusService;
     private final BinaryContentStorage binaryContentStorage;
+    private final AuthService authService;
 
     @MutationLog
     @Transactional
@@ -106,6 +108,7 @@ public class UserApplication {
     public UserDto updateUserRole(UUID userId, Role role) {
         User found = userService.findById(userId);
         User updated = found.updateRole(role);
+        authService.removeSession(updated);
         return UserDto.from(updated);
     }
 

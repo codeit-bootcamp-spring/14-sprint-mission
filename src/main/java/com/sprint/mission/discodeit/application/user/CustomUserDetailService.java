@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     @NullMarked
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User found = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(UserExceptionType.USER_NOT_FOUND.getDescription()));
 
