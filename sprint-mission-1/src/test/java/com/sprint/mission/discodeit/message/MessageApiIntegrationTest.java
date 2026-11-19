@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@WithMockUser
 class MessageApiIntegrationTest {
 
     @Autowired
@@ -58,7 +61,7 @@ class MessageApiIntegrationTest {
             ("{\"authorId\":\"" + author.getId() + "\",\"channelId\":\"" + channel.getId()
                 + "\",\"content\":\"안녕\"}").getBytes());
 
-        mockMvc.perform(multipart("/api/messages").file(requestPart))
+        mockMvc.perform(multipart("/api/messages").file(requestPart).with(csrf()))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.content").value("안녕"));
 
