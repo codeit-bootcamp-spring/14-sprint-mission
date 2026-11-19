@@ -43,7 +43,7 @@ public class UserController implements UserApi {
         .flatMap(this::resolveProfileRequest);
     UserDto createdUser = userService.create(userCreateRequest, profileRequest);
     return ResponseEntity
-        .status(HttpStatus.CREATED)
+        .status(HttpStatus.OK)
         .body(createdUser);
   }
 

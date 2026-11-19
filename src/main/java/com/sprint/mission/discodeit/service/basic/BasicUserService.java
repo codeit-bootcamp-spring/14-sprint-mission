@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -39,6 +40,7 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   @Transactional
@@ -66,9 +68,9 @@ public class BasicUserService implements UserService {
           return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
-
+    String hashedPassword = passwordEncoder.encode(userCreateRequest.password());
     User createdUser = userRepository.save(
-        new User(username, email, userCreateRequest.password(), profile)
+        new User(username, email, hashedPassword, profile)
     );
     userStatusRepository.save(new UserStatus(createdUser, Instant.now()));
     return toDto(createdUser);
@@ -133,7 +135,11 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    user.update(newUsername, newEmail, userUpdateRequest.newPassword(), profile);
+    String hashedPassword = null;
+    if (!Objects.isNull(userUpdateRequest.newPassword())) {
+      hashedPassword = passwordEncoder.encode(userUpdateRequest.newPassword());
+    }
+    user.update(newUsername, newEmail, hashedPassword, profile);
 //    log.debug("유저 업데이트 요청 - 업데이트 된 userId: {}, 변경 된 이름: {}",user.getId(), user.getUsername());
    /* 트랜잭션 사용해서 컨텍스트내에서 기존값과 새로운값을 비교 <- drity checking
     return userRepository.save(user);

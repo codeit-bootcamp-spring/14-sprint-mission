@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class UserUnitTest {
@@ -38,6 +39,8 @@ public class UserUnitTest {
     private UserStatusRepository userStatusRepository;
     @Mock
     private BinaryContentStorage binaryContentStorage;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     private BasicUserService userService;
 
@@ -48,7 +51,8 @@ public class UserUnitTest {
             binaryContentRepository,
             userStatusRepository,
             new UserMapper(),
-            binaryContentStorage
+            binaryContentStorage,
+            passwordEncoder
         );
     }
 

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,12 +61,15 @@ public class UserIntegrationTest {
         );
 
         // when, then
+        String csrfToken = "test-csrf-token";
         mockMvc.perform(
                 multipart("/api/users")
                     .file(jsonPart("userCreateRequest", request))
                     .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .cookie(new Cookie("XSRF-TOKEN", csrfToken))
+                    .header("X-XSRF-TOKEN", csrfToken)
             )
-            .andExpect(status().isCreated())
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.username").value("leemoo"))
             .andExpect(jsonPath("$.email").value("lee@gmail.com"));
 
