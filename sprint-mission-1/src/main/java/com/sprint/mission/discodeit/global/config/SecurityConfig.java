@@ -2,10 +2,18 @@ package com.sprint.mission.discodeit.global.config;
 
 import com.sprint.mission.discodeit.auth.security.LoginFailureHandler;
 import com.sprint.mission.discodeit.auth.security.LoginSuccessHandler;
+import com.sprint.mission.discodeit.global.exception.ExceptionType;
+import com.sprint.mission.discodeit.global.security.SecurityErrorWriter;
 import com.sprint.mission.discodeit.global.security.SpaCsrfTokenRequestHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,7 +22,10 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final SecurityErrorWriter errorWriter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
@@ -33,6 +44,37 @@ public class SecurityConfig {
             .logoutUrl("/api/auth/logout")
             .logoutSuccessHandler(
                 new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT)));
+
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+            .requestMatchers("/api/auth/login", "/api/auth/logout").permitAll()
+            .requestMatchers(request -> !request.getRequestURI().startsWith("/api/")).permitAll()
+            .anyRequest().authenticated());
+
+        http.exceptionHandling(exception -> exception
+            .authenticationEntryPoint(
+                (request, response, e) -> errorWriter.write(response, ExceptionType.AUTH_REQUIRED))
+            .accessDeniedHandler(
+                (request, response, e) -> errorWriter.write(response,
+                    ExceptionType.ACCESS_DENIED)));
+
         return http.build();
+    }
+
+    @Bean
+    static RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+            .role("ADMIN").implies("CHANNEL_MANAGER")
+            .role("CHANNEL_MANAGER").implies("USER")
+            .build();
+    }
+
+    @Bean
+    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+        RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setRoleHierarchy(roleHierarchy);
+        return handler;
     }
 }

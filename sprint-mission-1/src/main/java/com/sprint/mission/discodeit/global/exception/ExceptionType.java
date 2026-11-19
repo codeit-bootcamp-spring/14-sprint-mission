@@ -130,7 +130,17 @@ public enum ExceptionType {
         Level.WARN,
         HttpStatus.UNAUTHORIZED,
         "로그인에 실패했습니다"
-    );
+    ),
+
+    AUTH_REQUIRED(
+        Level.WARN,
+        HttpStatus.UNAUTHORIZED,
+        "로그인이 필요합니다"),
+
+    ACCESS_DENIED(
+        Level.WARN,
+        HttpStatus.FORBIDDEN,
+        "접근 권한이 없습니다");
 
     Level level;
     HttpStatus status;

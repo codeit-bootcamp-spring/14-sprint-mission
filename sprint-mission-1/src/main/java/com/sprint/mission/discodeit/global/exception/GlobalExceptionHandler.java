@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -106,6 +107,13 @@ public class GlobalExceptionHandler {
             .status(type.getStatus())
             .body(ErrorResponse.of(type, detail));
 
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException exception) {
+        ExceptionType type = ExceptionType.ACCESS_DENIED;
+        logMessage(type, exception, exception.getMessage());
+        return ResponseEntity.status(type.getStatus()).body(ErrorResponse.of(type));
     }
 
     private static void logMessage(ExceptionType type, Exception exception, String detail) {
