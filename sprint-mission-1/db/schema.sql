@@ -84,7 +84,9 @@ CREATE TABLE public.users (
     profile_id uuid,
     email character varying(255),
     password character varying(255),
-    user_name character varying(255)
+    user_name character varying(255),
+    role character varying(20) DEFAULT 'USER'::character varying NOT NULL,
+    CONSTRAINT users_role_check CHECK (((role)::text = ANY ((ARRAY['ADMIN'::character varying, 'CHANNEL_MANAGER'::character varying, 'USER'::character varying])::text[])))
 );
 
 
