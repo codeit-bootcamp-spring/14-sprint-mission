@@ -140,7 +140,22 @@ public enum ExceptionType {
     ACCESS_DENIED(
         Level.WARN,
         HttpStatus.FORBIDDEN,
-        "접근 권한이 없습니다");
+        "접근 권한이 없습니다"),
+
+    RESOURCE_NOT_FOUND(
+        Level.DEBUG,
+        HttpStatus.NOT_FOUND,
+        "요청한 리소스를 찾을 수 없습니다"),
+
+    METHOD_NOT_ALLOWED(
+        Level.WARN,
+        HttpStatus.METHOD_NOT_ALLOWED,
+        "지원하지 않는 HTTP 메서드입니다"),
+
+    UNSUPPORTED_MEDIA_TYPE(
+        Level.WARN,
+        HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+        "지원하지 않는 Content-Type입니다");
 
     Level level;
     HttpStatus status;
