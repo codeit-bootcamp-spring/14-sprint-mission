@@ -29,7 +29,9 @@ public class AuthController {
 
     @GetMapping("/api/auth/csrf-token")
     public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
-        log.debug("CSRF 토큰 요청: {}", csrfToken.getToken());
+        // getToken()으로 지연 로딩된 토큰을 만들어 XSRF-TOKEN 쿠키로 내려보낸다. 토큰 값은 로그에 남기지 않는다
+        csrfToken.getToken();
+        log.debug("CSRF 토큰 발급");
         return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).build();
     }
 

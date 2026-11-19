@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.global.config;
 
-import com.sprint.mission.discodeit.auth.security.LoginFailureHandler;
-import com.sprint.mission.discodeit.auth.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.global.security.SecurityErrorWriter;
 import com.sprint.mission.discodeit.global.security.SpaCsrfTokenRequestHandler;
@@ -16,6 +14,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -28,8 +28,10 @@ public class SecurityConfig {
     private final SecurityErrorWriter errorWriter;
 
     @Bean
+    // 핸들러는 Spring 인터페이스 타입으로 받아 global이 auth 구현 클래스에 의존하지 않게 한다
     public SecurityFilterChain filterChain(HttpSecurity http,
-        LoginSuccessHandler loginSuccessHandler, LoginFailureHandler loginFailureHandler)
+        AuthenticationSuccessHandler loginSuccessHandler,
+        AuthenticationFailureHandler loginFailureHandler)
         throws Exception {
         http.csrf(csrf -> csrf
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
