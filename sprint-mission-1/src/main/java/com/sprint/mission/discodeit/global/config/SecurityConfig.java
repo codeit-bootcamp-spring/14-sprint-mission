@@ -49,7 +49,13 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
             .requestMatchers("/api/auth/login", "/api/auth/logout").permitAll()
-            .requestMatchers(request -> !request.getRequestURI().startsWith("/api/")).permitAll()
+            // 공개 경로는 허용 목록으로 명시한다. 새 경로는 기본적으로 인증이 필요하다
+            .requestMatchers(HttpMethod.GET, "/", "/index.html", "/favicon.ico", "/assets/**")
+            .permitAll()
+            .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+            .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
+            .requestMatchers("/actuator/**").hasRole("ADMIN")
+            .requestMatchers("/error").permitAll()
             .anyRequest().authenticated());
 
         http.exceptionHandling(exception -> exception
