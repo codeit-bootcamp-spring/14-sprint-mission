@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authorization.AuthorityAuthorizationManager;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,10 +47,14 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
   private final ReadStatusCommand readStatusCommand;
   private final ReadStatusEntityFinder readStatusEntityFinder;
 
+  private static final AuthorizationManager<ChannelType> CHANNEL_MANAGER =
+      AuthorityAuthorizationManager.hasRole("CHANNEL_MANAGER");
+
   @Override
   public ChannelDto modify(UUID channelId, ChannelRequest request) {
 
     Channel channel = channelEntityFinder.getEntityById(channelId);
+    authorizeAuthority(channel.getType());
     Channel updated = channelCommand.update(channel, request.newName(), request.newDescription());
     Instant lastMessageAt = messageTimeFinder.getLastMessageAt(channelId).orElse(null);
     return channelMapper.toDto(updated, List.of(), lastMessageAt);
@@ -74,6 +81,7 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
 
     return switch (command) {
       case CreateChannel.Public(var name, var description) -> {
+        authorizeAuthority(ChannelType.PUBLIC);
         Channel aPublic = channelCommand.createPublic(name, description);
         yield channelMapper.toDto(aPublic, List.of(), null);
       }
@@ -90,6 +98,7 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
   @Override
   public void delete(UUID channelId) {
     Channel channel = channelEntityFinder.getEntityById(channelId);
+    authorizeAuthority(channel.getType());
     readStatusCommand.deleteAllByChannelId(channelId);
     messageRemover.removeAllByChannelId(channelId);
     channelCommand.delete(channel);
@@ -115,5 +124,11 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
       }
     }
     return list;
+  }
+
+  private void authorizeAuthority(ChannelType type) {
+    if (type == ChannelType.PUBLIC) {
+      CHANNEL_MANAGER.verify(SecurityContextHolder.getContext()::getAuthentication, type);
+    }
   }
 }

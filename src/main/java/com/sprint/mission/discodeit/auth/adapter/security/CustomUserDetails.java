@@ -16,14 +16,18 @@ public final class CustomUserDetails implements UserDetails, CredentialsContaine
   @Serial
   private static final long serialVersionUID = 1L;
 
+
   private final UUID userId;
   private final String username;
   private @Nullable String password;
+  private final List<GrantedAuthority> authorities;
 
-  public CustomUserDetails(UUID userId, String username, @Nullable String password) {
+  public CustomUserDetails(UUID userId, String username, @Nullable String password,
+      List<GrantedAuthority> authorities) {
     this.userId = userId;
     this.username = username;
     this.password = password;
+    this.authorities = List.copyOf(authorities);
   }
 
   @Override
@@ -46,7 +50,7 @@ public final class CustomUserDetails implements UserDetails, CredentialsContaine
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of();
+    return authorities;
   }
 
   @Override

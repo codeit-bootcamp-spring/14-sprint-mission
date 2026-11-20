@@ -51,6 +51,7 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
   private final ApplicationEventPublisher eventPublisher;
   private final PasswordHasher passwordHasher;
 
+
   @Override
   public UserDto register(UserCreateRequest request, BinaryContentCreateRequest profile) {
     BinaryContent savedProfile = registerProfile(profile);

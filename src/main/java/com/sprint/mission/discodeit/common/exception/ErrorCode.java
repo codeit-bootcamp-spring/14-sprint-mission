@@ -55,6 +55,11 @@ public enum ErrorCode {
       Level.WARN,
       HttpURLConnection.HTTP_NOT_FOUND,
       "존재하지 않는 바이너리 콘텐츠입니다."
+  ),
+  LOGIN_FAILED(
+      Level.WARN,
+      HttpURLConnection.HTTP_UNAUTHORIZED,
+      "이름과 비밀번호를 다시 확인해주세요."
   );
   Level level;
   int status;
