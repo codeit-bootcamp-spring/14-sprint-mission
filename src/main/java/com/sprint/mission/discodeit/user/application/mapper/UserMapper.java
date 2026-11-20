@@ -27,6 +27,7 @@ public class UserMapper {
         user.getUsername(),
         user.getEmail().value(),
         binaryContentMapper.toDto(user.getProfile()),
-        online);
+        online,
+        user.getRole());
   }
 }

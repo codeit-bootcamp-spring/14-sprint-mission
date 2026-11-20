@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.common.domain.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -43,12 +45,17 @@ public class User extends BaseUpdatableEntity {
   )
   private UserStatus userStatus;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role", length = 20, nullable = false)
+  private Role role;
+
   private User(String name, Password password, Email email, BinaryContent profile) {
     this.username = name;
     this.password = password;
     this.email = Objects.requireNonNull(email, "email 값은 필수임.");
     this.profile = profile;
     this.userStatus = UserStatus.create(this, Instant.now());
+    this.role = Role.USER;
   }
 
   public UserStatus refreshActivity(Instant lastActiveAt) {
@@ -70,6 +77,10 @@ public class User extends BaseUpdatableEntity {
       this.profile = profile;
     }
     return this;
+  }
+
+  public void updateRole(Role role) {
+    this.role = role;
   }
 
 

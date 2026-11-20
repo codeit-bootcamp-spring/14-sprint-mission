@@ -17,9 +17,11 @@ import com.sprint.mission.discodeit.user.application.provided.command.UserComman
 import com.sprint.mission.discodeit.user.application.provided.command.UserModifier;
 import com.sprint.mission.discodeit.user.application.provided.command.UserRegister;
 import com.sprint.mission.discodeit.user.application.provided.command.UserRemover;
+import com.sprint.mission.discodeit.user.application.provided.command.UserRoleModifier;
 import com.sprint.mission.discodeit.user.application.provided.command.UserStatusCommand;
 import com.sprint.mission.discodeit.user.application.provided.query.UserEntityFinder;
 import com.sprint.mission.discodeit.user.application.required.PasswordHasher;
+import com.sprint.mission.discodeit.user.domain.Role;
 import com.sprint.mission.discodeit.user.domain.User;
 import com.sprint.mission.discodeit.user.domain.UserStatus;
 import java.util.List;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ResolvableType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class UserAppService implements UserRegister, UserModifier, UserRemover, UserStatusCommand {
+public class UserAppService implements UserRegister, UserModifier, UserRemover, UserStatusCommand,
+    UserRoleModifier {
 
   private final UserCommand userCommand;
   private final UserEntityFinder entityFinder;
@@ -105,5 +109,13 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
     }
     List<BinaryContent> savedProfiles = binaryContentRegister.register(List.of(profile));
     return savedProfiles.getFirst();
+  }
+
+  @Override
+  @PreAuthorize("hasRole('ADMIN')")
+  public UserDto updateRole(UUID userId, Role role) {
+    User user = entityFinder.getEntityById(userId);
+    user.updateRole(role);
+    return userMapper.toDto(user);
   }
 }
