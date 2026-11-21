@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -35,6 +37,9 @@ public class User implements Serializable {
   private String email;
   @Column(length = 60)
   private String password;
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20, nullable = false)
+  private Role role = Role.USER;
 
   @OneToOne
   @JoinColumn(name = "profile_id", nullable = true)
@@ -71,6 +76,13 @@ public class User implements Serializable {
     }
 
     if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
+    }
+  }
+
+  public void updateRole(Role newRole) {
+    if(newRole != null && this.role != newRole){
+      this.role = newRole;
       this.updatedAt = Instant.now();
     }
   }
