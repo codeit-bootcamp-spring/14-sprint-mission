@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class BasicAuthService implements AuthService {
 
   @Override
   @Transactional
+  @PreAuthorize("hasRole('ADMIN')")
   public UserDto updateRole(UserRoleUpdateRequest request) {
     User user = userRepository.findById(request.userId())
         .orElseThrow(() -> new UserNotFoundException(request.userId()));
