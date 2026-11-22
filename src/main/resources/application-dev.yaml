@@ -12,6 +12,7 @@ logging:
   level:
     com.sprint.mission.discodeit: debug   # 우리 패키지만 debug
     org.hibernate.SQL: debug
+    org.springframework.security: trace
 
 management:
   endpoint:
