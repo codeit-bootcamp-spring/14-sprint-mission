@@ -1,0 +1,8 @@
+.git
+.idea
+.gradle/
+build/
+.DS_Store
+*.ser
+.discodeit/
+.env
