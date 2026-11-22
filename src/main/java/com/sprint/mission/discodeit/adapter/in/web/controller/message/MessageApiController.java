@@ -1,18 +1,16 @@
 package com.sprint.mission.discodeit.adapter.in.web.controller.message;
 
-import com.sprint.mission.discodeit.core.application.binarycontent.port.in.dto.request.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.adapter.in.web.controller.multipart.MultiPartFileUtil;
-import com.sprint.mission.discodeit.adapter.in.web.common.PageResponse;
+import com.sprint.mission.discodeit.adapter.in.web.common.pagination.PageResponse;
 import com.sprint.mission.discodeit.adapter.in.web.controller.message.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.adapter.in.web.controller.message.dto.MessageResponseDto;
 import com.sprint.mission.discodeit.adapter.in.web.controller.message.dto.MessageUpdateDto;
+import com.sprint.mission.discodeit.core.application.binarycontent.port.in.dto.request.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.application.message.port.in.MessageUseCase;
-import com.sprint.mission.discodeit.core.application.message.port.in.dto.response.MessageResult;
+import com.sprint.mission.discodeit.core.common.pagination.PageQuery;
 import com.sprint.mission.discodeit.core.config.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -90,21 +88,16 @@ public class MessageApiController {
             @PageableDefault(
                     size = 50,
                     sort = {"createdAt"},
-                    direction = Sort.Direction.DESC
-            ) Pageable pageable
+                    direction = Sort.Direction.DESC)
+            @Valid PageQuery pageQuery
     ) {
         Instant instantCursor = Optional.ofNullable(cursor)
                 .orElse(LocalDateTime.now(ZoneId.systemDefault()))
                 .atZone(ZoneId.systemDefault()).toInstant();
 
-        Slice<MessageResult> results = useCase.getAllByChannelId(
-                channelId,
-                instantCursor,
-                pageable
-        );
-        return PageResponse.fromSlice(
-                results.map(MessageResponseDto::from),
-                MessageResponseDto::createdAt
+        return PageResponse.from(
+                useCase.getAllByChannelId(channelId, instantCursor, pageQuery)
+                        .map(MessageResponseDto::from)
         );
     }
 }

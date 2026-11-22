@@ -1,9 +1,11 @@
-package com.sprint.mission.discodeit.adapter.out.persistence.message;
+package com.sprint.mission.discodeit.adapter.out.persistence.repository.message;
 
+import com.sprint.mission.discodeit.adapter.out.persistence.common.pagination.PageRequestMapper;
+import com.sprint.mission.discodeit.core.common.pagination.PageQuery;
+import com.sprint.mission.discodeit.core.common.pagination.PageResult;
 import com.sprint.mission.discodeit.core.application.message.port.out.MessagePort;
 import com.sprint.mission.discodeit.core.domain.message.Message;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
@@ -40,8 +42,11 @@ public class MessageAdapter implements MessagePort {
     }
 
     @Override
-    public Slice<Message> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
-        return repository.findAllByChannelId(channelId, cursor, pageable);
+    public PageResult<Message, Instant> findAllByChannelId(UUID channelId, Instant cursor, PageQuery pageQuery) {
+        Slice<Message> slice = repository.findAllByChannelId(
+                channelId, cursor, PageRequestMapper.from(pageQuery)
+        );
+        return PageResult.from(slice.getContent(), slice.getSize(), slice.hasNext(), Message::getCreatedAt);
     }
 
     @Override

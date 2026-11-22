@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.core.application.message.service;
 import com.sprint.mission.discodeit.core.application.binarycontent.port.out.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.application.binarycontent.port.in.dto.request.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.application.channel.port.out.ChannelPort;
+import com.sprint.mission.discodeit.core.common.pagination.PageQuery;
+import com.sprint.mission.discodeit.core.common.pagination.PageResult;
 import com.sprint.mission.discodeit.core.application.message.port.in.MessageUseCase;
 import com.sprint.mission.discodeit.core.application.message.port.in.dto.response.MessageResult;
 import com.sprint.mission.discodeit.core.application.message.port.out.MessagePort;
@@ -17,8 +19,6 @@ import com.sprint.mission.discodeit.core.domain.message.Message;
 import com.sprint.mission.discodeit.core.domain.user.User;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,18 +92,17 @@ public class MessageApplication implements MessageUseCase {
 
     @Override
     @Transactional
-    public Slice<MessageResult> getAllByChannelId(
+    public PageResult<MessageResult, Instant> getAllByChannelId(
             UUID channelId,
             Instant cursor,
-            Pageable pageable
+            PageQuery pageQuery
     ) {
-        channels.get(channelId);
-        return messages.findAllByChannelId(
+        PageResult<Message, Instant> page = messages.findAllByChannelId(
                         channelId,
                         Optional.ofNullable(cursor).orElse(Instant.now(Clock.systemDefaultZone())),
-                        pageable
-                )
-                .map(this::toResult);
+                        pageQuery
+                );
+        return page.map(this::toResult);
     }
 
     @Override

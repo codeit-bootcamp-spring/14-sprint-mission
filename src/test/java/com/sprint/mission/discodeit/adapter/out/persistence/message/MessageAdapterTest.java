@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.adapter.out.persistence.message;
 
-import com.sprint.mission.discodeit.adapter.out.persistence.config.QueryDslConfig;
+import com.sprint.mission.discodeit.adapter.out.persistence.repository.config.QueryDslConfig;
+import com.sprint.mission.discodeit.adapter.out.persistence.repository.message.MessageAdapter;
+import com.sprint.mission.discodeit.adapter.out.persistence.repository.message.MessageJpaRepository;
+import com.sprint.mission.discodeit.core.common.pagination.PageQuery;
+import com.sprint.mission.discodeit.core.common.pagination.PageResult;
+import com.sprint.mission.discodeit.core.common.pagination.SortOrder;
 import com.sprint.mission.discodeit.core.domain.channel.Channel;
 import com.sprint.mission.discodeit.core.domain.message.Message;
 import com.sprint.mission.discodeit.core.domain.user.User;
@@ -10,9 +15,6 @@ import org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoCo
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.time.Instant;
@@ -47,12 +49,23 @@ class MessageAdapterTest {
         assertThat(adapter.findLastMessageAtByChannelId(List.of(channel.getId())))
                 .containsEntry(channel.getId(), expectedLatest);
 
-        Slice<Message> found = adapter.findAllByChannelId(
+        PageResult<Message, Instant> found = adapter.findAllByChannelId(
                 channel.getId(),
                 Instant.now().plusSeconds(1),
-                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
+                new PageQuery(0, 10, List.of(new SortOrder("createdAt", SortOrder.Direction.DESC)))
         );
-        assertThat(found.getContent()).extracting(Message::getId)
+        assertThat(found.content()).extracting(Message::getId)
                 .containsExactlyInAnyOrder(first.getId(), second.getId());
+        assertThat(found.size()).isEqualTo(10);
+        assertThat(found.hasNext()).isFalse();
+
+        PageResult<Message, Instant> firstPage = adapter.findAllByChannelId(
+                channel.getId(),
+                Instant.now().plusSeconds(1),
+                new PageQuery(0, 1, List.of(new SortOrder("content", SortOrder.Direction.DESC)))
+        );
+        assertThat(firstPage.content()).extracting(Message::getId).containsExactly(second.getId());
+        assertThat(firstPage.size()).isOne();
+        assertThat(firstPage.hasNext()).isTrue();
     }
 }
