@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.adapter.out.persistence.channel;
 
-import com.sprint.mission.discodeit.adapter.out.persistence.config.QueryDslConfig;
+import com.sprint.mission.discodeit.adapter.out.persistence.repository.channel.ChannelAdapter;
+import com.sprint.mission.discodeit.adapter.out.persistence.repository.channel.ChannelJpaRepository;
+import com.sprint.mission.discodeit.adapter.out.persistence.repository.config.QueryDslConfig;
 import com.sprint.mission.discodeit.core.domain.channel.Channel;
 import com.sprint.mission.discodeit.core.domain.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.core.domain.user.User;

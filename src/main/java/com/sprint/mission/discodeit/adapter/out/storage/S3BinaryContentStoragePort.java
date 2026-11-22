@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.adapter.out.storage;
 
 import com.sprint.mission.discodeit.core.application.binarycontent.port.out.dto.response.DownloadContent;
 import com.sprint.mission.discodeit.core.application.binarycontent.port.out.BinaryContentStoragePort;
-import com.sprint.mission.discodeit.core.config.aws.AwsProperties;
+import com.sprint.mission.discodeit.adapter.out.storage.config.aws.AwsProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

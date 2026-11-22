@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.adapter.in.runner;
 
 import com.sprint.mission.discodeit.core.application.user.port.in.UserUseCase;
-import com.sprint.mission.discodeit.core.config.bootstrap.BootstrapAdminProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

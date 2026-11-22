@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.adapter.in.web.common;
 
+import com.sprint.mission.discodeit.adapter.in.web.common.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.adapter.out.storage.StorageException;
 import com.sprint.mission.discodeit.adapter.out.storage.StorageExceptionType;
 import com.sprint.mission.discodeit.core.domain.base.DomainException;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.config.security;
 
-import com.sprint.mission.discodeit.adapter.in.web.common.ErrorResponse;
-import com.sprint.mission.discodeit.adapter.in.web.common.ErrorResponseMapper;
+import com.sprint.mission.discodeit.adapter.in.web.common.exception.ErrorResponse;
+import com.sprint.mission.discodeit.adapter.in.web.common.exception.ErrorResponseMapper;
 import com.sprint.mission.discodeit.core.domain.user.UserExceptionType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
