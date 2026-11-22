@@ -63,7 +63,7 @@ public class ReadStatusService {
         ReadStatusUpdateRequestDto readStatusUpdateRequestDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(() -> new DiscodeitException(
-                ExceptionType.USER_STATUS_NOT_FOUND,
+                ExceptionType.READ_STATUS_NOT_FOUND,
                 Map.of("readStatusId", readStatusId)
             ));
 
@@ -78,7 +78,7 @@ public class ReadStatusService {
     public void readStatusDelete(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(() -> new DiscodeitException(
-                ExceptionType.USER_STATUS_NOT_FOUND,
+                ExceptionType.READ_STATUS_NOT_FOUND,
                 Map.of("readStatusId", readStatusId)
             ));
         readStatusRepository.delete(readStatus);
@@ -101,7 +101,7 @@ public class ReadStatusService {
     public ReadStatusDto findReadStatus(UUID readStatusId) {
         return readStatusMapper.toDto(readStatusRepository.findById(readStatusId)
             .orElseThrow(() -> new DiscodeitException(
-                ExceptionType.USER_STATUS_NOT_FOUND,
+                ExceptionType.READ_STATUS_NOT_FOUND,
                 Map.of("readStatusId", readStatusId)
             )));
     }

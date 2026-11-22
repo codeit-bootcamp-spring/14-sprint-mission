@@ -13,8 +13,6 @@ import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
-import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +34,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
-    private final UserStatusRepository userStatusRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserMapper userMapper;
@@ -80,8 +77,6 @@ public class UserService {
                 passwordEncoder.encode(userCreateRequestDto.password()),
                 userCreateRequestDto.email(), binaryContent));
 
-        userStatusRepository.save(UserStatus.create(user));
-
         log.info("사용자 생성 완료: userId={}", user.getId());
         return userMapper.toDto(user);
     }
@@ -114,12 +109,6 @@ public class UserService {
         user.update(userUpdateRequestDto.newUsername(),
             passwordEncoder.encode(userUpdateRequestDto.newPassword()),
             userUpdateRequestDto.newEmail());
-
-        userStatusRepository.findByUser(user)
-            .orElseThrow(() -> new DiscodeitException(
-                ExceptionType.USER_STATUS_MISSING_FOR_USER,
-                Map.of("userId", user.getId()
-                )));
 
         log.info("사용자 수정 완료: userId={}", user.getId());
         return userMapper.toDto(user);

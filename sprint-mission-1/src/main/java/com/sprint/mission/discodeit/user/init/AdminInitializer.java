@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.user.init;
 import com.sprint.mission.discodeit.user.entity.Role;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
-import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminInitializer implements ApplicationRunner {
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final PasswordEncoder passwordEncoder;
     @Value("${discodeit.admin.username}")
     private String username;
@@ -45,8 +42,6 @@ public class AdminInitializer implements ApplicationRunner {
         User admin = User.create(username, passwordEncoder.encode(password), email);
         admin.updateRole(Role.ADMIN);
         userRepository.save(admin);
-        // 회원가입과 같이 UserStatus를 만들어야 프로필 수정 시 USER_STATUS_MISSING_FOR_USER가 나지 않는다
-        userStatusRepository.save(UserStatus.create(admin));
         log.info("어드민 계정 초기화: {}", username);
     }
 }

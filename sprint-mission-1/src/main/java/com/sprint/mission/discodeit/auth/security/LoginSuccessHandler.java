@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.auth.security;
 
+import com.sprint.mission.discodeit.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import tools.jackson.databind.ObjectMapper;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
+    private final UserService userService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -24,6 +26,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        objectMapper.writeValue(response.getWriter(), principal.getUserDto());
+        // principal의 UserDto는 세션 등록 전에 만들어져 online이 false다. 세션 등록 후 새로 조회한다
+        objectMapper.writeValue(response.getWriter(),
+            userService.findById(principal.getUserDto().id()));
     }
 }

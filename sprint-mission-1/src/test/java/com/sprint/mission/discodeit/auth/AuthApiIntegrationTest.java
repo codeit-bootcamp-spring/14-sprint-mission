@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.auth;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -72,6 +73,8 @@ class AuthApiIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.username").value(USERNAME))
             .andExpect(jsonPath("$.role").value("USER"))
+            // 세션 등록 후 조회하므로 로그인 응답부터 접속 중으로 나온다
+            .andExpect(jsonPath("$.online").value(true))
             .andReturn();
 
         MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
@@ -148,6 +151,46 @@ class AuthApiIntegrationTest {
     void actuator_forbiddenForUser() throws Exception {
         mockMvc.perform(get("/actuator/loggers"))
             .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("권한 변경 - 대상 사용자의 기존 세션은 만료되어 401")
+    void updateRole_expiresTargetSession() throws Exception {
+        MockHttpSession session = login();
+
+        mockMvc.perform(put("/api/auth/role")
+                .with(user("admin").roles("ADMIN"))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(roleRequest("CHANNEL_MANAGER")))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/auth/me").session(session))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.code").value("SESSION_EXPIRED"));
+    }
+
+    @Test
+    @DisplayName("동시 세션 1개 - 새로 로그인하면 이전 세션이 만료된다")
+    void concurrentLogin_expiresPreviousSession() throws Exception {
+        MockHttpSession first = login();
+        MockHttpSession second = login();
+
+        mockMvc.perform(get("/api/auth/me").session(first))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.code").value("SESSION_EXPIRED"));
+        mockMvc.perform(get("/api/auth/me").session(second))
+            .andExpect(status().isOk());
+    }
+
+    private MockHttpSession login() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                .with(csrf())
+                .param("username", USERNAME)
+                .param("password", PASSWORD))
+            .andExpect(status().isOk())
+            .andReturn();
+        return (MockHttpSession) result.getRequest().getSession(false);
     }
 
     private String roleRequest(String newRole) {

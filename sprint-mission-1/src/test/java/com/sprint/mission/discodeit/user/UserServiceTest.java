@@ -22,8 +22,6 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.user.service.UserService;
-import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
-import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,8 +40,6 @@ public class UserServiceTest {
     private BinaryContentRepository binaryContentRepository;
     @Mock
     private BinaryContentStorage binaryContentStorage;
-    @Mock
-    private UserStatusRepository userStatusRepository;
     @Mock
     private ReadStatusRepository readStatusRepository;
     @Mock
@@ -74,7 +70,6 @@ public class UserServiceTest {
         assertThat(result.userName()).isEqualTo("kyj");
         // 평문이 아니라 인코딩된 비밀번호가 저장되어야 한다
         then(userRepository).should().save(argThat(u -> "encoded-pw".equals(u.getPassword())));
-        then(userStatusRepository).should().save(any(UserStatus.class));
     }
 
     @Test

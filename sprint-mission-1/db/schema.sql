@@ -61,19 +61,6 @@ CREATE TABLE public.read_status (
 
 
 --
--- Name: user_status; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_status (
-    created_at timestamp(6) with time zone,
-    last_active_at timestamp(6) with time zone,
-    updated_at timestamp(6) with time zone,
-    id uuid NOT NULL,
-    user_id uuid NOT NULL
-);
-
-
---
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -139,22 +126,6 @@ ALTER TABLE ONLY public.read_status
 
 
 --
--- Name: user_status user_status_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_status
-    ADD CONSTRAINT user_status_pkey PRIMARY KEY (id);
-
-
---
--- Name: user_status user_status_user_id_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_status
-    ADD CONSTRAINT user_status_user_id_key UNIQUE (user_id);
-
-
---
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -207,14 +178,6 @@ ALTER TABLE ONLY public.message_attachments
 
 ALTER TABLE ONLY public.read_status
     ADD CONSTRAINT fkd1q4o8lh6qh3vq8wi6rile7kl FOREIGN KEY (channel_id) REFERENCES public.channel(id);
-
-
---
--- Name: user_status fki21pi0g9yogah1kwedmuhnt5s; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_status
-    ADD CONSTRAINT fki21pi0g9yogah1kwedmuhnt5s FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
