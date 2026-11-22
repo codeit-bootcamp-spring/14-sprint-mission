@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.adapter.out.persistence;
 
 import com.sprint.mission.discodeit.adapter.out.persistence.config.QueryDslConfig;
+import com.sprint.mission.discodeit.adapter.out.persistence.user.UserRepositoryImpl;
 import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.core.domain.user.User;
 import org.junit.jupiter.api.DisplayName;

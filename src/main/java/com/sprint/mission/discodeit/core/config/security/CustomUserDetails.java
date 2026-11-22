@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.core.config.security;
 
-import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
-import com.sprint.mission.discodeit.core.domain.user.Role;
+import com.sprint.mission.discodeit.core.application.user.port.in.dto.response.UserResult;
 import lombok.Getter;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -17,29 +16,30 @@ import java.util.UUID;
 public class CustomUserDetails implements UserDetails {
 
     @Getter
-    private final UserDto userDto;
+    private final UserResult user;
+
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(UserDto userDto, String password) {
-        this.userDto = userDto;
+    public CustomUserDetails(UserResult user, String password) {
+        this.user = user;
         this.password = password;
-        this.authorities = getAuthorityFrom(userDto.role());
+        this.authorities = getAuthorityFrom(user.role());
     }
 
-    private Collection<SimpleGrantedAuthority> getAuthorityFrom(Role role) {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.name());
+    private Collection<SimpleGrantedAuthority> getAuthorityFrom(String role) {
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
         return List.of(authority);
     }
 
     public UUID getUserId() {
-        return userDto.id();
+        return user.id();
     }
 
     @Override
     @NullMarked
     public String getUsername() {
-        return userDto.username();
+        return user.username();
     }
 
     @Override

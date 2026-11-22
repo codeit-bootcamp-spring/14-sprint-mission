@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.core.config.security;
 
-import com.sprint.mission.discodeit.core.common.exception.ErrorResponse;
+import com.sprint.mission.discodeit.adapter.in.web.common.ErrorResponse;
+import com.sprint.mission.discodeit.adapter.in.web.common.ErrorResponseMapper;
 import com.sprint.mission.discodeit.core.domain.user.UserExceptionType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +15,6 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -24,19 +24,11 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        UserExceptionType userExceptionType = UserExceptionType.LOGIN_FAILED;
-        int statusCode = userExceptionType.getHttpStatus().value();
-
-        ErrorResponse errorResponse = ErrorResponse.of(
-                Instant.now(),
-                userExceptionType.toString(),
-                userExceptionType.getDescription(),
-                Map.of(),
-                exception.getClass().getName(),
-                statusCode
+        ErrorResponse errorResponse = ErrorResponseMapper.toResponse(
+                UserExceptionType.LOGIN_FAILED, Instant.now(), exception.getClass().getName()
         );
 
-        response.setStatus(statusCode);
+        response.setStatus(errorResponse.status());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
         objectMapper.writeValue(response.getOutputStream(), errorResponse);

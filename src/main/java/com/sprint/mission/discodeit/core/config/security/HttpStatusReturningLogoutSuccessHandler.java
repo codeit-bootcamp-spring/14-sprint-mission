@@ -25,7 +25,7 @@ public class HttpStatusReturningLogoutSuccessHandler implements LogoutSuccessHan
 
         if (Objects.nonNull(authentication)) {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-            UUID userId = customUserDetails.getUserDto().id();
+            UUID userId = customUserDetails.getUserId();
             log.info("Logout Success: userId={}", userId);
         }
     }

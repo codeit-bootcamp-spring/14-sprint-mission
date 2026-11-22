@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.config.security;
 
-import com.sprint.mission.discodeit.adapter.in.controller.user.dto.UserDto;
+import com.sprint.mission.discodeit.adapter.in.web.controller.user.dto.UserDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,11 +25,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-        UserDto userDto = principal.getUserDto().withOnline(true);
+        UserDto user = UserDto.from(principal.getUser().withOnline(true));
 
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getOutputStream(), userDto);
+        objectMapper.writeValue(response.getOutputStream(), user);
     }
 }

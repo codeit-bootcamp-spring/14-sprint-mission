@@ -1,7 +1,12 @@
 package com.sprint.mission.discodeit.application.user;
 
-import com.sprint.mission.discodeit.core.application.user.UserService;
-import com.sprint.mission.discodeit.core.application.user.out.UserRepository;
+import com.sprint.mission.discodeit.core.application.binarycontent.port.in.dto.request.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.application.binarycontent.port.out.BinaryContentStoragePort;
+import com.sprint.mission.discodeit.core.application.readstatus.port.out.ReadStatusPort;
+import com.sprint.mission.discodeit.core.application.user.port.in.dto.response.UserResult;
+import com.sprint.mission.discodeit.core.application.user.port.out.UserPort;
+import com.sprint.mission.discodeit.core.application.user.service.AuthService;
+import com.sprint.mission.discodeit.core.application.user.service.UserApplication;
 import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.core.domain.user.User;
 import com.sprint.mission.discodeit.core.domain.user.UserException;
@@ -14,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -24,154 +28,116 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
     @Mock
-    UserRepository userRepository;
+    UserPort users;
+    @Mock
+    ReadStatusPort readStatuses;
+    @Mock
+    BinaryContentStoragePort binaryContentStoragePort;
+    @Mock
+    AuthService authService;
     @Mock
     PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    UserService userService;
+    UserApplication userApplication;
 
     @Test
     @DisplayName("User 생성 성공 시, 생성 정보를 반환")
     void whenCreateUser_thenReturnCreatedUser() {
-        User creating = User.createUser(
-                "test",
-                "test@gmail.com",
-                "1234",
-                BinaryContent.of("profile", "png", new byte[]{1})
-        );
-        when(userRepository.existsByUsernameOrEmail(creating.getUsername(), creating.getEmail()))
-                .thenReturn(false);
-        when(userRepository.save(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-        when(passwordEncoder.encode(creating.getPassword())).thenReturn(creating.getPassword());
+        CreateBinaryContentCommand profile = createProfileCommand();
+        when(passwordEncoder.encode("1234")).thenReturn("encoded-password");
+        when(users.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
-        User created = userService.create(creating.getUsername(), creating.getEmail(), creating.getPassword(), creating.getProfile());
+        UserResult created = userApplication.createAccount("test", "test@gmail.com", "1234", profile);
 
         // then
-        assertThat(created.getUsername()).isEqualTo(creating.getUsername());
-        assertThat(created.getEmail()).isEqualTo(creating.getEmail());
-        assertThat(created.getProfile().getFileName()).isEqualTo(creating.getProfile().getFileName());
-        assertThat(created.getProfile().getContentType()).isEqualTo(creating.getProfile().getContentType());
-        assertThat(created.getProfile().getSize()).isEqualTo(creating.getProfile().getSize());
-
-        verify(userRepository).existsByUsernameOrEmail(creating.getUsername(), creating.getEmail());
-        verify(userRepository).save(any(User.class));
+        assertThat(created.username()).isEqualTo("test");
+        assertThat(created.email()).isEqualTo("test@gmail.com");
+        assertThat(created.binaryContentResult().filename()).isEqualTo(profile.fileName());
+        assertThat(created.binaryContentResult().contentType()).isEqualTo(profile.contentType());
+        assertThat(created.binaryContentResult().size()).isEqualTo(profile.content().length);
+        verify(users).existsByUsernameOrEmail("test", "test@gmail.com");
+        verify(users).save(argThat(user -> user.getPassword().equals("encoded-password")));
     }
 
     @Test
     @DisplayName("이미 사용중인 username 혹은 email 중복일 때, User 생성 실패 시, ")
     void givenUsernameOrEmailAlreadyExists_whenCreateUserFailed_then() {
-        User creating = User.createUser(
-                "existing",
-                "existing@gmail.com",
-                "1234",
-                BinaryContent.of("profile", "png", new byte[]{1})
-        );
-
-        when(userRepository.existsByUsernameOrEmail(creating.getUsername(), creating.getEmail()))
-                .thenReturn(true);
+        when(users.existsByUsernameOrEmail("existing", "existing@gmail.com")).thenReturn(true);
 
         // when
         UserException thrown = catchThrowableOfType(
                 UserException.class,
-                () -> userService.create(creating.getUsername(), creating.getEmail(), creating.getPassword(), creating.getProfile())
+                () -> userApplication.createAccount("existing", "existing@gmail.com", "1234", createProfileCommand())
         );
 
         // then
         assertThat(thrown.getType()).isEqualTo(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT);
-
-        verify(userRepository).existsByUsernameOrEmail(creating.getUsername(), creating.getEmail());
-        verifyNoMoreInteractions(userRepository);
+        verify(users).existsByUsernameOrEmail("existing", "existing@gmail.com");
+        verifyNoMoreInteractions(users);
+        verifyNoInteractions(binaryContentStoragePort, passwordEncoder);
     }
 
     @Test
     @DisplayName("User 삭제 성공")
     void whenDeleteUser_thenUserDeleted() {
         UUID id = UUID.randomUUID();
-        User deleting = User.createUser(
-                "test",
-                "test@gmail.com",
-                "1234",
-                BinaryContent.of("profile", "png", new byte[]{1})
-        );
+        when(users.existsById(id)).thenReturn(true);
 
-        when(userRepository.findById(id)).thenReturn(Optional.of(deleting));
+        userApplication.deleteAccount(id);
 
-        userService.deleteById(id);
-
-        verify(userRepository).delete(deleting);
+        verify(readStatuses).deleteAllByUserId(id);
+        verify(users).deleteById(id);
     }
 
     @Test
     @DisplayName("수정 가능한 모든 인자가 주어진 경우, User 갱신 성공 시, 갱신 정보 반환")
     void givenAllArgument_whenUpdateUser_thenReturnUpdatedUser() {
-        User updating = User.createUser(
-                "test",
-                "test@gmail.com",
-                "1234",
-                BinaryContent.of("profile", "png", new byte[]{1})
-        );
+        User updating = existingUser();
         UUID id = UUID.randomUUID();
         String newUsername = "newUsername";
         String newEmail = "newEmail";
         String newPassword = "newPassword";
-        BinaryContent newProfile = BinaryContent.of("newProfile", "png", new byte[]{1});
-
-        when(userRepository.existsByUsernameAndIdNot(newUsername, id))
-                .thenReturn(false);
-        when(userRepository.existsByEmailAndIdNot(newEmail, id))
-                .thenReturn(false);
-        when(userRepository.findById(id))
-                .thenReturn(Optional.of(updating));
+        CreateBinaryContentCommand newProfile = createProfileCommand();
+        when(users.get(id)).thenReturn(updating);
+        when(passwordEncoder.encode(newPassword)).thenReturn("encoded-password");
 
         // when
-        User updated = userService.update(id, newUsername, newEmail, newPassword, newProfile);
+        UserResult updated = userApplication.patchUserInfo(id, newUsername, newEmail, newPassword, newProfile);
 
         // then
-        assertThat(updated.getUsername()).isEqualTo(newUsername);
-        assertThat(updated.getEmail()).isEqualTo(newEmail);
-        assertThat(updated.getProfile()).isEqualTo(newProfile);
-
-        verify(userRepository).existsByUsernameAndIdNot(newUsername, id);
-        verify(userRepository).existsByEmailAndIdNot(newEmail, id);
-        verify(userRepository).findById(id);
+        assertThat(updated.username()).isEqualTo(newUsername);
+        assertThat(updated.email()).isEqualTo(newEmail);
+        assertThat(updated.binaryContentResult().filename()).isEqualTo(newProfile.fileName());
+        assertThat(updating.getPassword()).isEqualTo("encoded-password");
+        verify(users).existsByUsernameAndIdNot(newUsername, id);
+        verify(users).existsByEmailAndIdNot(newEmail, id);
+        verify(users).get(id);
+        verify(binaryContentStoragePort).put(updated.binaryContentResult().id(), newProfile.content());
     }
 
     @Test
     @DisplayName("수정 가능한 일부 인자가 주어진 경우, User 갱신 성공 시, 갱신된 정보만 반환")
     void givenPartialArgument_whenUpdateUser_thenReturnPartiallyUpdatedUser() {
-        User updating = User.createUser(
-                "test",
-                "test@gmail.com",
-                "1234",
-                BinaryContent.of("profile", "png", new byte[]{1})
-        );
+        User updating = existingUser();
         UUID id = UUID.randomUUID();
         String newUsername = "newUsername";
         String nullEmail = null;
         String newPassword = "newPassword";
-        BinaryContent newProfile = BinaryContent.of("newProfile", "png", new byte[]{1});
-
-        when(userRepository.existsByUsernameAndIdNot(newUsername, id))
-                .thenReturn(false);
-        when(userRepository.existsByEmailAndIdNot(nullEmail, id))
-                .thenReturn(false);
-        when(userRepository.findById(id))
-                .thenReturn(Optional.of(updating));
+        CreateBinaryContentCommand newProfile = createProfileCommand();
+        when(users.get(id)).thenReturn(updating);
+        when(passwordEncoder.encode(newPassword)).thenReturn("encoded-password");
 
         // when
-        User updated = userService.update(id, newUsername, nullEmail, newPassword, newProfile);
+        UserResult updated = userApplication.patchUserInfo(id, newUsername, nullEmail, newPassword, newProfile);
 
         // then
-        assertThat(updated.getUsername()).isEqualTo(newUsername);
-        assertThat(updated.getEmail()).isEqualTo(updating.getEmail());
-        assertThat(updated.getProfile()).isEqualTo(newProfile);
-
-        verify(userRepository).existsByUsernameAndIdNot(newUsername, id);
-        verify(userRepository).existsByEmailAndIdNot(nullEmail, id);
-        verify(userRepository).findById(id);
+        assertThat(updated.username()).isEqualTo(newUsername);
+        assertThat(updated.email()).isEqualTo("test@gmail.com");
+        assertThat(updated.binaryContentResult().filename()).isEqualTo(newProfile.fileName());
+        verify(users).existsByUsernameAndIdNot(newUsername, id);
+        verify(users).get(id);
     }
 
     @Test
@@ -181,22 +147,19 @@ class UserServiceTest {
         String duplicatedUsername = "newUsername";
         String newEmail = "newEmail";
         String newPassword = "newPassword";
-        BinaryContent newProfile = BinaryContent.of("newProfile", "png", new byte[]{1});
-
-        when(userRepository.existsByUsernameAndIdNot(duplicatedUsername, id))
-                .thenReturn(true);
+        when(users.existsByUsernameAndIdNot(duplicatedUsername, id)).thenReturn(true);
 
         // when
         UserException thrown = catchThrowableOfType(
                 UserException.class,
-                () -> userService.update(id, duplicatedUsername, newEmail, newPassword, newProfile)
+                () -> userApplication.patchUserInfo(id, duplicatedUsername, newEmail, newPassword, createProfileCommand())
         );
 
         // then
         assertThat(thrown.getType()).isEqualTo(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT);
-
-        verify(userRepository).existsByUsernameAndIdNot(duplicatedUsername, id);
-        verifyNoMoreInteractions(userRepository);
+        verify(users).existsByUsernameAndIdNot(duplicatedUsername, id);
+        verifyNoMoreInteractions(users);
+        verifyNoInteractions(binaryContentStoragePort, passwordEncoder);
     }
 
     @Test
@@ -206,24 +169,28 @@ class UserServiceTest {
         String newUsername = "newUsername";
         String duplicatedEmail = "newEmail";
         String newPassword = "newPassword";
-        BinaryContent newProfile = BinaryContent.of("newProfile", "png", new byte[]{1});
-
-        when(userRepository.existsByUsernameAndIdNot(newUsername, id))
-                .thenReturn(false);
-        when(userRepository.existsByEmailAndIdNot(duplicatedEmail, id))
-                .thenReturn(true);
+        when(users.existsByEmailAndIdNot(duplicatedEmail, id)).thenReturn(true);
 
         // when
         UserException thrown = catchThrowableOfType(
                 UserException.class,
-                () -> userService.update(id, newUsername, duplicatedEmail, newPassword, newProfile)
+                () -> userApplication.patchUserInfo(id, newUsername, duplicatedEmail, newPassword, createProfileCommand())
         );
 
         // then
         assertThat(thrown.getType()).isEqualTo(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT);
+        verify(users).existsByUsernameAndIdNot(newUsername, id);
+        verify(users).existsByEmailAndIdNot(duplicatedEmail, id);
+        verifyNoMoreInteractions(users);
+        verifyNoInteractions(binaryContentStoragePort, passwordEncoder);
+    }
 
-        verify(userRepository).existsByUsernameAndIdNot(newUsername, id);
-        verify(userRepository).existsByEmailAndIdNot(duplicatedEmail, id);
-        verifyNoMoreInteractions(userRepository);
+    private User existingUser() {
+        return User.createUser("test", "test@gmail.com", "1234",
+                BinaryContent.of("profile", "image/png", new byte[]{1}));
+    }
+
+    private CreateBinaryContentCommand createProfileCommand() {
+        return CreateBinaryContentCommand.of("newProfile", "image/png", new byte[]{1});
     }
 }

@@ -1,24 +1,21 @@
 package com.sprint.mission.discodeit.core.domain.binaryContent;
 
-import com.sprint.mission.discodeit.core.common.exception.ExceptionType;
+import com.sprint.mission.discodeit.core.domain.base.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.event.Level;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public enum BinaryContentExceptionType implements ExceptionType {
+public enum BinaryContentExceptionType implements ErrorCode {
 
-    BINARY_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, Level.INFO, "BinaryContent 미존재", "Database에서 해당 BinaryContent 찾을 수 없음", "등록되지 않은 BinaryContent입니다."),
+    BINARY_CONTENT_NOT_FOUND(Level.INFO, "BinaryContent 미존재", "Database에서 해당 BinaryContent 찾을 수 없음"),
 
     ;
-    HttpStatus httpStatus;
     Level logLevel;
     String title;
     String description;
-    String response;
 }

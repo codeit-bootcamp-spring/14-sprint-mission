@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.adapter.in.runner;
 
-import com.sprint.mission.discodeit.core.application.user.in.UserApplication;
+import com.sprint.mission.discodeit.core.application.user.port.in.UserUseCase;
 import com.sprint.mission.discodeit.core.config.bootstrap.BootstrapAdminProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AdminBootstrapRunner implements ApplicationRunner {
 
-    private final UserApplication application;
+    private final UserUseCase useCase;
     private final BootstrapAdminProperties properties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        application.createBootstrapAdmin(properties.username(), properties.email(), properties.password());
+        useCase.createBootstrapAdmin(properties.username(), properties.email(), properties.password());
     }
 }
