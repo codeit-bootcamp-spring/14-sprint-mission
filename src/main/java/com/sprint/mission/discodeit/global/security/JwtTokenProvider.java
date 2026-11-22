@@ -8,6 +8,7 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.sprint.mission.discodeit.global.security.exception.InvalidTokenException;
+import com.sprint.mission.discodeit.user.domain.entity.Role;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
@@ -45,32 +46,44 @@ public class JwtTokenProvider {
   }
 
   // 핸들러에서 성공 로직 후 호출
-  public String generateAccessToken(UUID userId) {
-    return generateToken(userId, ACCESS, properties.accessTokenExpireTime());
+  public String generateAccessToken(UUID userId, Role role) {
+    return generateToken(userId, ACCESS, properties.accessTokenExpireTime(), role);
   }
 
   public String generateRefreshToken(UUID userId) {
-    return generateToken(userId, REFRESH, properties.refreshTokenExpireTime());
+    return generateToken(userId, REFRESH, properties.refreshTokenExpireTime(), null);
   }
 
-  // 인증 후 > 헤더 확인
-  public UUID getUserIdFromAccessToken(String token) {
-    return getUserId(token, ACCESS);
+  // 인증 > 토큰에서 인증정보 확보
+  public JwtPrincipal getPrincipalFromAccessToken(String token) {
+    JWTClaimsSet claims = getClaims(token, ACCESS);
+    try {
+      String role = claims.getStringClaim("role");
+      if (role == null) {
+        throw new InvalidTokenException("JWT 역할이 없습니다.");
+      }
+      return new JwtPrincipal(UUID.fromString(claims.getSubject()), Role.valueOf(role));
+    } catch (ParseException | IllegalArgumentException e) {
+      throw new InvalidTokenException("JWT 사용자 정보가 유효하지 않습니다.", e);
+    }
   }
 
   public UUID getUserIdFromRefreshToken(String token) {
-    return getUserId(token, REFRESH);
+    return UUID.fromString(getClaims(token, REFRESH).getSubject());
   }
 
-  private String generateToken(UUID userId, String type, long expirationMillis) {
+  private String generateToken(UUID userId, String type, long expirationMillis, Role role) {
     Instant now = Instant.now();
-    JWTClaimsSet claims = new JWTClaimsSet.Builder()
+    JWTClaimsSet.Builder claims = new JWTClaimsSet.Builder()
         .subject(userId.toString())
         .issueTime(Date.from(now))
         .expirationTime(Date.from(now.plusMillis(expirationMillis)))
-        .claim(TOKEN_TYPE, type)
-        .build();
-    SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
+        .claim(TOKEN_TYPE, type);
+    if (role != null) {
+      claims.claim("role", role.name());
+    }
+
+    SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims.build());
     try {
       jwt.sign(new MACSigner(secretKey));
       return jwt.serialize();
@@ -80,7 +93,7 @@ public class JwtTokenProvider {
   }
 
   // 토큰(액세스,리프레시) 에서 유효한 유저 정보 추출
-  private UUID getUserId(String token, String expectedType) {
+  private JWTClaimsSet getClaims(String token, String expectedType) {
     if (token == null || token.isBlank()) {
       throw new InvalidTokenException("JWT 토큰 값이 유효하지 않습니다.");
     }
@@ -97,7 +110,8 @@ public class JwtTokenProvider {
           || claims.getSubject() == null) {
         throw new InvalidTokenException("JWT");
       }
-      return UUID.fromString(claims.getSubject());
+      UUID.fromString(claims.getSubject());
+      return claims;
     } catch (ParseException | JOSEException | IllegalArgumentException e) {
       throw new InvalidTokenException("JWT 로직에서 실패 발생", e);
     }

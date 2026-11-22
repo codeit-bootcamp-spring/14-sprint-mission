@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -21,13 +22,14 @@ public class AuthApplicationService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
 
+  @Transactional(readOnly = true)
   public RefreshTokenResult refreshAccessToken(String prevRefreshToken){
     UUID userId = jwtTokenProvider.getUserIdFromRefreshToken(prevRefreshToken);
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new InvalidTokenException("토큰값의 사용자를 찾을 수 없습니다."));
 
     UserResponseDTO userResponse = userMapper.toResponse(user);
-    String accessToken = jwtTokenProvider.generateAccessToken(userId);
+    String accessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole());
     String postRefreshToken = jwtTokenProvider.generateRefreshToken(userId);
 
     return RefreshTokenResult.of(JwtResponse.of(userResponse,accessToken), postRefreshToken);

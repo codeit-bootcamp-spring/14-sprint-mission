@@ -23,7 +23,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
         DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
-        UserResponseDTO user = userApplicationService.completeLogin(principal.getUser().userId());
+        UserResponseDTO user = userApplicationService.completeLogin(principal.getUser().id());
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.user.security;
 
+import com.sprint.mission.discodeit.user.web.dto.res.UserResponseDTO;
 import java.util.Collection;
 import java.util.List;
 import lombok.AccessLevel;
@@ -18,10 +19,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Builder(access = AccessLevel.PRIVATE)
 public class DiscodeitUserDetails implements UserDetails {
 
-    final SecurityUserInfo user;
+    final UserResponseDTO user;
     final String password;
 
-    public static DiscodeitUserDetails init(SecurityUserInfo user, String password) {
+    public static DiscodeitUserDetails init(UserResponseDTO user, String password) {
         return DiscodeitUserDetails.builder()
             .user(user)
             .password(password)

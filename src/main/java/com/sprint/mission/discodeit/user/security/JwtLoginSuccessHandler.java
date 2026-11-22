@@ -28,10 +28,10 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
     var principal = (DiscodeitUserDetails) authentication.getPrincipal();
-    UUID userId = principal.getUser().userId();
+    UUID userId = principal.getUser().id();
 
     UserResponseDTO user = userApplicationService.completeLogin(userId);
-    String accessToken = jwtTokenProvider.generateAccessToken(user.id());
+    String accessToken = jwtTokenProvider.generateAccessToken(user.id(), user.role());
     String refreshToken = jwtTokenProvider.generateRefreshToken(user.id());
 
     JwtResponse jwtResponse = JwtResponse.of(user, accessToken);

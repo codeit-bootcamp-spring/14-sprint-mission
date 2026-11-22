@@ -53,6 +53,7 @@ public class AuthController {
     ){
       RefreshTokenResult response = authApplicationService.refreshAccessToken(refreshToken);
       String cookie = ResponseCookie.from("REFRESH_TOKEN", response.refreshToken())
+          .httpOnly(true)
           .build()
           .toString();
 

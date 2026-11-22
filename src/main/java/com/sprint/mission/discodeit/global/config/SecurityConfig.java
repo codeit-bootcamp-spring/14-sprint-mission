@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.global.security.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.global.security.JwtProperties;
 import com.sprint.mission.discodeit.global.security.JwtTokenProvider;
 import com.sprint.mission.discodeit.global.security.SpaCsrfTokenRequestHandler;
-import com.sprint.mission.discodeit.user.security.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.user.security.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.user.security.JwtLogoutHandler;
 import com.sprint.mission.discodeit.user.security.LoginFailureHandler;
@@ -41,7 +40,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
     LoginFailureHandler loginFailureHandler, JwtLoginSuccessHandler jwtLoginSuccessHandler,
-      JwtTokenProvider jwtTokenProvider, DiscodeitUserDetailsService discodeitUserDetailsService,
+      JwtTokenProvider jwtTokenProvider,
       JwtLogoutHandler jwtLogoutHandler
   ) throws Exception {
     http.csrf(csrf -> csrf
@@ -83,7 +82,7 @@ public class SecurityConfig {
     );
 
     http.addFilterBefore(
-        new JwtAuthenticationFilter(jwtTokenProvider, discodeitUserDetailsService),
+        new JwtAuthenticationFilter(jwtTokenProvider),
         UsernamePasswordAuthenticationFilter.class    // 로그인 필터
     );
 
