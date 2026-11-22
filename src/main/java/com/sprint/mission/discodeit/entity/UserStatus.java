@@ -1,72 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
+import lombok.NoArgsConstructor;
 
 @Getter
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class UserStatus extends UpdatableEntity {
+@Entity
+@Table(name = "user_statuses")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    private static final long serialVersionUID = 1L;
-    private static final long ONLINE_THRESHOLD_MINUTES = 5;
+    private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(5);
 
-    UUID userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
-    @NonFinal
-    Instant lastActiveAt;
+    @Column(name = "last_active_at", nullable = false)
+    private Instant lastActiveAt;
 
-    private UserStatus(UUID userId,Instant lastActiveAt) {
-        super();
-        this.userId = userId;
+    public UserStatus(User user, Instant lastActiveAt) {
+        this.user = user;
         this.lastActiveAt = lastActiveAt;
+        user.assignStatus(this);
     }
 
-    public void updateLastActiveAt(Instant lastActiveAt) {
+    public void update(Instant lastActiveAt) {
         this.lastActiveAt = lastActiveAt;
-        updateTimeStamp();
     }
-
 
     public boolean isOnline() {
-        return lastActiveAt.isAfter(
-            Instant.now().minus(ONLINE_THRESHOLD_MINUTES,
-                java.time.temporal.ChronoUnit.MINUTES));
+        return lastActiveAt.isAfter(Instant.now().minus(ONLINE_THRESHOLD));
     }
-
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private UUID userId;
-        private Instant lastActiveAt = Instant.now();
-
-        public Builder userId(UUID userId) {
-          this.userId = userId;
-          return this;
-        }
-
-        public Builder lastActiveAt(Instant lastActiveAt) {
-            this.lastActiveAt = lastActiveAt;
-            return this;
-        }
-
-        public UserStatus build() {
-            return new UserStatus(userId, lastActiveAt);
-        }
-    }
-
-
-
-
-
-
-
-
-
 }

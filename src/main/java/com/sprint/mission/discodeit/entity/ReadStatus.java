@@ -1,66 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
+import lombok.NoArgsConstructor;
 
 @Getter
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class ReadStatus extends UpdatableEntity {
+@Entity
+@Table(
+    name = "read_statuses",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends BaseUpdatableEntity {
 
-    private static final long serialVersionUID = 1L;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    UUID userId;
-    UUID channelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
 
-    @NonFinal
-    Instant lastReadAt;
+    @Column(name = "last_read_at", nullable = false)
+    private Instant lastReadAt;
 
-
-    private ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        super();
-        this.userId = userId;
-        this.channelId = channelId;
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = user;
+        this.channel = channel;
         this.lastReadAt = lastReadAt;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public void update(Instant newLastReadAt) {
+        this.lastReadAt = newLastReadAt;
     }
-
-    public void updateLastReadAt(Instant lastReadAt) {
-        this.lastReadAt = lastReadAt;
-        updateTimeStamp();
-    }
-
-
-    public static class Builder {
-        private UUID userId;
-        private UUID channelId;
-        private Instant lastReadAt = Instant.now();
-
-        public Builder userId(UUID userId){
-            this.userId = userId;
-            return this;
-        }
-
-        public Builder channelId(UUID channelId) {
-            this.channelId = channelId;
-            return this;
-        }
-
-        public Builder lastReadAt(Instant lastReadAt) {
-            this.lastReadAt = lastReadAt;
-            return this;
-        }
-
-        public ReadStatus build() {
-            return new ReadStatus(userId, channelId, lastReadAt);
-        }
-
-    }
-
 }

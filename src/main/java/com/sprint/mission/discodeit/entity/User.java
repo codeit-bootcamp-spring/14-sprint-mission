@@ -1,109 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.DiscodeitException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
+import lombok.NoArgsConstructor;
 
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class User extends UpdatableEntity {
-    private static final long serialVersionUID = 1L;
+@Entity
+@Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseUpdatableEntity {
 
-    String userName;
-    String email;
-    String password;
-    String nickName;
-    UUID profileId;
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
 
-    private User (String userName, String email,  String password, String nickName,UUID profileId) {
-        super();
-        this.userName = userName;
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+
+    @Column(nullable = false, length = 60)
+    private String password;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus status;
+
+    public User(String username, String email, String password, BinaryContent profile) {
+        this.username = username;
         this.email = email;
         this.password = password;
-        this.nickName = nickName;
-        this.profileId = profileId;
+        this.profile = profile;
     }
 
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-
-    public String update(String nickName) {
-        if(nickName == null || nickName.isBlank()) {
-            throw new DiscodeitException(ErrorCode.INVALID_NICKNAME);
+    public void update(String newUsername, String newEmail, String newPassword) {
+        if (newUsername != null) {
+            this.username = newUsername;
         }
-        this.nickName = nickName;
-        updateTimeStamp();
-        return this.nickName;
-    }
-
-    public void updateProfileId(UUID profileId) {
-        this.profileId = profileId;
-        updateTimeStamp();
-    }
-
-    public void updatePassword(String password) {
-        this.password = password;
-        updateTimeStamp();
-    }
-
-    @Override
-    public String toString() {
-        return this.nickName;
-    }
-
-    public static class Builder {
-        private String userName;
-        private String email;
-        private String password;
-        private String nickName;
-        private UUID profileId;
-
-        public Builder userName(String userName){
-            this.userName = userName;
-            return this;
+        if (newEmail != null) {
+            this.email = newEmail;
         }
-
-        public Builder email(String email){
-            this.email = email;
-            return this;
+        if (newPassword != null) {
+            this.password = newPassword;
         }
-
-        public Builder password(String password){
-            this.password = password;
-            return this;
-        }
-
-    public Builder nickName(String nickName){
-        this.nickName = nickName;
-        return this;
     }
 
-    public Builder profileId(UUID profileId){
-        this.profileId = profileId;
-        return this;
+    public void updateProfile(BinaryContent newProfile) {
+        this.profile = newProfile;
     }
 
-    public User build() {
-        return new User(this.userName, this.email,
-            this.password, this.nickName,this.profileId);
+    void assignStatus(UserStatus status) {
+        this.status = status;
     }
-
-
-    }
-
 }
-
-
-
-
-
-
-
-
-

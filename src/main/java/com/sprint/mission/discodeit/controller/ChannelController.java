@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -30,47 +30,38 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @PostMapping(value = "/public")
-    public ResponseEntity<ChannelDto> publicChannelCreate(
-        @Valid @RequestBody PublicChannelCreateRequest request
-    ) {
-        log.info("publicChannelCreate 정상 작동. 채널 이름:{}", request.name());
-        ChannelDto created = channelService.createPublic(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    @PostMapping("/public")
+    public ResponseEntity<ChannelDto> createPublic(
+        @Valid @RequestBody PublicChannelCreateRequest request) {
+        log.info("createPublic 요청. name:{}", request.name());
+        return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPublic(request));
     }
 
     @PostMapping("/private")
-    public ResponseEntity<ChannelDto> privateChannelCreate(
-        @Valid @RequestBody PrivateChannelCreateRequest request
-    ) {
-        log.info("privateChannelCreate 정상 작동.");
-        ChannelDto created = channelService.createPrivate(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<ChannelDto> createPrivate(
+        @Valid @RequestBody PrivateChannelCreateRequest request) {
+        log.info("createPrivate 요청. participantIds:{}", request.participantIds());
+        return ResponseEntity.status(HttpStatus.CREATED).body(channelService.createPrivate(request));
     }
 
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> update(
         @PathVariable UUID channelId,
-        @Valid @RequestBody ChannelUpdateRequest request
-    ) {
-        log.info("공개채널 수정 정상 작동.");
-        ChannelDto updated = channelService.update(channelId, request);
-        return ResponseEntity.ok(updated);
+        @Valid @RequestBody PublicChannelUpdateRequest request) {
+        log.info("update 요청. channelId:{}", channelId);
+        return ResponseEntity.ok(channelService.update(channelId, request));
     }
 
     @DeleteMapping("/{channelId}")
-    public void delete(@PathVariable UUID channelId) {
-        log.info("delete 정상 작동. 삭제할 channelId:{}", channelId);
+    public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
+        log.info("delete 요청. channelId:{}", channelId);
         channelService.delete(channelId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<ChannelDto>> findAllByUserId(
-        @RequestParam UUID userId) {
-        log.info("findAllByUserId 정상 작동. userId:{}", userId);
-        List<ChannelDto> channels = channelService.findAllByUserId(userId);
-        return ResponseEntity.ok(channels);
+    public ResponseEntity<List<ChannelDto>> findAllByUserId(@RequestParam UUID userId) {
+        log.info("findAllByUserId 요청. userId:{}", userId);
+        return ResponseEntity.ok(channelService.findAllByUserId(userId));
     }
-
-
 }
