@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.core.domain.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.core.application.message.port.out.MessagePort;
 import com.sprint.mission.discodeit.core.application.readstatus.port.out.ReadStatusPort;
 import com.sprint.mission.discodeit.core.application.user.port.out.UserPort;
-import com.sprint.mission.discodeit.core.application.user.service.AuthService;
+import com.sprint.mission.discodeit.core.application.user.port.out.UserSessionPort;
 import com.sprint.mission.discodeit.core.application.user.port.in.dto.response.UserResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +27,7 @@ public class ChannelApplication implements ChannelUseCase {
     private final ChannelPort channels;
     private final MessagePort messages;
     private final UserPort users;
-    private final AuthService authService;
+    private final UserSessionPort userSessions;
     private final ReadStatusPort readStatuses;
 
     @Override
@@ -71,7 +71,7 @@ public class ChannelApplication implements ChannelUseCase {
     private ChannelResult toResult(Channel channel, Map<UUID, Instant> channelLastMessageAt) {
         List<UserResult> participants = channel.isPrivate()
                 ? channel.getParticipants().stream()
-                        .map(user -> UserResult.from(user, authService.isOnline(user)))
+                        .map(user -> UserResult.from(user, userSessions.isOnline(user.getId())))
                         .toList()
                 : null;
         return ChannelResult.from(

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.core.application.binarycontent.port.in.dto.r
 import com.sprint.mission.discodeit.core.application.user.port.in.UserUseCase;
 import com.sprint.mission.discodeit.core.application.user.port.in.dto.response.UserResult;
 import com.sprint.mission.discodeit.core.application.user.port.out.UserPort;
+import com.sprint.mission.discodeit.core.application.user.port.out.UserSessionPort;
 import com.sprint.mission.discodeit.core.common.annotation.ApplicationService;
 import com.sprint.mission.discodeit.core.common.log.MutationLog;
 import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
@@ -27,7 +28,7 @@ public class UserApplication implements UserUseCase {
     private final UserPort users;
     private final ReadStatusPort readStatuses;
     private final BinaryContentStoragePort binaryContentStoragePort;
-    private final AuthService authService;
+    private final UserSessionPort userSessions;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -47,7 +48,7 @@ public class UserApplication implements UserUseCase {
         String encodedPassword = passwordEncoder.encode(password);
         User createdUser = users.save(User.createUser(username, email, encodedPassword, createdProfile));
         saveCreatedProfile(createProfileCommand, createdProfile);
-        boolean isOnline = authService.isOnline(createdUser);
+        boolean isOnline = userSessions.isOnline(createdUser.getId());
         return UserResult.from(createdUser, isOnline);
     }
 
@@ -60,7 +61,7 @@ public class UserApplication implements UserUseCase {
     @Transactional
     public UserResult getUser(UUID id) {
         User foundUser = users.get(id);
-        boolean isOnline = authService.isOnline(foundUser);
+        boolean isOnline = userSessions.isOnline(foundUser.getId());
         return UserResult.from(foundUser, isOnline);
     }
 
@@ -69,7 +70,7 @@ public class UserApplication implements UserUseCase {
         List<User> found = users.findAll();
         return found.stream()
                 .map(user -> {
-                    boolean isOnline = authService.isOnline(user);
+                    boolean isOnline = userSessions.isOnline(user.getId());
                     return UserResult.from(user, isOnline);
                 })
                 .toList();
@@ -95,7 +96,7 @@ public class UserApplication implements UserUseCase {
         User updated = updating.update(username, email, encodedPassword, createdProfile);
 
         saveCreatedProfile(createProfileCommand, createdProfile);
-        boolean isOnline = authService.isOnline(updated);
+        boolean isOnline = userSessions.isOnline(updated.getId());
         return UserResult.from(updated, isOnline);
     }
 
@@ -128,8 +129,8 @@ public class UserApplication implements UserUseCase {
     public UserResult updateUserRole(UUID userId, Role role) {
         User found = users.get(userId);
         User updated = found.updateRole(role);
-        authService.removeSession(updated);
-        boolean isOnline = authService.isOnline(updated);
+        userSessions.expireSessions(updated.getId());
+        boolean isOnline = userSessions.isOnline(updated.getId());
         return UserResult.from(updated, isOnline);
     }
 

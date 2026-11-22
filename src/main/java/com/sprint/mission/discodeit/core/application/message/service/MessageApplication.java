@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.core.application.message.port.in.dto.respons
 import com.sprint.mission.discodeit.core.application.message.port.out.MessagePort;
 import com.sprint.mission.discodeit.core.application.readstatus.port.out.ReadStatusPort;
 import com.sprint.mission.discodeit.core.application.user.port.out.UserPort;
-import com.sprint.mission.discodeit.core.application.user.service.AuthService;
+import com.sprint.mission.discodeit.core.application.user.port.out.UserSessionPort;
 import com.sprint.mission.discodeit.core.common.annotation.ApplicationService;
 import com.sprint.mission.discodeit.core.common.log.MutationLog;
 import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
@@ -33,7 +33,7 @@ public class MessageApplication implements MessageUseCase {
     private final MessagePort messages;
     private final ChannelPort channels;
     private final UserPort users;
-    private final AuthService authService;
+    private final UserSessionPort userSessions;
     private final ReadStatusPort readStatuses;
     private final BinaryContentStoragePort binaryContentStoragePort;
 
@@ -135,6 +135,8 @@ public class MessageApplication implements MessageUseCase {
 
     private MessageResult toResult(Message message) {
         User author = message.getAuthor();
-        return MessageResult.from(message, author != null && authService.isOnline(author));
+        boolean isOnline = Objects.nonNull(author)
+                && userSessions.isOnline(author.getId());
+        return MessageResult.from(message, isOnline);
     }
 }

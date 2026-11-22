@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.core.application.binarycontent.port.out.Bina
 import com.sprint.mission.discodeit.core.application.readstatus.port.out.ReadStatusPort;
 import com.sprint.mission.discodeit.core.application.user.port.in.dto.response.UserResult;
 import com.sprint.mission.discodeit.core.application.user.port.out.UserPort;
-import com.sprint.mission.discodeit.core.application.user.service.AuthService;
+import com.sprint.mission.discodeit.core.application.user.port.out.UserSessionPort;
 import com.sprint.mission.discodeit.core.application.user.service.UserApplication;
 import com.sprint.mission.discodeit.core.domain.binaryContent.BinaryContent;
 import com.sprint.mission.discodeit.core.domain.user.Role;
@@ -19,11 +19,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -36,7 +39,7 @@ class UserApplicationTest {
     @Mock
     BinaryContentStoragePort binaryContentStoragePort;
     @Mock
-    AuthService authService;
+    UserSessionPort userSessions;
     @Mock
     PasswordEncoder passwordEncoder;
 
@@ -62,7 +65,8 @@ class UserApplicationTest {
         assertThat(response.binaryContentResult().filename()).isEqualTo(command.fileName());
         assertThat(response.binaryContentResult().contentType()).isEqualTo(command.contentType());
         assertThat(response.binaryContentResult().size()).isEqualTo(command.content().length);
-        verify(users).save(any(User.class));
+        verify(users).existsByUsernameOrEmail(username, email);
+        verify(users).save(argThat(user -> user.getPassword().equals("encoded-password")));
         verify(binaryContentStoragePort).put(response.binaryContentResult().id(), command.content());
     }
 
@@ -102,7 +106,42 @@ class UserApplicationTest {
                         assertThat(exception.getType()).isEqualTo(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT));
         verify(users).existsByUsernameOrEmail(username, email);
         verifyNoMoreInteractions(users);
-        verifyNoInteractions(binaryContentStoragePort);
+        verifyNoInteractions(binaryContentStoragePort, passwordEncoder);
+    }
+
+    @Test
+    @DisplayName("User 조회 시, 세션의 온라인 상태를 반환한다.")
+    void givenOnlineUser_whenGetUser_thenReturnOnlineStatus() {
+        UUID userId = UUID.randomUUID();
+        User user = createUserWithId(userId, "test");
+        when(users.get(userId)).thenReturn(user);
+        when(userSessions.isOnline(userId)).thenReturn(true);
+
+        // when
+        UserResult response = userApplication.getUser(userId);
+
+        // then
+        assertThat(response.id()).isEqualTo(userId);
+        assertThat(response.isOnline()).isTrue();
+    }
+
+    @Test
+    @DisplayName("User 목록 조회 시, 사용자별 온라인 상태를 반환한다.")
+    void givenUsersWithDifferentSessionStates_whenGetAllUsers_thenReturnEachOnlineStatus() {
+        UUID onlineUserId = UUID.randomUUID();
+        UUID offlineUserId = UUID.randomUUID();
+        User onlineUser = createUserWithId(onlineUserId, "online");
+        User offlineUser = createUserWithId(offlineUserId, "offline");
+        when(users.findAll()).thenReturn(List.of(onlineUser, offlineUser));
+        when(userSessions.isOnline(onlineUserId)).thenReturn(true);
+        when(userSessions.isOnline(offlineUserId)).thenReturn(false);
+
+        // when
+        List<UserResult> responses = userApplication.getAllUsers();
+
+        // then
+        assertThat(responses).extracting(UserResult::id).containsExactly(onlineUserId, offlineUserId);
+        assertThat(responses).extracting(UserResult::isOnline).containsExactly(true, false);
     }
 
     @Test
@@ -126,6 +165,9 @@ class UserApplicationTest {
         assertThat(response.binaryContentResult().filename()).isEqualTo(command.fileName());
         assertThat(response.binaryContentResult().contentType()).isEqualTo(command.contentType());
         assertThat(response.binaryContentResult().size()).isEqualTo(command.content().length);
+        assertThat(existing.getPassword()).isEqualTo("encoded-password");
+        verify(users).existsByUsernameAndIdNot(newUsername, userId);
+        verify(users).existsByEmailAndIdNot(newEmail, userId);
         verify(users).get(userId);
         verify(binaryContentStoragePort).put(response.binaryContentResult().id(), command.content());
     }
@@ -172,7 +214,53 @@ class UserApplicationTest {
                         assertThat(exception.getType()).isEqualTo(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT));
         verify(users).existsByUsernameAndIdNot(newUsername, userId);
         verifyNoMoreInteractions(users);
-        verifyNoInteractions(binaryContentStoragePort);
+        verifyNoInteractions(binaryContentStoragePort, passwordEncoder);
+    }
+
+    @Test
+    @DisplayName("수정 가능한 일부 인자가 주어진 경우, User 갱신 성공 시, 갱신된 정보만 반환")
+    void givenPartialArgument_whenUpdateUser_thenReturnPartiallyUpdatedUser() {
+        User updating = existingUser();
+        UUID id = UUID.randomUUID();
+        String newUsername = "newUsername";
+        String nullEmail = null;
+        String newPassword = "newPassword";
+        CreateBinaryContentCommand newProfile = createProfileCommand();
+        when(users.get(id)).thenReturn(updating);
+        when(passwordEncoder.encode(newPassword)).thenReturn("encoded-password");
+
+        // when
+        UserResult updated = userApplication.patchUserInfo(id, newUsername, nullEmail, newPassword, newProfile);
+
+        // then
+        assertThat(updated.username()).isEqualTo(newUsername);
+        assertThat(updated.email()).isEqualTo("test@gmail.com");
+        assertThat(updated.binaryContentResult().filename()).isEqualTo(newProfile.fileName());
+        verify(users).existsByUsernameAndIdNot(newUsername, id);
+        verify(users).get(id);
+    }
+
+    @Test
+    @DisplayName("다른 User가 이미 사용중인 email 주어진 경우, User 갱신 실패 시, 예외를 던지고 갱신 목적으로 User를 조회하지 않는다")
+    void givenDuplicatedEmail_whenUserUpdateFailed_thenThrowExceptionAndDoNotFindUserForUpdate() {
+        UUID id = UUID.randomUUID();
+        String newUsername = "newUsername";
+        String duplicatedEmail = "newEmail";
+        String newPassword = "newPassword";
+        when(users.existsByEmailAndIdNot(duplicatedEmail, id)).thenReturn(true);
+
+        // when
+        UserException thrown = catchThrowableOfType(
+                UserException.class,
+                () -> userApplication.patchUserInfo(id, newUsername, duplicatedEmail, newPassword, createProfileCommand())
+        );
+
+        // then
+        assertThat(thrown.getType()).isEqualTo(UserExceptionType.USER_UNIQUE_FIELD_CONFLICT);
+        verify(users).existsByUsernameAndIdNot(newUsername, id);
+        verify(users).existsByEmailAndIdNot(duplicatedEmail, id);
+        verifyNoMoreInteractions(users);
+        verifyNoInteractions(binaryContentStoragePort, passwordEncoder);
     }
 
     @Test
@@ -186,6 +274,25 @@ class UserApplicationTest {
         verify(users).existsById(userId);
         verify(readStatuses).deleteAllByUserId(userId);
         verify(users).deleteById(userId);
+    }
+
+    @Test
+    @DisplayName("User 역할 변경 시, 기존 세션을 만료시키고 온라인 상태를 다시 조회한다.")
+    void whenUpdateUserRole_thenExpireSessionsBeforeReadingOnlineStatus() {
+        UUID userId = UUID.randomUUID();
+        User user = createUserWithId(userId, "test");
+        when(users.get(userId)).thenReturn(user);
+        when(userSessions.isOnline(userId)).thenReturn(false);
+
+        // when
+        UserResult response = userApplication.updateUserRole(userId, Role.CHANNEL_MANAGER);
+
+        // then
+        assertThat(response.role()).isEqualTo(Role.CHANNEL_MANAGER.name());
+        assertThat(response.isOnline()).isFalse();
+        var sessionCalls = inOrder(userSessions);
+        sessionCalls.verify(userSessions).expireSessions(userId);
+        sessionCalls.verify(userSessions).isOnline(userId);
     }
 
     @Test
@@ -227,5 +334,20 @@ class UserApplicationTest {
 
     private CreateBinaryContentCommand createBinaryContentCommand() {
         return CreateBinaryContentCommand.of("profile", "image/png", new byte[]{1});
+    }
+
+    private User existingUser() {
+        return User.createUser("test", "test@gmail.com", "1234",
+                BinaryContent.of("profile", "image/png", new byte[]{1}));
+    }
+
+    private CreateBinaryContentCommand createProfileCommand() {
+        return CreateBinaryContentCommand.of("newProfile", "image/png", new byte[]{1});
+    }
+
+    private User createUserWithId(UUID userId, String username) {
+        User user = User.createUser(username, username + "@example.com", "1234", null);
+        ReflectionTestUtils.setField(user, "id", userId);
+        return user;
     }
 }
