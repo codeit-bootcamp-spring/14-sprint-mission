@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.message.application.MessageApplicationServic
 import com.sprint.mission.discodeit.message.web.dto.req.MessageCreateRequestDTO;
 import com.sprint.mission.discodeit.message.web.dto.req.MessageUpdateRequestDTO;
 import com.sprint.mission.discodeit.message.web.dto.res.MessageResponseDTO;
-import com.sprint.mission.discodeit.user.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.global.security.JwtPrincipal;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -58,9 +58,9 @@ public class MessageController {
     @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessage(
         @PathVariable UUID messageId,
-        @AuthenticationPrincipal DiscodeitUserDetails principal
+        @AuthenticationPrincipal JwtPrincipal principal
     ){
-        messageApplicationService.deleteMessage(messageId, principal.getUser().userId());
+        messageApplicationService.deleteMessage(messageId, principal.userId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build();
@@ -69,10 +69,10 @@ public class MessageController {
     @PatchMapping("/{messageId}")
     public ResponseEntity<MessageResponseDTO> updateMessageContent(
         @PathVariable UUID messageId,
-        @AuthenticationPrincipal DiscodeitUserDetails principal,
+        @AuthenticationPrincipal JwtPrincipal principal,
         @Valid @RequestBody MessageUpdateRequestDTO request
     ){
-        MessageResponseDTO response = messageApplicationService.updateMessageContent(messageId, principal.getUser().userId(), request.newContent());
+        MessageResponseDTO response = messageApplicationService.updateMessageContent(messageId, principal.userId(), request.newContent());
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(response);

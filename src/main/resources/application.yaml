@@ -1,3 +1,8 @@
+jwt:
+  secret-key: ${JWT_SECRET_KEY:}
+  access-token-expire-time: ${JWT_ACCESS_TOKEN_EXPIRE_TIME:900000}        # 15분
+  refresh-token-expire-time: ${JWT_REFRESH_TOKEN_EXPIRE_TIME:604800000}   # 7일
+
 spring:
   application:
     name: discodeit

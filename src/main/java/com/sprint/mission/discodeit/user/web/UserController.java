@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.user.web;
 
 import com.sprint.mission.discodeit.user.application.UserApplicationService;
-import com.sprint.mission.discodeit.user.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.global.security.JwtPrincipal;
 import com.sprint.mission.discodeit.user.web.dto.req.UserCreateRequestDTO;
 import com.sprint.mission.discodeit.user.web.dto.req.UserStatusUpdateRequestDTO;
 import com.sprint.mission.discodeit.user.web.dto.req.UserUpdateRequestDTO;
@@ -55,9 +55,9 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUserAccount(
         @PathVariable UUID userId,
-        @AuthenticationPrincipal DiscodeitUserDetails principal
+        @AuthenticationPrincipal JwtPrincipal principal
     ){
-        userApplicationService.deleteUserAccount(userId, principal.getUser().userId());
+        userApplicationService.deleteUserAccount(userId, principal.userId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build();
@@ -66,11 +66,11 @@ public class UserController {
     @PatchMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> updateUserAccount(
         @PathVariable UUID userId ,
-        @AuthenticationPrincipal DiscodeitUserDetails principal,
+        @AuthenticationPrincipal JwtPrincipal principal,
         @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequestDTO request,
         @RequestPart(value = "profile", required = false) MultipartFile profileImage
     ){
-        UserResponseDTO response = userApplicationService.updateUser(userId, principal.getUser().userId(), request, profileImage);
+        UserResponseDTO response = userApplicationService.updateUser(userId, principal.userId(), request, profileImage);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(response);

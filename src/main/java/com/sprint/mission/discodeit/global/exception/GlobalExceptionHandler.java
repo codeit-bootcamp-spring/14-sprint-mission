@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.global.exception;
 
+import com.sprint.mission.discodeit.global.security.exception.InvalidTokenException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
-import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     /*
         비즈니스 로직 처리 중 발생한 예외 처리
      */
@@ -102,6 +101,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Void> handleException(AccessDeniedException e) {
       log.warn("인가 실패 ------- ", e);
       return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    // 토큰 발급 실패
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleException(InvalidTokenException e) {
+      ErrorResponse response = ErrorResponse.of(CustomErrorCode.INVALID_TOKEN, e, Map.of());
+      return ResponseEntity.status(response.status()).body(response);
     }
 
   @ExceptionHandler

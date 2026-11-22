@@ -1,8 +1,14 @@
 package com.sprint.mission.discodeit.global.config;
 
+import com.sprint.mission.discodeit.global.security.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.global.security.JwtProperties;
+import com.sprint.mission.discodeit.global.security.JwtTokenProvider;
 import com.sprint.mission.discodeit.global.security.SpaCsrfTokenRequestHandler;
+import com.sprint.mission.discodeit.user.security.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.user.security.JwtLogoutHandler;
 import com.sprint.mission.discodeit.user.security.LoginFailureHandler;
 import com.sprint.mission.discodeit.user.security.LoginSuccessHandler;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -12,6 +18,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
@@ -20,35 +27,51 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
-    LoginSuccessHandler loginSuccessHandler, LoginFailureHandler loginFailureHandler) throws Exception {
+    LoginFailureHandler loginFailureHandler, JwtLoginSuccessHandler jwtLoginSuccessHandler,
+      JwtTokenProvider jwtTokenProvider,
+      JwtLogoutHandler jwtLogoutHandler
+  ) throws Exception {
     http.csrf(csrf -> csrf
         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
     );
 
+    http.sessionManagement(session -> session
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    );
+
     http.formLogin(login -> login
         .loginProcessingUrl("/api/auth/login")
-        .successHandler(loginSuccessHandler)
+        .successHandler(jwtLoginSuccessHandler)
         .failureHandler(loginFailureHandler)
     );
 
     http.logout(logout -> logout
         .logoutUrl("/api/auth/logout")
+        .addLogoutHandler(jwtLogoutHandler)
         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
     );
 
     http.authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/login", "/api/auth/logout").permitAll()
+        .requestMatchers(
+            "/api/auth/csrf-token",
+            "/api/users",
+            "/api/auth/login",
+            "/api/auth/logout",
+            "/api/auth/refresh"
+        ).permitAll()
         .requestMatchers("/api/**").authenticated()
         .anyRequest().permitAll()
     );
@@ -56,6 +79,11 @@ public class SecurityConfig {
     http.exceptionHandling(ex -> ex
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
         .accessDeniedHandler(new AccessDeniedHandlerImpl())
+    );
+
+    http.addFilterBefore(
+        new JwtAuthenticationFilter(jwtTokenProvider),
+        UsernamePasswordAuthenticationFilter.class    // 로그인 필터
     );
 
     return http.build();
