@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.config.security;
+package com.sprint.mission.discodeit.adapter.in.web.common.security;
 
 import com.sprint.mission.discodeit.core.application.user.port.in.dto.response.UserResult;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.config.security;
+package com.sprint.mission.discodeit.adapter.in.web.common.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

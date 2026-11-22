@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.config.security;
+package com.sprint.mission.discodeit.adapter.in.web.common.security;
 
 import com.sprint.mission.discodeit.adapter.in.web.controller.user.dto.UserDto;
 import jakarta.servlet.ServletException;

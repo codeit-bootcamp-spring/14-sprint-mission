@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.adapter.in.web.controller.message.dto.Messag
 import com.sprint.mission.discodeit.core.application.binarycontent.port.in.dto.request.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.application.message.port.in.MessageUseCase;
 import com.sprint.mission.discodeit.core.common.pagination.PageQuery;
-import com.sprint.mission.discodeit.core.config.security.CustomUserDetails;
+import com.sprint.mission.discodeit.adapter.in.web.common.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;

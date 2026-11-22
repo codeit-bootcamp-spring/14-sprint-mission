@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.config.security;
+package com.sprint.mission.discodeit.adapter.in.web.common.security;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.context.annotation.Bean;

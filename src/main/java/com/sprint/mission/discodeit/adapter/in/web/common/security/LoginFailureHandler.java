@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.config.security;
+package com.sprint.mission.discodeit.adapter.in.web.common.security;
 
 import com.sprint.mission.discodeit.adapter.in.web.common.exception.ErrorResponse;
 import com.sprint.mission.discodeit.adapter.in.web.common.exception.ErrorResponseMapper;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.out.security;
 
 import com.sprint.mission.discodeit.core.application.user.port.out.UserSessionPort;
-import com.sprint.mission.discodeit.core.config.security.UserSessionKey;
+import com.sprint.mission.discodeit.adapter.in.web.common.security.UserSessionKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
