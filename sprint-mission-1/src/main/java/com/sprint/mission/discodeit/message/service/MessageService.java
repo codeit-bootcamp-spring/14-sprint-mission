@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -89,7 +90,9 @@ public class MessageService {
         return messageMapper.toDto(message);
     }
 
+    // 작성자만 수정·삭제할 수 있다. 작성자는 DB 조회가 필요해서 Bean 메서드로 검사한다
     @Transactional
+    @PreAuthorize("@messageAuthorization.isAuthor(#messageId, authentication.principal.userDto.id)")
     public MessageDto messageUpdate(UUID messageId,
         MessageUpdateRequestDto messageUpdateRequestDto) {
         Message message = messageRepository.findById(messageId)
@@ -105,6 +108,7 @@ public class MessageService {
     }
 
     @Transactional
+    @PreAuthorize("@messageAuthorization.isAuthor(#messageId, authentication.principal.userDto.id)")
     public void messageDelete(UUID messageId) {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new DiscodeitException(

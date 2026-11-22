@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,7 +82,9 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
+    // 본인만 수정할 수 있다. #userId는 이 메서드의 파라미터 이름과 같아야 한다
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.userDto.id")
     public UserDto userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto,
         MultipartFile profile) {
         User user = userRepository.findById(userId)
@@ -115,6 +118,7 @@ public class UserService {
     }
 
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.userDto.id")
     public void userDelete(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DiscodeitException(
