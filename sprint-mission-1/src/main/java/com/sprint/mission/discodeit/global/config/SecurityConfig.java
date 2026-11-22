@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.global.security.SecurityErrorWriter;
 import com.sprint.mission.discodeit.global.security.SpaCsrfTokenRequestHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -35,7 +37,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
         AuthenticationSuccessHandler loginSuccessHandler,
         AuthenticationFailureHandler loginFailureHandler,
-        SessionRegistry sessionRegistry)
+        SessionRegistry sessionRegistry,
+        UserDetailsService userDetailsService,
+        @Value("${discodeit.security.remember-me.key}") String rememberMeKey,
+        @Value("${discodeit.security.remember-me.token-validity-seconds:1209600}") int rememberMeValiditySeconds)
         throws Exception {
         http.csrf(csrf -> csrf
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -61,6 +66,14 @@ public class SecurityConfig {
                 // 기본 전략은 상태 코드 없이(200) 평문을 써서 FE가 성공으로 처리한다. 401 JSON으로 응답한다
                 .expiredSessionStrategy(event ->
                     errorWriter.write(event.getResponse(), ExceptionType.SESSION_EXPIRED))));
+
+        // 세션이 없어도(타임아웃, 재배포) remember-me 쿠키로 다시 인증하고 새 세션을 만든다.
+        // 쿠키는 username + 만료 시각 + 서명(key, 비밀번호 해시 포함)이라 key가 유출되면 위조할 수 있다
+        http.rememberMe(rememberMe -> rememberMe
+            .key(rememberMeKey)
+            .rememberMeParameter("remember-me")
+            .tokenValiditySeconds(rememberMeValiditySeconds)
+            .userDetailsService(userDetailsService));
 
         http.authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()

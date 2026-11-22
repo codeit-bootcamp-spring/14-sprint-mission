@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.auth;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,7 @@ class AuthApiIntegrationTest {
 
     private static final String USERNAME = "kyj";
     private static final String PASSWORD = "pw1234";
+    private static final String REMEMBER_ME = "remember-me";
 
     @Autowired
     private MockMvc mockMvc;
@@ -183,6 +186,52 @@ class AuthApiIntegrationTest {
             .andExpect(status().isOk());
     }
 
+    @Test
+    @DisplayName("remember-me - 세션 없이 쿠키만으로 /me 조회")
+    void rememberMe_authenticatesWithoutSession() throws Exception {
+        MvcResult result = rememberMeLogin();
+        Cookie rememberMe = result.getResponse().getCookie(REMEMBER_ME);
+        assertThat(rememberMe).isNotNull();
+
+        // JSESSIONID를 지운 상황: 세션 없이 쿠키만 보낸다
+        mockMvc.perform(get("/api/auth/me").cookie(rememberMe))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(user.getId().toString()));
+    }
+
+    @Test
+    @DisplayName("remember-me - 로그아웃하면 쿠키가 삭제된다")
+    void rememberMe_clearedOnLogout() throws Exception {
+        MvcResult result = rememberMeLogin();
+
+        mockMvc.perform(post("/api/auth/logout")
+                .with(csrf())
+                .session((MockHttpSession) result.getRequest().getSession(false))
+                .cookie(result.getResponse().getCookie(REMEMBER_ME)))
+            .andExpect(status().isNoContent())
+            .andExpect(cookie().maxAge(REMEMBER_ME, 0));
+    }
+
+    @Test
+    @DisplayName("remember-me - 권한 변경으로 세션이 만료되면 쿠키도 삭제되어 다시 로그인해야 한다")
+    void rememberMe_clearedWhenSessionExpiredByRoleChange() throws Exception {
+        MvcResult result = rememberMeLogin();
+
+        mockMvc.perform(put("/api/auth/role")
+                .with(user("admin").roles("ADMIN"))
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(roleRequest("CHANNEL_MANAGER")))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/auth/me")
+                .session((MockHttpSession) result.getRequest().getSession(false))
+                .cookie(result.getResponse().getCookie(REMEMBER_ME)))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.code").value("SESSION_EXPIRED"))
+            .andExpect(cookie().maxAge(REMEMBER_ME, 0));
+    }
+
     private MockHttpSession login() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/auth/login")
                 .with(csrf())
@@ -191,6 +240,17 @@ class AuthApiIntegrationTest {
             .andExpect(status().isOk())
             .andReturn();
         return (MockHttpSession) result.getRequest().getSession(false);
+    }
+
+    // FE와 같이 remember-me를 쿼리 파라미터로 보낸다
+    private MvcResult rememberMeLogin() throws Exception {
+        return mockMvc.perform(post("/api/auth/login")
+                .with(csrf())
+                .queryParam(REMEMBER_ME, "true")
+                .param("username", USERNAME)
+                .param("password", PASSWORD))
+            .andExpect(status().isOk())
+            .andReturn();
     }
 
     private String roleRequest(String newRole) {
