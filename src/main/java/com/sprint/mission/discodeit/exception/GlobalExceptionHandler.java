@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -81,6 +82,14 @@ public class GlobalExceptionHandler {
             case PRIVATE_CHANNEL_UPDATE -> HttpStatus.FORBIDDEN;      // 403
             case INVALID_CREDENTIALS -> HttpStatus.UNAUTHORIZED;      // 401
         };
+    }
+    @ExceptionHandler(AccessDeniedException.class)   // org.springframework.security.access.AccessDeniedException
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
+        log.warn("접근 거부: {}", e.getMessage());
+        ErrorResponse body = new ErrorResponse(
+            Instant.now(), "FORBIDDEN", "접근 권한이 없습니다.",
+            Map.of(), e.getClass().getSimpleName(), HttpStatus.FORBIDDEN.value());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
 

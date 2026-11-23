@@ -26,10 +26,10 @@ discodeit:
     type: local
     local:
       root-path: .discodeit/storage
-    admin:
-      username: ${DISCODEIT_ADMIN_USERNAME:admin}
-      email: ${DISCODEIT_ADMIN_EMAIL:admin@discodeit.com}
-      password: ${DISCODEIT_ADMIN_PASSWORD:admin1234}
+  admin:
+    username: ${DISCODEIT_ADMIN_USERNAME:admin}
+    email: ${DISCODEIT_ADMIN_EMAIL:admin@discodeit.com}
+    password: ${DISCODEIT_ADMIN_PASSWORD:admin1234}
 
 logging:
   level:
