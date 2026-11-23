@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponseDto login(LoginRequestDto loginRequest) {
         User user = userRepository.findByUsername(loginRequest.username())
             .orElseThrow(() -> new InvalidCredentialsException(loginRequest.username()));
 
-        if (!user.getPassword().equals(loginRequest.password())) {
+        if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             throw new InvalidCredentialsException(loginRequest.username());
         }
 

@@ -23,11 +23,11 @@ public record UserCreateRequestDto(
 ) {
 
 
-    public User toEntity(BinaryContent profileId){
+    public User toEntity(BinaryContent profileId, String encodedPassword){
         return new User(
             this.username,
             this.email,
-            this.password,
+            encodedPassword,
             profileId
         );
     }
