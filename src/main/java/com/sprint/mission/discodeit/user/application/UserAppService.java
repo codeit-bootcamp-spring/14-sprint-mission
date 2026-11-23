@@ -6,13 +6,13 @@ import com.sprint.mission.discodeit.binarycontent.domain.BinaryContent;
 import com.sprint.mission.discodeit.common.DeletionEvent;
 import com.sprint.mission.discodeit.message.application.provided.command.MessageCommand;
 import com.sprint.mission.discodeit.readstatus.application.provided.command.ReadStatusCommand;
-import com.sprint.mission.discodeit.user.application.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.user.application.dto.UserDto;
 import com.sprint.mission.discodeit.user.application.dto.UserStatusDto;
-import com.sprint.mission.discodeit.user.application.dto.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.user.application.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.user.application.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.application.mapper.UserStatusMapper;
+import com.sprint.mission.discodeit.user.application.provided.command.ModifyUserCommand;
+import com.sprint.mission.discodeit.user.application.provided.command.RefreshUserStatusCommand;
+import com.sprint.mission.discodeit.user.application.provided.command.RegisterUserCommand;
 import com.sprint.mission.discodeit.user.application.provided.command.UserCommand;
 import com.sprint.mission.discodeit.user.application.provided.command.UserModifier;
 import com.sprint.mission.discodeit.user.application.provided.command.UserRegister;
@@ -51,9 +51,9 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
 
 
   @Override
-  public UserDto register(UserCreateRequest request, BinaryContentCreateRequest profile) {
-    BinaryContent savedProfile = registerProfile(profile);
-    User user = userCommand.create(request.username(), request.email(), request.password(),
+  public UserDto register(RegisterUserCommand command) {
+    BinaryContent savedProfile = registerProfile(command.profile());
+    User user = userCommand.create(command.username(), command.email(), command.password(),
         savedProfile);
     log.info("유저 생성 완료: user={}", user);
     return userMapper.toDto(user);
@@ -61,15 +61,14 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
 
 
   @Override
-  public UserDto modify(UUID userId, UserUpdateRequest request,
-      BinaryContentCreateRequest profile) {
-    User user = entityFinder.getEntityById(userId);
-    if (profile != null) {
+  public UserDto modify(ModifyUserCommand command) {
+    User user = entityFinder.getEntityById(command.userId());
+    if (command.profile() != null) {
       deleteProfile(user);
     }
-    BinaryContent savedProfile = registerProfile(profile);
-    String password = request.newPassword();
-    User updatedUser = userCommand.update(user, request.newUsername(), request.newEmail(),
+    BinaryContent savedProfile = registerProfile(command.profile());
+    String password = command.newPassword();
+    User updatedUser = userCommand.update(user, command.newUsername(), command.newEmail(),
         password,
         savedProfile);
     return userMapper.toDto(updatedUser);
@@ -95,9 +94,9 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
   }
 
   @Override
-  public UserStatusDto update(UUID userId, UserStatusUpdateRequest request) {
-    User user = entityFinder.getEntityById(userId);
-    UserStatus refresh = user.refreshActivity(request.newLastActiveAt());
+  public UserStatusDto update(RefreshUserStatusCommand command) {
+    User user = entityFinder.getEntityById(command.userId());
+    UserStatus refresh = user.refreshActivity(command.lastActiveAt());
     return userStatusMapper.toDto(refresh);
   }
 

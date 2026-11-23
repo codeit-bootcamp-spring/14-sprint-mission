@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.user.application.dto;
+package com.sprint.mission.discodeit.user.adapter.api.request;
 
 import java.time.Instant;
 
