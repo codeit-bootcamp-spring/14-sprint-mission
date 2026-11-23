@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.exception.user.EmailAlreadyExistsException;
-import com.sprint.mission.discodeit.common.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.common.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -16,17 +16,17 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -92,6 +92,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @PreAuthorize("principal.userDto.id() == #userId")
   @Transactional
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -148,6 +149,9 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  /* 안의 값이 boolean 판별되야함
+   * true면 메서드 실행, false면 403 권한예외 발생 */
+  @PreAuthorize("principal.userDto.id() == #userId")
   @Transactional
   public void delete(UUID userId) {
     log.info("유저 삭제 요청 - 삭제 대상 id: {}", userId);
