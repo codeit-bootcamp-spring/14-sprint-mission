@@ -83,7 +83,7 @@ public class UserApiController {
 
   @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> update(@PathVariable UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest request,
+      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
     BinaryContentCreateRequest binaryContentCreateRequest = binaryContentRequestMapper.toCreateRequest(
         profile);

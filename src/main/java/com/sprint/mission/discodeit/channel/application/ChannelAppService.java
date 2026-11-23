@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.channel.application.provided.command.Channel
 import com.sprint.mission.discodeit.channel.application.provided.command.CreateChannel;
 import com.sprint.mission.discodeit.channel.application.provided.query.ChannelEntityFinder;
 import com.sprint.mission.discodeit.channel.application.provided.query.ChannelFinder;
+import com.sprint.mission.discodeit.channel.application.required.RoleChecker;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 import com.sprint.mission.discodeit.channel.domain.ChannelType;
 import com.sprint.mission.discodeit.message.application.provided.command.MessageRemover;
@@ -18,6 +19,7 @@ import com.sprint.mission.discodeit.readstatus.application.provided.command.Read
 import com.sprint.mission.discodeit.readstatus.application.provided.query.ReadStatusEntityFinder;
 import com.sprint.mission.discodeit.readstatus.domain.ReadStatus;
 import com.sprint.mission.discodeit.user.application.provided.query.UserEntityFinder;
+import com.sprint.mission.discodeit.user.domain.Role;
 import com.sprint.mission.discodeit.user.domain.User;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -25,9 +27,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authorization.AuthorityAuthorizationManager;
-import org.springframework.security.authorization.AuthorizationManager;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,9 +45,8 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
   private final UserEntityFinder userEntityFinder;
   private final ReadStatusCommand readStatusCommand;
   private final ReadStatusEntityFinder readStatusEntityFinder;
+  private final RoleChecker roleChecker;
 
-  private static final AuthorizationManager<ChannelType> CHANNEL_MANAGER =
-      AuthorityAuthorizationManager.hasRole("CHANNEL_MANAGER");
 
   @Override
   public ChannelDto modify(UUID channelId, ChannelRequest request) {
@@ -128,7 +126,7 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
 
   private void authorizeAuthority(ChannelType type) {
     if (type == ChannelType.PUBLIC) {
-      CHANNEL_MANAGER.verify(SecurityContextHolder.getContext()::getAuthentication, type);
+      roleChecker.checkRole(Role.CHANNEL_MANAGER);
     }
   }
 }
