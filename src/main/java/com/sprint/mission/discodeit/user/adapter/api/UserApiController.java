@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.user.application.provided.command.UserRemove
 import com.sprint.mission.discodeit.user.application.provided.command.UserStatusCommand;
 import com.sprint.mission.discodeit.user.application.provided.query.UserAllFinder;
 import com.sprint.mission.discodeit.user.application.provided.query.UserFinder;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,7 @@ public class UserApiController {
 
   @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
+      @Valid @RequestBody UserStatusUpdateRequest request) {
 
     UserStatusDto response = userStatusCommand.update(userId, request);
     return ResponseEntity.ok(response);
@@ -59,7 +60,7 @@ public class UserApiController {
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> register(
-      @RequestPart("userCreateRequest") UserCreateRequest request,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
     BinaryContentCreateRequest binaryContentCreateRequest = binaryContentRequestMapper.toCreateRequest(
         profile);
