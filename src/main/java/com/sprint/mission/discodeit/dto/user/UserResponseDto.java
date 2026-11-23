@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.UUID;
 
@@ -8,7 +9,8 @@ public record UserResponseDto(
     String name,
     String email,
     UUID profileId,
-     boolean onlined
+    boolean onlined,
+    Role role
 ) {
 
     public static UserResponseDto from(User user, boolean onlined){
@@ -17,7 +19,8 @@ public record UserResponseDto(
             user.getUsername(),
             user.getEmail(),
             user.getProfile() != null ? user.getProfile().getId() : null,
-            onlined
+            onlined,
+            user.getRole()
         );
     }
 }
