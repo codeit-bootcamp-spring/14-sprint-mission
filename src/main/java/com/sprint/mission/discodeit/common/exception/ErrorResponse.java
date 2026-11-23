@@ -12,14 +12,14 @@ public record ErrorResponse(
     int status
 ) {
 
-  public static ErrorResponse from(DiscodeitRuntimeException e) {
+  public static ErrorResponse from(DiscodeitRuntimeException e, int status) {
     return new ErrorResponse(
         e.getTimestamp(),
         e.getErrorCode().name(),
         e.getMessage(),
         e.getDetails(),
         e.getClass().getSimpleName(),
-        e.getErrorCode().getStatus()
+        status
     );
   }
 }

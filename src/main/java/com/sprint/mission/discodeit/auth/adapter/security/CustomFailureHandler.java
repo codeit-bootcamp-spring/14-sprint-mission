@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.auth.adapter.security;
 
+import com.sprint.mission.discodeit.common.advice.HttpStatusConverter;
 import com.sprint.mission.discodeit.common.exception.DiscodeitRuntimeException;
 import com.sprint.mission.discodeit.common.exception.ErrorCode;
 import com.sprint.mission.discodeit.common.exception.ErrorResponse;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -27,10 +29,13 @@ public class CustomFailureHandler implements AuthenticationFailureHandler {
     if (exception instanceof AuthenticationServiceException) {
       throw new ServletException("서버 오류가 발생했습니다.", exception);
     }
+    DiscodeitRuntimeException ex = new DiscodeitRuntimeException(
+        ErrorCode.LOGIN_FAILED);
 
-    ErrorResponse errorResponse = ErrorResponse.from(new DiscodeitRuntimeException(
-        ErrorCode.LOGIN_FAILED));
+    ErrorCode errorCode = ex.getErrorCode();
+    HttpStatus status = HttpStatusConverter.from(errorCode);
 
+    ErrorResponse errorResponse = ErrorResponse.from(ex, status.value());
     response.setStatus(errorResponse.status());
 
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
