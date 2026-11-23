@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.auth.adapter.api;
 
+import com.sprint.mission.discodeit.auth.adapter.api.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.auth.adapter.security.CustomUserDetails;
 import com.sprint.mission.discodeit.auth.application.dto.LoginRequest;
 import com.sprint.mission.discodeit.auth.application.provided.AuthLogin;
-import com.sprint.mission.discodeit.user.adapter.api.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.user.application.dto.UserDto;
 import com.sprint.mission.discodeit.user.application.provided.command.UserRoleModifier;
 import com.sprint.mission.discodeit.user.application.provided.query.UserFinder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class AuthApiController {
 
   @PutMapping("/api/auth/role")
   public ResponseEntity<UserDto> updateRole(
-      @RequestBody UserRoleUpdateRequest request
+      @RequestBody @Valid UserRoleUpdateRequest request
   ) {
     UserDto userDto = roleModifier.updateRole(request.userId(), request.role());
     return ResponseEntity.ok(userDto);

@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.channel.application;
 
 import com.sprint.mission.discodeit.channel.application.dto.ChannelDto;
-import com.sprint.mission.discodeit.channel.application.dto.ChannelRequest;
 import com.sprint.mission.discodeit.channel.application.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.channel.application.provided.command.ChannelCommand;
 import com.sprint.mission.discodeit.channel.application.provided.command.ChannelModifier;
 import com.sprint.mission.discodeit.channel.application.provided.command.ChannelRegister;
 import com.sprint.mission.discodeit.channel.application.provided.command.ChannelRemover;
 import com.sprint.mission.discodeit.channel.application.provided.command.CreateChannel;
+import com.sprint.mission.discodeit.channel.application.provided.command.ModifyChannelCommand;
 import com.sprint.mission.discodeit.channel.application.provided.query.ChannelEntityFinder;
 import com.sprint.mission.discodeit.channel.application.provided.query.ChannelFinder;
 import com.sprint.mission.discodeit.channel.application.required.RoleChecker;
@@ -49,12 +49,12 @@ public class ChannelAppService implements ChannelRegister, ChannelModifier, Chan
 
 
   @Override
-  public ChannelDto modify(UUID channelId, ChannelRequest request) {
+  public ChannelDto modify(ModifyChannelCommand command) {
 
-    Channel channel = channelEntityFinder.getEntityById(channelId);
+    Channel channel = channelEntityFinder.getEntityById(command.channelId());
     authorizeAuthority(channel.getType());
-    Channel updated = channelCommand.update(channel, request.newName(), request.newDescription());
-    Instant lastMessageAt = messageTimeFinder.getLastMessageAt(channelId).orElse(null);
+    Channel updated = channelCommand.update(channel, command.newName(), command.newDescription());
+    Instant lastMessageAt = messageTimeFinder.getLastMessageAt(command.channelId()).orElse(null);
     return channelMapper.toDto(updated, List.of(), lastMessageAt);
   }
 
