@@ -9,10 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +35,7 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http, CustomSuccessHandler successHandler,
-      CustomFailureHandler failureHandler)
+      CustomFailureHandler failureHandler, SessionRegistry sessionRegistry)
       throws Exception {
 
     http.csrf(csrf -> csrf.spa())
@@ -42,6 +45,13 @@ public class SecurityConfig {
         .logout(logout -> logout.logoutUrl("/api/auth/logout")
             .logoutSuccessHandler(
                 new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT)));
+
+    http.sessionManagement(session -> session.sessionConcurrency(
+        concurrency -> concurrency
+            .maximumSessions(1)
+            .maxSessionsPreventsLogin(true)
+            .sessionRegistry(sessionRegistry)
+    ));
 
     http.authorizeHttpRequests(auth ->
             auth.requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
@@ -53,6 +63,16 @@ public class SecurityConfig {
             PathPatternRequestMatcher.withDefaults().matcher("/api/**")));
 
     return http.build();
+  }
+
+  @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
+  }
+
+  @Bean
+  public HttpSessionEventPublisher httpSessionEventPublisher() {
+    return new HttpSessionEventPublisher();
   }
 
   /*SimpleUrlLogoutSuccessHandler 의 onLogoutSuccess 서버가 targetUrl 지정

@@ -31,7 +31,7 @@ public enum ErrorCode {
       "이미 존재하는 메세지입니다."
   ),
   INVALID_INFO(
-      "이름과 비밀번호를 다시 확인해주세요."
+      "잘못된 요청입니다."
   ),
   BINARY_CONTENT_NOT_FOUND(
       "존재하지 않는 바이너리 콘텐츠입니다."

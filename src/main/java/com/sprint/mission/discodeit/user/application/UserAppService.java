@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.common.DeletionEvent;
 import com.sprint.mission.discodeit.message.application.provided.command.MessageCommand;
 import com.sprint.mission.discodeit.readstatus.application.provided.command.ReadStatusCommand;
 import com.sprint.mission.discodeit.user.application.dto.UserDto;
+import com.sprint.mission.discodeit.user.application.dto.UserRoleChanged;
 import com.sprint.mission.discodeit.user.application.dto.UserStatusDto;
 import com.sprint.mission.discodeit.user.application.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.application.mapper.UserStatusMapper;
@@ -31,6 +32,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ResolvableType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -84,6 +86,20 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
 
   }
 
+  @Override
+  @PreAuthorize("hasRole('ADMIN')")
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public UserDto updateRole(UUID userId, Role role) {
+    User user = entityFinder.getEntityById(userId);
+
+    if (user.getRole() != role) {
+      user.updateRole(role);
+      eventPublisher.publishEvent(UserRoleChanged.to(userId));
+    }
+
+    return userMapper.toDto(user);
+  }
+
   private void deleteProfile(User user) {
     if (user.getProfile() != null) {
       ResolvableType resolvableType = ResolvableType.forClassWithGenerics(List.class, UUID.class);
@@ -108,11 +124,5 @@ public class UserAppService implements UserRegister, UserModifier, UserRemover, 
     return savedProfiles.getFirst();
   }
 
-  @Override
-  @PreAuthorize("hasRole('ADMIN')")
-  public UserDto updateRole(UUID userId, Role role) {
-    User user = entityFinder.getEntityById(userId);
-    user.updateRole(role);
-    return userMapper.toDto(user);
-  }
+
 }
