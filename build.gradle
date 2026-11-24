@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '1.2-M8'
+version = '2.0-M9'
 
 java {
     toolchain {
@@ -33,6 +33,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'software.amazon.awssdk:s3:2.31.7'
     runtimeOnly 'org.postgresql:postgresql'
 
@@ -45,13 +46,16 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'com.h2database:h2'
+    testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 's3-integration'
+    }
 }
 
 test {
@@ -64,4 +68,16 @@ jacocoTestReport {
         xml.required = true
         html.required = true
     }
+}
+
+// 실제 AWS S3 검증은 자격 증명을 준비한 뒤 명시적으로 실행한다.
+tasks.register('s3IntegrationTest', Test) {
+    description = 'Runs integration tests against the configured AWS S3 bucket.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 's3-integration'
+    }
+    shouldRunAfter tasks.named('test')
 }

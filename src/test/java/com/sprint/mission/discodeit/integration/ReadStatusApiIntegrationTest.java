@@ -96,8 +96,8 @@ class ReadStatusApiIntegrationTest {
   }
 
   @Test
-  @DisplayName("읽음 상태 중복 생성 시 기존 상태를 반환하는 API 통합 테스트")
-  void createReadStatus_Success_Idempotent() throws Exception {
+  @DisplayName("읽음 상태 생성 실패 API 통합 테스트 - 중복 생성")
+  void createReadStatus_Failure_Duplicate() throws Exception {
     // Given
     // 테스트 사용자 생성
     UserCreateRequest userRequest = new UserCreateRequest(
@@ -123,15 +123,12 @@ class ReadStatusApiIntegrationTest {
     );
 
     String firstRequestBody = objectMapper.writeValueAsString(firstCreateRequest);
-    String firstResponse = mockMvc.perform(post("/api/readStatuses")
+    mockMvc.perform(post("/api/readStatuses")
             .contentType(MediaType.APPLICATION_JSON)
             .content(firstRequestBody))
-        .andExpect(status().isCreated())
-        .andReturn().getResponse().getContentAsString();
-    String existingId = objectMapper.readTree(firstResponse).get("id").asText();
-    int existingCount = readStatusService.findAllByUserId(user.id()).size();
+        .andExpect(status().isCreated());
 
-    // 두 번째 요청은 동일 사용자와 채널의 기존 읽음 상태를 반환한다.
+    // 두 번째 읽음 상태 생성 요청 (동일 사용자, 동일 채널) - 실패해야 함
     ReadStatusCreateRequest duplicateCreateRequest = new ReadStatusCreateRequest(
         user.id(),
         channel.id(),
@@ -144,11 +141,7 @@ class ReadStatusApiIntegrationTest {
     mockMvc.perform(post("/api/readStatuses")
             .contentType(MediaType.APPLICATION_JSON)
             .content(duplicateRequestBody))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id", is(existingId)))
-        .andExpect(jsonPath("$.lastReadAt", is(lastReadAt.toString())));
-    org.assertj.core.api.Assertions.assertThat(readStatusService.findAllByUserId(user.id()))
-        .hasSize(existingCount);
+        .andExpect(status().isConflict());
   }
 
   @Test
@@ -270,4 +263,4 @@ class ReadStatusApiIntegrationTest {
         .andExpect(jsonPath("$[*].channelId",
             hasItems(channel1.id().toString(), channel2.id().toString())));
   }
-} 
+}

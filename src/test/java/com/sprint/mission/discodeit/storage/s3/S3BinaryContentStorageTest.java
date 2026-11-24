@@ -2,109 +2,146 @@ package com.sprint.mission.discodeit.storage.s3;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.http.AbortableInputStream;
+import org.springframework.test.context.ActiveProfiles;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
-@ExtendWith(MockitoExtension.class)
+@Tag("s3-integration")
+@SpringBootTest(properties = "discodeit.storage.type=s3")
+@ActiveProfiles("test")
+@DisplayName("S3BinaryContentStorage 테스트")
 class S3BinaryContentStorageTest {
 
-    @Mock
-    private S3Client s3Client;
+  @Autowired
+  private S3BinaryContentStorage s3BinaryContentStorage;
 
-    private S3BinaryContentStorage storage;
+  @Value("${discodeit.storage.s3.bucket}")
+  private String bucket;
 
-    @BeforeEach
-    void setUp() {
-        storage = spy(new S3BinaryContentStorage("access", "secret", "ap-northeast-2", "bucket"));
+  @Value("${discodeit.storage.s3.access-key}")
+  private String accessKey;
+
+  @Value("${discodeit.storage.s3.secret-key}")
+  private String secretKey;
+
+  @Value("${discodeit.storage.s3.region}")
+  private String region;
+
+  private final UUID testId = UUID.randomUUID();
+  private final byte[] testData = "테스트 데이터".getBytes();
+
+  @BeforeEach
+  void setUp() {
+    // 테스트 준비 작업
+    // 실제 S3BinaryContentStorage는 스프링이 의존성 주입으로 제공
+  }
+
+  @AfterEach
+  void tearDown() {
+    // 테스트 종료 후 생성된 S3 객체 삭제
+    try {
+      // S3 클라이언트 생성
+      S3Client s3Client = S3Client.builder()
+          .region(Region.of(region))
+          .credentialsProvider(
+              StaticCredentialsProvider.create(
+                  AwsBasicCredentials.create(accessKey, secretKey)
+              )
+          )
+          .build();
+
+      // 테스트에서 생성한 객체 삭제
+      DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+          .bucket(bucket)
+          .key(testId.toString())
+          .build();
+
+      s3Client.deleteObject(deleteRequest);
+      System.out.println("테스트 객체 삭제 완료: " + testId);
+    } catch (NoSuchKeyException e) {
+      // 객체가 이미 없는 경우는 무시
+      System.out.println("삭제할 객체가 없음: " + testId);
+    } catch (Exception e) {
+      // 정리 실패 시 로그만 남기고 테스트는 실패로 처리하지 않음
+      System.err.println("테스트 객체 정리 실패: " + e.getMessage());
     }
+  }
 
-    @Test
-    @DisplayName("파일 업로드 성공 시 UUID를 반환한다")
-    void put_Success() {
-        UUID id = UUID.randomUUID();
-        byte[] bytes = "test".getBytes();
+  @Test
+  @DisplayName("S3에 파일 업로드 성공 테스트")
+  void put_success() {
+    // when
+    UUID resultId = s3BinaryContentStorage.put(testId, testData);
 
-        doReturn(s3Client).when(storage).getS3Client();
-        given(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
-            .willReturn(PutObjectResponse.builder().build());
+    // then
+    assertThat(resultId).isEqualTo(testId);
+  }
 
-        UUID result = storage.put(id, bytes);
+  @Test
+  @DisplayName("S3에서 파일 다운로드 테스트")
+  void get_success() throws IOException {
+    // given
+    s3BinaryContentStorage.put(testId, testData);
 
-        assertThat(result).isEqualTo(id);
-        verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
-    }
+    // when
+    InputStream result = s3BinaryContentStorage.get(testId);
 
-    @Test
-    @DisplayName("파일 조회 성공 시 InputStream을 반환한다")
-    void get_Success() throws Exception {
-        UUID id = UUID.randomUUID();
-        byte[] bytes = "test".getBytes();
+    // then
+    assertNotNull(result);
 
-        ResponseInputStream<GetObjectResponse> mockResponse = new ResponseInputStream<>(
-            GetObjectResponse.builder().build(),
-            AbortableInputStream.create(new ByteArrayInputStream(bytes))
-        );
+    // 내용 검증
+    byte[] resultBytes = result.readAllBytes();
+    assertThat(resultBytes).isEqualTo(testData);
+  }
 
-        doReturn(s3Client).when(storage).getS3Client();
-        given(s3Client.getObject(any(GetObjectRequest.class))).willReturn(mockResponse);
+  @Test
+  @DisplayName("존재하지 않는 파일 조회 시 예외 발생 테스트")
+  void get_notFound() {
+    // when & then
+    assertThatThrownBy(() -> s3BinaryContentStorage.get(UUID.randomUUID()))
+        .isInstanceOf(NoSuchElementException.class);
+  }
 
-        InputStream result = storage.get(id);
+  @Test
+  @DisplayName("Presigned URL 생성 테스트")
+  void download_success() {
+    // given
+    s3BinaryContentStorage.put(testId, testData);
+    BinaryContentDto dto = new BinaryContentDto(
+        testId, "test.txt", (long) testData.length, "text/plain"
+    );
 
-        assertThat(result.readAllBytes()).isEqualTo(bytes);
-    }
+    // when
+    ResponseEntity<Void> response = s3BinaryContentStorage.download(dto);
 
-    @Test
-    @DisplayName("S3에 키가 없으면 NoSuchElementException을 던진다")
-    void get_NotFound() {
-        UUID id = UUID.randomUUID();
+    // then
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+    assertThat(response.getHeaders().get(HttpHeaders.LOCATION)).isNotNull();
 
-        doReturn(s3Client).when(storage).getS3Client();
-        given(s3Client.getObject(any(GetObjectRequest.class)))
-            .willThrow(NoSuchKeyException.builder().build());
-
-        assertThatThrownBy(() -> storage.get(id))
-            .isInstanceOf(NoSuchElementException.class);
-    }
-
-    @Test
-    @DisplayName("download 호출 시 Presigned URL 리다이렉트 응답을 반환한다")
-    void download_ReturnsRedirect() {
-        UUID id = UUID.randomUUID();
-        BinaryContentDto dto = new BinaryContentDto(id, "test.png", 1024L, "image/png");
-        String fakeUrl = "https://s3.amazon.com/" + id;
-
-        doReturn(fakeUrl).when(storage).generatePresignedUrl(id.toString(), "image/png");
-
-        ResponseEntity<?> response = storage.download(dto);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-        assertThat(response.getHeaders().getFirst(HttpHeaders.LOCATION)).isEqualTo(fakeUrl);
-    }
-}
+    String location = response.getHeaders().getFirst(HttpHeaders.LOCATION);
+    assertThat(location).contains(bucket);
+    assertThat(location).contains(testId.toString());
+  }
+} 
