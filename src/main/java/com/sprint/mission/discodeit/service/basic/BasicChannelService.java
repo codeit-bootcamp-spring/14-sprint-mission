@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -67,7 +68,7 @@ public class BasicChannelService  implements ChannelService {
         }
         log.info("private 채널 생성 완료: channelId={}, participantCount={}",
             channel.getId(), request.participantIds().size());
-        return ChannelResponseDto.from(channel, request.participantIds(), null);
+        return ChannelResponseDto.from(channel, getParticipants(channel), null);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class BasicChannelService  implements ChannelService {
             .toList()
             : List.of();
 
-        return ChannelResponseDto.from(channel, participantIds, lastMessageAt);
+        return ChannelResponseDto.from(channel, getParticipants(channel), lastMessageAt);
     }
 
     @Override
@@ -158,8 +159,19 @@ public class BasicChannelService  implements ChannelService {
                     .toList()
                     : List.of();
 
-                return ChannelResponseDto.from(channel, participantIds, lastMessageAt);
+                return ChannelResponseDto.from(channel, getParticipants(channel), lastMessageAt);
             })
+            .toList();
+    }
+    private List<UserResponseDto> getParticipants(Channel channel) {
+        if (channel.getType() != ChannelType.PRIVATE) {
+            return List.of();
+        }
+        return readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
+            .map(ReadStatus::getUser)
+            .map(user -> UserResponseDto.from(
+                user,
+                user.getStatus() != null && user.getStatus().isOnline()))
             .toList();
     }
 }

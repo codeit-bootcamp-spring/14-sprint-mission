@@ -1,25 +1,26 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.UUID;
 
 public record UserResponseDto(
     UUID id,
-    String name,
+    String username,
     String email,
-    UUID profileId,
-    boolean onlined,
+    BinaryContentResponseDto profile,
+    boolean online,
     Role role
 ) {
 
-    public static UserResponseDto from(User user, boolean onlined){
+    public static UserResponseDto from(User user, boolean online){
         return new UserResponseDto(
             user.getId(),
             user.getUsername(),
             user.getEmail(),
-            user.getProfile() != null ? user.getProfile().getId() : null,
-            onlined,
+            user.getProfile() != null ? BinaryContentResponseDto.from(user.getProfile()) : null,
+            online,
             user.getRole()
         );
     }

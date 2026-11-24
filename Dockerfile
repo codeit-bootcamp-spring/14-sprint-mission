@@ -6,7 +6,7 @@ RUN yum install -y findutils && yum clean all
 WORKDIR /app
 
 ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=1.2-M8 \
+    PROJECT_VERSION=2.0-M9 \
     JVM_OPTS=""
 
 # Gradle 파일 먼저 복사 → 의존성 다운로드 (캐시용)
