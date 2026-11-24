@@ -43,3 +43,6 @@ bin/
 .discodeit/
 
 .logs/
+
+.env
+*.env
