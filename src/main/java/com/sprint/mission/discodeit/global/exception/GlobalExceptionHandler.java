@@ -1,15 +1,10 @@
 package com.sprint.mission.discodeit.global.exception;
 
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.validation.BindException;
-import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.net.BindException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,13 +19,12 @@ public class GlobalExceptionHandler {
         비즈니스 로직 처리 중 발생한 예외 처리
      */
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleException(CustomException exception){
+    public ResponseEntity<String> handleException(CustomException exception){
         log.warn("서비스 로직 처리 중 예외 발생 ------- message : {}", exception.getMessage());
 
-        ErrorResponse response = ErrorResponse.from(exception);
-
-        return ResponseEntity.status(response.status())
-            .body(response);
+        CustomErrorCode errorCode = exception.getCustomErrorCode();
+        return ResponseEntity.status(errorCode.getStatus())
+            .body(errorCode.getMessage());
     }
 
     /*
@@ -59,20 +53,12 @@ public class GlobalExceptionHandler {
         웹 데이터 바인더 내부에서 자바 빈 검증 실패 시 (스프링 밸리데이터 통한 필드 검증)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException exception){
-        Map<String, Object> details = new LinkedHashMap<>();
+    public ResponseEntity<Void> handleException(MethodArgumentNotValidException exception){
+        //todo : 바인딩 리절트 처리
+        log.warn("Validator 검증 중 예외 발생 ---------- message : {}", exception.getMessage());
 
-        for (FieldError fieldError : exception.getBindingResult().getFieldErrors()) {
-            details.put(
-                fieldError.getField(),
-                fieldError.getDefaultMessage()
-            );
-        }
-
-        ErrorResponse response = ErrorResponse.of(CustomErrorCode.VALIDATION_FAILED, exception, details);
-
-        return ResponseEntity.status(response.status())
-            .body(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+            build();
     }
 
     /*
@@ -97,15 +83,9 @@ public class GlobalExceptionHandler {
             .build();
     }
 
-    // 인가 실패
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Void> handleException(AccessDeniedException e) {
-      log.warn("인가 실패 ------- ", e);
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-    }
 
-  @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(Exception exception){
+    @ExceptionHandler
+    public ResponseEntity<Void> handleException(Exception exception){
         log.error("서버 내부에서 정의하지 않은 예외 발생 -------- ", exception);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
