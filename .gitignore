@@ -45,8 +45,11 @@ bin/
 
 #File I/O
 .discodeit
-.discodeit-files
+.discodeit/storage
 logs
+
+.env
+.env.**
 
 
 .env
