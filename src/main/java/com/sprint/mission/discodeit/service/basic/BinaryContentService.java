@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.IService.IBinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -34,7 +35,8 @@ public class BinaryContentService implements IBinaryContentService {
     @Transactional(readOnly = true)
     public BinaryContentResponseDto find(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("데이터가 없습니다."));
+            .orElseThrow(() -> new BinaryContentNotFoundException(id));
+
 
         return BinaryContentResponseDto.from(binaryContent);
     }
@@ -52,9 +54,11 @@ public class BinaryContentService implements IBinaryContentService {
 
     @Override
     public void delete(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 파일입니다."));
+        if (!binaryContentRepository.existsById(id)) {
+            throw new BinaryContentNotFoundException(id);
+        }
 
         binaryContentRepository.deleteById(id);
+        binaryContentStorage.delete(id);
     }
 }

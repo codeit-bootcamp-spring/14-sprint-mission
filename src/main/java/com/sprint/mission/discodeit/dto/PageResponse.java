@@ -6,7 +6,8 @@ public record PageResponse<T>(
     List<T> content,
     int number,
     int size,
-    Long totalElements
+    Long totalElements,
+    Boolean hasNext
 ){
 
 }
