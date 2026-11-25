@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.user.domain.User;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,5 +44,17 @@ public class ReadStatusCommandService implements ReadStatusCommand {
   @Override
   public void delete(ReadStatus readStatus) {
     readStatusRepository.delete(readStatus);
+  }
+
+  @Override
+  public void deleteAllByChannelId(UUID channelId) {
+    List<ReadStatus> readStatuses = readStatusRepository.findAllByChannel_Id(channelId);
+    readStatusRepository.deleteAll(readStatuses);
+  }
+
+  @Override
+  public void deleteAllByUserId(UUID userId) {
+    List<ReadStatus> readStatuses = readStatusRepository.findAllByUser_Id(userId);
+    readStatusRepository.deleteAll(readStatuses);
   }
 }

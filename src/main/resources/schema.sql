@@ -19,6 +19,7 @@ create table if not exists users
     password   VARCHAR(60)  NOT NULL,
     created_at TIMESTAMPTZ  NOT NULL,
     email      VARCHAR(100) NOT NULL,
+    role       VARCHAR(20)  NOT NULL,
 
     CONSTRAINT pk_users
         primary key (id),

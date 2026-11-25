@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.message.application.required.MessageReposito
 import com.sprint.mission.discodeit.message.domain.Message;
 import com.sprint.mission.discodeit.user.domain.User;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,5 +34,17 @@ public class MessageCommandService implements MessageCommand {
   @Override
   public void delete(Message message) {
     messageRepository.delete(message);
+  }
+
+  @Override
+  public void deleteAllByChannelId(List<Message> messages) {
+    messageRepository.deleteAll(messages);
+  }
+
+  @Override
+  public void clearAuthorByUserId(UUID authorId) {
+    List<Message> messages = messageRepository.findAllByAuthor_Id(authorId);
+    messages.forEach(Message::clearAuthor);
+
   }
 }

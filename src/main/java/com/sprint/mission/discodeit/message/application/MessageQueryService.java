@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.message.application.mapper.MessageMapper;
 import com.sprint.mission.discodeit.message.application.provided.query.MessageEntityFinder;
 import com.sprint.mission.discodeit.message.application.provided.query.MessageFinder;
 import com.sprint.mission.discodeit.message.application.provided.query.MessageTimeFinder;
-import com.sprint.mission.discodeit.message.application.required.MessageQRepository;
 import com.sprint.mission.discodeit.message.application.required.MessageRepository;
 import com.sprint.mission.discodeit.message.domain.Message;
 import java.time.Instant;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MessageQueryService implements MessageEntityFinder, MessageTimeFinder, MessageFinder {
 
   private final MessageRepository messageRepository;
-  private final MessageQRepository messageQRepository;
   private final MessageMapper messageMapper;
 
   @Override
@@ -35,6 +33,10 @@ public class MessageQueryService implements MessageEntityFinder, MessageTimeFind
         ErrorCode.MESSAGE_NOT_FOUND));
   }
 
+  @Override
+  public List<Message> getEntitiesByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannel_Id(channelId);
+  }
 
   @Override
   public Optional<Instant> getLastMessageAt(UUID channelId) {
@@ -44,7 +46,7 @@ public class MessageQueryService implements MessageEntityFinder, MessageTimeFind
 
   @Override
   public CursorPageResponse<MessageDto> getByCursor(MessageCursorRequest request) {
-    List<Message> messages = messageQRepository.findAllByCursor(request.channelId(),
+    List<Message> messages = messageRepository.findAllByCursor(request.channelId(),
         request.cursor(), request.idAfter(), request.size() + 1);
 
     boolean hasNext = messages.size() > request.size();

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.readstatus.domain.ReadStatus;
 import com.sprint.mission.discodeit.user.domain.User;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 public interface ReadStatusCommand {
 
@@ -15,4 +16,8 @@ public interface ReadStatusCommand {
   ReadStatus update(ReadStatus readStatus, Instant lastReadAt);
 
   void delete(ReadStatus readStatus);
+
+  void deleteAllByChannelId(UUID channelId);
+
+  void deleteAllByUserId(UUID userId);
 }

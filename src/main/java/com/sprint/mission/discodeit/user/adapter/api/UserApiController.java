@@ -2,17 +2,21 @@ package com.sprint.mission.discodeit.user.adapter.api;
 
 import com.sprint.mission.discodeit.binarycontent.BinaryContentRequestMapper;
 import com.sprint.mission.discodeit.binarycontent.application.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.user.application.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.user.adapter.api.request.UserCreateRequest;
+import com.sprint.mission.discodeit.user.adapter.api.request.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.user.adapter.api.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.user.application.dto.UserDto;
 import com.sprint.mission.discodeit.user.application.dto.UserStatusDto;
-import com.sprint.mission.discodeit.user.application.dto.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.user.application.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.user.application.provided.command.ModifyUserCommand;
+import com.sprint.mission.discodeit.user.application.provided.command.RefreshUserStatusCommand;
+import com.sprint.mission.discodeit.user.application.provided.command.RegisterUserCommand;
 import com.sprint.mission.discodeit.user.application.provided.command.UserModifier;
 import com.sprint.mission.discodeit.user.application.provided.command.UserRegister;
 import com.sprint.mission.discodeit.user.application.provided.command.UserRemover;
 import com.sprint.mission.discodeit.user.application.provided.command.UserStatusCommand;
 import com.sprint.mission.discodeit.user.application.provided.query.UserAllFinder;
 import com.sprint.mission.discodeit.user.application.provided.query.UserFinder;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -51,21 +55,30 @@ public class UserApiController {
 
   @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
+      @Valid @RequestBody UserStatusUpdateRequest request) {
 
-    UserStatusDto response = userStatusCommand.update(userId, request);
+    RefreshUserStatusCommand command = RefreshUserStatusCommand.to(userId,
+        request.newLastActiveAt());
+    UserStatusDto response = userStatusCommand.update(command);
     return ResponseEntity.ok(response);
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> register(
-      @RequestPart("userCreateRequest") UserCreateRequest request,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
     BinaryContentCreateRequest binaryContentCreateRequest = binaryContentRequestMapper.toCreateRequest(
         profile);
-    UserDto response = userRegister.register(request, binaryContentCreateRequest);
+    RegisterUserCommand command = RegisterUserCommand.to(
+        request.username(),
+        request.email(),
+        request.password(),
+        binaryContentCreateRequest
+    );
+
+    UserDto response = userRegister.register(command);
     log.debug("유저 등록 완료: userId={}", response.id());
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/{id}")
@@ -82,11 +95,17 @@ public class UserApiController {
 
   @RequestMapping(method = RequestMethod.PATCH, value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> update(@PathVariable UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest request,
+      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
-    BinaryContentCreateRequest binaryContentCreateRequest = binaryContentRequestMapper.toCreateRequest(
+    BinaryContentCreateRequest newProfile = binaryContentRequestMapper.toCreateRequest(
         profile);
-    UserDto response = userModifier.modify(userId, request, binaryContentCreateRequest);
+    ModifyUserCommand command = ModifyUserCommand.to(userId,
+        request.newUsername(),
+        request.newEmail(),
+        request.newPassword(),
+        newProfile
+    );
+    UserDto response = userModifier.modify(command);
     return ResponseEntity.ok(response);
   }
 

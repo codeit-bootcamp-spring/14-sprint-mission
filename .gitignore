@@ -52,3 +52,6 @@ bin/
 
 ### logs ###
 /.logs/
+
+### localContent ###
+/.discodeit/storage

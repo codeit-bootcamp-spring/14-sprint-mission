@@ -4,5 +4,8 @@ import java.util.UUID;
 
 public interface MessageRemover {
 
-  void delete(UUID messageId);
+  void remove(UUID messageId);
+
+  void removeAllByChannelId(UUID channelId);
+
 }

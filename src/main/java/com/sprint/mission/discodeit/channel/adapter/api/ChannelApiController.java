@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.channel.adapter.api;
 
+import com.sprint.mission.discodeit.channel.adapter.api.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.channel.adapter.api.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.channel.adapter.api.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.channel.application.dto.ChannelDto;
-import com.sprint.mission.discodeit.channel.application.dto.ChannelRequest;
-import com.sprint.mission.discodeit.channel.application.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.channel.application.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.channel.application.provided.command.ChannelModifier;
 import com.sprint.mission.discodeit.channel.application.provided.command.ChannelRegister;
 import com.sprint.mission.discodeit.channel.application.provided.command.ChannelRemover;
+import com.sprint.mission.discodeit.channel.application.provided.command.CreateChannel;
+import com.sprint.mission.discodeit.channel.application.provided.command.ModifyChannelCommand;
 import com.sprint.mission.discodeit.channel.application.provided.query.ChannelFinder;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +36,8 @@ public class ChannelApiController {
   @RequestMapping(method = RequestMethod.POST, value = "/public")
   public ResponseEntity<ChannelDto> createPublic(
       @RequestBody PublicChannelCreateRequest request) {
-    ChannelDto channelDto = channelRegister.registerPublic(request);
+    ChannelDto channelDto = channelRegister.register(
+        new CreateChannel.Public(request.name(), request.description()));
     log.debug("공개 채널: channelDto = {}", channelDto);
     return ResponseEntity.status(201).body(channelDto);
   }
@@ -42,15 +45,18 @@ public class ChannelApiController {
   @RequestMapping(method = RequestMethod.POST, value = "/private")
   public ResponseEntity<ChannelDto> createPrivate(
       @RequestBody PrivateChannelCreateRequest request) {
-    ChannelDto channelDto = channelRegister.registerPrivate(request);
+    ChannelDto channelDto = channelRegister.register(
+        new CreateChannel.Private(request.participantIds()));
     log.debug("비공개 채널: channelDto = {}", channelDto);
     return ResponseEntity.status(201).body(channelDto);
   }
 
   @RequestMapping(method = RequestMethod.PATCH, value = "/{channelId}")
   public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId,
-      @RequestBody ChannelRequest request) {
-    ChannelDto response = channelModifier.modify(channelId, request);
+      @RequestBody ChannelUpdateRequest request) {
+    ModifyChannelCommand command = ModifyChannelCommand.to(channelId,
+        request.newName(), request.newDescription());
+    ChannelDto response = channelModifier.modify(command);
     return ResponseEntity.ok(response);
   }
 

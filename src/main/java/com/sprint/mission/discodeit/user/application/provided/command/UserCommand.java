@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.user.domain.User;
 
 public interface UserCommand {
 
-  User create(String username, String email, String password, BinaryContent profile);
+  User create(String username, String emailVal, String password, BinaryContent profile);
 
   void delete(User user);
 
-  User update(User user, String username, String email, String password, BinaryContent profile);
+  User update(User user, String username, String emailVal, String password, BinaryContent profile);
 }

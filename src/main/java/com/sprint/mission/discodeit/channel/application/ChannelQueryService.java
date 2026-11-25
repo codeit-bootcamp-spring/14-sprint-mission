@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.channel.application;
 
 
 import com.sprint.mission.discodeit.channel.application.provided.query.ChannelEntityFinder;
-import com.sprint.mission.discodeit.channel.application.required.ChannelQRepository;
 import com.sprint.mission.discodeit.channel.application.required.ChannelRepository;
 import com.sprint.mission.discodeit.channel.domain.Channel;
 import com.sprint.mission.discodeit.common.exception.DiscodeitRuntimeException;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChannelQueryService implements ChannelEntityFinder {
 
   private final ChannelRepository channelRepository;
-  private final ChannelQRepository channelQRepository;
 
   @Override
   public Channel getEntityById(UUID channelId) {
@@ -29,7 +27,7 @@ public class ChannelQueryService implements ChannelEntityFinder {
 
   @Override
   public List<Channel> getAllByUserId(UUID userId) {
-    return channelQRepository.findAllByUserId(userId);
+    return channelRepository.findAllByUserId(userId);
   }
 
 }

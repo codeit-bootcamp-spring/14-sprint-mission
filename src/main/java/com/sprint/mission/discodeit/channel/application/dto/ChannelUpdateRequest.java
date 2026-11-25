@@ -1,7 +1,0 @@
-package com.sprint.mission.discodeit.channel.application.dto;
-
-public record ChannelUpdateRequest(
-
-) {
-
-}

@@ -5,11 +5,14 @@ import com.sprint.mission.discodeit.common.domain.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,11 +25,16 @@ public class User extends BaseUpdatableEntity {
 
   @Column(name = "username", nullable = false, unique = true, length = 50)
   private String username;
+
   @Column(name = "password", nullable = false, length = 60)
-  private String password;
+  private Password password;
+
   @Column(name = "email", nullable = false, length = 100, unique = true)
-  private String email;
-  @OneToOne(fetch = FetchType.LAZY)
+  private Email email;
+
+  @OneToOne(fetch = FetchType.LAZY,
+      cascade = CascadeType.REMOVE,
+      orphanRemoval = true)
   @JoinColumn(name = "profile_id", unique = true)
   private BinaryContent profile;
   @OneToOne(
@@ -37,15 +45,25 @@ public class User extends BaseUpdatableEntity {
   )
   private UserStatus userStatus;
 
-  private User(String name, String password, String email, BinaryContent profile) {
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role", length = 20, nullable = false)
+  private Role role;
+
+  private User(String name, Password password, Email email, BinaryContent profile) {
     this.username = name;
     this.password = password;
-    this.email = email;
+    this.email = Objects.requireNonNull(email, "email 값은 필수임.");
     this.profile = profile;
+    this.userStatus = UserStatus.create(this, Instant.now());
+    this.role = Role.USER;
+  }
+
+  public UserStatus refreshActivity(Instant lastActiveAt) {
+    return this.userStatus.refresh(lastActiveAt);
   }
 
 
-  public User update(String updateName, String password, String email, BinaryContent profile) {
+  public User update(String updateName, Password password, Email email, BinaryContent profile) {
     if (updateName != null) {
       this.username = updateName;
     }
@@ -61,9 +79,10 @@ public class User extends BaseUpdatableEntity {
     return this;
   }
 
-  public void initStatus(Instant lastActiveAt) {
-    this.userStatus = UserStatus.create(this, lastActiveAt);
+  public void updateRole(Role role) {
+    this.role = role;
   }
+
 
   @Override
   public String toString() {
@@ -71,7 +90,9 @@ public class User extends BaseUpdatableEntity {
   }
 
 
-  public static User create(String username, String password, String email, BinaryContent profile) {
+  public static User create(String username, Password password, Email email,
+      BinaryContent profile) {
+
     return new User(username, password, email, profile);
   }
 }

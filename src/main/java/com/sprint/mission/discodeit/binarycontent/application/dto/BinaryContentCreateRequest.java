@@ -9,4 +9,5 @@ public record BinaryContentCreateRequest(
   public long size() {
     return bytes.length;
   }
+  
 }

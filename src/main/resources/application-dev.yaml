@@ -10,8 +10,14 @@ spring:
 
   sql:
     init:
-      mode: always
+      mode: never
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
 
 logging:
   level:
     com.sprint.mission.discodeit: DEBUG
+    org.springframework.security: TRACE

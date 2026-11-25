@@ -34,7 +34,7 @@ public class UserStatus extends BaseUpdatableEntity {
     return new UserStatus(user, lastActiveAt);
   }
 
-  public UserStatus refresh(Instant lastActiveAt) {
+  UserStatus refresh(Instant lastActiveAt) {
     this.lastActiveAt = lastActiveAt;
     return this;
   }

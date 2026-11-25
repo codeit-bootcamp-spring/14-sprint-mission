@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.binarycontent.adapter.storage;
 
 import com.sprint.mission.discodeit.binarycontent.application.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.binarycontent.application.required.BinaryContentStorage;
+import com.sprint.mission.discodeit.common.DeletionEvent;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -20,12 +23,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @ConditionalOnProperty(
     name = "discodeit.storage.type",
     havingValue = "local"
 )
+@Slf4j
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
 
@@ -96,6 +102,25 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             contentDisposition.toString()
         ).body(resource);
   }
+
+  @Override
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handle(DeletionEvent<List<UUID>> deletionEvent) {
+    deleteFiles(deletionEvent.getValue());
+  }
+
+
+  private void deleteFiles(List<UUID> attachmentsIds) {
+    for (UUID id : attachmentsIds) {
+      try {
+        Path path = resolvePath(id);
+        Files.deleteIfExists(path);
+      } catch (IOException e) {
+        log.error("파일 삭제 실패 id={}", id, e);
+      }
+    }
+  }
+
 
   private Path resolvePath(UUID id) {
     return root.resolve(id.toString()).normalize();

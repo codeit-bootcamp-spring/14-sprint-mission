@@ -3,13 +3,15 @@ package com.sprint.mission.discodeit.message.adapter.api;
 import com.sprint.mission.discodeit.binarycontent.BinaryContentRequestMapper;
 import com.sprint.mission.discodeit.binarycontent.application.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.common.CursorPageResponse;
-import com.sprint.mission.discodeit.message.application.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.message.adapter.api.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.message.adapter.api.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.message.application.dto.MessageCursorRequest;
 import com.sprint.mission.discodeit.message.application.dto.MessageDto;
-import com.sprint.mission.discodeit.message.application.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.message.application.provided.command.MessageModifier;
 import com.sprint.mission.discodeit.message.application.provided.command.MessageRegister;
 import com.sprint.mission.discodeit.message.application.provided.command.MessageRemover;
+import com.sprint.mission.discodeit.message.application.provided.command.ModifyMessageCommand;
+import com.sprint.mission.discodeit.message.application.provided.command.RegisterMessageCommand;
 import com.sprint.mission.discodeit.message.application.provided.query.MessageFinder;
 import java.util.List;
 import java.util.UUID;
@@ -45,7 +47,13 @@ public class MessageApiController {
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
     List<BinaryContentCreateRequest> files = binaryContentRequestMapper.toCreateRequests(
         attachments);
-    MessageDto messageDto = messageRegister.register(request, files);
+
+    RegisterMessageCommand command = RegisterMessageCommand.to(request.authorId(),
+        request.channelId(),
+        request.content(),
+        files);
+
+    MessageDto messageDto = messageRegister.register(command);
     log.debug("메세지 응답: messageDto = {}", messageDto);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(messageDto);
@@ -53,7 +61,7 @@ public class MessageApiController {
 
   @RequestMapping(method = RequestMethod.DELETE, value = "/{messageId}")
   public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
-    messageRemover.delete(messageId);
+    messageRemover.remove(messageId);
     return ResponseEntity.noContent().build();
   }
 
@@ -66,6 +74,9 @@ public class MessageApiController {
   @RequestMapping(method = RequestMethod.PATCH, value = "/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest request) {
-    return ResponseEntity.ok(messageModifier.modify(messageId, request));
+
+    ModifyMessageCommand command = ModifyMessageCommand.to(messageId,
+        request.newContent());
+    return ResponseEntity.ok(messageModifier.modify(command));
   }
 }
