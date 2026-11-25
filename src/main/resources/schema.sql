@@ -1,8 +1,8 @@
 CREATE TABLE channels
 (
     id          uuid PRIMARY KEY,
-    created_at  timestamptz NOT NULL,
-    updated_at  timestamptz,
+    created_at  timestamp with time zone NOT NULL,
+    updated_at  timestamp with time zone,
     name        varchar(100),
     description varchar(500),
     type        varchar(10) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE channels
 CREATE TABLE binary_contents
 (
     id           uuid PRIMARY KEY,
-    created_at   timestamptz  NOT NULL,
+    created_at   timestamp with time zone  NOT NULL,
     file_name    varchar(255) NOT NULL,
     size         bigint       NOT NULL,
     content_type varchar(100) NOT NULL
@@ -25,35 +25,24 @@ CREATE TABLE binary_contents
 CREATE TABLE users
 (
     id         uuid PRIMARY KEY,
-    created_at timestamptz         NOT NULL,
-    updated_at timestamptz,
+    created_at timestamp with time zone         NOT NULL,
+    updated_at timestamp with time zone,
     username   varchar(50) UNIQUE  NOT NULL,
     email      varchar(100) UNIQUE NOT NULL,
     password   varchar(60)         NOT NULL,
     profile_id uuid UNIQUE,
+    role       varchar(20) NOT NULL,
     FOREIGN KEY (profile_id)
         REFERENCES binary_contents
         ON DELETE SET NULL
 );
 
-CREATE TABLE user_statuses
-(
-    id             uuid PRIMARY KEY,
-    created_at     timestamptz NOT NULL,
-    updated_at     timestamptz,
-    last_active_at timestamptz NOT NULL,
-    user_id        uuid UNIQUE NOT NULL,
-    FOREIGN KEY (user_id)
-        REFERENCES users (id)
-        ON DELETE CASCADE
-);
-
 CREATE TABLE read_statuses
 (
     id           uuid PRIMARY KEY,
-    created_at   timestamptz NOT NULL,
-    updated_at   timestamptz,
-    last_read_at timestamptz NOT NULL,
+    created_at   timestamp with time zone NOT NULL,
+    updated_at   timestamp with time zone,
+    last_read_at timestamp with time zone NOT NULL,
     user_id      uuid        NOT NULL,
     channel_id   uuid        NOT NULL,
     FOREIGN KEY (user_id)
@@ -68,8 +57,8 @@ CREATE TABLE read_statuses
 CREATE TABLE messages
 (
     id         uuid PRIMARY KEY,
-    created_at timestamptz NOT NULL,
-    updated_at timestamptz,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
     content    text,
     channel_id uuid        NOT NULL,
     author_id  uuid,

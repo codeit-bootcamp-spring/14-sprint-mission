@@ -1,0 +1,15 @@
+.git
+.github
+.gitignore
+
+.gradle
+build/*
+!build/libs/
+!build/libs/*.jar
+build/libs/*-plain.jar
+
+.idea
+
+.DS_Store
+
+HELP.md

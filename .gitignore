@@ -48,8 +48,9 @@ bin/
 ### FileRepository data files ###
 *.ser
 
-## api test ##
-postman/
+## Environment Varibles ##
+.envrc
+*.env
 
 ### BinaryContent Local Stroage ###
 src/main/java/com/sprint/mission/discodeit/storage/storage/**

@@ -1,0 +1,24 @@
+package com.sprint.mission.discodeit.core.domain.user;
+
+import com.sprint.mission.discodeit.core.domain.base.ErrorCode;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.slf4j.event.Level;
+
+
+@Getter
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public enum UserExceptionType implements ErrorCode {
+    LOGIN_FAILED(Level.INFO, "로그인 실패", "잘못된 username 혹은 password 입니다."),
+    USER_NOT_FOUND(Level.INFO, "User 미존재", "Database에서 해당 User를 찾을 수 없음."),
+    USER_UNIQUE_FIELD_CONFLICT(Level.INFO, "User unique 필드 중복", "(Name, Email) 필드 중복 불가"),
+    USER_MISSING_UPSERT_ARGUMENT(Level.INFO, "User 갱신 인자 누락", "User create/update시 name, email, password가 반드시 필요함")
+    ;
+
+    Level logLevel;
+    String title;
+    String description;
+}
