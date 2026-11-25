@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.data;
 
+import com.sprint.mission.discodeit.entity.Role;
 import java.time.Instant;
 import java.util.UUID;
 import com.sprint.mission.discodeit.entity.User;
@@ -12,7 +13,8 @@ public record UserDto(
     String email,
     UUID profileId,
     Boolean online,
-    BinaryContentDto profile
+    BinaryContentDto profile,
+    Role role
 ) {
   public static UserDto toDto(User user, Boolean online) {
     BinaryContentDto profile = null;
@@ -28,7 +30,8 @@ public record UserDto(
         user.getEmail(),
         user.getProfile() != null ? user.getProfile().getId() : null,
         online,
-        profile
+        profile,
+        user.getRole()
     );
   }
 }

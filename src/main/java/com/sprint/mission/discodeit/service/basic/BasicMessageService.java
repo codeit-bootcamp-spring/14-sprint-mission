@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.common.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.common.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.common.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
-import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -21,16 +21,15 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Slice;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -113,6 +112,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @PreAuthorize("@messageRepository.existsByIdAndAuthorId(#messageId, principal.userDto.id())")
   @Transactional
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     log.info("메시지 업데이트 요청 - 메세지아이디: {}", messageId);
@@ -124,6 +124,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @PreAuthorize("@messageRepository.existsByIdAndAuthorId(#messageId, principal.userDto.id())")
   @Transactional
   public void delete(UUID messageId) {
     log.info("메시지 삭제 요청 - 메세지아이디: {}", messageId);

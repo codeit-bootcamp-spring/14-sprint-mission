@@ -14,6 +14,7 @@ CREATE TABLE users (
     username VARCHAR(50),
     email VARCHAR(100),
     password VARCHAR(60),
+    role VARCHAR(20) NOT NULL,
     profile_id UUID UNIQUE REFERENCES binary_content(id) ON DELETE SET NULL
 );
 
