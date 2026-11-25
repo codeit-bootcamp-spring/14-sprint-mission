@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.message;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,10 +22,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(MessageController.class)
+// 슬라이스 테스트는 컨트롤러 동작만 본다. 인증·CSRF만 채우고 인가 규칙은 *ApiIntegrationTest에서 검증한다
+@WithMockUser
 class MessageControllerTest {
 
     @Autowired
@@ -46,7 +50,7 @@ class MessageControllerTest {
             UUID.randomUUID(), null, null, "메시지입니다", UUID.randomUUID(), null, List.of());
         given(messageService.messageCreate(any(), any())).willReturn(responseDto);
 
-        mockMvc.perform(multipart("/api/messages").file(requestPart))
+        mockMvc.perform(multipart("/api/messages").file(requestPart).with(csrf()))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.content").value("메시지입니다"));
     }
@@ -60,7 +64,7 @@ class MessageControllerTest {
             ExceptionType.MESSAGE_NOT_FOUND, Map.of("messageId", messageId)))
             .given(messageService).messageDelete(messageId);
 
-        mockMvc.perform(delete("/api/messages/{messageId}", messageId))
+        mockMvc.perform(delete("/api/messages/{messageId}", messageId).with(csrf()))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message").exists());
     }

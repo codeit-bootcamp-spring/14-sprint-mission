@@ -7,6 +7,15 @@ spring:
       hibernate:
         default_batch_fetch_size: 100
 
+discodeit:
+  admin:
+    username: ${DISCODEIT_ADMIN_USERNAME}
+    password: ${DISCODEIT_ADMIN_PASSWORD}
+    email: ${DISCODEIT_ADMIN_EMAIL}
+  security:
+    remember-me:
+      key: ${DISCODEIT_REMEMBER_ME_KEY}
+
 logging:
   level:
     org.hibernate.SQL: info

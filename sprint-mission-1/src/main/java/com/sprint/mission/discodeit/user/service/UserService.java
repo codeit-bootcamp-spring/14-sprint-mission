@@ -13,8 +13,6 @@ import com.sprint.mission.discodeit.user.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
-import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +20,8 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,10 +35,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
-    private final UserStatusRepository userStatusRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserDto userCreate(UserCreateRequestDto userCreateRequestDto,
@@ -74,16 +74,17 @@ public class UserService {
         }
 
         User user = userRepository.save(
-            User.create(userCreateRequestDto.username(), userCreateRequestDto.password(),
+            User.create(userCreateRequestDto.username(),
+                passwordEncoder.encode(userCreateRequestDto.password()),
                 userCreateRequestDto.email(), binaryContent));
-
-        userStatusRepository.save(UserStatus.create(user));
 
         log.info("사용자 생성 완료: userId={}", user.getId());
         return userMapper.toDto(user);
     }
 
+    // 본인만 수정할 수 있다. #userId는 이 메서드의 파라미터 이름과 같아야 한다
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.userDto.id")
     public UserDto userUpdate(UUID userId, UserUpdateRequestDto userUpdateRequestDto,
         MultipartFile profile) {
         User user = userRepository.findById(userId)
@@ -108,20 +109,16 @@ public class UserService {
             user.updateProfile(binaryContent);
         }
 
-        user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newPassword(),
+        user.update(userUpdateRequestDto.newUsername(),
+            passwordEncoder.encode(userUpdateRequestDto.newPassword()),
             userUpdateRequestDto.newEmail());
-
-        userStatusRepository.findByUser(user)
-            .orElseThrow(() -> new DiscodeitException(
-                ExceptionType.USER_STATUS_MISSING_FOR_USER,
-                Map.of("userId", user.getId()
-                )));
 
         log.info("사용자 수정 완료: userId={}", user.getId());
         return userMapper.toDto(user);
     }
 
     @Transactional
+    @PreAuthorize("#userId == authentication.principal.userDto.id")
     public void userDelete(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new DiscodeitException(

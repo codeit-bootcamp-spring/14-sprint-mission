@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class ChannelService {
     private final ChannelMapper channelMapper;
 
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelDto channelCreate(
         ChannelPublicCreateRequestDto channelPublicCreateRequestDto) {
         Channel channel = new Channel(channelPublicCreateRequestDto.name(),
@@ -74,6 +76,7 @@ public class ChannelService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelDto channelUpdate(UUID channelId,
         ChannelUpdateRequestDto channelUpdateRequestDto) {
         Channel channel = channelRepository.findById(channelId)
@@ -120,7 +123,9 @@ public class ChannelService {
             .toList();
     }
 
+    // 퍼블릭 채널 삭제는 CHANNEL_MANAGER 이상, 프라이빗 채널은 권한 제한 없음
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER') or @channelAuthorization.isPrivate(#channelId)")
     public void channelDelete(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> new DiscodeitException(

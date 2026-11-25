@@ -29,6 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // OpenAPI / Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
@@ -48,6 +49,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-webmvc-test'
     testImplementation 'org.springframework.boot:spring-boot-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Boot 4는 MockMvc에 Security 테스트 지원을 붙이는 자동 설정이 이 스타터에 분리되어 있다
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -74,4 +77,8 @@ tasks.named('test') {
 
 tasks.named('jar') {
     enabled = false
+}
+
+tasks.named('bootJar') {
+    archiveFileName = 'app.jar'
 }

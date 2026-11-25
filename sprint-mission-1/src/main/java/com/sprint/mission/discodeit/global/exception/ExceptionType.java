@@ -28,23 +28,6 @@ public enum ExceptionType {
     ),
 
 
-    USER_STATUS_NOT_FOUND(
-        Level.WARN,
-        HttpStatus.NOT_FOUND,
-        "찾으시는 유저 상태가 존재하지 않습니다"
-    ),
-    USER_STATUS_MISSING_FOR_USER(
-        Level.ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        "해당 유저 상태 정보를 처리할 수 없습니다"
-    ),
-    USER_STATUS_CONFLICT(
-        Level.WARN,
-        HttpStatus.CONFLICT,
-        "이미 존재하는 유저의 상태입니다"
-    ),
-
-
     CHANNEL_NOT_FOUND(
         Level.WARN,
         HttpStatus.NOT_FOUND,
@@ -79,9 +62,14 @@ public enum ExceptionType {
         "파일을 저장하는데 실패했습니다"
     ),
     FILE_NOT_FOUND(
-        Level.ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        Level.WARN,
+        HttpStatus.NOT_FOUND,
         "파일을 찾을 수 없습니다"
+    ),
+    STORAGE_UNAVAILABLE(
+        Level.ERROR,
+        HttpStatus.SERVICE_UNAVAILABLE,
+        "파일 저장소에 일시적으로 접근할 수 없습니다"
     ),
 
 
@@ -91,6 +79,11 @@ public enum ExceptionType {
         "아이디 또는 비밀번호가 올바르지 않습니다"
     ),
 
+    READ_STATUS_NOT_FOUND(
+        Level.WARN,
+        HttpStatus.NOT_FOUND,
+        "찾으시는 읽음 상태가 존재하지 않습니다"
+    ),
     READ_STATUS_CONFLICT(
         Level.WARN,
         HttpStatus.CONFLICT,
@@ -119,7 +112,43 @@ public enum ExceptionType {
         Level.ERROR,
         HttpStatus.INTERNAL_SERVER_ERROR,
         "서버 내부 오류가 발생했습니다"
-    );
+    ),
+
+    LOGIN_UNAUTHORIZED(
+        Level.WARN,
+        HttpStatus.UNAUTHORIZED,
+        "로그인에 실패했습니다"
+    ),
+
+    AUTH_REQUIRED(
+        Level.WARN,
+        HttpStatus.UNAUTHORIZED,
+        "로그인이 필요합니다"),
+
+    SESSION_EXPIRED(
+        Level.INFO,
+        HttpStatus.UNAUTHORIZED,
+        "세션이 만료되었습니다. 다시 로그인해주세요"),
+
+    ACCESS_DENIED(
+        Level.WARN,
+        HttpStatus.FORBIDDEN,
+        "접근 권한이 없습니다"),
+
+    RESOURCE_NOT_FOUND(
+        Level.DEBUG,
+        HttpStatus.NOT_FOUND,
+        "요청한 리소스를 찾을 수 없습니다"),
+
+    METHOD_NOT_ALLOWED(
+        Level.WARN,
+        HttpStatus.METHOD_NOT_ALLOWED,
+        "지원하지 않는 HTTP 메서드입니다"),
+
+    UNSUPPORTED_MEDIA_TYPE(
+        Level.WARN,
+        HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+        "지원하지 않는 Content-Type입니다");
 
     Level level;
     HttpStatus status;

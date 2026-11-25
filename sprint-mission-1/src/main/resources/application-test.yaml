@@ -16,6 +16,13 @@ spring:
 discodeit:
   storage:
     type: local
+  admin:
+    username: admin
+    password: admin1234
+    email: admin@discodeit.com
+  security:
+    remember-me:
+      key: test-remember-me-key
 
 logging:
   level:

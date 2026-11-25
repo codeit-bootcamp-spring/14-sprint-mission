@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.sprint.mission.discodeit.support.TestPrincipals;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,7 +40,8 @@ class UserApiIntegrationTest {
             "userCreateRequest", "", "application/json",
             "{\"username\":\"kyj\",\"password\":\"pw1234\",\"email\":\"a@b.com\"}".getBytes());
 
-        mockMvc.perform(multipart("/api/users").file(requestPart))
+        // 회원가입은 비로그인 허용이지만 CSRF 토큰은 필요하다
+        mockMvc.perform(multipart("/api/users").file(requestPart).with(csrf()))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.username").value("kyj"));
 
@@ -44,14 +49,50 @@ class UserApiIntegrationTest {
     }
 
     @Test
-    @DisplayName("사용자 삭제 성공")
+    @DisplayName("사용자 삭제 성공 - 본인")
     void deleteUser_success() throws Exception {
         User saved = userRepository.save(
             User.create("kkk", "pw1234", "b@c.com", null));
 
-        mockMvc.perform(delete("/api/users/{userId}", saved.getId()))
+        mockMvc.perform(delete("/api/users/{userId}", saved.getId())
+                .with(user(TestPrincipals.of(saved)))
+                .with(csrf()))
             .andExpect(status().isNoContent());
 
         assertThat(userRepository.findById(saved.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("사용자 삭제 실패 - 본인이 아니면 403")
+    void deleteUser_fail_notOwner() throws Exception {
+        User owner = userRepository.save(User.create("kkk", "pw1234", "b@c.com", null));
+        User other = userRepository.save(User.create("ooo", "pw1234", "o@c.com", null));
+
+        mockMvc.perform(delete("/api/users/{userId}", owner.getId())
+                .with(user(TestPrincipals.of(other)))
+                .with(csrf()))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+
+        assertThat(userRepository.findById(owner.getId())).isPresent();
+    }
+
+    @Test
+    @DisplayName("사용자 수정 실패 - 본인이 아니면 403")
+    void updateUser_fail_notOwner() throws Exception {
+        User owner = userRepository.save(User.create("kkk", "pw1234", "b@c.com", null));
+        User other = userRepository.save(User.create("ooo", "pw1234", "o@c.com", null));
+        MockMultipartFile requestPart = new MockMultipartFile(
+            "userUpdateRequest", "", "application/json",
+            "{\"newUsername\":\"hacked\"}".getBytes());
+
+        mockMvc.perform(multipart(HttpMethod.PATCH, "/api/users/{userId}", owner.getId())
+                .file(requestPart)
+                .with(user(TestPrincipals.of(other)))
+                .with(csrf()))
+            .andExpect(status().isForbidden());
+
+        assertThat(userRepository.findById(owner.getId()).orElseThrow().getUserName())
+            .isEqualTo("kkk");
     }
 }

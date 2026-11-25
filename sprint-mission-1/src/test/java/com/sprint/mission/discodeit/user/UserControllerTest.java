@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.user;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,6 +13,7 @@ import com.sprint.mission.discodeit.global.exception.DiscodeitException;
 import com.sprint.mission.discodeit.global.exception.ExceptionType;
 import com.sprint.mission.discodeit.user.controller.UserController;
 import com.sprint.mission.discodeit.user.dto.UserDto;
+import com.sprint.mission.discodeit.user.entity.Role;
 import com.sprint.mission.discodeit.user.service.UserService;
 import java.util.Map;
 import java.util.UUID;
@@ -20,11 +22,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(UserController.class)
+// 슬라이스 테스트는 컨트롤러 동작만 본다. 인증·CSRF만 채우고 인가 규칙은 *ApiIntegrationTest에서 검증한다
+@WithMockUser
 @ActiveProfiles("test")
 class UserControllerTest {
 
@@ -42,10 +47,10 @@ class UserControllerTest {
             "{\"username\":\"kyj\",\"password\":\"pw1234\",\"email\":\"a@b.com\"}".getBytes());
 
         UserDto responseDto = new UserDto(
-            UUID.randomUUID(), "kyj", "a@b.com", null, false);
+            UUID.randomUUID(), "kyj", "a@b.com", null, false, Role.USER);
         given(userService.userCreate(any(), any())).willReturn(responseDto);
 
-        mockMvc.perform(multipart("/api/users").file(requestPart))
+        mockMvc.perform(multipart("/api/users").file(requestPart).with(csrf()))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.username").value("kyj"));
     }
@@ -57,7 +62,7 @@ class UserControllerTest {
         willThrow(new DiscodeitException(ExceptionType.USER_NOT_FOUND, Map.of("userId", userId)))
             .given(userService).userDelete(userId);
 
-        mockMvc.perform(delete("/api/users/{userId}", userId))
+        mockMvc.perform(delete("/api/users/{userId}", userId).with(csrf()))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message").exists());
     }

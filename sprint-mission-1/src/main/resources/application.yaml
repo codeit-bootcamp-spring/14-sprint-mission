@@ -1,7 +1,7 @@
 discodeit:
   seed: true
   storage:
-    type: ${STORAGE_TYPE:s3}
+    type: ${STORAGE_TYPE:local}
     local:
       root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
     s3:
@@ -28,6 +28,8 @@ springdoc:
   swagger-ui:
     tags-sorter: alpha          # Controller 알파벳 정렬
     operations-sorter: alpha    # URL 알파벳 정렬
+    csrf:
+      enabled: true
 
 management:
   endpoints:

@@ -61,19 +61,6 @@ CREATE TABLE public.read_status (
 
 
 --
--- Name: user_status; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_status (
-    created_at timestamp(6) with time zone,
-    last_active_at timestamp(6) with time zone,
-    updated_at timestamp(6) with time zone,
-    id uuid NOT NULL,
-    user_id uuid NOT NULL
-);
-
-
---
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -84,7 +71,9 @@ CREATE TABLE public.users (
     profile_id uuid,
     email character varying(255),
     password character varying(255),
-    user_name character varying(255)
+    user_name character varying(255),
+    role character varying(20) DEFAULT 'USER'::character varying NOT NULL,
+    CONSTRAINT users_role_check CHECK (((role)::text = ANY ((ARRAY['ADMIN'::character varying, 'CHANNEL_MANAGER'::character varying, 'USER'::character varying])::text[])))
 );
 
 
@@ -129,35 +118,11 @@ ALTER TABLE ONLY public.read_status
 
 
 --
--- Name: read_status read_status_user_id_channel_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: read_status uk_read_status_user_channel; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.read_status
-    ADD CONSTRAINT read_status_user_id_channel_id_key UNIQUE (user_id, channel_id);
-
-
---
--- Name: read_status uks2dq41xxk6kq89ov394a93cqi; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.read_status
-    ADD CONSTRAINT uks2dq41xxk6kq89ov394a93cqi UNIQUE (user_id, channel_id);
-
-
---
--- Name: user_status user_status_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_status
-    ADD CONSTRAINT user_status_pkey PRIMARY KEY (id);
-
-
---
--- Name: user_status user_status_user_id_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_status
-    ADD CONSTRAINT user_status_user_id_key UNIQUE (user_id);
+    ADD CONSTRAINT uk_read_status_user_channel UNIQUE (user_id, channel_id);
 
 
 --
@@ -213,14 +178,6 @@ ALTER TABLE ONLY public.message_attachments
 
 ALTER TABLE ONLY public.read_status
     ADD CONSTRAINT fkd1q4o8lh6qh3vq8wi6rile7kl FOREIGN KEY (channel_id) REFERENCES public.channel(id);
-
-
---
--- Name: user_status fki21pi0g9yogah1kwedmuhnt5s; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_status
-    ADD CONSTRAINT fki21pi0g9yogah1kwedmuhnt5s FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
@@ -60,19 +61,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public InputStream get(UUID binaryContentId) {
-        Path path = resolvePath(binaryContentId);
-        try {
-            return Files.newInputStream(path);
-        } catch (IOException e) {
-            throw new DiscodeitException(
-                ExceptionType.FILE_NOT_FOUND,
-                Map.of("binaryContentId", binaryContentId),
-                e);
-        }
-    }
-
-    @Override
     public ResponseEntity<Resource> download(BinaryContentDto dto) {
         Resource resource = new InputStreamResource(get(dto.id()));
 
@@ -98,5 +86,22 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     private Path resolvePath(UUID id) {
         return root.resolve(id.toString());
+    }
+
+    private InputStream get(UUID binaryContentId) {
+        Path path = resolvePath(binaryContentId);
+        try {
+            return Files.newInputStream(path);
+        } catch (NoSuchFileException e) {
+            throw new DiscodeitException(
+                ExceptionType.FILE_NOT_FOUND,
+                Map.of("binaryContentId", binaryContentId),
+                e);
+        } catch (IOException e) {
+            throw new DiscodeitException(
+                ExceptionType.STORAGE_UNAVAILABLE,
+                Map.of("binaryContentId", binaryContentId),
+                e);
+        }
     }
 }

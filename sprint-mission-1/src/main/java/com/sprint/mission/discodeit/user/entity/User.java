@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.user.entity;
 
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.entity.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -24,8 +26,9 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private BinaryContent profile;
-    @OneToOne(mappedBy = "user", orphanRemoval = true)
-    private UserStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role = Role.USER;
 
     private User(String userName, String password, String email, BinaryContent profile) {
         this.userName = userName;
@@ -48,10 +51,6 @@ public class User extends BaseUpdatableEntity {
         return new User(name, password, email);
     }
 
-    public void assignStatus(UserStatus status) {
-        this.status = status;
-    }
-
     public void update(String name, String password, String email) {
         if (name != null) {
             this.userName = name;
@@ -70,5 +69,9 @@ public class User extends BaseUpdatableEntity {
             this.profile = binaryId;
             markUpdated();
         }
+    }
+
+    public void updateRole(Role role) {
+        this.role = role;
     }
 }
