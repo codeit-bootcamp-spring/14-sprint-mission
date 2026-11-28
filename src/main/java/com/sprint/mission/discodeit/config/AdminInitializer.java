@@ -43,6 +43,6 @@ public class AdminInitializer implements ApplicationRunner {
         admin.updateRole(Role.ADMIN);
         new UserStatus(admin, Instant.now());
         userRepository.save(admin);
-        log.info("어드민 계정 생성 완료: username={}", username);
+        log.info("어드민 계정 생성 완료");
     }
 }
