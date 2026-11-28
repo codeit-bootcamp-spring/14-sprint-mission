@@ -19,4 +19,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     @Query("select max(m.createdAt) from Message m where m.channel.id = :channelId")
     Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
+
+    boolean existsByIdAndAuthorId(UUID id, UUID authorId);
 }
