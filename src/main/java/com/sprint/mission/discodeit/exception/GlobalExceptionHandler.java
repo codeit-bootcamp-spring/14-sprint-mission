@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,6 +32,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .badRequest()
             .body(ErrorResponse.of(ErrorCode.INVALID_INPUT, details, exception));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+        AccessDeniedException exception) {
+        log.warn("[ACCESS_DENIED] {}", exception.getMessage());
+        return ResponseEntity
+            .status(ErrorCode.ACCESS_DENIED.getHttpStatus())
+            .body(ErrorResponse.of(ErrorCode.ACCESS_DENIED, Map.of(), exception));
     }
 
     @ExceptionHandler(Exception.class)
