@@ -15,8 +15,12 @@ CREATE TABLE IF NOT EXISTS users
     username   VARCHAR(50)  NOT NULL UNIQUE,
     email      VARCHAR(100) NOT NULL UNIQUE,
     password   VARCHAR(60)  NOT NULL,
+    role       VARCHAR(20)  NOT NULL,
     profile_id UUID UNIQUE REFERENCES binary_contents (id) ON DELETE SET NULL
 );
+
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'USER';
 
 CREATE TABLE IF NOT EXISTS user_statuses
 (

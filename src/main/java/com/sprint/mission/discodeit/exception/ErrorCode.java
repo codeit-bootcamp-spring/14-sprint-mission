@@ -8,6 +8,9 @@ public enum ErrorCode {
     DUPLICATE_USER(HttpStatus.CONFLICT, "이미 존재하는 유저입니다."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Username 또는 password가 일치하지 않습니다."),
 
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+
     USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "UserStatus를 찾을 수 없습니다."),
 
     CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 채널을 찾을 수 없습니다."),

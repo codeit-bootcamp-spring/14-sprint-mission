@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public ChannelDto createPublic(PublicChannelCreateRequest request) {
@@ -78,6 +80,7 @@ public class BasicChannelService implements ChannelService {
             .toList();
     }
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
@@ -88,6 +91,8 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(channel);
     }
 
+    @PreAuthorize("hasRole('CHANNEL_MANAGER') or @channelRepository.existsByIdAndType("
+        + "#channelId, T(com.sprint.mission.discodeit.entity.ChannelType).PRIVATE)")
     @Transactional
     @Override
     public void delete(UUID channelId) {

@@ -28,6 +28,10 @@ logging:
     org.hibernate.orm.jdbc.bind: trace
 
 discodeit:
+  admin:
+    username: ${DISCODEIT_ADMIN_USERNAME:admin}
+    email: ${DISCODEIT_ADMIN_EMAIL:admin@discodeit.com}
+    password: ${DISCODEIT_ADMIN_PASSWORD:admin1234!}
   storage:
     type: ${STORAGE_TYPE:local}
     local:
@@ -51,7 +55,7 @@ management:
 info:
   app:
     name: Discodeit
-    version: 1.2-M8
+    version: 2.0-M9
     java-version: 17
     spring-boot-version: 3.4.0
   config:

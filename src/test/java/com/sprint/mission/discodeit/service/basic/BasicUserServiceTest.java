@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +40,8 @@ class BasicUserServiceTest {
     private BinaryContentStorage binaryContentStorage;
     @Mock
     private UserMapper userMapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private BasicUserService userService;
@@ -52,7 +56,8 @@ class BasicUserServiceTest {
     @DisplayName("사용자 생성 성공")
     void create_success() {
         UserCreateRequest request = new UserCreateRequest("tester", "tester@test.com", "1234");
-        UserDto expected = new UserDto(UUID.randomUUID(), "tester", "tester@test.com", null, true);
+        UserDto expected = new UserDto(UUID.randomUUID(), "tester", "tester@test.com", null, true,
+            Role.USER);
         given(userRepository.existsByUsername("tester")).willReturn(false);
         given(userRepository.existsByEmail("tester@test.com")).willReturn(false);
         given(userMapper.toDto(any(User.class))).willReturn(expected);

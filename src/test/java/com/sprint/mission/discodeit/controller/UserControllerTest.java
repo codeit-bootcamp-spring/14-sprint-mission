@@ -10,12 +10,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -23,6 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(UserController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
 
     @Autowired
@@ -44,7 +47,8 @@ class UserControllerTest {
     @DisplayName("사용자 생성 성공 - 201과 생성된 사용자 JSON")
     void create_success() throws Exception {
         UserCreateRequest request = new UserCreateRequest("tester", "tester@test.com", "1234");
-        UserDto response = new UserDto(UUID.randomUUID(), "tester", "tester@test.com", null, true);
+        UserDto response = new UserDto(UUID.randomUUID(), "tester", "tester@test.com", null, true,
+            Role.USER);
         given(userService.create(any(UserCreateRequest.class), isNull())).willReturn(response);
 
         mockMvc.perform(multipart("/api/users").file(jsonPart("userCreateRequest", request)))

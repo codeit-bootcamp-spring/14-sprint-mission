@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@WithMockUser(roles = "CHANNEL_MANAGER")
 class ChannelApiIntegrationTest {
 
     @Autowired
@@ -42,7 +45,8 @@ class ChannelApiIntegrationTest {
         String json = mockMvc.perform(post("/api/channels/public")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                    new PublicChannelCreateRequest(name, "설명"))))
+                    new PublicChannelCreateRequest(name, "설명")))
+                .with(csrf()))
             .andExpect(status().isCreated())
             .andReturn().getResponse().getContentAsString();
         return objectMapper.readValue(json, ChannelDto.class);
@@ -65,7 +69,8 @@ class ChannelApiIntegrationTest {
         mockMvc.perform(patch("/api/channels/{channelId}", channel.id())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                    new PublicChannelUpdateRequest("after", "새 설명"))))
+                    new PublicChannelUpdateRequest("after", "새 설명")))
+                .with(csrf()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value("after"))
             .andExpect(jsonPath("$.description").value("새 설명"));
@@ -76,7 +81,8 @@ class ChannelApiIntegrationTest {
     void delete_success() throws Exception {
         ChannelDto channel = createPublicChannel("삭제할 채널");
 
-        mockMvc.perform(delete("/api/channels/{channelId}", channel.id()))
+        mockMvc.perform(delete("/api/channels/{channelId}", channel.id())
+                .with(csrf()))
             .andExpect(status().isNoContent());
 
         assertThat(channelRepository.findById(channel.id())).isEmpty();

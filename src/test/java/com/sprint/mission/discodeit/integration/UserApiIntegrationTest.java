@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -12,6 +14,7 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +47,8 @@ class UserApiIntegrationTest {
 
     private UserDto createUser(String username) throws Exception {
         String json = mockMvc.perform(multipart("/api/users").file(jsonPart("userCreateRequest",
-                new UserCreateRequest(username, username + "@test.com", "1234"))))
+                new UserCreateRequest(username, username + "@test.com", "1234")))
+                .with(csrf()))
             .andExpect(status().isCreated())
             .andReturn().getResponse().getContentAsString();
         return objectMapper.readValue(json, UserDto.class);
@@ -59,7 +63,8 @@ class UserApiIntegrationTest {
         mockMvc.perform(multipart("/api/users")
                 .file(jsonPart("userCreateRequest",
                     new UserCreateRequest("tester", "tester@test.com", "1234")))
-                .file(profile))
+                .file(profile)
+                .with(csrf()))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.username").value("tester"))
             .andExpect(jsonPath("$.online").value(true))
@@ -75,7 +80,8 @@ class UserApiIntegrationTest {
         createUser("tester");
 
         mockMvc.perform(multipart("/api/users").file(jsonPart("userCreateRequest",
-                new UserCreateRequest("tester", "other@test.com", "1234"))))
+                new UserCreateRequest("tester", "other@test.com", "1234")))
+                .with(csrf()))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.code").value("DUPLICATE_USER"))
             .andExpect(jsonPath("$.details.username").value("tester"));
@@ -87,7 +93,9 @@ class UserApiIntegrationTest {
         UserDto user = createUser("before");
 
         mockMvc.perform(multipart(HttpMethod.PATCH, "/api/users/{userId}", user.id())
-                .file(jsonPart("userUpdateRequest", new UserUpdateRequest("after", null, null))))
+                .file(jsonPart("userUpdateRequest", new UserUpdateRequest("after", null, null)))
+                .with(user(new DiscodeitUserDetails(user, "password")))
+                .with(csrf()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.username").value("after"));
 
@@ -100,7 +108,9 @@ class UserApiIntegrationTest {
     void delete_success() throws Exception {
         UserDto user = createUser("tester");
 
-        mockMvc.perform(delete("/api/users/{userId}", user.id()))
+        mockMvc.perform(delete("/api/users/{userId}", user.id())
+                .with(user(new DiscodeitUserDetails(user, "password")))
+                .with(csrf()))
             .andExpect(status().isNoContent());
 
         assertThat(userRepository.findById(user.id())).isEmpty();
@@ -112,8 +122,8 @@ class UserApiIntegrationTest {
         createUser("a");
         createUser("b");
 
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/users").with(user("tester")))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(2));
+            .andExpect(jsonPath("$.length()").value(3));
     }
 }

@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
@@ -40,7 +43,8 @@ public class BasicUserService implements UserService {
         validateDuplicateEmail(request.email());
 
         BinaryContent profile = saveProfile(profileRequest);
-        User user = new User(request.username(), request.email(), request.password(), profile);
+        String encodedPassword = passwordEncoder.encode(request.password());
+        User user = new User(request.username(), request.email(), encodedPassword, profile);
         new UserStatus(user, Instant.now());
 
         userRepository.save(user);
@@ -62,6 +66,7 @@ public class BasicUserService implements UserService {
             .toList();
     }
 
+    @PreAuthorize("principal.userDto.id == #userId")
     @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest request,
@@ -75,7 +80,10 @@ public class BasicUserService implements UserService {
         if (request.newEmail() != null && !request.newEmail().equals(user.getEmail())) {
             validateDuplicateEmail(request.newEmail());
         }
-        user.update(request.newUsername(), request.newEmail(), request.newPassword());
+        String encodedPassword = request.newPassword() == null
+            ? null
+            : passwordEncoder.encode(request.newPassword());
+        user.update(request.newUsername(), request.newEmail(), encodedPassword);
 
         if (profileRequest != null) {
             user.updateProfile(saveProfile(profileRequest));
@@ -85,6 +93,7 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
+    @PreAuthorize("principal.userDto.id == #userId")
     @Transactional
     @Override
     public void delete(UUID userId) {
